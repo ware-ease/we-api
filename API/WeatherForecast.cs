@@ -1,4 +1,4 @@
-namespace we_api
+namespace API
 {
     public class WeatherForecast
     {
