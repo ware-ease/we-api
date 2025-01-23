@@ -11,9 +11,9 @@ namespace Data.Entity
     [Table("PermissionAction")]
     public class PermissionAction : BaseEntity
     {
-        [ForeignKey("Action")]
+        [ForeignKey("AppAction")]
         public string ActionId { get; set; }
-        public Action Action { get; set; }
+        public AppAction Action { get; set; }
 
         [ForeignKey("Permission")]
         public string PermissionId { get; set; }

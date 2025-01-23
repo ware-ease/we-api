@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace Data.Entity
 {
     [Table("Action")]
-    public class Action : BaseEntity
+    public class AppAction : BaseEntity
     {
         [Required]
         public string Code { get; set; }
