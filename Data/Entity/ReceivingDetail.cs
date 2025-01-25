@@ -9,15 +9,17 @@ using Data.Entity.Base;
 
 namespace Data.Entity
 {
-    [Table("NoteDetail")]
-    public class NoteDetail : BaseEntity
+    [Table("ReceiptDetail")]
+    public class ReceivingDetail : BaseEntity
     {
         [Required]
-        public int Quantity { get; set; }
+        public int Quanlity { get; set; }
+        [Required]
+        public float Price { get; set; }
 
         [ForeignKey("ReceivingNote")]
-        public string ReceivingNoteId { get; set; }
-        public ReceivingNote ReceivingNote { get; set; }
+        public string NoteId { get; set; }
+        public ReceivingNote receivingNote { get; set; }
 
         [ForeignKey("ProductType")]
         public string ProductTypeId { get; set; }

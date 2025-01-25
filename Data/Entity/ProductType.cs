@@ -14,7 +14,11 @@ namespace Data.Entity
     {
         [Required]
         public string Name { get; set; }
-        public ICollection<NoteDetail> NoteDetails { get; set; }
+        public ICollection<PurchaseDetail> PurchaseDetails { get; set; }
+        public ICollection<ReceivingDetail> ReceivingDetails { get; set; }
+        public ICollection<SaleDetail> SaleDetails { get; set; }
+        public ICollection<StockCardDetail> StockCardDetails { get; set; }
+        public ICollection<IssueDetail> IssueDetails { get; set; }
 
         [ForeignKey("Product")]
         public string ProductId { get; set; }

@@ -14,6 +14,10 @@ namespace Data.Entity
     {
         [Required]
         public DateTime? Date { get; set; }
+        public ICollection<ReceivingNote> ReceivingNotes { get; set; }
 
+        [ForeignKey("Supplier")]
+        public string SupplierId { get; set; }
+        public Supplier Supplier { get; set; }
     }
 }

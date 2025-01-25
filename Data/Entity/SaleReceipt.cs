@@ -14,5 +14,9 @@ namespace Data.Entity
     {
         [Required]
         public DateTime Date { get; set; }
+
+        [ForeignKey("Customer")]
+        public string CustomerId { get; set; }
+        public Customer Customer { get; set; }
     }
 }

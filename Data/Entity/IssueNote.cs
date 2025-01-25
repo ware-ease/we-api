@@ -18,5 +18,10 @@ namespace Data.Entity
         [ForeignKey("Customer")]
         public string CustomerId { get; set; }
         public Customer Customer { get; set; }
+
+        [ForeignKey("SaleReceipt")]
+        public string SaleReceiptId { get; set; }
+        public SaleReceipt SaleReceipt { get; set; }
+
     }
 }

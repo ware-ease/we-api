@@ -15,22 +15,17 @@ namespace Data.Entity
         [Required]
         public string UserName { get; set; }
         [Required]
-        public string FirstName { get; set; }
-        [Required]
-        public string LastName { get; set; }
-        [Required]
         public string Password { get; set; }
         [Required]
         public string Email { get; set; }
-        [Required]
-        public string Phone { get; set; }
-        [Required]
-        public string Address { get; set; }
-        [Required]
         public ICollection<AccountGroup> AccountGroups { get; set; }
         public ICollection<AccountPermission> AccountPermissions { get; set; }
         public ICollection<Notification> Notifications { get; set; }
         public ICollection<AccountWarehouse> AccountWarehouses { get; set; }
+
+        [ForeignKey("Profile")]
+        public string ProfileId { get; set; }
+        public Profile Profile { get; set; }
 
     }
 }

@@ -19,6 +19,7 @@ namespace Data.Entity
         [Required]
         public bool Status { get; set; }
         public ICollection<ReceivingNote> ReceivingNotes { get; set; }
+        public ICollection<PurchaseReceipt> PurchaseReceipts { get; set; }
 
     }
 }

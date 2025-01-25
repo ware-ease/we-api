@@ -14,10 +14,14 @@ namespace Data.Entity
     {
         [Required]
         public DateTime Date { get; set; }
-        public ICollection<NoteDetail> NoteDetails { get; set; }
+        public ICollection<ReceivingDetail> ReceivingDetails { get; set; }
 
         [ForeignKey("Supplier")]
         public string SupplierId { get; set; }
         public Supplier Supplier { get; set; }
+
+        [ForeignKey("PurchaseReceipt")]
+        public string PurchaseId { get; set; }
+        public PurchaseReceipt PurchaseReceipt { get; set; }
     }
 }

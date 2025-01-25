@@ -37,7 +37,7 @@ namespace DataAccessLayer
         public virtual DbSet<Group> Groups { get; set; }
         public virtual DbSet<GroupPermission> GroupPermissions { get; set; }
         public virtual DbSet<IssueNote> IssueNotes { get; set; }
-        public virtual DbSet<NoteDetail> NoteDetails { get; set; }
+        public virtual DbSet<IssueDetail> NoteDetails { get; set; }
         public virtual DbSet<Notification> Notifications { get; set; }
         public virtual DbSet<Permission> Permissions { get; set; }
         public virtual DbSet<PermissionAction> PermissionActions { get; set; }
@@ -45,7 +45,7 @@ namespace DataAccessLayer
         public virtual DbSet<ProductType> ProductTypes { get; set; }
         public virtual DbSet<ProductTypeTypeDetail> ProductTypeTypeDetails { get; set; }
         public virtual DbSet<PurchaseReceipt> PurchaseReceipts { get; set; }
-        public virtual DbSet<ReceiptDetail> ReceiptDetails { get; set; }
+        public virtual DbSet<ReceivingDetail> ReceiptDetails { get; set; }
         public virtual DbSet<ReceivingNote> ReceivingNotes { get; set; }
         public virtual DbSet<SaleReceipt> SaleReceipts { get; set; }
         public virtual DbSet<Shelf> Shelves { get; set; }
@@ -69,20 +69,86 @@ namespace DataAccessLayer
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // Iterate through all entity types
+            // Set OnDelete behavior to NoAction for all foreign keys
             foreach (var entityType in modelBuilder.Model.GetEntityTypes())
             {
-                // Find all foreign keys in the entity type
-                var foreignKeys = entityType.GetForeignKeys();
-
-                // Set OnDelete behavior to NoAction for each foreign key
-                foreach (var foreignKey in foreignKeys)
+                foreach (var foreignKey in entityType.GetForeignKeys())
                 {
                     foreignKey.DeleteBehavior = DeleteBehavior.NoAction;
                 }
             }
 
-            // Account relationships
+            // AccountGroup composite key
+            modelBuilder.Entity<AccountGroup>()
+                .HasKey(ag => new { ag.AccountId, ag.GroupId });
+
+            modelBuilder.Entity<AccountGroup>()
+                .HasOne(ag => ag.Account)
+                .WithMany(a => a.AccountGroups)
+                .HasForeignKey(ag => ag.AccountId);
+
+            modelBuilder.Entity<AccountGroup>()
+                .HasOne(ag => ag.Group)
+                .WithMany(g => g.AccountGroups)
+                .HasForeignKey(ag => ag.GroupId);
+
+            // GroupPermission composite key
+            modelBuilder.Entity<GroupPermission>()
+                .HasKey(gp => new { gp.GroupId, gp.PermissionId });
+
+            modelBuilder.Entity<GroupPermission>()
+                .HasOne(gp => gp.Group)
+                .WithMany(g => g.GroupPermissions)
+                .HasForeignKey(gp => gp.GroupId);
+
+            modelBuilder.Entity<GroupPermission>()
+                .HasOne(gp => gp.Permission)
+                .WithMany(p => p.GroupPermissions)
+                .HasForeignKey(gp => gp.PermissionId);
+
+            // PermissionAction composite key
+            modelBuilder.Entity<PermissionAction>()
+                .HasKey(pa => new { pa.PermissionId, pa.ActionId });
+
+            modelBuilder.Entity<PermissionAction>()
+                .HasOne(pa => pa.Permission)
+                .WithMany(p => p.PermissionActions)
+                .HasForeignKey(pa => pa.PermissionId);
+
+            modelBuilder.Entity<PermissionAction>()
+                .HasOne(pa => pa.Action)
+                .WithMany(a => a.PermissionActions)
+                .HasForeignKey(pa => pa.ActionId);
+
+            // AccountWarehouse composite key
+            modelBuilder.Entity<AccountWarehouse>()
+                .HasKey(aw => new { aw.AccountId, aw.WarehouseId });
+
+            modelBuilder.Entity<AccountWarehouse>()
+                .HasOne(aw => aw.Account)
+                .WithMany(a => a.AccountWarehouses)
+                .HasForeignKey(aw => aw.AccountId);
+
+            modelBuilder.Entity<AccountWarehouse>()
+                .HasOne(aw => aw.Warehouse)
+                .WithMany(w => w.AccountWarehouses)
+                .HasForeignKey(aw => aw.WarehouseId);
+
+            // StockCardDetail composite key
+            modelBuilder.Entity<StockCardDetail>()
+                .HasKey(scd => new { scd.StockCardId, scd.ProductTypeId });
+
+            modelBuilder.Entity<StockCardDetail>()
+                .HasOne(scd => scd.StockCard)
+                .WithMany(sc => sc.StockCardDetails)
+                .HasForeignKey(scd => scd.StockCardId);
+
+            modelBuilder.Entity<StockCardDetail>()
+                .HasOne(scd => scd.ProductType)
+                .WithMany(pt => pt.StockCardDetails)
+                .HasForeignKey(scd => scd.ProductTypeId);
+
+            // Account configurations
             modelBuilder.Entity<Account>()
                 .HasMany(a => a.AccountGroups)
                 .WithOne(ag => ag.Account)
@@ -98,17 +164,6 @@ namespace DataAccessLayer
                 .IsRequired()
                 .HasMaxLength(100);
 
-            // Permission and PermissionAction relationships
-            modelBuilder.Entity<PermissionAction>()
-                .HasOne(pa => pa.Permission)
-                .WithMany(p => p.PermissionActions)
-                .HasForeignKey(pa => pa.PermissionId);
-
-            modelBuilder.Entity<PermissionAction>()
-                .HasOne(pa => pa.Action)
-                .WithMany(a => a.PermissionActions)
-                .HasForeignKey(pa => pa.ActionId);
-
             // Category configurations
             modelBuilder.Entity<Category>()
                 .Property(c => c.Name)
@@ -120,7 +175,7 @@ namespace DataAccessLayer
                 .Property(c => c.Status)
                 .HasDefaultValue(true);
 
-            // Product relationships
+            // Product configurations
             modelBuilder.Entity<Product>()
                 .HasMany(p => p.ProductTypes)
                 .WithOne(pt => pt.Product)
@@ -136,72 +191,63 @@ namespace DataAccessLayer
                 .WithMany(c => c.Products)
                 .HasForeignKey(p => p.CellId);
 
-            // ProductType relationships
-            modelBuilder.Entity<ProductType>()
-                .HasMany(pt => pt.NoteDetails)
-                .WithOne(nd => nd.ProductType)
-                .HasForeignKey(nd => nd.ProductTypeId);
-
+            // ProductType configuration
             modelBuilder.Entity<ProductType>()
                 .HasOne(pt => pt.Product)
                 .WithMany(p => p.ProductTypes)
-                .HasForeignKey(pt => pt.ProductId);
+                .HasForeignKey(pt => pt.ProductId)
+                .OnDelete(DeleteBehavior.NoAction);
 
-            // Shelf and Floor relationships
+            modelBuilder.Entity<ProductType>()
+                .HasMany(pt => pt.PurchaseDetails)
+                .WithOne(pd => pd.ProductType)
+                .HasForeignKey(pd => pd.ProductTypeId);
+
+            modelBuilder.Entity<ProductType>()
+                .HasMany(pt => pt.ReceivingDetails)
+                .WithOne(rd => rd.ProductType)
+                .HasForeignKey(rd => rd.ProductTypeId);
+
+            modelBuilder.Entity<ProductType>()
+                .HasMany(pt => pt.SaleDetails)
+                .WithOne(sd => sd.ProductType)
+                .HasForeignKey(sd => sd.ProductTypeId);
+
+            modelBuilder.Entity<ProductType>()
+                .HasMany(pt => pt.StockCardDetails)
+                .WithOne(scd => scd.ProductType)
+                .HasForeignKey(scd => scd.ProductTypeId);
+
+            modelBuilder.Entity<ProductType>()
+                .HasMany(pt => pt.IssueDetails)
+                .WithOne(id => id.ProductType)
+                .HasForeignKey(id => id.ProductTypeId);
+
+            // Shelf and Floor configurations
             modelBuilder.Entity<Shelf>()
                 .HasMany(s => s.Floors)
                 .WithOne(f => f.Shelf)
                 .HasForeignKey(f => f.ShelfId);
 
-            // Warehouse and Shelf relationships
+            // Warehouse and Shelf configurations
             modelBuilder.Entity<Warehouse>()
                 .HasMany(w => w.Shelves)
                 .WithOne(s => s.Warehouse)
                 .HasForeignKey(s => s.WarehouseId);
 
-            // ReceivingNote relationships
+            // ReceivingNote configurations
             modelBuilder.Entity<ReceivingNote>()
-                .HasMany(rn => rn.NoteDetails)
-                .WithOne(nd => nd.ReceivingNote)
-                .HasForeignKey(nd => nd.ReceivingNoteId);
+                .HasMany(rn => rn.ReceivingDetails)
+                .WithOne(nd => nd.receivingNote)
+                .HasForeignKey(nd => nd.NoteId);
 
-            // Supplier relationships
+            // Supplier configurations
             modelBuilder.Entity<Supplier>()
                 .HasMany(s => s.ReceivingNotes)
                 .WithOne(rn => rn.Supplier)
                 .HasForeignKey(rn => rn.SupplierId);
 
-            // StockCard and StockCardDetail relationships
-            modelBuilder.Entity<StockCard>()
-                .HasMany(sc => sc.StockCardDetails)
-                .WithOne(scd => scd.StockCard)
-                .HasForeignKey(scd => scd.StockCardId);
-
-            // Group relationships
-            modelBuilder.Entity<Group>()
-                .HasMany(g => g.GroupPermissions)
-                .WithOne(gp => gp.Group)
-                .HasForeignKey(gp => gp.GroupId);
-
-            modelBuilder.Entity<Group>()
-                .HasMany(g => g.AccountGroups)
-                .WithOne(ag => ag.Group)
-                .HasForeignKey(ag => ag.GroupId);
-
-            // Other configurations
-            modelBuilder.Entity<Permission>()
-                .HasMany(p => p.GroupPermissions)
-                .WithOne(gp => gp.Permission)
-                .HasForeignKey(gp => gp.PermissionId);
-
-            modelBuilder.Entity<ReceivingNote>()
-                .Property(rn => rn.Date)
-                .IsRequired();
-
-            modelBuilder.Entity<IssueNote>()
-                .Property(isn => isn.Date)
-                .IsRequired();
-
+            // TypeDetail configurations
             modelBuilder.Entity<TypeDetail>()
                 .Property(td => td.Name)
                 .IsRequired()
@@ -214,7 +260,6 @@ namespace DataAccessLayer
 
             base.OnModelCreating(modelBuilder);
         }
-
 
     }
 }
