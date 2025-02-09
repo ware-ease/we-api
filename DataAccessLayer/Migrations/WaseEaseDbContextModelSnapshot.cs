@@ -27,6 +27,10 @@ namespace DataAccessLayer.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
 
@@ -44,8 +48,16 @@ namespace DataAccessLayer.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("LastUpdatedBy")
                         .HasColumnType("nvarchar(max)");
@@ -53,13 +65,20 @@ namespace DataAccessLayer.Migrations
                     b.Property<DateTime?>("LastUpdatedTime")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("Nationality")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Password")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ProfileId")
+                    b.Property<string>("Phone")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("Sex")
+                        .HasColumnType("bit");
 
                     b.Property<string>("UserName")
                         .IsRequired()
@@ -68,17 +87,16 @@ namespace DataAccessLayer.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ProfileId");
-
                     b.ToTable("Account");
                 });
 
             modelBuilder.Entity("Data.Entity.AccountGroup", b =>
                 {
-                    b.Property<string>("AccountId")
+                    b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("GroupId")
+                    b.Property<string>("AccountId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("CreatedBy")
@@ -94,8 +112,9 @@ namespace DataAccessLayer.Migrations
                     b.Property<DateTime?>("DeletedTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("GroupId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -106,9 +125,12 @@ namespace DataAccessLayer.Migrations
                     b.Property<DateTime?>("LastUpdatedTime")
                         .HasColumnType("datetime2");
 
-                    b.HasKey("AccountId", "GroupId");
+                    b.HasKey("Id");
 
                     b.HasIndex("GroupId");
+
+                    b.HasIndex("AccountId", "GroupId")
+                        .IsUnique();
 
                     b.ToTable("AccountGroup");
                 });
@@ -159,10 +181,11 @@ namespace DataAccessLayer.Migrations
 
             modelBuilder.Entity("Data.Entity.AccountWarehouse", b =>
                 {
-                    b.Property<string>("AccountId")
+                    b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("WarehouseId")
+                    b.Property<string>("AccountId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("CreatedBy")
@@ -178,14 +201,10 @@ namespace DataAccessLayer.Migrations
                     b.Property<DateTime?>("DeletedTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
                     b.Property<DateTime?>("JoinedDate")
-                        .IsRequired()
                         .HasColumnType("datetime2");
 
                     b.Property<string>("LastUpdatedBy")
@@ -195,15 +214,21 @@ namespace DataAccessLayer.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("LeftDate")
-                        .IsRequired()
                         .HasColumnType("datetime2");
 
                     b.Property<bool>("Status")
                         .HasColumnType("bit");
 
-                    b.HasKey("AccountId", "WarehouseId");
+                    b.Property<string>("WarehouseId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
 
                     b.HasIndex("WarehouseId");
+
+                    b.HasIndex("AccountId", "WarehouseId")
+                        .IsUnique();
 
                     b.ToTable("AccountWarehouse");
                 });
@@ -277,7 +302,6 @@ namespace DataAccessLayer.Migrations
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("Note")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -459,10 +483,7 @@ namespace DataAccessLayer.Migrations
 
             modelBuilder.Entity("Data.Entity.GroupPermission", b =>
                 {
-                    b.Property<string>("GroupId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("PermissionId")
+                    b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("CreatedBy")
@@ -478,8 +499,9 @@ namespace DataAccessLayer.Migrations
                     b.Property<DateTime?>("DeletedTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("GroupId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -490,9 +512,16 @@ namespace DataAccessLayer.Migrations
                     b.Property<DateTime?>("LastUpdatedTime")
                         .HasColumnType("datetime2");
 
-                    b.HasKey("GroupId", "PermissionId");
+                    b.Property<string>("PermissionId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
 
                     b.HasIndex("PermissionId");
+
+                    b.HasIndex("GroupId", "PermissionId")
+                        .IsUnique();
 
                     b.ToTable("GroupPermission");
                 });
@@ -604,7 +633,6 @@ namespace DataAccessLayer.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Content")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("CreatedBy")
@@ -681,10 +709,11 @@ namespace DataAccessLayer.Migrations
 
             modelBuilder.Entity("Data.Entity.PermissionAction", b =>
                 {
-                    b.Property<string>("PermissionId")
+                    b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ActionId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("CreatedBy")
@@ -700,9 +729,6 @@ namespace DataAccessLayer.Migrations
                     b.Property<DateTime?>("DeletedTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
@@ -712,24 +738,33 @@ namespace DataAccessLayer.Migrations
                     b.Property<DateTime?>("LastUpdatedTime")
                         .HasColumnType("datetime2");
 
-                    b.HasKey("PermissionId", "ActionId");
+                    b.Property<string>("PermissionId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
 
                     b.HasIndex("ActionId");
+
+                    b.HasIndex("PermissionId", "ActionId")
+                        .IsUnique();
 
                     b.ToTable("PermissionAction");
                 });
 
             modelBuilder.Entity("Data.Entity.Product", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("CategoryId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("CellId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("CreatedBy")
@@ -798,9 +833,8 @@ namespace DataAccessLayer.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ProductId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int?>("ProductId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -837,7 +871,6 @@ namespace DataAccessLayer.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("ProductTypeId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("TypeDetailId")
@@ -851,67 +884,6 @@ namespace DataAccessLayer.Migrations
                     b.HasIndex("TypeDetailId");
 
                     b.ToTable("ProductTypeTypeDetails");
-                });
-
-            modelBuilder.Entity("Data.Entity.Profile", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("AccountId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("Address")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("CreatedTime")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("DeletedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("DeletedTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("FirstName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("LastName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("LastUpdatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("LastUpdatedTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Nationality")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Phone")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("Sex")
-                        .HasColumnType("bit");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AccountId");
-
-                    b.ToTable("Profile");
                 });
 
             modelBuilder.Entity("Data.Entity.PurchaseDetail", b =>
@@ -977,7 +949,6 @@ namespace DataAccessLayer.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("Date")
-                        .IsRequired()
                         .HasColumnType("datetime2");
 
                     b.Property<string>("DeletedBy")
@@ -1091,7 +1062,6 @@ namespace DataAccessLayer.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("SupplierId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
@@ -1289,10 +1259,7 @@ namespace DataAccessLayer.Migrations
 
             modelBuilder.Entity("Data.Entity.StockCardDetail", b =>
                 {
-                    b.Property<string>("StockCardId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("ProductTypeId")
+                    b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("CreatedBy")
@@ -1311,11 +1278,7 @@ namespace DataAccessLayer.Migrations
                     b.Property<DateTime?>("DeletedTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("In")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsDeleted")
@@ -1328,16 +1291,26 @@ namespace DataAccessLayer.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Out")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ProductTypeId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Stock")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("StockCardId", "ProductTypeId");
+                    b.Property<string>("StockCardId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
 
                     b.HasIndex("ProductTypeId");
+
+                    b.HasIndex("StockCardId", "ProductTypeId")
+                        .IsUnique();
 
                     b.ToTable("StockCardDetail");
                 });
@@ -1468,7 +1441,7 @@ namespace DataAccessLayer.Migrations
                     b.Property<string>("ParentId")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("ShelfCount")
+                    b.Property<int?>("ShelfCount")
                         .HasColumnType("int");
 
                     b.Property<float>("Width")
@@ -1477,17 +1450,6 @@ namespace DataAccessLayer.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Warehouse");
-                });
-
-            modelBuilder.Entity("Data.Entity.Account", b =>
-                {
-                    b.HasOne("Data.Entity.Profile", "Profile")
-                        .WithMany()
-                        .HasForeignKey("ProfileId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("Profile");
                 });
 
             modelBuilder.Entity("Data.Entity.AccountGroup", b =>
@@ -1667,8 +1629,7 @@ namespace DataAccessLayer.Migrations
                     b.HasOne("Data.Entity.Cell", "Cell")
                         .WithMany("Products")
                         .HasForeignKey("CellId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.Navigation("Category");
 
@@ -1680,8 +1641,7 @@ namespace DataAccessLayer.Migrations
                     b.HasOne("Data.Entity.Product", "Product")
                         .WithMany("ProductTypes")
                         .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.Navigation("Product");
                 });
@@ -1691,8 +1651,7 @@ namespace DataAccessLayer.Migrations
                     b.HasOne("Data.Entity.ProductType", "ProductType")
                         .WithMany()
                         .HasForeignKey("ProductTypeId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("Data.Entity.TypeDetail", "TypeDetail")
                         .WithMany()
@@ -1703,17 +1662,6 @@ namespace DataAccessLayer.Migrations
                     b.Navigation("ProductType");
 
                     b.Navigation("TypeDetail");
-                });
-
-            modelBuilder.Entity("Data.Entity.Profile", b =>
-                {
-                    b.HasOne("Data.Entity.Account", "Account")
-                        .WithMany()
-                        .HasForeignKey("AccountId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("Account");
                 });
 
             modelBuilder.Entity("Data.Entity.PurchaseDetail", b =>
@@ -1776,8 +1724,7 @@ namespace DataAccessLayer.Migrations
                     b.HasOne("Data.Entity.Supplier", "Supplier")
                         .WithMany("ReceivingNotes")
                         .HasForeignKey("SupplierId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.Navigation("PurchaseReceipt");
 

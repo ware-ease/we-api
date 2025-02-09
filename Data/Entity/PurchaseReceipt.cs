@@ -12,7 +12,6 @@ namespace Data.Entity
     [Table("PurchaseReceipt")]
     public class PurchaseReceipt : BaseEntity
     {
-        [Required]
         public DateTime? Date { get; set; }
         public ICollection<ReceivingNote> ReceivingNotes { get; set; }
 

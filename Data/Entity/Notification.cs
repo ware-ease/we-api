@@ -12,13 +12,9 @@ namespace Data.Entity
     [Table("Notification")]
     public class Notification : BaseEntity
     {
-        [Required]
         public string Title { get; set; }
-        [Required]
-        public string Content { get; set; }
-        [Required]
+        public string? Content { get; set; }
         public bool Status { get; set; }
-        [Required]
 
         [ForeignKey("Account")]
         public string AccountId { get; set; }

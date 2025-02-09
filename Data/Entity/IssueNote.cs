@@ -12,7 +12,6 @@ namespace Data.Entity
     [Table("IssueNote")]
     public class IssueNote : BaseEntity
     {
-        [Required]
         public DateTime Date { get; set; }
 
         [ForeignKey("Customer")]

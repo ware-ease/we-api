@@ -10,7 +10,7 @@ using Data.Entity.Base;
 namespace Data.Entity
 {
     [Table("Product")]
-    public class Product : BaseEntity
+    public class Product : IntBaseEntity
     {
         [Required]
         public string Name { get; set; }
@@ -21,7 +21,7 @@ namespace Data.Entity
         public Category Category { get; set; }
 
         [ForeignKey("Cell")]
-        public string CellId { get; set; }
+        public string? CellId { get; set; }
         public Cell Cell { get; set; }
     }
 }

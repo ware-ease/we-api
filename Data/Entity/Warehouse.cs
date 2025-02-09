@@ -12,16 +12,11 @@ namespace Data.Entity
     [Table("Warehouse")]
     public class Warehouse : BaseEntity
     {
-        [Required]
         public string Name { get; set; }
-        [Required]
         public string Address { get; set; }
-        [Required]
         public float Length { get; set; }
-        [Required]
         public float Width { get; set; }
-        [Required]
-        public int ShelfCount { get; set; }
+        public int? ShelfCount { get; set; }
         public string? ParentId { get; set; }
 
         public ICollection<AccountWarehouse> AccountWarehouses { get; set; }

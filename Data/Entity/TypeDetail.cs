@@ -12,9 +12,7 @@ namespace Data.Entity
     [Table("TypeDetail")]
     public class TypeDetail : BaseEntity
     {
-        [Required]
         public string Name { get; set; }
-        [Required]
-        public string Description { get; set; }
+        public string? Description { get; set; }
     }
 }

@@ -20,7 +20,7 @@ namespace Data.Entity.Base
 
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [DefaultValue("GETDATE()")]
-        public DateTime? CreatedTime { get; set; } = DateTime.Now;
+        public DateTime? CreatedTime { get; set; }
         public DateTime? LastUpdatedTime { get; set; }
         public DateTime? DeletedTime { get; set; }
     }

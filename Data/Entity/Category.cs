@@ -12,10 +12,8 @@ namespace Data.Entity
     [Table("Category")]
     public class Category : BaseEntity
     {
-        [Required]
         public string Name { get; set; }
-        [Required]
-        public string Note { get; set; }
+        public string? Note { get; set; }
         public ICollection<Product> Products { get; set; }
 
     }

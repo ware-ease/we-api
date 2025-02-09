@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using BusinessLogicLayer.IService;
 using BusinessLogicLayer.Mappings;
+using BusinessLogicLayer.Service;
 using BusinessLogicLayer.Services;
 using DataAccessLayer;
 using DataAccessLayer.IRepositories;
@@ -61,9 +62,17 @@ builder.Services.AddSingleton(mapper.CreateMapper());
 // Register repositories
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<ISupplierRepository, SupplierRepository>();
+builder.Services.AddScoped<IPurchaseReceiptRepository, PurchaseReceiptRepository>();
 
 // Register servicies
 builder.Services.AddScoped<IAccountService, AccountService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<ISupplierService, SupplierService>();
+builder.Services.AddScoped<IPurchaseReceiptService, PurchaseReceiptService>();
+
+builder.Services.AddScoped<IGenericPaginationService, GenericPaginationService>();
 
 ////Config Jwt Token
 //builder.Services.AddAuthentication(options =>
