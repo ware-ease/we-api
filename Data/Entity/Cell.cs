@@ -12,13 +12,9 @@ namespace Data.Entity
     [Table("Cell")]
     public class Cell : BaseEntity
     {
-        [Required]
         public int Number { get; set; }
-        [Required]
         public float Length { get; set; }
-        [Required]
         public float Height { get; set; }
-        [Required]
         public float MaxLoad { get; set; }
         public ICollection<StockCard> StockCards { get; set; }
         public ICollection<Product> Products { get; set; }

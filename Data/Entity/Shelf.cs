@@ -12,9 +12,7 @@ namespace Data.Entity
     [Table("Shelf")]
     public class Shelf : BaseEntity
     {
-        [Required]
         public int Number { get; set; }
-        [Required]
         public int FloorNumber { get; set; }
         public ICollection<Floor> Floors { get; set; }
 

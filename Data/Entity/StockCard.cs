@@ -12,11 +12,8 @@ namespace Data.Entity
     [Table("StockCard")]
     public class StockCard : BaseEntity
     {
-        [Required]
         public string Name { get; set; }
-        [Required]
         public string Unit { get; set; }
-        [Required]
         public DateTime Date { get; set; }
         public ICollection<StockCardDetail> StockCardDetails { get; set; }
 

@@ -12,7 +12,6 @@ namespace Data.Entity
     [Table("Floor")]
     public class Floor : BaseEntity
     {
-        [Required]
         public int Number { get; set; }
 
         [ForeignKey("Shelf")]

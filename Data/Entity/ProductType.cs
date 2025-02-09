@@ -12,7 +12,6 @@ namespace Data.Entity
     [Table("ProductType")]
     public class ProductType : BaseEntity
     {
-        [Required]
         public string Name { get; set; }
         public ICollection<PurchaseDetail> PurchaseDetails { get; set; }
         public ICollection<ReceivingDetail> ReceivingDetails { get; set; }
@@ -21,7 +20,7 @@ namespace Data.Entity
         public ICollection<IssueDetail> IssueDetails { get; set; }
 
         [ForeignKey("Product")]
-        public string ProductId { get; set; }
+        public int? ProductId { get; set; }
         public Product Product { get; set; }
     }
 }

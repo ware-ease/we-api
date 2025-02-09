@@ -12,7 +12,6 @@ namespace Data.Entity
     [Table("Group")]
     public class Group : BaseEntity
     {
-        [Required]
         public string Name { get; set; }
 
         public ICollection<GroupPermission> GroupPermissions { get; set; }

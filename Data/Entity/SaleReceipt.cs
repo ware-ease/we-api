@@ -12,7 +12,6 @@ namespace Data.Entity
     [Table("SaleReceipt")]
     public class SaleReceipt : BaseEntity
     {
-        [Required]
         public DateTime Date { get; set; }
 
         [ForeignKey("Customer")]

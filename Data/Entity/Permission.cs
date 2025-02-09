@@ -12,7 +12,6 @@ namespace Data.Entity
     [Table("Permission")]
     public class Permission : BaseEntity
     {
-        [Required]
         public string Url { get; set; }
 
         public ICollection<GroupPermission> GroupPermissions { get; set; }

@@ -12,20 +12,22 @@ namespace Data.Entity
     [Table("Account")]
     public class Account : BaseEntity
     {
-        [Required]
+
         public string UserName { get; set; }
-        [Required]
         public string Password { get; set; }
-        [Required]
         public string Email { get; set; }
+
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public string Phone { get; set; }
+        public string Address { get; set; }
+        public bool Sex { get; set; }
+        public string Nationality { get; set; }
+
         public ICollection<AccountGroup> AccountGroups { get; set; }
         public ICollection<AccountPermission> AccountPermissions { get; set; }
         public ICollection<Notification> Notifications { get; set; }
         public ICollection<AccountWarehouse> AccountWarehouses { get; set; }
-
-        [ForeignKey("Profile")]
-        public string ProfileId { get; set; }
-        public Profile Profile { get; set; }
 
     }
 }

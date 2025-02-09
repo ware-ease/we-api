@@ -12,13 +12,9 @@ namespace Data.Entity
     [Table("StockCardDetail")]
     public class StockCardDetail : BaseEntity
     {
-        [Required]
-        public string In {  get; set; }
-        [Required]
-        public string Out { get; set; }
-        [Required]
+        public string? In {  get; set; }
+        public string? Out { get; set; }
         public string Stock {  get; set; }
-        [Required]
         public DateTime Date { get; set; }
 
         [ForeignKey("StockCard")]
