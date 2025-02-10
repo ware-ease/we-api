@@ -1,15 +1,18 @@
 ﻿using System;
-using System.IO;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using Data.Entity;
 using Data.Entity.Base;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace DataAccessLayer
 {
     public interface IApplicationDbContext
     {
-        // Bạn có thể khai báo các phương thức cần thiết cho context tại đây
+
     }
 
     public class WaseEaseDbContext : DbContext, IApplicationDbContext
@@ -18,18 +21,15 @@ namespace DataAccessLayer
         {
         }
 
-        public WaseEaseDbContext(DbContextOptions<WaseEaseDbContext> options)
-            : base(options)
+        public WaseEaseDbContext(DbContextOptions<WaseEaseDbContext> options) : base(options)
         {
         }
-
-        #region DbSet Properties
 
         public virtual DbSet<Account> Accounts { get; set; }
         public virtual DbSet<AccountGroup> AccountGroups { get; set; }
         public virtual DbSet<AccountPermission> AccountPermissions { get; set; }
         public virtual DbSet<AccountWarehouse> AccountWarehouses { get; set; }
-        public virtual DbSet<AppAction> AppActions { get; set; }
+        public virtual DbSet<AppAction> Actions { get; set; }
         public virtual DbSet<Category> Categories { get; set; }
         public virtual DbSet<Cell> Cells { get; set; }
         public virtual DbSet<Customer> Customers { get; set; }
@@ -37,7 +37,7 @@ namespace DataAccessLayer
         public virtual DbSet<Group> Groups { get; set; }
         public virtual DbSet<GroupPermission> GroupPermissions { get; set; }
         public virtual DbSet<IssueNote> IssueNotes { get; set; }
-        public virtual DbSet<IssueDetail> IssueDetails { get; set; }
+        public virtual DbSet<IssueDetail> NoteDetails { get; set; }
         public virtual DbSet<Notification> Notifications { get; set; }
         public virtual DbSet<Permission> Permissions { get; set; }
         public virtual DbSet<PermissionAction> PermissionActions { get; set; }
@@ -45,7 +45,7 @@ namespace DataAccessLayer
         public virtual DbSet<ProductType> ProductTypes { get; set; }
         public virtual DbSet<ProductTypeTypeDetail> ProductTypeTypeDetails { get; set; }
         public virtual DbSet<PurchaseReceipt> PurchaseReceipts { get; set; }
-        public virtual DbSet<ReceivingDetail> ReceivingDetails { get; set; }
+        public virtual DbSet<ReceivingDetail> ReceiptDetails { get; set; }
         public virtual DbSet<ReceivingNote> ReceivingNotes { get; set; }
         public virtual DbSet<SaleReceipt> SaleReceipts { get; set; }
         public virtual DbSet<Shelf> Shelves { get; set; }
@@ -55,25 +55,21 @@ namespace DataAccessLayer
         public virtual DbSet<TypeDetail> TypeDetails { get; set; }
         public virtual DbSet<Warehouse> Warehouses { get; set; }
 
-        #endregion
-
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            // Nếu chưa cấu hình từ bên ngoài (DI) thì sử dụng cấu hình trong appsettings.json
             if (!optionsBuilder.IsConfigured)
             {
                 var config = new ConfigurationBuilder()
                     .SetBasePath(Directory.GetCurrentDirectory())
-                    .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                    .AddJsonFile("appsettings.json", true, true)
                     .Build();
 
                 optionsBuilder.UseSqlServer(config.GetConnectionString("Default"));
             }
         }
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // 1. Thiết lập hành vi xóa cho tất cả các FK (theo phiên bản cũ là NoAction)
+            // Set OnDelete behavior to NoAction for all foreign keys
             foreach (var entityType in modelBuilder.Model.GetEntityTypes())
             {
                 foreach (var foreignKey in entityType.GetForeignKeys())
@@ -82,68 +78,16 @@ namespace DataAccessLayer
                 }
             }
 
-            // 2. Các entity join trong phiên bản cũ sử dụng composite key.
-            //    Tuy nhiên, trong các entity mới, do kế thừa từ BaseEntity (có thuộc tính Id) nên đã có khóa chính riêng.
-            //    Nếu bạn vẫn muốn đảm bảo không có dữ liệu trùng lặp, hãy thiết lập index duy nhất cho tổ hợp các FK.
+            modelBuilder.Entity<Profile>()
+                .HasOne(p => p.Account)
+                .WithOne(a => a.Profile)
+                .HasForeignKey<Profile>(p => p.AccountId)
+                .OnDelete(DeleteBehavior.NoAction);
 
+            // AccountGroup composite key
             modelBuilder.Entity<AccountGroup>()
-                .HasIndex(ag => new { ag.AccountId, ag.GroupId })
-                .IsUnique();
+                .HasKey(ag => new { ag.AccountId, ag.GroupId });
 
-            modelBuilder.Entity<GroupPermission>()
-                .HasIndex(gp => new { gp.GroupId, gp.PermissionId })
-                .IsUnique();
-
-            modelBuilder.Entity<PermissionAction>()
-                .HasIndex(pa => new { pa.PermissionId, pa.ActionId })
-                .IsUnique();
-
-            modelBuilder.Entity<AccountWarehouse>()
-                .HasIndex(aw => new { aw.AccountId, aw.WarehouseId })
-                .IsUnique();
-
-            modelBuilder.Entity<StockCardDetail>()
-                .HasIndex(scd => new { scd.StockCardId, scd.ProductTypeId })
-                .IsUnique();
-
-            // 3. Cấu hình thuộc tính cho một số entity (các cấu hình này được áp dụng trong phiên bản cũ)
-            modelBuilder.Entity<Account>()
-                .Property(a => a.UserName)
-                .IsRequired()
-                .HasMaxLength(100);
-
-            modelBuilder.Entity<Category>()
-                .Property(c => c.Name)
-                .IsRequired()
-                .HasMaxLength(100);
-
-            modelBuilder.Entity<Customer>()
-                .Property(c => c.Status)
-                .HasDefaultValue(true);
-
-            modelBuilder.Entity<TypeDetail>()
-                .Property(td => td.Name)
-                .IsRequired()
-                .HasMaxLength(200);
-
-            modelBuilder.Entity<TypeDetail>()
-                .Property(td => td.Description)
-                .IsRequired()
-                .HasMaxLength(500);
-
-            // 4. Cấu hình quan hệ (chú ý: một số cấu hình đã được định nghĩa qua DataAnnotations nên có thể không cần thiết lặp lại)
-            // --- Account & các quan hệ ---
-            modelBuilder.Entity<Account>()
-                .HasMany(a => a.AccountGroups)
-                .WithOne(ag => ag.Account)
-                .HasForeignKey(ag => ag.AccountId);
-
-            modelBuilder.Entity<Account>()
-                .HasMany(a => a.Notifications)
-                .WithOne(n => n.Account)
-                .HasForeignKey(n => n.AccountId);
-
-            // --- Quan hệ của AccountGroup ---
             modelBuilder.Entity<AccountGroup>()
                 .HasOne(ag => ag.Account)
                 .WithMany(a => a.AccountGroups)
@@ -154,7 +98,10 @@ namespace DataAccessLayer
                 .WithMany(g => g.AccountGroups)
                 .HasForeignKey(ag => ag.GroupId);
 
-            // --- Quan hệ của GroupPermission ---
+            // GroupPermission composite key
+            modelBuilder.Entity<GroupPermission>()
+                .HasKey(gp => new { gp.GroupId, gp.PermissionId });
+
             modelBuilder.Entity<GroupPermission>()
                 .HasOne(gp => gp.Group)
                 .WithMany(g => g.GroupPermissions)
@@ -165,7 +112,10 @@ namespace DataAccessLayer
                 .WithMany(p => p.GroupPermissions)
                 .HasForeignKey(gp => gp.PermissionId);
 
-            // --- Quan hệ của PermissionAction ---
+            // PermissionAction composite key
+            modelBuilder.Entity<PermissionAction>()
+                .HasKey(pa => new { pa.PermissionId, pa.ActionId });
+
             modelBuilder.Entity<PermissionAction>()
                 .HasOne(pa => pa.Permission)
                 .WithMany(p => p.PermissionActions)
@@ -176,7 +126,10 @@ namespace DataAccessLayer
                 .WithMany(a => a.PermissionActions)
                 .HasForeignKey(pa => pa.ActionId);
 
-            // --- Quan hệ của AccountWarehouse ---
+            // AccountWarehouse composite key
+            modelBuilder.Entity<AccountWarehouse>()
+                .HasKey(aw => new { aw.AccountId, aw.WarehouseId });
+
             modelBuilder.Entity<AccountWarehouse>()
                 .HasOne(aw => aw.Account)
                 .WithMany(a => a.AccountWarehouses)
@@ -187,7 +140,10 @@ namespace DataAccessLayer
                 .WithMany(w => w.AccountWarehouses)
                 .HasForeignKey(aw => aw.WarehouseId);
 
-            // --- Quan hệ của StockCardDetail ---
+            // StockCardDetail composite key
+            modelBuilder.Entity<StockCardDetail>()
+                .HasKey(scd => new { scd.StockCardId, scd.ProductTypeId });
+
             modelBuilder.Entity<StockCardDetail>()
                 .HasOne(scd => scd.StockCard)
                 .WithMany(sc => sc.StockCardDetails)
@@ -198,7 +154,34 @@ namespace DataAccessLayer
                 .WithMany(pt => pt.StockCardDetails)
                 .HasForeignKey(scd => scd.ProductTypeId);
 
-            // --- Cấu hình cho Product & ProductType ---
+            // Account configurations
+            modelBuilder.Entity<Account>()
+                .HasMany(a => a.AccountGroups)
+                .WithOne(ag => ag.Account)
+                .HasForeignKey(ag => ag.AccountId);
+
+            modelBuilder.Entity<Account>()
+                .HasMany(a => a.Notifications)
+                .WithOne(n => n.Account)
+                .HasForeignKey(n => n.AccountId);
+
+            modelBuilder.Entity<Account>()
+                .Property(a => a.UserName)
+                .IsRequired()
+                .HasMaxLength(100);
+
+            // Category configurations
+            modelBuilder.Entity<Category>()
+                .Property(c => c.Name)
+                .IsRequired()
+                .HasMaxLength(100);
+
+            // Customer configurations
+            modelBuilder.Entity<Customer>()
+                .Property(c => c.Status)
+                .HasDefaultValue(true);
+
+            // Product configurations
             modelBuilder.Entity<Product>()
                 .HasMany(p => p.ProductTypes)
                 .WithOne(pt => pt.Product)
@@ -214,6 +197,7 @@ namespace DataAccessLayer
                 .WithMany(c => c.Products)
                 .HasForeignKey(p => p.CellId);
 
+            // ProductType configuration
             modelBuilder.Entity<ProductType>()
                 .HasOne(pt => pt.Product)
                 .WithMany(p => p.ProductTypes)
@@ -245,31 +229,43 @@ namespace DataAccessLayer
                 .WithOne(id => id.ProductType)
                 .HasForeignKey(id => id.ProductTypeId);
 
-            // --- Cấu hình cho Shelf & Floor ---
+            // Shelf and Floor configurations
             modelBuilder.Entity<Shelf>()
                 .HasMany(s => s.Floors)
                 .WithOne(f => f.Shelf)
                 .HasForeignKey(f => f.ShelfId);
 
-            // --- Cấu hình cho Warehouse & Shelf ---
+            // Warehouse and Shelf configurations
             modelBuilder.Entity<Warehouse>()
                 .HasMany(w => w.Shelves)
                 .WithOne(s => s.Warehouse)
                 .HasForeignKey(s => s.WarehouseId);
 
-            // --- Cấu hình ReceivingNote ---
+            // ReceivingNote configurations
             modelBuilder.Entity<ReceivingNote>()
                 .HasMany(rn => rn.ReceivingDetails)
-                .WithOne(rd => rd.receivingNote)
-                .HasForeignKey(rd => rd.NoteId);
+                .WithOne(nd => nd.receivingNote)
+                .HasForeignKey(nd => nd.NoteId);
 
-            // --- Cấu hình cho Supplier ---
+            // Supplier configurations
             modelBuilder.Entity<Supplier>()
                 .HasMany(s => s.ReceivingNotes)
                 .WithOne(rn => rn.Supplier)
                 .HasForeignKey(rn => rn.SupplierId);
 
+            // TypeDetail configurations
+            modelBuilder.Entity<TypeDetail>()
+                .Property(td => td.Name)
+                .IsRequired()
+                .HasMaxLength(200);
+
+            modelBuilder.Entity<TypeDetail>()
+                .Property(td => td.Description)
+                .IsRequired()
+                .HasMaxLength(500);
+
             base.OnModelCreating(modelBuilder);
         }
+
     }
 }
