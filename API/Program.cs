@@ -1,6 +1,8 @@
-﻿using AutoMapper;
+﻿using API.Payloads.Responses;
+using AutoMapper;
 using BusinessLogicLayer.IService;
 using BusinessLogicLayer.Mappings;
+using BusinessLogicLayer.Service;
 using BusinessLogicLayer.Services;
 using DataAccessLayer;
 using DataAccessLayer.IRepositories;
@@ -23,7 +25,12 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddDbContext<WaseEaseDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
 
-
+//Add kebab repsone
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.PropertyNamingPolicy = new KebabCaseNamingPolicy();
+    options.JsonSerializerOptions.DictionaryKeyPolicy = new KebabCaseNamingPolicy();
+});
 builder.Services.AddSwaggerGen(option =>
 {
     option.SwaggerDoc("v1", new OpenApiInfo { Title = "WareEase API", Version = "v1" });
@@ -61,9 +68,10 @@ builder.Services.AddSingleton(mapper.CreateMapper());
 // Register repositories
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
+builder.Services.AddScoped<IGroupRepository, GroupRepository>();
 
 // Register servicies
-builder.Services.AddScoped<IAccountService, AccountService>();
+builder.Services.AddScoped<IGroupService, GroupService>();
 
 ////Config Jwt Token
 //builder.Services.AddAuthentication(options =>

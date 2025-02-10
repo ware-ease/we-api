@@ -5,12 +5,12 @@ using Microsoft.Extensions.Configuration;
 
 namespace DataAccessLayer.Repositories
 {
-    public class AccountRepository  : IAccountRepository
+    public class AccountRepository  : GenericRepository<Account>, IAccountRepository
     {
         private readonly WaseEaseDbContext _context;
         private readonly IConfiguration _configuration;
 
-        public AccountRepository(WaseEaseDbContext context, IConfiguration configuration)
+        public AccountRepository(WaseEaseDbContext context, IConfiguration configuration) : base(context)
         {
             _context = context;
             _configuration = configuration;
