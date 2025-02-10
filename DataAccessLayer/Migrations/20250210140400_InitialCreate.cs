@@ -19,12 +19,6 @@ namespace DataAccessLayer.Migrations
                     UserName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    FirstName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    LastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Phone = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Address = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Sex = table.Column<bool>(type: "bit", nullable: false),
-                    Nationality = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     LastUpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -229,6 +223,36 @@ namespace DataAccessLayer.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Profile",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    FirstName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    LastName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Phone = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Address = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Sex = table.Column<bool>(type: "bit", nullable: false),
+                    Nationality = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    AccountId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    LastUpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DeletedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedTime = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    LastUpdatedTime = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DeletedTime = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Profile", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Profile_Account_AccountId",
+                        column: x => x.AccountId,
+                        principalTable: "Account",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "SaleReceipt",
                 columns: table => new
                 {
@@ -257,9 +281,9 @@ namespace DataAccessLayer.Migrations
                 name: "AccountGroup",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     AccountId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     GroupId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Id = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     LastUpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -270,7 +294,7 @@ namespace DataAccessLayer.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_AccountGroup", x => x.Id);
+                    table.PrimaryKey("PK_AccountGroup", x => new { x.AccountId, x.GroupId });
                     table.ForeignKey(
                         name: "FK_AccountGroup_Account_AccountId",
                         column: x => x.AccountId,
@@ -317,9 +341,9 @@ namespace DataAccessLayer.Migrations
                 name: "GroupPermission",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     GroupId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     PermissionId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Id = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     LastUpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -330,7 +354,7 @@ namespace DataAccessLayer.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_GroupPermission", x => x.Id);
+                    table.PrimaryKey("PK_GroupPermission", x => new { x.GroupId, x.PermissionId });
                     table.ForeignKey(
                         name: "FK_GroupPermission_Group_GroupId",
                         column: x => x.GroupId,
@@ -347,9 +371,9 @@ namespace DataAccessLayer.Migrations
                 name: "PermissionAction",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     ActionId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     PermissionId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Id = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     LastUpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -360,7 +384,7 @@ namespace DataAccessLayer.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_PermissionAction", x => x.Id);
+                    table.PrimaryKey("PK_PermissionAction", x => new { x.PermissionId, x.ActionId });
                     table.ForeignKey(
                         name: "FK_PermissionAction_Action_ActionId",
                         column: x => x.ActionId,
@@ -402,12 +426,12 @@ namespace DataAccessLayer.Migrations
                 name: "AccountWarehouse",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    AccountId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    WarehouseId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     JoinedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     LeftDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     Status = table.Column<bool>(type: "bit", nullable: false),
-                    AccountId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    WarehouseId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Id = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     LastUpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -418,7 +442,7 @@ namespace DataAccessLayer.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_AccountWarehouse", x => x.Id);
+                    table.PrimaryKey("PK_AccountWarehouse", x => new { x.AccountId, x.WarehouseId });
                     table.ForeignKey(
                         name: "FK_AccountWarehouse_Account_AccountId",
                         column: x => x.AccountId,
@@ -818,13 +842,13 @@ namespace DataAccessLayer.Migrations
                 name: "StockCardDetail",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    StockCardId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ProductTypeId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     In = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Out = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Stock = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Date = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    StockCardId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    ProductTypeId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Id = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     LastUpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -835,7 +859,7 @@ namespace DataAccessLayer.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_StockCardDetail", x => x.Id);
+                    table.PrimaryKey("PK_StockCardDetail", x => new { x.StockCardId, x.ProductTypeId });
                     table.ForeignKey(
                         name: "FK_StockCardDetail_ProductType_ProductTypeId",
                         column: x => x.ProductTypeId,
@@ -847,12 +871,6 @@ namespace DataAccessLayer.Migrations
                         principalTable: "StockCard",
                         principalColumn: "Id");
                 });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_AccountGroup_AccountId_GroupId",
-                table: "AccountGroup",
-                columns: new[] { "AccountId", "GroupId" },
-                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_AccountGroup_GroupId",
@@ -870,12 +888,6 @@ namespace DataAccessLayer.Migrations
                 column: "PermissionId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_AccountWarehouse_AccountId_WarehouseId",
-                table: "AccountWarehouse",
-                columns: new[] { "AccountId", "WarehouseId" },
-                unique: true);
-
-            migrationBuilder.CreateIndex(
                 name: "IX_AccountWarehouse_WarehouseId",
                 table: "AccountWarehouse",
                 column: "WarehouseId");
@@ -889,12 +901,6 @@ namespace DataAccessLayer.Migrations
                 name: "IX_Floor_ShelfId",
                 table: "Floor",
                 column: "ShelfId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_GroupPermission_GroupId_PermissionId",
-                table: "GroupPermission",
-                columns: new[] { "GroupId", "PermissionId" },
-                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_GroupPermission_PermissionId",
@@ -932,12 +938,6 @@ namespace DataAccessLayer.Migrations
                 column: "ActionId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_PermissionAction_PermissionId_ActionId",
-                table: "PermissionAction",
-                columns: new[] { "PermissionId", "ActionId" },
-                unique: true);
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Product_CategoryId",
                 table: "Product",
                 column: "CategoryId");
@@ -961,6 +961,13 @@ namespace DataAccessLayer.Migrations
                 name: "IX_ProductTypeTypeDetails_TypeDetailId",
                 table: "ProductTypeTypeDetails",
                 column: "TypeDetailId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Profile_AccountId",
+                table: "Profile",
+                column: "AccountId",
+                unique: true,
+                filter: "[AccountId] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_PurchaseDetail_ProductTypeId",
@@ -1026,12 +1033,6 @@ namespace DataAccessLayer.Migrations
                 name: "IX_StockCardDetail_ProductTypeId",
                 table: "StockCardDetail",
                 column: "ProductTypeId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_StockCardDetail_StockCardId_ProductTypeId",
-                table: "StockCardDetail",
-                columns: new[] { "StockCardId", "ProductTypeId" },
-                unique: true);
         }
 
         /// <inheritdoc />
@@ -1062,6 +1063,9 @@ namespace DataAccessLayer.Migrations
                 name: "ProductTypeTypeDetails");
 
             migrationBuilder.DropTable(
+                name: "Profile");
+
+            migrationBuilder.DropTable(
                 name: "PurchaseDetail");
 
             migrationBuilder.DropTable(
@@ -1080,9 +1084,6 @@ namespace DataAccessLayer.Migrations
                 name: "IssueNote");
 
             migrationBuilder.DropTable(
-                name: "Account");
-
-            migrationBuilder.DropTable(
                 name: "Action");
 
             migrationBuilder.DropTable(
@@ -1090,6 +1091,9 @@ namespace DataAccessLayer.Migrations
 
             migrationBuilder.DropTable(
                 name: "TypeDetail");
+
+            migrationBuilder.DropTable(
+                name: "Account");
 
             migrationBuilder.DropTable(
                 name: "ReceivingNote");
