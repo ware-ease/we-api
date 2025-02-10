@@ -12,12 +12,11 @@ namespace Data.Entity
     [Table("ReceivingNote")]
     public class ReceivingNote : BaseEntity
     {
-        [Required]
         public DateTime Date { get; set; }
         public ICollection<ReceivingDetail> ReceivingDetails { get; set; }
 
         [ForeignKey("Supplier")]
-        public string SupplierId { get; set; }
+        public string? SupplierId { get; set; }
         public Supplier Supplier { get; set; }
 
         [ForeignKey("PurchaseReceipt")]

@@ -12,11 +12,8 @@ namespace Data.Entity
     [Table("Customer")]
     public class Customer : BaseEntity
     {
-        [Required]
         public string Name { get; set; }
-        [Required]
         public string Phone { get; set; }
-        [Required]
         public bool Status { get; set; }
         public ICollection<IssueNote> IssueNotes { get; set; }
 

@@ -12,7 +12,6 @@ namespace Data.Entity
     [Table("Action")]
     public class AppAction : BaseEntity
     {
-        [Required]
         public string Code { get; set; }
 
         public ICollection<PermissionAction> PermissionActions { get; set; }

@@ -12,9 +12,7 @@ namespace Data.Entity
     [Table("NoteDetail")]
     public class IssueDetail : BaseEntity
     {
-        [Required]
         public int Quanlity { get; set; }
-        [Required]
         public float Price { get; set; }
 
         [ForeignKey("IssueNote")]

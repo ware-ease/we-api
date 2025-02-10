@@ -12,11 +12,8 @@ namespace Data.Entity
     [Table("AccountWarehouse")]
     public class AccountWarehouse : BaseEntity
     {
-        [Required]
         public DateTime? JoinedDate { get; set; }
-        [Required]
         public DateTime? LeftDate { get; set; }
-        [Required]
         public bool Status { get; set; }
 
         [ForeignKey("Account")]

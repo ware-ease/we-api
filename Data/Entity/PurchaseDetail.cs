@@ -12,9 +12,7 @@ namespace Data.Entity
     [Table("PurchaseDetail")]
     public class PurchaseDetail : BaseEntity
     {
-        [Required]
         public int Quanlity { get; set; }
-        [Required]
         public float Price { get; set; }
 
         [ForeignKey("PurchaseReceipt")]

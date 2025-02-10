@@ -16,7 +16,7 @@ namespace Data.Entity
         public TypeDetail TypeDetail { get; set; }
 
         [ForeignKey("ProductType")]
-        public string ProductTypeId { get; set; }
+        public string? ProductTypeId { get; set; }
         public ProductType ProductType { get; set; }
     }
 }
