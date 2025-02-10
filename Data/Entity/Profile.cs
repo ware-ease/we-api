@@ -12,19 +12,15 @@ namespace Data.Entity
     [Table("Profile")]
     public class Profile : BaseEntity
     {
-        [Required]
         public string FirstName { get; set; }
-        [Required]
-        public string LastName { get; set; }
-        [Required]
+        public string? LastName { get; set; }
         public string Phone {  get; set; }
         public string Address { get; set; }
-        [Required]
         public bool Sex { get; set; }
         public string Nationality { get; set; }
 
         [ForeignKey("Account")]
-        public string AccountId { get; set; }
-        public Account Account { get; set; }
+        public string? AccountId { get; set; }
+        public Account? Account { get; set; }
     }
 }
