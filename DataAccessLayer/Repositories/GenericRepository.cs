@@ -57,7 +57,7 @@ namespace DataAccessLayer.Repositories
             return await query.AsNoTracking().ToListAsync();
         }
 
-        public virtual async Task<TEntity> GetByID(int id)
+        public virtual async Task<TEntity> GetByID(string id)
         {
             return await dbSet.FindAsync(id)!;
         }

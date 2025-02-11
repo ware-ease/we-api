@@ -10,9 +10,9 @@ namespace BusinessLogicLayer.IService
     public interface IGroupService
     {
         Task<IEnumerable<Group>> GetAllGroupsAsync();
-        Task<Group> GetGroupByIdAsync(int id);
+        Task<Group> GetGroupByIdAsync(string id);
         Task<Group> CreateGroupAsync(Group group);
-        Task<Group> UpdateGroupAsync(int id, Group group);
-        Task<bool> DeleteGroupAsync(int id);
+        Task<Group> UpdateGroupAsync(string id, Group group);
+        Task<bool> DeleteGroupAsync(string id);
     }
 }

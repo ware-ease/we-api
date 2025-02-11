@@ -47,9 +47,9 @@ namespace API.Controllers
                     {
                         token,
                         userDto.Id,
-                        userDto.AccountWarehouses,
-                        userDto.AccountGroups,
-                        userDto.AccountPermissions
+                        GroupIds = userDto.GroupIds,          
+                        PermissionIds = userDto.PermissionIds,
+                        WarehouseIds = userDto.WarehouseIds
                     },
                     IsSuccess = true
                 });
@@ -65,67 +65,6 @@ namespace API.Controllers
                 });
             }
         }
-        ////[Authorize(Roles = UserRoles.BrandManager + "," + UserRoles.Admin+","+UserRoles.Store)]
-        //[HttpPut(APIRoutes.Account.ChangePassword, Name = "ChangePasswordAsync")]
-        //public async Task<IActionResult> ChangePasswordAsync(int id, [FromBody] ChangePasswordRequest reqObj)
-        //{
-        //    try
-        //    {
-        //        if (!reqObj.NewPassword.Equals(reqObj.Confirm))
-        //        {
-        //            return BadRequest(new BaseResponse
-        //            {
-        //                StatusCode = StatusCodes.Status400BadRequest,
-        //                Message = "mật khẩu mới chưa được xác thực chính xác",
-        //                Data = null,
-        //                IsSuccess = false
-        //            });
-        //        }
-        //        var checkPass = await _accountService.checkCorrectPassword(id, reqObj.OldPassword);
-        //        if (checkPass == false)
-        //        {
-        //            return BadRequest(new BaseResponse
-        //            {
-        //                StatusCode = StatusCodes.Status400BadRequest,
-        //                Message = "Mật khẩu cũ của bạn chưa chính xác",
-        //                Data = null,
-        //                IsSuccess = false
-        //            });
-        //        }
-
-        //        var dto = new AppUserDTO();
-        //        dto.Password = reqObj.NewPassword;
-        //        dto.IsActive = true;
-        //        var result = await _appUserService.Update(id, dto, null);
-        //        if (!result)
-        //        {
-        //            return NotFound(new BaseResponse
-        //            {
-        //                StatusCode = StatusCodes.Status404NotFound,
-        //                Message = "Không tìm thấy người dùng",
-        //                Data = null,
-        //                IsSuccess = false
-        //            });
-        //        }
-        //        return Ok(new BaseResponse
-        //        {
-        //            StatusCode = StatusCodes.Status200OK,
-        //            Message = "Đổi mật khẩu thành công",
-        //            Data = result,
-        //            IsSuccess = true
-        //        });
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return BadRequest(new BaseResponse
-        //        {
-        //            StatusCode = StatusCodes.Status400BadRequest,
-        //            Message = ex.Message,
-        //            Data = null,
-        //            IsSuccess = false
-        //        });
-        //    }
-        //}
     }
 }
 

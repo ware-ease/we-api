@@ -23,7 +23,7 @@ namespace BusinessLogicLayer.Service
             return await _unitOfWork.GroupRepository.Get();
         }
 
-        public async Task<Group> GetGroupByIdAsync(int id)
+        public async Task<Group> GetGroupByIdAsync(string id)
         {
             return await _unitOfWork.GroupRepository.GetByID(id);
         }
@@ -35,7 +35,7 @@ namespace BusinessLogicLayer.Service
             return group;
         }
 
-        public async Task<Group> UpdateGroupAsync(int id, Group group)
+        public async Task<Group> UpdateGroupAsync(string id, Group group)
         {
             var existingGroup = await _unitOfWork.GroupRepository.GetByID(id);
             if (existingGroup == null)
@@ -46,7 +46,7 @@ namespace BusinessLogicLayer.Service
             return existingGroup;
         }
 
-        public async Task<bool> DeleteGroupAsync(int id)
+        public async Task<bool> DeleteGroupAsync(string id)
         {
             var group = await _unitOfWork.GroupRepository.GetByID(id);
             if (group == null)
