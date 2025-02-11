@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using API.Payloads.Responses;
+using AutoMapper;
 using BusinessLogicLayer.IService;
 using BusinessLogicLayer.Mappings;
 using BusinessLogicLayer.Service;
@@ -24,7 +25,12 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddDbContext<WaseEaseDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
 
-
+//Add kebab
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.PropertyNamingPolicy = new KebabCaseNamingPolicy();
+    options.JsonSerializerOptions.DictionaryKeyPolicy = new KebabCaseNamingPolicy();
+});
 builder.Services.AddSwaggerGen(option =>
 {
     option.SwaggerDoc("v1", new OpenApiInfo { Title = "WareEase API", Version = "v1" });
@@ -65,6 +71,7 @@ builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<ISupplierRepository, SupplierRepository>();
 builder.Services.AddScoped<IPurchaseReceiptRepository, PurchaseReceiptRepository>();
+builder.Services.AddScoped<IGroupRepository, GroupRepository>();
 
 // Register servicies
 builder.Services.AddScoped<IAccountService, AccountService>();
@@ -73,27 +80,28 @@ builder.Services.AddScoped<ISupplierService, SupplierService>();
 builder.Services.AddScoped<IPurchaseReceiptService, PurchaseReceiptService>();
 
 builder.Services.AddScoped<IGenericPaginationService, GenericPaginationService>();
+builder.Services.AddScoped<IGroupService, GroupService>();
 
 ////Config Jwt Token
-//builder.Services.AddAuthentication(options =>
-//{
-//    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-//    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-//    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-//}).AddJwtBearer(options =>
-//{
-//    options.SaveToken = true;
-//    options.RequireHttpsMetadata = false;
-//    options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
-//    {
-//        ValidateIssuer = true,
-//        ValidateAudience = true,
-//        ValidAudience = builder.Configuration["JWT:ValidAudience"],
-//        ValidIssuer = builder.Configuration["JWT:ValidIssuer"],
-//        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:SecretKey"])),
-//        ClockSkew = TimeSpan.Zero
-//    };
-//});
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(options =>
+{
+    options.SaveToken = true;
+    options.RequireHttpsMetadata = false;
+    options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidAudience = builder.Configuration["JWT:ValidAudience"],
+        ValidIssuer = builder.Configuration["JWT:ValidIssuer"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:SecretKey"])),
+        ClockSkew = TimeSpan.Zero
+    };
+});
 
 // Add CORS
 builder.Services.AddCors(p => p.AddPolicy("Cors", policy =>

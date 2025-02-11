@@ -8,8 +8,9 @@ namespace DataAccessLayer.UnitOfWork
     {
         private readonly IConfiguration _configuration;
         private WaseEaseDbContext _context;
-        private AccountRepository _accountRepo;
 
+        private AccountRepository _accountRepo;
+        private GroupRepository _groupRepo;
 
 
         public UnitOfWork(WaseEaseDbContext context, IConfiguration configuration)
@@ -55,6 +56,17 @@ namespace DataAccessLayer.UnitOfWork
                     this._accountRepo = new AccountRepository(_context, _configuration);
                 }
                 return _accountRepo;
+            }
+        } 
+        GroupRepository IUnitOfWork.GroupRepository
+        {
+            get
+            {
+                if (_groupRepo == null)
+                {
+                    this._groupRepo = new GroupRepository(_context);
+                }
+                return _groupRepo;
             }
         }
     }

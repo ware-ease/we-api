@@ -1,4 +1,6 @@
-﻿using Data.Entity;
+﻿using BusinessLogicLayer.Models.Account;
+using BusinessLogicLayer.Models.Authentication;
+using Data.Entity;
 
 namespace BusinessLogicLayer.IService
 {
@@ -6,8 +8,8 @@ namespace BusinessLogicLayer.IService
     {
         public  Task<IEnumerable<Account>> GetAccountsAsync();
 
-        //public  Task<AppUserDTO?> CheckLoginAsync(string userName, string password);
-        //public Task<TokenDto> GenerateAccessTokenAsync(int id);
+        public  Task<AccountDTO?> CheckLoginAsync(string userName, string password);
+        public Task<TokenDTO> GenerateAccessTokenAsync(string id);
         //public Task<AppUserDTO> BanAccount(int id);
         //public Task<bool> checkCorrectPassword(int id, string password);
     }
