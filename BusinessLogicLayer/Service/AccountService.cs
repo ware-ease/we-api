@@ -1,5 +1,8 @@
 ﻿using AutoMapper;
 using BusinessLogicLayer.IService;
+using BusinessLogicLayer.Models;
+using BusinessLogicLayer.Models.Account;
+using BusinessLogicLayer.Models.Authentication;
 using Data.Entity;
 using DataAccessLayer.UnitOfWork;
 using System.Linq.Expressions;
@@ -21,18 +24,6 @@ namespace BusinessLogicLayer.Services
             return await _unitOfWork.AccountRepository.GetAccountsAsync();
         }
 
-        //public async Task<AppUserDTO> BanAccount(int id)
-        //{
-        //    var checkExist = await _unitOfWork.AppUserRepository.GetByID(id);
-        //    if (checkExist == null)
-        //    {
-        //        return null!;
-        //    }
-        //    checkExist.IsActive = false;
-        //    _unitOfWork.AppUserRepository.Update(checkExist);
-        //    var result = _mapper.Map<AppUserDTO>(checkExist);
-        //    return result;
-        //}
         //public async Task<bool> checkCorrectPassword(int id, string password)
         //{
         //    Expression<Func<AppUser, bool>> filter = x => x.Password.Equals(PasswordHelper.ConvertToEncrypt(password)) && x.UserId == id;
@@ -44,20 +35,20 @@ namespace BusinessLogicLayer.Services
         //    return true;
         //}
 
-        //public async Task<AppUserDTO?> CheckLoginAsync(string userName, string password)
-        //{
-        //    var user = await _unitOfWork.AccountRepository
-        //        .CheckLoginAsync(userName, password);
+        public async Task<AccountDTO?> CheckLoginAsync(string userName, string password)
+        {
+            var user = await _unitOfWork.AccountRepository
+                .CheckLoginAsync(userName, password);
 
-        //    var userDTO = _mapper.Map<AppUserDTO>(user);
-        //    return userDTO;
-        //}
+            var userDTO = _mapper.Map<AccountDTO>(user);
+            return userDTO;
+        }
 
-        //public async Task<TokenDto> GenerateAccessTokenAsync(int id)
-        //{
-        //    var token = await _unitOfWork.AccountRepository.GenerateAccessTokenAsync(id);
-        //    var tokentDTO = _mapper.Map<TokenDto>(token);
-        //    return tokentDTO;
-        //}
+        public async Task<TokenDTO> GenerateAccessTokenAsync(string id)
+        {
+            var token = await _unitOfWork.AccountRepository.GenerateAccessTokenAsync(id);
+            var tokentDTO = _mapper.Map<TokenDTO>(token);
+            return tokentDTO;
+        }
     }
 }

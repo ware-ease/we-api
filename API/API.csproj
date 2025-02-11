@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Payloads\Requests\Account\" />
+    <Folder Include="Payloads\Requests\" />
   </ItemGroup>
 
 </Project>

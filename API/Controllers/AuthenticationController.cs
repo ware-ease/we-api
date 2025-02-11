@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using API.Payloads.Responses;
+using BusinessLogicLayer.IService;
+using BusinessLogicLayer.Models.Authentication;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 
@@ -9,7 +12,7 @@ namespace API.Controllers
     public class AuthenticationController : ControllerBase
     {
         private readonly IAccountService _accountService;
-      
+
         public AuthenticationController(IAccountService accountService)
         {
             _accountService = accountService;
@@ -33,31 +36,7 @@ namespace API.Controllers
                     });
                 }
 
-                if (userDto.IsActive == false)
-                {
-                    var baseResponse = new BaseResponse
-                    {
-                        StatusCode = StatusCodes.Status403Forbidden,
-                        Message = "Tài khoản của bạn đã bị khóa. Vui lòng liên hệ với quản trị viên để biết thêm thông tin",
-                        Data = null,
-                        IsSuccess = false
-                    };
-
-                    return new ObjectResult(baseResponse)
-                    {
-                        StatusCode = StatusCodes.Status403Forbidden
-                    };
-                }
-                var tokenExist = await _refreshTokenService
-                    .CheckRefreshTokenByUserIdAsync(userDto.UserId!.Value);
-
-                if (tokenExist != null)
-                {
-                    var reuslt = await _refreshTokenService
-                        .RemoveRefreshTokenAsync(tokenExist);
-                }
-
-                var token = await _accountService.GenerateAccessTokenAsync(userDto.UserId.Value);
+                var token = await _accountService.GenerateAccessTokenAsync(userDto.Id);
 
 
                 return Ok(new BaseResponse
@@ -67,8 +46,10 @@ namespace API.Controllers
                     Data = new
                     {
                         token,
-                        userDto.UserId,
-                        userDto.RoleId
+                        userDto.Id,
+                        userDto.AccountWarehouses,
+                        userDto.AccountGroups,
+                        userDto.AccountPermissions
                     },
                     IsSuccess = true
                 });

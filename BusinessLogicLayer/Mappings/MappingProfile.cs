@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using BusinessLogicLayer.Models.Account;
+using BusinessLogicLayer.Models.Authentication;
 using BusinessLogicLayer.Models.Category;
 using BusinessLogicLayer.Models.PurchaseReceipt;
 using BusinessLogicLayer.Models.Supplier;
@@ -11,7 +13,8 @@ namespace BusinessLogicLayer.Mappings
         public MappingProfile()
         {
             // Mapping classes
-            //CreateMap<Account, TokenDto>().ReverseMap();
+            CreateMap<Account, AccountDTO>().ReverseMap();
+            CreateMap<Token, TokenDTO>().ReverseMap();
 
             #region Category
             CreateMap<Category, CategoryDTO>();
