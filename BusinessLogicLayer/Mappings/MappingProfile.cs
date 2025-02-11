@@ -13,7 +13,18 @@ namespace BusinessLogicLayer.Mappings
         public MappingProfile()
         {
             // Mapping classes
-            CreateMap<Account, AccountDTO>().ReverseMap();
+            #region Account
+            CreateMap<Account, AccountDTO>()
+                .ForMember(dest => dest.GroupIds, opt => opt.MapFrom(src => src.AccountGroups.Select(ag => ag.GroupId).ToList()))
+                .ForMember(dest => dest.PermissionIds, opt => opt.MapFrom(src => src.AccountPermissions.Select(ap => ap.PermissionId).ToList()))
+                .ForMember(dest => dest.WarehouseIds, opt => opt.MapFrom(src => src.AccountWarehouses.Select(aw => aw.WarehouseId).ToList()));
+            CreateMap<Account, AccountUpdateDTO>();
+            CreateMap<AccountUpdateDTO, Account>();
+
+            CreateMap<Account, AccountCreateDTO>();
+            CreateMap<AccountCreateDTO, Account>();
+            #endregion
+
             CreateMap<Token, TokenDTO>().ReverseMap();
 
             #region Category

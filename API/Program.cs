@@ -72,6 +72,7 @@ builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<ISupplierRepository, SupplierRepository>();
 builder.Services.AddScoped<IPurchaseReceiptRepository, PurchaseReceiptRepository>();
 builder.Services.AddScoped<IGroupRepository, GroupRepository>();
+builder.Services.AddScoped<IProfileRepository, ProfileRepository>();
 
 // Register servicies
 builder.Services.AddScoped<IAccountService, AccountService>();
@@ -81,6 +82,7 @@ builder.Services.AddScoped<IPurchaseReceiptService, PurchaseReceiptService>();
 
 builder.Services.AddScoped<IGenericPaginationService, GenericPaginationService>();
 builder.Services.AddScoped<IGroupService, GroupService>();
+builder.Services.AddScoped<IProfileService, ProfileService>();
 
 ////Config Jwt Token
 builder.Services.AddAuthentication(options =>

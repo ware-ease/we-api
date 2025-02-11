@@ -17,9 +17,8 @@ namespace BusinessLogicLayer.Models.Account
         public DateTime? CreatedTime { get; set; }
         public DateTime? LastUpdatedTime { get; set; }
         public DateTime? DeletedTime { get; set; }
-        public ICollection<AccountGroup>? AccountGroups { get; set; }
-        public ICollection<AccountPermission>? AccountPermissions { get; set; }
-        public ICollection<Notification>? Notifications { get; set; }
-        public ICollection<AccountWarehouse>? AccountWarehouses { get; set; }
+        public List<string>? GroupIds { get; set; }
+        public List<string>? PermissionIds { get; set; }
+        public List<string>? WarehouseIds { get; set; }
     }
 }

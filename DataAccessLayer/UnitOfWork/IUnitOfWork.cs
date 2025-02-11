@@ -8,5 +8,7 @@ namespace DataAccessLayer.UnitOfWork
         Task<int> SaveAsync();
         public AccountRepository AccountRepository { get; }
         public GroupRepository GroupRepository { get; }
+        public ProfileRepository ProfileRepository { get; }
+
     }
 }
