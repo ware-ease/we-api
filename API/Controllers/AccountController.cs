@@ -27,7 +27,7 @@ namespace API.Controllers
             {
                 var allAccount = await _accountService.GetAccountsAsync();
 
-                return Ok(new BaseResponse
+                return Ok(new 
                 {
                     StatusCode = StatusCodes.Status200OK,
                     Message = "Tải dữ liệu thành công",
@@ -37,17 +37,17 @@ namespace API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new BaseResponse
+                return BadRequest(new 
                 {
                     StatusCode = StatusCodes.Status400BadRequest,
                     Message = ex.Message,
-                    Data = null,
+                    //Data = null,
                     IsSuccess = false
                 });
             }
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id}", Name = "GetAccountById")]
         public async Task<IActionResult> GetByIdAsync(string id)
         {
             try
@@ -55,16 +55,16 @@ namespace API.Controllers
                 var account = await _accountService.GetAccountByIdAsync(id);
                 if (account == null)
                 {
-                    return NotFound(new BaseResponse
+                    return NotFound(new 
                     {
                         StatusCode = StatusCodes.Status404NotFound,
                         Message = "Tài khoản không tồn tại",
-                        Data = null,
+                        //Data = null,
                         IsSuccess = false
                     });
                 }
 
-                return Ok(new BaseResponse
+                return Ok(new 
                 {
                     StatusCode = StatusCodes.Status200OK,
                     Message = "Tải dữ liệu thành công",
@@ -74,11 +74,11 @@ namespace API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new BaseResponse
+                return BadRequest(new 
                 {
                     StatusCode = StatusCodes.Status400BadRequest,
                     Message = ex.Message,
-                    Data = null,
+                    //Data = null,
                     IsSuccess = false
                 });
             }
@@ -90,7 +90,7 @@ namespace API.Controllers
             try
             {
                 var account = await _accountService.CreateAccountAsync(model);
-                return CreatedAtAction(nameof(GetByIdAsync), new { id = account.Id }, new BaseResponse
+                return Created("GetAccountById", new 
                 {
                     StatusCode = StatusCodes.Status201Created,
                     Message = "Tạo tài khoản thành công",
@@ -100,11 +100,11 @@ namespace API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new BaseResponse
+                return BadRequest(new 
                 {
                     StatusCode = StatusCodes.Status400BadRequest,
                     Message = ex.Message,
-                    Data = null,
+                    //Data = null,
                     IsSuccess = false
                 });
             }
@@ -118,16 +118,16 @@ namespace API.Controllers
                 var updatedAccount = await _accountService.UpdateAccountAsync(id, model);
                 if (updatedAccount == null)
                 {
-                    return NotFound(new BaseResponse
+                    return NotFound(new 
                     {
                         StatusCode = StatusCodes.Status404NotFound,
                         Message = "Tài khoản không tồn tại",
-                        Data = null,
+                        //Data = null,
                         IsSuccess = false
                     });
                 }
 
-                return Ok(new BaseResponse
+                return Ok(new 
                 {
                     StatusCode = StatusCodes.Status200OK,
                     Message = "Cập nhật tài khoản thành công",
@@ -137,11 +137,11 @@ namespace API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new BaseResponse
+                return BadRequest(new 
                 {
                     StatusCode = StatusCodes.Status400BadRequest,
                     Message = ex.Message,
-                    Data = null,
+                    //Data = null,
                     IsSuccess = false
                 });
             }
@@ -155,30 +155,30 @@ namespace API.Controllers
                 var deleted = await _accountService.DeleteAccountAsync(id);
                 if (!deleted)
                 {
-                    return NotFound(new BaseResponse
+                    return NotFound(new 
                     {
                         StatusCode = StatusCodes.Status404NotFound,
                         Message = "Tài khoản không tồn tại",
-                        Data = null,
+                        //Data = null,
                         IsSuccess = false
                     });
                 }
 
-                return Ok(new BaseResponse
+                return Ok(new 
                 {
                     StatusCode = StatusCodes.Status200OK,
                     Message = "Xóa tài khoản thành công",
-                    Data = null,
+                    //Data = null,
                     IsSuccess = true
                 });
             }
             catch (Exception ex)
             {
-                return BadRequest(new BaseResponse
+                return BadRequest(new 
                 {
                     StatusCode = StatusCodes.Status400BadRequest,
                     Message = ex.Message,
-                    Data = null,
+                    //Data = null,
                     IsSuccess = false
                 });
             }

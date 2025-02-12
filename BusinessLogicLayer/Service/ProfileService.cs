@@ -1,4 +1,7 @@
-﻿using BusinessLogicLayer.IService;
+﻿using AutoMapper;
+using BusinessLogicLayer.IService;
+using BusinessLogicLayer.Models.Profile;
+using Data.Entity;
 using DataAccessLayer.UnitOfWork;
 using System;
 using System.Collections.Generic;
@@ -11,10 +14,117 @@ namespace BusinessLogicLayer.Service
     public class ProfileService : IProfileService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
 
-        public ProfileService(IUnitOfWork unitOfWork)
+        public ProfileService(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
+            _mapper = mapper;
+        }
+
+        public async Task<IEnumerable<ProfileDTO>> GetProfilesAsync()
+        {
+            var profiles = await _unitOfWork.ProfileRepository.Get();
+            return _mapper.Map<IEnumerable<ProfileDTO>>(profiles);
+        }
+
+        public async Task<ProfileDTO?> GetProfileByIdAsync(string id)
+        {
+            var profile = await _unitOfWork.ProfileRepository.GetByID(id);
+            return _mapper.Map<ProfileDTO>(profile);
+        }
+
+        public async Task<ProfileDTO> CreateProfileAsync(ProfileCreateDTO model)
+        {
+            try
+            {
+                // Kiểm tra accountId có hợp lệ không
+                var account = await _unitOfWork.AccountRepository.GetByID(model.AccountId);
+                if (account == null)
+                {
+                    throw new ArgumentException("Account ID không hợp lệ hoặc không tồn tại.");
+                }
+
+                // Kiểm tra xem accountId đã có profile chưa
+                var existingProfile = await _unitOfWork.ProfileRepository.GetByCondition(p => p.AccountId == model.AccountId);
+                if (existingProfile != null)
+                {
+                    throw new InvalidOperationException("Tài khoản này đã có profile, không thể tạo mới.");
+                }
+
+                // Ánh xạ dữ liệu từ DTO sang entity
+                var profile = _mapper.Map<Data.Entity.Profile>(model);
+                profile.CreatedTime = DateTime.Now;
+                // created By
+                // Thêm vào database
+                await _unitOfWork.ProfileRepository.Insert(profile);
+                await _unitOfWork.SaveAsync();
+
+                return _mapper.Map<ProfileDTO>(profile);
+            }
+            catch (ArgumentException ex)
+            {
+                throw new ArgumentException($"Lỗi đầu vào: {ex.Message}");
+            }
+            catch (InvalidOperationException ex)
+            {
+                throw new InvalidOperationException($"Lỗi logic: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Đã xảy ra lỗi khi tạo profile.", ex);
+            }
+        }
+
+        public async Task<ProfileDTO?> UpdateProfileAsync(string id, ProfileUpdateDTO model)
+        {
+            try
+            {
+                var profile = await _unitOfWork.ProfileRepository.GetByID(id);
+                if (profile == null)
+                    throw new KeyNotFoundException("Profile không tồn tại.");
+                profile.LastUpdatedTime = DateTime.Now;
+                //updated by
+                _mapper.Map(model, profile);
+                _unitOfWork.ProfileRepository.Update(profile);
+                await _unitOfWork.SaveAsync();
+
+                return _mapper.Map<ProfileDTO>(profile);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                throw new KeyNotFoundException($"Lỗi: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Đã xảy ra lỗi khi cập nhật profile.", ex);
+            }
+        }
+
+        public async Task<bool> DeleteProfileAsync(string id)
+        {
+            try
+            {
+                var profile = await _unitOfWork.ProfileRepository.GetByID(id);
+                if (profile == null)
+                    throw new KeyNotFoundException("Profile không tồn tại.");
+
+                profile.IsDeleted = true;
+                profile.DeletedTime = DateTime.Now;
+                //deletedby
+                _unitOfWork.ProfileRepository.Update(profile);
+                await _unitOfWork.SaveAsync();
+
+                return true;
+            }
+            catch (KeyNotFoundException ex)
+            {
+                throw new KeyNotFoundException($"Lỗi: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Đã xảy ra lỗi khi xóa profile.", ex);
+            }
         }
 
     }
