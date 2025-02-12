@@ -27,11 +27,11 @@ namespace API.Controllers
 
                 if (userDto == null)
                 {
-                    return Unauthorized(new BaseResponse
+                    return Unauthorized(new 
                     {
                         StatusCode = StatusCodes.Status401Unauthorized,
                         Message = "Sai tài khoản hoặc mật khẩu",
-                        Data = null,
+                        //Data = null,
                         IsSuccess = false
                     });
                 }
@@ -39,7 +39,7 @@ namespace API.Controllers
                 var token = await _accountService.GenerateAccessTokenAsync(userDto.Id);
 
 
-                return Ok(new BaseResponse
+                return Ok(new 
                 {
                     StatusCode = StatusCodes.Status200OK,
                     Message = "Đăng nhập thành công",
@@ -56,11 +56,11 @@ namespace API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new BaseResponse
+                return BadRequest(new 
                 {
                     StatusCode = StatusCodes.Status400BadRequest,
                     Message = ex.Message,
-                    Data = null,
+                    //Data = null,
                     IsSuccess = false
                 });
             }

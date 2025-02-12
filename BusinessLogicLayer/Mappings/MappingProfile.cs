@@ -2,9 +2,11 @@
 using BusinessLogicLayer.Models.Account;
 using BusinessLogicLayer.Models.Authentication;
 using BusinessLogicLayer.Models.Category;
+using BusinessLogicLayer.Models.Profile;
 using BusinessLogicLayer.Models.PurchaseReceipt;
 using BusinessLogicLayer.Models.Supplier;
 using Data.Entity;
+using Profile = Data.Entity.Profile;
 
 namespace BusinessLogicLayer.Mappings
 {
@@ -18,14 +20,18 @@ namespace BusinessLogicLayer.Mappings
                 .ForMember(dest => dest.GroupIds, opt => opt.MapFrom(src => src.AccountGroups.Select(ag => ag.GroupId).ToList()))
                 .ForMember(dest => dest.PermissionIds, opt => opt.MapFrom(src => src.AccountPermissions.Select(ap => ap.PermissionId).ToList()))
                 .ForMember(dest => dest.WarehouseIds, opt => opt.MapFrom(src => src.AccountWarehouses.Select(aw => aw.WarehouseId).ToList()));
-            CreateMap<Account, AccountUpdateDTO>();
-            CreateMap<AccountUpdateDTO, Account>();
+            CreateMap<Account, AccountUpdateDTO>().ReverseMap();
 
-            CreateMap<Account, AccountCreateDTO>();
-            CreateMap<AccountCreateDTO, Account>();
+            CreateMap<Account, AccountCreateDTO>().ReverseMap();      
             #endregion
 
             CreateMap<Token, TokenDTO>().ReverseMap();
+
+            #region Profile
+            CreateMap<Profile, ProfileDTO>().ReverseMap();
+            CreateMap<Profile, ProfileCreateDTO>().ReverseMap();
+            CreateMap<Profile, ProfileUpdateDTO>().ReverseMap();
+            #endregion
 
             #region Category
             CreateMap<Category, CategoryDTO>();

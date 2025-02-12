@@ -26,7 +26,7 @@ namespace API.Controllers
             try
             {
                 var groups = await _groupService.GetAllGroupsAsync();
-                return Ok(new BaseResponse
+                return Ok(new 
                 {
                     StatusCode = StatusCodes.Status200OK,
                     Message = "Tải dữ liệu thành công",
@@ -36,11 +36,11 @@ namespace API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new BaseResponse
+                return BadRequest(new 
                 {
                     StatusCode = StatusCodes.Status400BadRequest,
                     Message = ex.Message,
-                    Data = null,
+                    //Data = null,
                     IsSuccess = false
                 });
             }
@@ -53,14 +53,14 @@ namespace API.Controllers
             {
                 var group = await _groupService.GetGroupByIdAsync(id);
                 if (group == null)
-                    return NotFound(new BaseResponse
+                    return NotFound(new 
                     {
                         StatusCode = StatusCodes.Status404NotFound,
                         Message = "Nhóm không tồn tại",
                         IsSuccess = false
                     });
 
-                return Ok(new BaseResponse
+                return Ok(new 
                 {
                     StatusCode = StatusCodes.Status200OK,
                     Message = "Lấy dữ liệu thành công",
@@ -70,11 +70,11 @@ namespace API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new BaseResponse
+                return BadRequest(new 
                 {
                     StatusCode = StatusCodes.Status400BadRequest,
                     Message = ex.Message,
-                    Data = null,
+                    //Data = null,
                     IsSuccess = false
                 });
             }
@@ -86,7 +86,7 @@ namespace API.Controllers
             try
             {
                 var createdGroup = await _groupService.CreateGroupAsync(group);
-                return Ok(new BaseResponse
+                return Ok(new 
                 {
                     StatusCode = StatusCodes.Status201Created,
                     Message = "Tạo nhóm thành công",
@@ -96,11 +96,11 @@ namespace API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new BaseResponse
+                return BadRequest(new 
                 {
                     StatusCode = StatusCodes.Status400BadRequest,
                     Message = ex.Message,
-                    Data = null,
+                    //Data = null,
                     IsSuccess = false
                 });
             }
@@ -113,14 +113,14 @@ namespace API.Controllers
             {
                 var updatedGroup = await _groupService.UpdateGroupAsync(id, group);
                 if (updatedGroup == null)
-                    return NotFound(new BaseResponse
+                    return NotFound(new 
                     {
                         StatusCode = StatusCodes.Status404NotFound,
                         Message = "Nhóm không tồn tại",
                         IsSuccess = false
                     });
 
-                return Ok(new BaseResponse
+                return Ok(new 
                 {
                     StatusCode = StatusCodes.Status200OK,
                     Message = "Cập nhật nhóm thành công",
@@ -130,11 +130,11 @@ namespace API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new BaseResponse
+                return BadRequest(new 
                 {
                     StatusCode = StatusCodes.Status400BadRequest,
                     Message = ex.Message,
-                    Data = null,
+                    //Data = null,
                     IsSuccess = false
                 });
             }
@@ -147,14 +147,14 @@ namespace API.Controllers
             {
                 var isDeleted = await _groupService.DeleteGroupAsync(id);
                 if (!isDeleted)
-                    return NotFound(new BaseResponse
+                    return NotFound(new 
                     {
                         StatusCode = StatusCodes.Status404NotFound,
                         Message = "Nhóm không tồn tại",
                         IsSuccess = false
                     });
 
-                return Ok(new BaseResponse
+                return Ok(new 
                 {
                     StatusCode = StatusCodes.Status200OK,
                     Message = "Xóa nhóm thành công",
@@ -163,11 +163,11 @@ namespace API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new BaseResponse
+                return BadRequest(new 
                 {
                     StatusCode = StatusCodes.Status400BadRequest,
                     Message = ex.Message,
-                    Data = null,
+                    //Data = null,
                     IsSuccess = false
                 });
             }

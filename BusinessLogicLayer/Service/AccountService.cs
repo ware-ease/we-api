@@ -47,21 +47,51 @@ namespace BusinessLogicLayer.Services
 
         public async Task<AccountDTO> CreateAccountAsync(AccountCreateDTO model)
         {
-            var account = _mapper.Map<Account>(model);
-            account.CreatedTime = DateTime.Now;
-            //Data.Entity.Profile profile = new Profile();
-            //profile.AccountId = account.Id;
-            await _unitOfWork.AccountRepository.Insert(account);
-            //await _unitOfWork.ProfileRepository.Insert(profile);
-            await _unitOfWork.SaveAsync();
-            return _mapper.Map<AccountDTO>(account);
+            try
+            {
+                // Kiểm tra xem username đã tồn tại chưa
+                var existingUsername = await _unitOfWork.AccountRepository
+                    .GetByCondition(a => a.UserName == model.UserName);
+                if (existingUsername != null)
+                {
+                    throw new Exception("Username đã tồn tại");
+                }
+
+                // Kiểm tra xem email đã tồn tại chưa
+                var existingEmail = await _unitOfWork.AccountRepository
+                    .GetByCondition(a => a.Email == model.Email);
+                if (existingEmail != null)
+                {
+                    throw new Exception("Email đã tồn tại");
+                }
+
+                var account = _mapper.Map<Account>(model);
+                account.CreatedTime = DateTime.Now;
+                //created by
+
+                //Data.Entity.Profile profile = new Profile();
+                //profile.AccountId = account.Id;
+
+                await _unitOfWork.AccountRepository.Insert(account);
+                //await _unitOfWork.ProfileRepository.Insert(profile);
+
+                await _unitOfWork.SaveAsync();
+
+                return _mapper.Map<AccountDTO>(account);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Lỗi khi tạo tài khoản: {ex.Message}");
+            }
         }
+
 
         public async Task<AccountDTO?> UpdateAccountAsync(string id, AccountUpdateDTO model)
         {
             var account = await _unitOfWork.AccountRepository.GetByID(id);
             if (account == null) return null;
-
+            account.LastUpdatedTime = DateTime.Now;
+            //update by
             _mapper.Map(model, account); // Cập nhật dữ liệu từ DTO vào entity
             _unitOfWork.AccountRepository.Update(account);
             await _unitOfWork.SaveAsync();
@@ -73,6 +103,8 @@ namespace BusinessLogicLayer.Services
             var account = await _unitOfWork.AccountRepository.GetByID(id);
             if (account == null) return false;
             account.IsDeleted = true;
+            account.DeletedTime = DateTime.Now;
+            //delete by
             _unitOfWork.AccountRepository.Update(account);
             await _unitOfWork.SaveAsync();
             return true;
