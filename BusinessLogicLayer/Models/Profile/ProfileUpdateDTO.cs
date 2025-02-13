@@ -14,5 +14,11 @@ namespace BusinessLogicLayer.Models.Profile
         public string Address { get; set; }
         public bool Sex { get; set; }
         public string Nationality { get; set; }
+        public string? LastUpdatedBy { get; set; }
+
+    }
+    public class DeleteProfileDTO
+    {
+        public string? DeletedBy { get; set; }
     }
 }
