@@ -1,13 +1,18 @@
 ﻿using AutoMapper;
 using BusinessLogicLayer.IService;
+using BusinessLogicLayer.Models.Group;
+using BusinessLogicLayer.Models.Pagination;
 using BusinessLogicLayer.Models.Profile;
+using BusinessLogicLayer.Utils;
 using Data.Entity;
 using DataAccessLayer.UnitOfWork;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
+using Profile = Data.Entity.Profile;
 
 namespace BusinessLogicLayer.Service
 {
@@ -22,10 +27,26 @@ namespace BusinessLogicLayer.Service
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<ProfileDTO>> GetProfilesAsync()
+        public async Task<PageEntity<ProfileDTO>?> GetAllAsync(int? pageIndex, int? pageSize)
         {
-            var profiles = await _unitOfWork.ProfileRepository.Get();
-            return _mapper.Map<IEnumerable<ProfileDTO>>(profiles);
+            // Sắp xếp theo thời gian tạo mới nhất
+            Func<IQueryable<Profile>, IOrderedQueryable<Profile>> orderBy = q => q.OrderByDescending(x => x.CreatedTime);
+
+            // Lấy danh sách có phân trang
+            var entities = await _unitOfWork.ProfileRepository
+                .Get(filter: null, orderBy: orderBy, pageIndex: pageIndex, pageSize: pageSize);
+
+            // Khởi tạo đối tượng PageEntity
+            var pagin = new PageEntity<ProfileDTO>();
+            pagin.List = _mapper.Map<IEnumerable<ProfileDTO>>(entities).ToList();
+
+            // Đếm tổng số bản ghi
+            pagin.TotalRecord = await _unitOfWork.ProfileRepository.Count(null);
+
+            // Tính tổng số trang
+            pagin.TotalPage = PaginHelper.PageCount(pagin.TotalRecord, pageSize ?? 10);
+
+            return pagin;
         }
 
         public async Task<ProfileDTO?> GetProfileByIdAsync(string id)
@@ -55,7 +76,7 @@ namespace BusinessLogicLayer.Service
                 // Ánh xạ dữ liệu từ DTO sang entity
                 var profile = _mapper.Map<Data.Entity.Profile>(model);
                 profile.CreatedTime = DateTime.Now;
-                // created By
+                profile.CreatedBy = model.CreatedBy;
                 // Thêm vào database
                 await _unitOfWork.ProfileRepository.Insert(profile);
                 await _unitOfWork.SaveAsync();
@@ -84,7 +105,8 @@ namespace BusinessLogicLayer.Service
                 if (profile == null)
                     throw new KeyNotFoundException("Profile không tồn tại.");
                 profile.LastUpdatedTime = DateTime.Now;
-                //updated by
+                profile.LastUpdatedBy = model.LastUpdatedBy;
+
                 _mapper.Map(model, profile);
                 _unitOfWork.ProfileRepository.Update(profile);
                 await _unitOfWork.SaveAsync();
@@ -101,7 +123,7 @@ namespace BusinessLogicLayer.Service
             }
         }
 
-        public async Task<bool> DeleteProfileAsync(string id)
+        public async Task<bool> DeleteProfileAsync(string id, string deleteBy)
         {
             try
             {
@@ -111,7 +133,8 @@ namespace BusinessLogicLayer.Service
 
                 profile.IsDeleted = true;
                 profile.DeletedTime = DateTime.Now;
-                //deletedby
+                profile.DeletedBy = deleteBy;
+
                 _unitOfWork.ProfileRepository.Update(profile);
                 await _unitOfWork.SaveAsync();
 
@@ -127,5 +150,52 @@ namespace BusinessLogicLayer.Service
             }
         }
 
+        public async Task<ProfileDTO?> UpdateProfileByAccountIdAsync(string accountId, ProfileUpdateDTO model)
+        {
+            var profile = await _unitOfWork.ProfileRepository.GetByCondition(p =>p.AccountId == accountId);
+            if (profile == null) return null;
+
+            profile.FirstName = model.FirstName ?? profile.FirstName;
+            profile.LastName = model.LastName ?? profile.LastName;
+            profile.Sex = model.Sex;
+            profile.Address = model.Address ?? profile.Address;
+            profile.Phone = model.Phone ?? profile.Phone;
+            profile.Nationality = model.Nationality ?? profile.Nationality;
+            profile.LastUpdatedBy = model.LastUpdatedBy ?? profile.LastUpdatedBy;
+
+             _unitOfWork.ProfileRepository.Update(profile);
+            await _unitOfWork.SaveAsync();
+            return _mapper.Map<ProfileDTO>(profile);
+        }
+
+        public async Task<PageEntity<ProfileDTO>?> SearchAsync(string? searchKey, int? pageIndex, int? pageSize)
+        {
+            Expression<Func<Data.Entity.Profile, bool>> filter = x =>
+                string.IsNullOrEmpty(searchKey) ||
+                x.FirstName.ToLower().Contains(searchKey.ToLower()) ||
+                x.Address.ToLower().Contains(searchKey.ToLower()) ||
+                x.Nationality.ToLower().Contains(searchKey.ToLower()) ||
+                x.Phone.ToLower().Contains(searchKey.ToLower()) ||
+                x.LastName!.ToLower().Contains(searchKey.ToLower());
+
+            // Sắp xếp theo thời gian tạo mới nhất
+            Func<IQueryable<Data.Entity.Profile>, IOrderedQueryable<Data.Entity.Profile>> orderBy = q => q.OrderByDescending(x => x.CreatedTime);
+
+            // Lấy danh sách có phân trang
+            var entities = await _unitOfWork.ProfileRepository
+                .Get(filter: filter, orderBy: orderBy, pageIndex: pageIndex, pageSize: pageSize);
+
+            // Khởi tạo đối tượng PageEntity
+            var pagin = new PageEntity<ProfileDTO>();
+            pagin.List = _mapper.Map<IEnumerable<ProfileDTO>>(entities).ToList();
+
+            // Đếm tổng số bản ghi khớp với bộ lọc
+            pagin.TotalRecord = await _unitOfWork.ProfileRepository.Count(filter);
+
+            // Tính tổng số trang
+            pagin.TotalPage = PaginHelper.PageCount(pagin.TotalRecord, pageSize ?? 10);
+
+            return pagin;
+        }
     }
 }

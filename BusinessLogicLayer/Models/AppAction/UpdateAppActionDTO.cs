@@ -6,11 +6,13 @@ using System.Threading.Tasks;
 
 namespace BusinessLogicLayer.Models.AppAction
 {
-    public class CreateAppActionDTO
+    public class UpdateAppActionDTO
     {
         public string Code { get; set; }
-        public string? CreatedBy { get; set; }
-
-
+        public string? LastUpdatedBy { get; set; }
+    }
+    public class DeleteAppActionDTO
+    {
+        public string? DeletedBy { get; set; }
     }
 }

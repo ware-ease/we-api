@@ -1,5 +1,6 @@
 ﻿using BusinessLogicLayer.Models.Account;
 using BusinessLogicLayer.Models.Authentication;
+using BusinessLogicLayer.Models.Pagination;
 using Data.Entity;
 
 namespace BusinessLogicLayer.IService
@@ -8,10 +9,13 @@ namespace BusinessLogicLayer.IService
     {
         public  Task<AccountDTO?> CheckLoginAsync(string userName, string password);
         public Task<TokenDTO> GenerateAccessTokenAsync(string id);
-        public Task<IEnumerable<AccountDTO?>> GetAccountsAsync();
+        Task<PageEntity<AccountDTO>?> GetAllAccountsAsync(int? pageIndex, int? pageSize);
         Task<AccountDTO?> GetAccountByIdAsync(string id);
         Task<AccountDTO> CreateAccountAsync(AccountCreateDTO model);
         Task<AccountDTO?> UpdateAccountAsync(string id, AccountUpdateDTO model);
-        Task<bool> DeleteAccountAsync(string id);
+        Task<bool> DeleteAccountAsync(string id, string deleteBy);
+        Task<AccountDTO> UpdateUsernameAsync(string accountId, string newUsername, string updateId);
+        Task<AccountDTO> UpdatePasswordAsync(string accountId, string currentPassword, string newPassword, string updateId);
+        Task<PageEntity<AccountDTO>?> SearchAccountAsync(string? searchKey, int? pageIndex, int? pageSize);
     }
 }

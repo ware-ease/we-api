@@ -21,7 +21,7 @@ namespace API.Controllers
         {
             try
             {
-                var actions = await _appActionService.GetAllAsync();
+                var actions = await _appActionService.GetAllAsync(null, null);
                 return Ok(new
                 {
                     StatusCode = StatusCodes.Status200OK,
@@ -100,7 +100,7 @@ namespace API.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateAsync(string id, [FromBody] CreateAppActionDTO action)
+        public async Task<IActionResult> UpdateAsync(string id, [FromBody] UpdateAppActionDTO action)
         {
             try
             {
@@ -133,11 +133,11 @@ namespace API.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteAsync(string id)
+        public async Task<IActionResult> DeleteAsync(string id, [FromBody] DeleteAppActionDTO action)
         {
             try
             {
-                var isDeleted = await _appActionService.DeleteAsync(id);
+                var isDeleted = await _appActionService.DeleteAsync(id, action.DeletedBy!);
                 if (!isDeleted)
                     return NotFound(new
                     {
@@ -163,5 +163,31 @@ namespace API.Controllers
                 });
             }
         }
+
+        [HttpGet("search")]
+        public async Task<IActionResult> SearchAsync([FromQuery] string? searchKey, [FromQuery] int? pageIndex, [FromQuery] int? pageSize)
+        {
+            try
+            {
+                var actions = await _appActionService.SearchAsync(searchKey, pageIndex, pageSize);
+                return Ok(new
+                {
+                    StatusCode = StatusCodes.Status200OK,
+                    Message = "Tìm kiếm thành công",
+                    Data = actions,
+                    IsSuccess = true
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new
+                {
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    Message = ex.Message,
+                    IsSuccess = false
+                });
+            }
+        }
+
     }
 }

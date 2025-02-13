@@ -20,7 +20,7 @@ namespace API.Controllers
         {
             try
             {
-                var profiles = await _profileService.GetProfilesAsync();
+                var profiles = await _profileService.GetAllAsync(1,10);
                 return Ok(new
                 {
                     StatusCode = StatusCodes.Status200OK,
@@ -140,11 +140,11 @@ namespace API.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteAsync(string id)
+        public async Task<IActionResult> DeleteAsync(string id, [FromBody] DeleteProfileDTO model)
         {
             try
             {
-                var deleted = await _profileService.DeleteProfileAsync(id);
+                var deleted = await _profileService.DeleteProfileAsync(id, model.DeletedBy!);
                 return deleted ? Ok(new
                 {
                     StatusCode = StatusCodes.Status200OK,
@@ -169,5 +169,71 @@ namespace API.Controllers
                 });
             }
         }
+
+        [HttpPut("account/{accountId}")]
+        public async Task<IActionResult> UpdateByAccountIdAsync(string accountId, [FromBody] ProfileUpdateDTO model)
+        {
+            try
+            {
+                var updatedProfile = await _profileService.UpdateProfileByAccountIdAsync(accountId, model);
+                if (updatedProfile == null)
+                {
+                    return NotFound(new
+                    {
+                        StatusCode = StatusCodes.Status404NotFound,
+                        Message = "Profile không tồn tại cho tài khoản này",
+                        IsSuccess = false
+                    });
+                }
+
+                return Ok(new
+                {
+                    StatusCode = StatusCodes.Status200OK,
+                    Message = "Cập nhật profile thành công",
+                    Data = updatedProfile,
+                    IsSuccess = true
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    StatusCode = StatusCodes.Status500InternalServerError,
+                    Message = "Lỗi khi cập nhật profile",
+                    Error = ex.Message,
+                    IsSuccess = false
+                });
+            }
+        }
+
+        [HttpGet("search")]
+        public async Task<IActionResult> SearchProfilesAsync([FromQuery] string? searchKey,
+                                                             [FromQuery] int pageNumber = 1,
+                                                             [FromQuery] int pageSize = 10)
+        {
+            try
+            {
+                var result = await _profileService.SearchAsync(searchKey, pageNumber, pageSize);
+
+                return Ok(new
+                {
+                    StatusCode = StatusCodes.Status200OK,
+                    Message = "Tìm kiếm profile thành công",
+                    Data = result,
+                    IsSuccess = true
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    StatusCode = StatusCodes.Status500InternalServerError,
+                    Message = "Lỗi khi tìm kiếm profile",
+                    Error = ex.Message,
+                    IsSuccess = false
+                });
+            }
+        }
+
     }
 }

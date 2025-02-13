@@ -3,6 +3,7 @@ using BusinessLogicLayer.IService;
 using BusinessLogicLayer.Models;
 using BusinessLogicLayer.Models.Account;
 using BusinessLogicLayer.Models.Authentication;
+using BusinessLogicLayer.Models.Pagination;
 using BusinessLogicLayer.Utils;
 using Data.Entity;
 using DataAccessLayer.UnitOfWork;
@@ -21,11 +22,28 @@ namespace BusinessLogicLayer.Services
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<AccountDTO>> GetAccountsAsync()
+        public async Task<PageEntity<AccountDTO>?> GetAllAccountsAsync(int? pageIndex, int? pageSize)
         {
-            var accounts = await _unitOfWork.AccountRepository.GetAccountsAsync();
-            return _mapper.Map<IEnumerable<AccountDTO>>(accounts);
+            // Sắp xếp theo ngày tạo mới nhất
+            Func<IQueryable<Account>, IOrderedQueryable<Account>> orderBy = q => q.OrderByDescending(x => x.CreatedTime);
+
+            // Lấy danh sách tài khoản có phân trang
+            var entities = await _unitOfWork.AccountRepository
+                .Get(filter: null, orderBy: orderBy, pageIndex: pageIndex, pageSize: pageSize);
+
+            // Khởi tạo đối tượng PageEntity
+            var pagin = new PageEntity<AccountDTO>();
+            pagin.List = _mapper.Map<IEnumerable<AccountDTO>>(entities).ToList();
+
+            // Đếm tổng số tài khoản
+            pagin.TotalRecord = await _unitOfWork.AccountRepository.Count(null);
+
+            // Tính tổng số trang
+            pagin.TotalPage = PaginHelper.PageCount(pagin.TotalRecord, pageSize ?? 10);
+
+            return pagin;
         }
+
 
         public async Task<AccountDTO?> CheckLoginAsync(string userName, string password)
         {
@@ -70,8 +88,7 @@ namespace BusinessLogicLayer.Services
                 
                 account.Password = PasswordHelper.ConvertToEncrypt(model.Password);
                 account.CreatedTime = DateTime.Now;
-                //created by
-
+                account.CreatedBy = model.CreatedBy;
                 //Data.Entity.Profile profile = new Profile();
                 //profile.AccountId = account.Id;
 
@@ -94,23 +111,97 @@ namespace BusinessLogicLayer.Services
             var account = await _unitOfWork.AccountRepository.GetByID(id);
             if (account == null) return null;
             account.LastUpdatedTime = DateTime.Now;
-            //update by
-            _mapper.Map(model, account); // Cập nhật dữ liệu từ DTO vào entity
+            account.LastUpdatedBy = model.LastUpdatedBy;
+
+            account.Email = model.Email ?? account.Email;
+
             _unitOfWork.AccountRepository.Update(account);
             await _unitOfWork.SaveAsync();
             return _mapper.Map<AccountDTO>(account);
         }
 
-        public async Task<bool> DeleteAccountAsync(string id)
+        public async Task<bool> DeleteAccountAsync(string id, string deletedBy)
         {
             var account = await _unitOfWork.AccountRepository.GetByID(id);
             if (account == null) return false;
+
             account.IsDeleted = true;
             account.DeletedTime = DateTime.Now;
-            //delete by
+            account.DeletedBy = deletedBy; 
+
             _unitOfWork.AccountRepository.Update(account);
             await _unitOfWork.SaveAsync();
             return true;
         }
+
+
+        public async Task<AccountDTO> UpdateUsernameAsync(string accountId, string newUsername, string LastUpdatedBy)
+        {
+            var account = await _unitOfWork.AccountRepository.GetByID(accountId);
+            if (account == null)
+                return null!;
+
+            if (!string.IsNullOrEmpty(newUsername))
+            {
+                account.UserName = newUsername;
+            }
+            account.LastUpdatedTime = DateTime.Now;
+            account.LastUpdatedBy = LastUpdatedBy;
+
+            _unitOfWork.AccountRepository.Update(account);
+            await _unitOfWork.SaveAsync();
+            return _mapper.Map<AccountDTO>(account);
+        }
+
+        public async Task<AccountDTO> UpdatePasswordAsync(string accountId, string currentPassword, string newPassword, string LastUpdatedBy)
+        {
+            var account = await _unitOfWork.AccountRepository.GetByID(accountId);
+            if (account == null)
+                return null!;
+            if (string.IsNullOrEmpty(newPassword))
+            {
+                return _mapper.Map<AccountDTO>(account);
+            }
+            // Kiểm tra mật khẩu hiện tại
+            if (!string.IsNullOrEmpty(currentPassword) && PasswordHelper.ConvertToEncrypt(currentPassword) != account.Password)
+            {
+                throw new Exception("Password không trùng khớp");
+            }
+            account.Password = PasswordHelper.ConvertToEncrypt(newPassword);
+            account.LastUpdatedTime = DateTime.Now;
+            account.LastUpdatedBy = LastUpdatedBy;
+            _unitOfWork.AccountRepository.Update(account);
+            await _unitOfWork.SaveAsync();
+            return _mapper.Map<AccountDTO>(account);
+        }
+
+        public async Task<PageEntity<AccountDTO>?> SearchAccountAsync(string? searchKey, int? pageIndex, int? pageSize)
+        {
+            // Tạo bộ lọc tìm kiếm theo AccountName hoặc Email
+            Expression<Func<Account, bool>> filter = x =>
+                string.IsNullOrEmpty(searchKey) ||
+                x.UserName .ToLower().Contains(searchKey.ToLower()) ||
+                x.Email.ToLower().Contains(searchKey.ToLower());
+
+            // Sắp xếp theo AccountId giảm dần
+            Func<IQueryable<Account>, IOrderedQueryable<Account>> orderBy = q => q.OrderByDescending(x => x.CreatedTime);
+
+            // Lấy danh sách tài khoản có phân trang
+            var entities = await _unitOfWork.AccountRepository
+                .Get(filter: filter, orderBy: orderBy, pageIndex: pageIndex, pageSize: pageSize);
+
+            // Khởi tạo đối tượng PageEntity
+            var pagin = new PageEntity<AccountDTO>();
+            pagin.List = _mapper.Map<IEnumerable<AccountDTO>>(entities).ToList();
+
+            // Đếm tổng số tài khoản khớp với bộ lọc
+            pagin.TotalRecord = await _unitOfWork.AccountRepository.Count(filter);
+
+            // Tính tổng số trang
+            pagin.TotalPage = PaginHelper.PageCount(pagin.TotalRecord, pageSize ?? 10);
+
+            return pagin;
+        }
+
     }
 }
