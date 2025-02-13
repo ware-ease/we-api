@@ -17,7 +17,6 @@ namespace Data.Entity
         public float Height { get; set; }
         public float MaxLoad { get; set; }
         public ICollection<StockCard> StockCards { get; set; }
-        public ICollection<Product> Products { get; set; }
 
         [ForeignKey("Floor")]
         public string FloorId { get; set; }
