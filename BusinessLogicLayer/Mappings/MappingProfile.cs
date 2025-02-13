@@ -4,8 +4,10 @@ using BusinessLogicLayer.Models.AppAction;
 using BusinessLogicLayer.Models.Authentication;
 using BusinessLogicLayer.Models.Category;
 using BusinessLogicLayer.Models.Group;
+using BusinessLogicLayer.Models.Product;
 using BusinessLogicLayer.Models.Profile;
 using BusinessLogicLayer.Models.PurchaseReceipt;
+using BusinessLogicLayer.Models.ReceivingNote;
 using BusinessLogicLayer.Models.Supplier;
 using Data.Entity;
 using Profile = Data.Entity.Profile;
@@ -56,6 +58,16 @@ namespace BusinessLogicLayer.Mappings
             #region PurchaseReceipt
             CreateMap<PurchaseReceipt, CreatePurchaseReceiptDTO>();
             CreateMap<CreatePurchaseReceiptDTO, PurchaseReceipt>();
+            #endregion
+
+            #region ReceivingNote
+            CreateMap<ReceivingNote, CreateReceivingNoteDTO>();
+            CreateMap<CreateReceivingNoteDTO, ReceivingNote>();
+            #endregion
+
+            #region Product
+            CreateMap<Product, CreateProductDTO>();
+            CreateMap<CreateProductDTO, Product>();
             #endregion
 
             #region Group

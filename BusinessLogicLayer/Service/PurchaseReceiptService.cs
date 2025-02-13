@@ -68,25 +68,33 @@ namespace BusinessLogicLayer.Service
         }
 
         public async Task<PurchaseReceipt> UpdateAsync(string purchaseReceiptId, UpdatePurchaseReceiptDTO updatePurchaseReceiptDTO)
-        {          
+        {
             var purchaseReceipt = await _purchaseReceiptRepository.GetByIdAsync(purchaseReceiptId);
             if (purchaseReceipt == null)
             {
                 throw new ArgumentException("Không thể tìm thấy PurchaseReceipt với ID này");
             }
 
-            var updateSupplier = await _supplierRepository.GetByIdAsync(updatePurchaseReceiptDTO.SupplierId);
-            if (updateSupplier == null)
-            {
-                throw new ArgumentException("Không thể tìm thấy Supplier với ID này");
-            }
             if (!string.IsNullOrWhiteSpace(updatePurchaseReceiptDTO.SupplierId))
             {
+                var updateSupplier = await _supplierRepository.GetByIdAsync(updatePurchaseReceiptDTO.SupplierId);
+                if (updateSupplier == null)
+                {
+                    throw new ArgumentException("Không thể tìm thấy Supplier với ID này");
+                }
                 purchaseReceipt.SupplierId = updatePurchaseReceiptDTO.SupplierId;
             }
             if (updatePurchaseReceiptDTO.Date != null)
             {
+                if (updatePurchaseReceiptDTO.Date >= DateTime.Now)
+                {
+                    throw new ArgumentException("Không thể đặt ngày ở tương lai");
+                }
                 purchaseReceipt.Date = updatePurchaseReceiptDTO.Date;
+            }
+            if (string.IsNullOrWhiteSpace(updatePurchaseReceiptDTO.LastUpdatedBy))
+            {
+                throw new ArgumentException("Người sửa không được để trống");
             }
 
             purchaseReceipt.LastUpdatedBy = updatePurchaseReceiptDTO.LastUpdatedBy;

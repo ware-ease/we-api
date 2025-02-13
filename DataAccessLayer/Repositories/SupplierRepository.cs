@@ -53,5 +53,9 @@ namespace DataAccessLayer.Repositories
             await _context.SaveChangesAsync();
         }
 
+        public Task<List<Supplier>> GetAllAsync(string supplierId)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
