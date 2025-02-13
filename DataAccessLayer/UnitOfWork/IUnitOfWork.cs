@@ -9,6 +9,7 @@ namespace DataAccessLayer.UnitOfWork
         public AccountRepository AccountRepository { get; }
         public GroupRepository GroupRepository { get; }
         public ProfileRepository ProfileRepository { get; }
+        public AppActionRepository AppActionRepository { get; }
 
     }
 }

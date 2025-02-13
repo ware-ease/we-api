@@ -4,11 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BusinessLogicLayer.Models.Group
+namespace DataAccessLayer.IRepositories
 {
-    public class CreateGroupDTO
+    public interface IAppActionRepository
     {
-        public string Name { get; set; }
-
     }
 }

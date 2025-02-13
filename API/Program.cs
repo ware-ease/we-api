@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System.Globalization;
 using System.Text;
 using System.Text.Json.Serialization;
 
@@ -73,16 +74,17 @@ builder.Services.AddScoped<ISupplierRepository, SupplierRepository>();
 builder.Services.AddScoped<IPurchaseReceiptRepository, PurchaseReceiptRepository>();
 builder.Services.AddScoped<IGroupRepository, GroupRepository>();
 builder.Services.AddScoped<IProfileRepository, ProfileRepository>();
+builder.Services.AddScoped<IAppActionRepository, AppActionRepository>();
 
 // Register servicies
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<ISupplierService, SupplierService>();
 builder.Services.AddScoped<IPurchaseReceiptService, PurchaseReceiptService>();
-
 builder.Services.AddScoped<IGenericPaginationService, GenericPaginationService>();
 builder.Services.AddScoped<IGroupService, GroupService>();
 builder.Services.AddScoped<IProfileService, ProfileService>();
+builder.Services.AddScoped<IAppActionService, AppActionService>();
 
 ////Config Jwt Token
 builder.Services.AddAuthentication(options =>
@@ -118,6 +120,11 @@ builder.Services.AddControllers().AddJsonOptions(options =>
     options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
     options.JsonSerializerOptions.WriteIndented = true;
 });
+
+// Đặt múi giờ VN cho toàn bộ ứng dụng
+TimeZoneInfo vnTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
+CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("vi-VN");
+CultureInfo.DefaultThreadCurrentUICulture = new CultureInfo("vi-VN");
 
 var app = builder.Build();
 

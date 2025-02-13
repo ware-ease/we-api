@@ -1,4 +1,5 @@
-﻿using Data.Entity;
+﻿using BusinessLogicLayer.Models.Group;
+using Data.Entity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,10 +10,10 @@ namespace BusinessLogicLayer.IService
 {
     public interface IGroupService
     {
-        Task<IEnumerable<Group>> GetAllGroupsAsync();
-        Task<Group> GetGroupByIdAsync(string id);
-        Task<Group> CreateGroupAsync(Group group);
-        Task<Group> UpdateGroupAsync(string id, Group group);
+        Task<IEnumerable<GroupDTO>> GetAllGroupsAsync();
+        Task<GroupDTO?> GetGroupByIdAsync(string id);
+        Task<GroupDTO> CreateGroupAsync(CreateGroupDTO groupDto);
+        Task<GroupDTO?> UpdateGroupAsync(string id, CreateGroupDTO groupDto);
         Task<bool> DeleteGroupAsync(string id);
     }
 }

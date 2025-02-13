@@ -4,11 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BusinessLogicLayer.Models.Group
+namespace BusinessLogicLayer.Models.AppAction
 {
-    public class CreateGroupDTO
+    public class CreateAppActionDTO
     {
-        public string Name { get; set; }
+        public string Code { get; set; }
 
     }
 }
