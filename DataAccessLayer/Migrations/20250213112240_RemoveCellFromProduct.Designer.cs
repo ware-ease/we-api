@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccessLayer.Migrations
 {
     [DbContext(typeof(WaseEaseDbContext))]
-    [Migration("20250213111320_RemoveCellFromProduct")]
+    [Migration("20250213112240_RemoveCellFromProduct")]
     partial class RemoveCellFromProduct
     {
         /// <inheritdoc />
@@ -724,9 +724,6 @@ namespace DataAccessLayer.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("CellId")
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
 
@@ -756,8 +753,6 @@ namespace DataAccessLayer.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CategoryId");
-
-                    b.HasIndex("CellId");
 
                     b.ToTable("Product");
                 });
@@ -1642,11 +1637,6 @@ namespace DataAccessLayer.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("Data.Entity.Cell", null)
-                        .WithMany("Products")
-                        .HasForeignKey("CellId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
                     b.Navigation("Category");
                 });
 
@@ -1852,8 +1842,6 @@ namespace DataAccessLayer.Migrations
 
             modelBuilder.Entity("Data.Entity.Cell", b =>
                 {
-                    b.Navigation("Products");
-
                     b.Navigation("StockCards");
                 });
 

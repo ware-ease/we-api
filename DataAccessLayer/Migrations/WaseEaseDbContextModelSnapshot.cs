@@ -721,9 +721,6 @@ namespace DataAccessLayer.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("CellId")
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
 
@@ -753,8 +750,6 @@ namespace DataAccessLayer.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CategoryId");
-
-                    b.HasIndex("CellId");
 
                     b.ToTable("Product");
                 });
@@ -1639,11 +1634,6 @@ namespace DataAccessLayer.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("Data.Entity.Cell", null)
-                        .WithMany("Products")
-                        .HasForeignKey("CellId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
                     b.Navigation("Category");
                 });
 
@@ -1849,8 +1839,6 @@ namespace DataAccessLayer.Migrations
 
             modelBuilder.Entity("Data.Entity.Cell", b =>
                 {
-                    b.Navigation("Products");
-
                     b.Navigation("StockCards");
                 });
 
