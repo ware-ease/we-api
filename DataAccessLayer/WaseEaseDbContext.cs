@@ -192,10 +192,8 @@ namespace DataAccessLayer
                 .WithMany(c => c.Products)
                 .HasForeignKey(p => p.CategoryId);
 
-            modelBuilder.Entity<Product>()
-                .HasOne(p => p.Cell)
-                .WithMany(c => c.Products)
-                .HasForeignKey(p => p.CellId);
+
+
 
             // ProductType configuration
             modelBuilder.Entity<ProductType>()
