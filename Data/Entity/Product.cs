@@ -20,8 +20,5 @@ namespace Data.Entity
         public string CategoryId { get; set; }
         public Category Category { get; set; }
 
-        [ForeignKey("Cell")]
-        public string? CellId { get; set; }
-        public Cell Cell { get; set; }
     }
 }

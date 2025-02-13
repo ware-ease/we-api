@@ -10,7 +10,7 @@ namespace DataAccessLayer.IRepositories
     public interface ISupplierRepository
     {
         IQueryable<Supplier> GetAllQueryable();
-        Task<List<Supplier>> GetAllAsync();
+        Task<List<Supplier>> GetAllAsync(string supplierId);
         Task<Supplier> GetByIdAsync(string id);
         Task AddAsync(Supplier supplier);
         Task UpdateAsync(Supplier supplier);

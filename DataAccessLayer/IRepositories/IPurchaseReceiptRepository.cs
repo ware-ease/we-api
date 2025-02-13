@@ -15,5 +15,6 @@ namespace DataAccessLayer.IRepositories
         Task AddAsync(PurchaseReceipt purchaseReceipt);
         Task UpdateAsync(PurchaseReceipt purchaseReceipt);
         Task DeleteAsync(PurchaseReceipt purchaseReceipt);
+        Task UpdateAsync(ReceivingNote note);
     }
 }

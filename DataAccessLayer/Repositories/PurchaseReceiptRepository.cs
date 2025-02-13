@@ -54,5 +54,10 @@ namespace DataAccessLayer.Repositories
             _context.PurchaseReceipts.Update(purchaseReceipt);
             await _context.SaveChangesAsync();
         }
+
+        public Task UpdateAsync(ReceivingNote note)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
