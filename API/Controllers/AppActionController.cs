@@ -1,37 +1,32 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using BusinessLogicLayer.IService;
-using API.Payloads.Responses;
-using API.Payloads;
+﻿using BusinessLogicLayer.IService;
+using BusinessLogicLayer.Models.AppAction;
 using Data.Entity;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using BusinessLogicLayer.Models.Group;
+using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
 {
     [ApiController]
-    [Route("api/group")]
-    public class GroupController : ControllerBase
+    [Route("api/app-action")]
+    public class AppActionController : ControllerBase
     {
-        private readonly IGroupService _groupService;
+        private readonly IAppActionService _appActionService;
 
-        public GroupController(IGroupService groupService)
+        public AppActionController(IAppActionService appActionService)
         {
-            _groupService = groupService;
+            _appActionService = appActionService;
         }
 
-        [HttpGet("groups")]
+        [HttpGet("app-actions")]
         public async Task<IActionResult> GetAllAsync()
         {
             try
             {
-                var groups = await _groupService.GetAllGroupsAsync();
+                var actions = await _appActionService.GetAllAsync();
                 return Ok(new
                 {
                     StatusCode = StatusCodes.Status200OK,
-                    Message = "Tải dữ liệu thành công",
-                    Data = groups,
+                    Message = "Lấy dữ liệu thành công",
+                    Data = actions,
                     IsSuccess = true
                 });
             }
@@ -51,12 +46,12 @@ namespace API.Controllers
         {
             try
             {
-                var group = await _groupService.GetGroupByIdAsync(id);
-                if (group == null)
+                var action = await _appActionService.GetByIdAsync(id);
+                if (action == null)
                     return NotFound(new
                     {
                         StatusCode = StatusCodes.Status404NotFound,
-                        Message = "Nhóm không tồn tại",
+                        Message = "Hành động không tồn tại",
                         IsSuccess = false
                     });
 
@@ -64,7 +59,7 @@ namespace API.Controllers
                 {
                     StatusCode = StatusCodes.Status200OK,
                     Message = "Lấy dữ liệu thành công",
-                    Data = group,
+                    Data = action,
                     IsSuccess = true
                 });
             }
@@ -80,16 +75,16 @@ namespace API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateAsync([FromBody] CreateGroupDTO groupDto)
+        public async Task<IActionResult> CreateAsync([FromBody] CreateAppActionDTO action)
         {
             try
             {
-                var createdGroup = await _groupService.CreateGroupAsync(groupDto);
+                var createdAction = await _appActionService.CreateAsync(action);
                 return Ok(new
                 {
                     StatusCode = StatusCodes.Status201Created,
-                    Message = "Tạo nhóm thành công",
-                    Data = createdGroup,
+                    Message = "Tạo hành động thành công",
+                    Data = createdAction,
                     IsSuccess = true
                 });
             }
@@ -105,24 +100,24 @@ namespace API.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateAsync(string id, [FromBody] CreateGroupDTO groupDto)
+        public async Task<IActionResult> UpdateAsync(string id, [FromBody] CreateAppActionDTO action)
         {
             try
             {
-                var updatedGroup = await _groupService.UpdateGroupAsync(id, groupDto);
-                if (updatedGroup == null)
+                var updatedAction = await _appActionService.UpdateAsync(id, action);
+                if (updatedAction == null)
                     return NotFound(new
                     {
                         StatusCode = StatusCodes.Status404NotFound,
-                        Message = "Nhóm không tồn tại",
+                        Message = "Hành động không tồn tại",
                         IsSuccess = false
                     });
 
                 return Ok(new
                 {
                     StatusCode = StatusCodes.Status200OK,
-                    Message = "Cập nhật nhóm thành công",
-                    Data = updatedGroup,
+                    Message = "Cập nhật hành động thành công",
+                    Data = updatedAction,
                     IsSuccess = true
                 });
             }
@@ -142,19 +137,19 @@ namespace API.Controllers
         {
             try
             {
-                var isDeleted = await _groupService.DeleteGroupAsync(id);
+                var isDeleted = await _appActionService.DeleteAsync(id);
                 if (!isDeleted)
                     return NotFound(new
                     {
                         StatusCode = StatusCodes.Status404NotFound,
-                        Message = "Nhóm không tồn tại",
+                        Message = "Hành động không tồn tại",
                         IsSuccess = false
                     });
 
                 return Ok(new
                 {
                     StatusCode = StatusCodes.Status200OK,
-                    Message = "Xóa nhóm thành công",
+                    Message = "Xóa hành động thành công",
                     IsSuccess = true
                 });
             }

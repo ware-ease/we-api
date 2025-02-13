@@ -1,4 +1,6 @@
-﻿using BusinessLogicLayer.IService;
+﻿using AutoMapper;
+using BusinessLogicLayer.IService;
+using BusinessLogicLayer.Models.Group;
 using Data.Entity;
 using DataAccessLayer.UnitOfWork;
 using System;
@@ -12,48 +14,61 @@ namespace BusinessLogicLayer.Service
     public class GroupService : IGroupService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
 
-        public GroupService(IUnitOfWork unitOfWork)
+        public GroupService(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
+            _mapper = mapper;
         }
 
-        public async Task<IEnumerable<Group>> GetAllGroupsAsync()
+        public async Task<IEnumerable<GroupDTO>> GetAllGroupsAsync()
         {
-            return await _unitOfWork.GroupRepository.Get();
+            var groups = await _unitOfWork.GroupRepository.Get();
+            return _mapper.Map<IEnumerable<GroupDTO>>(groups);
         }
 
-        public async Task<Group> GetGroupByIdAsync(string id)
+        public async Task<GroupDTO?> GetGroupByIdAsync(string id)
         {
-            return await _unitOfWork.GroupRepository.GetByID(id);
+            var group = await _unitOfWork.GroupRepository.GetByID(id);
+            return group == null ? null : _mapper.Map<GroupDTO>(group);
         }
 
-        public async Task<Group> CreateGroupAsync(Group group)
+        public async Task<GroupDTO> CreateGroupAsync(CreateGroupDTO groupDto)
         {
+            var group = _mapper.Map<Group>(groupDto);
+            group.CreatedTime = DateTime.Now;
+            //created by
             await _unitOfWork.GroupRepository.Insert(group);
             await _unitOfWork.SaveAsync();
-            return group;
+            return _mapper.Map<GroupDTO>(group);
         }
 
-        public async Task<Group> UpdateGroupAsync(string id, Group group)
+        public async Task<GroupDTO?> UpdateGroupAsync(string id, CreateGroupDTO groupDto)
         {
-            var existingGroup = await _unitOfWork.GroupRepository.GetByID(id);
-            if (existingGroup == null)
-                return null;
+            var group = await _unitOfWork.GroupRepository.GetByID(id);
+            if (group == null) return null;
 
-            existingGroup.Name = group.Name;
+            group.Name = groupDto.Name;
+            group.LastUpdatedTime = DateTime.Now;
+
+            _unitOfWork.GroupRepository.Update(group);
             await _unitOfWork.SaveAsync();
-            return existingGroup;
+
+            return _mapper.Map<GroupDTO>(group);
         }
 
         public async Task<bool> DeleteGroupAsync(string id)
         {
             var group = await _unitOfWork.GroupRepository.GetByID(id);
-            if (group == null)
-                return false;
+            if (group == null) return false;
 
-            _unitOfWork.GroupRepository.Delete(group);
+            group.IsDeleted = true;
+            group.DeletedTime = System.DateTime.Now;
+
+            _unitOfWork.GroupRepository.Update(group);
             await _unitOfWork.SaveAsync();
+
             return true;
         }
     }

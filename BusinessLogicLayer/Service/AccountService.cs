@@ -3,6 +3,7 @@ using BusinessLogicLayer.IService;
 using BusinessLogicLayer.Models;
 using BusinessLogicLayer.Models.Account;
 using BusinessLogicLayer.Models.Authentication;
+using BusinessLogicLayer.Utils;
 using Data.Entity;
 using DataAccessLayer.UnitOfWork;
 using System.Linq.Expressions;
@@ -29,7 +30,7 @@ namespace BusinessLogicLayer.Services
         public async Task<AccountDTO?> CheckLoginAsync(string userName, string password)
         {
             var user = await _unitOfWork.AccountRepository
-                .CheckLoginAsync(userName, password);
+                .CheckLoginAsync(userName, PasswordHelper.ConvertToEncrypt(password));
             return _mapper.Map<AccountDTO>(user);
         }
 
@@ -66,6 +67,8 @@ namespace BusinessLogicLayer.Services
                 }
 
                 var account = _mapper.Map<Account>(model);
+                
+                account.Password = PasswordHelper.ConvertToEncrypt(model.Password);
                 account.CreatedTime = DateTime.Now;
                 //created by
 
