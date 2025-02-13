@@ -94,7 +94,7 @@ namespace BusinessLogicLayer.Service
             }
             if (string.IsNullOrWhiteSpace(updatePurchaseReceiptDTO.LastUpdatedBy))
             {
-                throw new ArgumentException("Người tạo không được để trống");
+                throw new ArgumentException("Người sửa không được để trống");
             }
 
             purchaseReceipt.LastUpdatedBy = updatePurchaseReceiptDTO.LastUpdatedBy;

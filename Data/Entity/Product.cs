@@ -12,7 +12,6 @@ namespace Data.Entity
     [Table("Product")]
     public class Product : IntBaseEntity
     {
-        [Required]
         public string Name { get; set; }
         public ICollection<ProductType> ProductTypes { get; set; }
 
