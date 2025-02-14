@@ -1,8 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using BusinessLogicLayer.IService;
-using API.Common.Constants;
-using API.Payloads.Responses;
-using API.Payloads;
 using BusinessLogicLayer.Models.Account;
 
 namespace API.Controllers
@@ -19,7 +16,6 @@ namespace API.Controllers
             _accountService = appUserService;
         }
 
-        //[Authorize(Roles = UserRoles.Admin)]
         [HttpGet("accounts", Name = "GetUsersAsync")]
         public async Task<IActionResult> GetAllAsync()
         {
