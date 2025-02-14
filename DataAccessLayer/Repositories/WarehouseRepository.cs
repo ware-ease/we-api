@@ -3,13 +3,14 @@ using DataAccessLayer.IRepositories;
 
 namespace DataAccessLayer.Repositories
 {
-    public class ProfileRepository : GenericRepository<Profile>, IProfileRepository
+    public class WarehouseRepository : GenericRepository<Warehouse>, IWarehouseRepository
     {
         private readonly WaseEaseDbContext _context;
 
-        public ProfileRepository(WaseEaseDbContext context) : base(context)
+        public WarehouseRepository(WaseEaseDbContext context) : base(context)
         {
             _context = context;
         }
     }
 }
+

@@ -11,6 +11,7 @@ namespace DataAccessLayer.UnitOfWork
         public ProfileRepository ProfileRepository { get; }
         public AppActionRepository AppActionRepository { get; }
         public PermissionRepository PermissionRepository { get; }
+        public WarehouseRepository WarehouseRepository { get; }
 
     }
 }

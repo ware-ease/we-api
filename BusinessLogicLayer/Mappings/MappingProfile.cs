@@ -10,6 +10,7 @@ using BusinessLogicLayer.Models.Profile;
 using BusinessLogicLayer.Models.PurchaseReceipt;
 using BusinessLogicLayer.Models.ReceivingNote;
 using BusinessLogicLayer.Models.Supplier;
+using BusinessLogicLayer.Models.Warehouse;
 using Data.Entity;
 using Profile = Data.Entity.Profile;
 
@@ -84,6 +85,11 @@ namespace BusinessLogicLayer.Mappings
             #region Permission
             CreateMap<Permission, PermissionDTO>().ReverseMap();
             CreateMap<Permission, CreatePermissionDTO>().ReverseMap();
+            #endregion
+
+            #region Warehouse
+            CreateMap<Warehouse, WarehouseDTO>().ReverseMap();
+            CreateMap<Warehouse, CreateWarehouseDTO>().ReverseMap();
             #endregion
         }
     }
