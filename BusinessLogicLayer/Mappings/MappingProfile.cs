@@ -4,6 +4,7 @@ using BusinessLogicLayer.Models.AppAction;
 using BusinessLogicLayer.Models.Authentication;
 using BusinessLogicLayer.Models.Category;
 using BusinessLogicLayer.Models.Group;
+using BusinessLogicLayer.Models.Permission;
 using BusinessLogicLayer.Models.Product;
 using BusinessLogicLayer.Models.Profile;
 using BusinessLogicLayer.Models.PurchaseReceipt;
@@ -78,6 +79,11 @@ namespace BusinessLogicLayer.Mappings
             #region AppAction
             CreateMap<AppAction, AppActionDTO>().ReverseMap();
             CreateMap<AppAction, CreateAppActionDTO>().ReverseMap();
+            #endregion
+
+            #region Permission
+            CreateMap<Permission, PermissionDTO>().ReverseMap();
+            CreateMap<Permission, CreatePermissionDTO>().ReverseMap();
             #endregion
         }
     }

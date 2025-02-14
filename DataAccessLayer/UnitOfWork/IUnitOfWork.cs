@@ -10,6 +10,7 @@ namespace DataAccessLayer.UnitOfWork
         public GroupRepository GroupRepository { get; }
         public ProfileRepository ProfileRepository { get; }
         public AppActionRepository AppActionRepository { get; }
+        public PermissionRepository PermissionRepository { get; }
 
     }
 }
