@@ -13,6 +13,7 @@ namespace DataAccessLayer.UnitOfWork
         private GroupRepository _groupRepo;
         private ProfileRepository _profileRepo;
         private AppActionRepository _appActionRepo;
+        private PermissionRepository _permissionRepo;
 
 
         public UnitOfWork(WaseEaseDbContext context, IConfiguration configuration)
@@ -91,6 +92,17 @@ namespace DataAccessLayer.UnitOfWork
                     this._appActionRepo = new AppActionRepository(_context);
                 }
                 return _appActionRepo;
+            }
+        }
+        PermissionRepository IUnitOfWork.PermissionRepository
+        {
+            get
+            {
+                if (_permissionRepo == null)
+                {
+                    this._permissionRepo = new PermissionRepository(_context);
+                }
+                return _permissionRepo;
             }
         }
     }
