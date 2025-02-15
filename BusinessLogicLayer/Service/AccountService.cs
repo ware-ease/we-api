@@ -202,6 +202,55 @@ namespace BusinessLogicLayer.Services
 
             return pagin;
         }
+        public async Task<HashSet<string>> GetUserPermissionsAsync(string userId)
+        {
+            var user = await _unitOfWork.AccountRepository.GetByCondition(
+                filter: a => a.Id == userId,
+                includeProperties: "AccountGroups.Group.GroupPermissions.Permission.PermissionActions.Action, AccountPermissions.Permission.PermissionActions.Action"
+            );
+
+            if (user == null) return new HashSet<string>();
+
+            var permissions = new HashSet<string>();
+
+            // ✅ Lấy quyền từ Group của User
+            if (user.AccountGroups != null)
+            {
+                foreach (var userGroup in user.AccountGroups)
+                {
+                    if (userGroup.Group?.GroupPermissions != null)
+                    {
+                        foreach (var groupPermission in userGroup.Group.GroupPermissions)
+                        {
+                            if (groupPermission.Permission?.PermissionActions != null)
+                            {
+                                foreach (var action in groupPermission.Permission.PermissionActions)
+                                {
+                                    permissions.Add($"{groupPermission.Permission.Url}.{action.Action.Code}");
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // ✅ Lấy quyền riêng của User
+            if (user.AccountPermissions != null)
+            {
+                foreach (var userPermission in user.AccountPermissions)
+                {
+                    if (userPermission.Permission?.PermissionActions != null)
+                    {
+                        foreach (var action in userPermission.Permission.PermissionActions)
+                        {
+                            permissions.Add($"{userPermission.Permission.Url}.{action.Action.Code}");
+                        }
+                    }
+                }
+            }
+
+            return permissions;
+        }
 
     }
 }
