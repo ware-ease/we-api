@@ -5,26 +5,24 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BusinessLogicLayer.Models.AccountGroup
+namespace BusinessLogicLayer.Models.AccountPermission
 {
-    public class AccountGroupDTO : BaseEntity
+    public class AccountPermissionDTO : BaseEntity
     {
         public string AccountId { get; set; }
-        public string GroupId { get; set; }
+        public string PermissionId { get; set; }
     }
 
-    public class CreateAccountGroupDTO
+    public class CreateAccountPermissionDTO
     {
         public string AccountId { get; set; }
-        public string GroupId { get; set; }
+        public string PermissionId { get; set; }
         public string? CreatedBy { get; set; }
-
     }
-
-    public class UpdateAccountGroupDTO
+    public class UpdateAccountPermissionDTO
     {
         public string AccountId { get; set; }
-        public string GroupId { get; set; }
+        public string PermissionId { get; set; }
         public string? LastUpdatedBy { get; set; }
 
     }

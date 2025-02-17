@@ -4,7 +4,7 @@ using BusinessLogicLayer.Models.Profile;
 
 namespace API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/profile")]
     [ApiController]
     public class ProfileController : ControllerBase
     {

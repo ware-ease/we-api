@@ -13,6 +13,7 @@ namespace DataAccessLayer.UnitOfWork
         public PermissionRepository PermissionRepository { get; }
         public WarehouseRepository WarehouseRepository { get; }
         public AccountGroupRepository AccountGroupRepository { get; }
+        public AccountPermissionRepository AccountPermissionRepository { get; }
 
     }
 }

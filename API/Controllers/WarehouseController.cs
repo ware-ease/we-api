@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/warehouse")]
     [ApiController]
     public class WarehouseController : ControllerBase
     {
