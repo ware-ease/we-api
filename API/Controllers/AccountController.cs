@@ -4,7 +4,7 @@ using BusinessLogicLayer.Models.Account;
 
 namespace API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/account")]
     [ApiController]
     public class AccountController : ControllerBase
     {

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using BusinessLogicLayer.Models.Account;
 using BusinessLogicLayer.Models.AccountGroup;
+using BusinessLogicLayer.Models.AccountPermission;
 using BusinessLogicLayer.Models.AppAction;
 using BusinessLogicLayer.Models.Authentication;
 using BusinessLogicLayer.Models.Category;
@@ -97,6 +98,12 @@ namespace BusinessLogicLayer.Mappings
             CreateMap<AccountGroup, AccountGroupDTO>().ReverseMap();
             CreateMap<AccountGroup, CreateAccountGroupDTO>().ReverseMap();
             CreateMap<AccountGroup, UpdateAccountGroupDTO>().ReverseMap();
+            #endregion
+
+            #region AccountPermission
+            CreateMap<AccountPermission, AccountPermissionDTO>();
+            CreateMap<CreateAccountPermissionDTO, AccountPermission>();
+            CreateMap<UpdateAccountPermissionDTO, AccountPermission>();
             #endregion
         }
     }
