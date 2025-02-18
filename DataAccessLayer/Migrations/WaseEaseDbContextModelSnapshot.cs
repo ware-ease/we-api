@@ -711,11 +711,8 @@ namespace DataAccessLayer.Migrations
 
             modelBuilder.Entity("Data.Entity.Product", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("CategoryId")
                         .IsRequired()
@@ -785,8 +782,8 @@ namespace DataAccessLayer.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("ProductId")
-                        .HasColumnType("int");
+                    b.Property<string>("ProductId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 

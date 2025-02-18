@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccessLayer.Migrations
 {
     [DbContext(typeof(WaseEaseDbContext))]
-    [Migration("20250213112240_RemoveCellFromProduct")]
-    partial class RemoveCellFromProduct
+    [Migration("20250217083854_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -714,11 +714,8 @@ namespace DataAccessLayer.Migrations
 
             modelBuilder.Entity("Data.Entity.Product", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("CategoryId")
                         .IsRequired()
@@ -788,8 +785,8 @@ namespace DataAccessLayer.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("ProductId")
-                        .HasColumnType("int");
+                    b.Property<string>("ProductId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
