@@ -13,9 +13,9 @@ namespace BusinessLogicLayer.IService
     {
         Task<PagedResult<Product>> GetAllAsync(int? pageNumber, int? pageSize);
         Task<PagedResult<Product>> GetAllByCategoryIdAsync(string categoryId, int? pageNumber, int? pageSize);
-        Task<Product> GetByIdAsync(int id);
+        Task<Product> GetByIdAsync(string id);
         Task<Product> AddAsync(string categoryId, CreateProductDTO createProductDTO);
-        Task<Product> UpdateAsync(int id, UpdateProductDTO updateProductDTO);
-        Task DeleteAsync(int Id, string deletedBy);
+        Task<Product> UpdateAsync(string id, UpdateProductDTO updateProductDTO);
+        Task DeleteAsync(string Id, string deletedBy);
     }
 }

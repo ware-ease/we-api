@@ -20,7 +20,7 @@ namespace Data.Entity
         public ICollection<IssueDetail> IssueDetails { get; set; }
 
         [ForeignKey("Product")]
-        public int? ProductId { get; set; }
+        public string? ProductId { get; set; }
         public Product Product { get; set; }
     }
 }
