@@ -37,13 +37,13 @@ namespace API.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(string id)
+        public async Task<IActionResult> GetById(int id)
         {
 
             try
             {
-                var product = await _productService.GetByIdAsync(id);
-                return Ok(new {  Data = product });
+                var supplier = await _productService.GetByIdAsync(id);
+                return Ok(new {  Data = supplier });
             }
             catch (ArgumentException ex)
             {
@@ -70,12 +70,12 @@ namespace API.Controllers
 
             try
             {
-                var product = await _productService.AddAsync(categoryId, createProductDTO);
+                var purchaseReceipt = await _productService.AddAsync(categoryId, createProductDTO);
                 var response = new
                 {
-                    Data = product
+                    Data = purchaseReceipt
                 };
-                return CreatedAtAction(nameof(GetById), new { id = product.Id }, response);
+                return CreatedAtAction(nameof(GetById), new { id = purchaseReceipt.Id }, response);
             }
             catch (ArgumentException ex)
             {
@@ -97,14 +97,14 @@ namespace API.Controllers
 
 
         [HttpPut("id")]
-        public async Task<IActionResult> Update(string productId, [FromBody] UpdateProductDTO updateProductDTO)
+        public async Task<IActionResult> Update(int productId, [FromBody] UpdateProductDTO updateProductDTO)
         {
             try
             {
-                var product = await _productService.UpdateAsync(productId, updateProductDTO);
+                var updatePurchaseReceipt = await _productService.UpdateAsync(productId, updateProductDTO);
                 return Ok(new
                 {
-                    Data = product
+                    Data = updatePurchaseReceipt
                 });
             }
             catch (ArgumentException ex)
@@ -126,7 +126,7 @@ namespace API.Controllers
         }
 
         [HttpPut("Delete")]
-        public async Task<IActionResult> Delete(string id, [FromBody] DeleteProductDTO deleteProductDTO)
+        public async Task<IActionResult> Delete(int id, [FromBody] DeleteProductDTO deleteProductDTO)
         {
             try
             {

@@ -46,7 +46,6 @@ namespace DataAccessLayer
         public virtual DbSet<ProductTypeTypeDetail> ProductTypeTypeDetails { get; set; }
         public virtual DbSet<PurchaseReceipt> PurchaseReceipts { get; set; }
         public virtual DbSet<ReceivingDetail> ReceiptDetails { get; set; }
-        public virtual DbSet<PurchaseDetail> PurchaseDetails { get; set; }
         public virtual DbSet<ReceivingNote> ReceivingNotes { get; set; }
         public virtual DbSet<SaleReceipt> SaleReceipts { get; set; }
         public virtual DbSet<Shelf> Shelves { get; set; }

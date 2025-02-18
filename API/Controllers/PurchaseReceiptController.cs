@@ -35,8 +35,8 @@ namespace API.Controllers
 
             try
             {
-                var purchaseReiceipt = await _purchaseReceiptService.GetByIdAsync(id);
-                return Ok(new { StatusCode = StatusCodes.Status200OK, Message = "Thành công", Data = purchaseReiceipt });
+                var supplier = await _purchaseReceiptService.GetByIdAsync(id);
+                return Ok(new { StatusCode = StatusCodes.Status200OK, Message = "Thành công", Data = supplier });
             }
             catch (ArgumentException ex)
             {

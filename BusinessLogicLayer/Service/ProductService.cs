@@ -49,7 +49,7 @@ namespace BusinessLogicLayer.Service
             return await _genericPaginationService.GetPagedDataAsync(query, pageNumber, pageSize);
         }
 
-        public async Task<Product> GetByIdAsync(string id)
+        public async Task<Product> GetByIdAsync(int id)
         {
             var product = await _productRepository.GetByIdAsync(id);
             if (product == null)
@@ -86,7 +86,7 @@ namespace BusinessLogicLayer.Service
             return product;
         }
 
-        public async Task<Product> UpdateAsync(string id, UpdateProductDTO updateProductDTO)
+        public async Task<Product> UpdateAsync(int id, UpdateProductDTO updateProductDTO)
         {
             var product = await _productRepository.GetByIdAsync(id);
             if (product == null)
@@ -123,7 +123,7 @@ namespace BusinessLogicLayer.Service
             return product;
         }
 
-        public async Task DeleteAsync(string Id, string deletedBy)
+        public async Task DeleteAsync(int Id, string deletedBy)
         {
             var product = await _productRepository.GetByIdAsync(Id);
             if (product == null)

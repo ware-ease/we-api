@@ -10,7 +10,7 @@ using Data.Entity.Base;
 namespace Data.Entity
 {
     [Table("Product")]
-    public class Product : BaseEntity
+    public class Product : IntBaseEntity
     {
         public string Name { get; set; }
         public ICollection<ProductType> ProductTypes { get; set; }

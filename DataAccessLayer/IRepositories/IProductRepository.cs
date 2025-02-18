@@ -10,7 +10,7 @@ namespace DataAccessLayer.IRepositories
     public interface IProductRepository
     {
         IQueryable<Product> GetAllQueryable();
-        Task<Product> GetByIdAsync(string id);
+        Task<Product> GetByIdAsync(int id);
         Task AddAsync(Product product);
         Task UpdateAsync(Product product);
         Task DeleteAsync(Product product);

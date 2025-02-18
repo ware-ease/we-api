@@ -25,7 +25,7 @@ namespace DataAccessLayer.Repositories
         }
 
         // Get product by Id
-        public async Task<Product> GetByIdAsync(string id)
+        public async Task<Product> GetByIdAsync(int id)
         {
             return await _context.Products
                 .Include(p => p.Category)
