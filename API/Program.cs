@@ -14,6 +14,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Globalization;
 using System.Text;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -29,8 +30,8 @@ builder.Services.AddDbContext<WaseEaseDbContext>(options =>
 //Add kebab
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
-    options.JsonSerializerOptions.PropertyNamingPolicy = new KebabCaseNamingPolicy();
-    options.JsonSerializerOptions.DictionaryKeyPolicy = new KebabCaseNamingPolicy();
+    options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+    options.JsonSerializerOptions.DictionaryKeyPolicy = JsonNamingPolicy.CamelCase;
 });
 builder.Services.AddSwaggerGen(option =>
 {
