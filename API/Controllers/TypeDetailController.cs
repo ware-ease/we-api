@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using BusinessLogicLayer.IService;
-using BusinessLogicLayer.Models.Product;
 using BusinessLogicLayer.Models.PurchaseReceipt;
+using BusinessLogicLayer.Models.TypeDetail;
 using BusinessLogicLayer.Service;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -11,28 +11,21 @@ namespace API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ProductController : ControllerBase
+    public class TypeDetailController : ControllerBase
     {
-        private readonly IProductService _productService;
+        private readonly ITypeDetailService _typeDetailService;
         private readonly IMapper _mapper;
 
-        public ProductController(IProductService productService, IMapper mapper)
+        public TypeDetailController(ITypeDetailService typeDetailService, IMapper mapper)
         {
-            _productService = productService;
+            _typeDetailService = typeDetailService;
             _mapper = mapper;
         }
 
         [HttpGet("GetAll")]
         public async Task<IActionResult> GetAll([FromQuery] int? pageNumber, [FromQuery] int? pageSize)
         {
-            var result = await _productService.GetAllAsync(pageNumber, pageSize);
-            return Ok(result);
-        }
-
-        [HttpGet("GetAllByCategoryId")]
-        public async Task<IActionResult> GetAllByCategoryId(string categoryId, [FromQuery] int? pageNumber, [FromQuery] int? pageSize)
-        {
-            var result = await _productService.GetAllByCategoryIdAsync(categoryId,pageNumber, pageSize);
+            var result = await _typeDetailService.GetAllAsync(pageNumber, pageSize);
             return Ok(result);
         }
 
@@ -42,8 +35,8 @@ namespace API.Controllers
 
             try
             {
-                var product = await _productService.GetByIdAsync(id);
-                return Ok(new {  Data = product });
+                var typeDetail = await _typeDetailService.GetByIdAsync(id);
+                return Ok(new { StatusCode = StatusCodes.Status200OK, Message = "Thành công", Data = typeDetail });
             }
             catch (ArgumentException ex)
             {
@@ -62,20 +55,21 @@ namespace API.Controllers
                 });
             }
         }
-
 
         [HttpPost]
-        public async Task<IActionResult> Create([Required] string categoryId, [FromBody] CreateProductDTO createProductDTO)
+        public async Task<IActionResult> Create([FromBody] CreateTypeDetailDTO createTypeDetailDTO)
         {
 
             try
             {
-                var product = await _productService.AddAsync(categoryId, createProductDTO);
+
+
+                var typeDetail = await _typeDetailService.AddAsync(createTypeDetailDTO);
                 var response = new
                 {
-                    Data = product
+                    Data = typeDetail
                 };
-                return CreatedAtAction(nameof(GetById), new { id = product.Id }, response);
+                return CreatedAtAction(nameof(GetById), new { id = typeDetail.Id }, response);
             }
             catch (ArgumentException ex)
             {
@@ -95,16 +89,15 @@ namespace API.Controllers
             }
         }
 
-
         [HttpPut("id")]
-        public async Task<IActionResult> Update(string productId, [FromBody] UpdateProductDTO updateProductDTO)
+        public async Task<IActionResult> Update(string typeDetailId, [FromBody] UpdateTypeDetailDTO updateTypeDetailDTO)
         {
             try
             {
-                var product = await _productService.UpdateAsync(productId, updateProductDTO);
+                var updateTypeDetail = await _typeDetailService.UpdateAsync(typeDetailId, updateTypeDetailDTO);
                 return Ok(new
                 {
-                    Data = product
+                    Data = updateTypeDetailDTO
                 });
             }
             catch (ArgumentException ex)
@@ -126,13 +119,13 @@ namespace API.Controllers
         }
 
         [HttpPut("Delete")]
-        public async Task<IActionResult> Delete(string id, [FromBody] DeleteProductDTO deleteProductDTO)
+        public async Task<IActionResult> Delete(string id, [FromBody] DeleteTypeDetailDTO deleteTypeDetailDTO)
         {
             try
             {
-                await _productService.DeleteAsync(id, deleteProductDTO.DeletedBy);
+                await _typeDetailService.DeleteAsync(id, deleteTypeDetailDTO.DeletedBy);
 
-                return Ok(new {  Data = (object)null });
+                return Ok(new { StatusCode = StatusCodes.Status200OK, Message = "Xóa PurchaseReceipt thành công", Data = (object)null });
             }
             catch (ArgumentException ex)
             {

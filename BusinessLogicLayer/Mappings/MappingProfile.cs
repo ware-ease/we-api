@@ -8,10 +8,15 @@ using BusinessLogicLayer.Models.Category;
 using BusinessLogicLayer.Models.Group;
 using BusinessLogicLayer.Models.Permission;
 using BusinessLogicLayer.Models.Product;
+using BusinessLogicLayer.Models.ProductType;
+using BusinessLogicLayer.Models.ProductTypeTypeDetail;
 using BusinessLogicLayer.Models.Profile;
+using BusinessLogicLayer.Models.PurchaseDetail;
 using BusinessLogicLayer.Models.PurchaseReceipt;
+using BusinessLogicLayer.Models.ReceivingDetail;
 using BusinessLogicLayer.Models.ReceivingNote;
 using BusinessLogicLayer.Models.Supplier;
+using BusinessLogicLayer.Models.TypeDetail;
 using BusinessLogicLayer.Models.Warehouse;
 using Data.Entity;
 using Profile = Data.Entity.Profile;
@@ -72,6 +77,31 @@ namespace BusinessLogicLayer.Mappings
             #region Product
             CreateMap<Product, CreateProductDTO>();
             CreateMap<CreateProductDTO, Product>();
+            #endregion
+
+            #region ProductType
+            CreateMap<ProductType, CreateProductTypeDTO>();
+            CreateMap<CreateProductTypeDTO, ProductType>();
+            #endregion
+
+            #region PurchaseDetail
+            CreateMap<PurchaseDetail, CreatePurchaseDetailDTO>();
+            CreateMap<CreatePurchaseDetailDTO, PurchaseDetail>();
+            #endregion
+
+            #region ReceivingDetail
+            CreateMap<ReceivingDetail, CreateReceivingDetailDTO>();
+            CreateMap<CreateReceivingDetailDTO, ReceivingDetail>();
+            #endregion
+
+            #region TypeDetail
+            CreateMap<TypeDetail, CreateTypeDetailDTO>();
+            CreateMap<CreateTypeDetailDTO, TypeDetail>();
+            #endregion
+
+            #region ProductTypeTypeDetail
+            CreateMap<ProductTypeTypeDetail, CreateProductTypeTypeDetailDTO>();
+            CreateMap<CreateProductTypeTypeDetailDTO, ProductTypeTypeDetail>();
             #endregion
 
             #region Group
