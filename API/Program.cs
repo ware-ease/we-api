@@ -26,12 +26,12 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddDbContext<WaseEaseDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
 
-//Add kebab
-builder.Services.AddControllers().AddJsonOptions(options =>
-{
-    options.JsonSerializerOptions.PropertyNamingPolicy = new KebabCaseNamingPolicy();
-    options.JsonSerializerOptions.DictionaryKeyPolicy = new KebabCaseNamingPolicy();
-});
+////Add kebab
+//builder.Services.AddControllers().AddJsonOptions(options =>
+//{
+//    options.JsonSerializerOptions.PropertyNamingPolicy = new KebabCaseNamingPolicy();
+//    options.JsonSerializerOptions.DictionaryKeyPolicy = new KebabCaseNamingPolicy();
+//});
 builder.Services.AddSwaggerGen(option =>
 {
     option.SwaggerDoc("v1", new OpenApiInfo { Title = "WareEase API", Version = "v1" });
