@@ -36,7 +36,7 @@ namespace API.Controllers
             try
             {
                 var receivingDetail = await _receivingDetailService.GetByIdAsync(id);
-                return Ok(new { StatusCode = StatusCodes.Status200OK, Message = "Thành công", Data = receivingDetail });
+                return Ok(new { Data = receivingDetail });
             }
             catch (ArgumentException ex)
             {
@@ -67,8 +67,6 @@ namespace API.Controllers
                 var receivingDetail = await _receivingDetailService.AddAsync(noteId, productTypeId, createReceivingDetailDTO);
                 var response = new
                 {
-                    StatusCode = StatusCodes.Status201Created,
-                    Message = "Tạo PurchaseReceipt thành công",
                     Data = receivingDetail
                 };
                 return CreatedAtAction(nameof(GetById), new { id = receivingDetail.Id }, response);
@@ -99,8 +97,6 @@ namespace API.Controllers
                 var updateRereceivingDetail = await _receivingDetailService.UpdateAsync(receivingId, updateReceivingDetailDTO);
                 return Ok(new
                 {
-                    StatusCode = StatusCodes.Status200OK,
-                    Message = "Cập nhật Supplier thành công",
                     Data = updateRereceivingDetail
                 });
             }

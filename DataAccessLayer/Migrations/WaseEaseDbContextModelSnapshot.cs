@@ -820,6 +820,7 @@ namespace DataAccessLayer.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("ProductTypeId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("TypeDetailId")
@@ -1649,7 +1650,8 @@ namespace DataAccessLayer.Migrations
                     b.HasOne("Data.Entity.ProductType", "ProductType")
                         .WithMany()
                         .HasForeignKey("ProductTypeId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
 
                     b.HasOne("Data.Entity.TypeDetail", "TypeDetail")
                         .WithMany()

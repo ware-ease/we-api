@@ -624,7 +624,7 @@ namespace DataAccessLayer.Migrations
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     TypeDetailId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    ProductTypeId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    ProductTypeId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     LastUpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
