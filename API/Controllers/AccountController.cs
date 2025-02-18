@@ -4,7 +4,7 @@ using BusinessLogicLayer.Models.Account;
 
 namespace API.Controllers
 {
-    [Route("api/account")]
+    [Route("api/accounts")]
     [ApiController]
     public class AccountController : ControllerBase
     {
@@ -16,7 +16,7 @@ namespace API.Controllers
             _accountService = appUserService;
         }
 
-        [HttpGet("accounts", Name = "GetUsersAsync")]
+        [HttpGet(Name = "GetUsersAsync")]
         public async Task<IActionResult> GetAllAsync()
         {
             try
