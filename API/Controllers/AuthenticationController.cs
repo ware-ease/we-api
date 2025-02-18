@@ -23,7 +23,7 @@ namespace API.Controllers
         {
             try
             {
-                var userDto = await _accountService.CheckLoginAsync(reqObj.UserName, reqObj.Password);
+                var userDto = await _accountService.CheckLoginAsync(reqObj.Username, reqObj.Password);
 
                 if (userDto == null)
                 {
