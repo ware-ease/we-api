@@ -87,6 +87,8 @@ builder.Services.AddScoped<IPermissionRepository, PermissionRepository>();
 builder.Services.AddScoped<IWarehouseRepository, WarehouseRepository>();
 builder.Services.AddScoped<IAccountGroupRepository, AccountGroupRepository>();
 builder.Services.AddScoped<IAccountPermissionRepository, AccountPermissionRepository>();
+builder.Services.AddScoped<IPermissionActionRepository, PermissionActionRepository>();
+builder.Services.AddScoped<IGroupPermissionRepository, GroupPermissionRepository>();
 
 // Register servicies
 builder.Services.AddScoped<IAccountService, AccountService>();
@@ -108,6 +110,8 @@ builder.Services.AddScoped<IPermissionService, PermissionService>();
 builder.Services.AddScoped<IWarehouseService, WarehouseService>();
 builder.Services.AddScoped<IAccountGroupService, AccountGroupService>();
 builder.Services.AddScoped<IAccountPermissionService, AccountPermissionService>();
+builder.Services.AddScoped<IPermissionActionService, PermissionActionService>();
+builder.Services.AddScoped<IGroupPermissionService, GroupPermissionService>();
 
 ////Config Jwt Token
 builder.Services.AddAuthentication(options =>

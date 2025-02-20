@@ -78,7 +78,7 @@ namespace API.Controllers
             }
         }
 
-        [HttpGet("account/{accountId}")]
+        [HttpGet("groups/{accountId}")]
         public async Task<IActionResult> GetGroupsByAccountIdAsync(string accountId)
         {
             try
@@ -92,7 +92,7 @@ namespace API.Controllers
             }
         }
 
-        [HttpGet("group/{groupId}")]
+        [HttpGet("accounts/{groupId}")]
         public async Task<IActionResult> GetAccountsByGroupIdAsync(string groupId)
         {
             try

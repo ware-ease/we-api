@@ -6,7 +6,9 @@ using BusinessLogicLayer.Models.AppAction;
 using BusinessLogicLayer.Models.Authentication;
 using BusinessLogicLayer.Models.Category;
 using BusinessLogicLayer.Models.Group;
+using BusinessLogicLayer.Models.GroupPermission;
 using BusinessLogicLayer.Models.Permission;
+using BusinessLogicLayer.Models.PermissionAction;
 using BusinessLogicLayer.Models.Product;
 using BusinessLogicLayer.Models.ProductType;
 using BusinessLogicLayer.Models.ProductTypeTypeDetail;
@@ -131,9 +133,21 @@ namespace BusinessLogicLayer.Mappings
             #endregion
 
             #region AccountPermission
-            CreateMap<AccountPermission, AccountPermissionDTO>();
-            CreateMap<CreateAccountPermissionDTO, AccountPermission>();
-            CreateMap<UpdateAccountPermissionDTO, AccountPermission>();
+            CreateMap<AccountPermission, AccountPermissionDTO>().ReverseMap();
+            CreateMap<CreateAccountPermissionDTO, AccountPermission>().ReverseMap();
+            CreateMap<UpdateAccountPermissionDTO, AccountPermission>().ReverseMap();
+            #endregion
+
+            #region PermissionAction
+            CreateMap<PermissionAction, PermissionActionDTO>().ReverseMap();
+            CreateMap<CreatePermissionActionDTO, PermissionAction>().ReverseMap();
+            CreateMap<UpdatePermissionActionDTO, PermissionAction>().ReverseMap();
+            #endregion
+
+            #region GroupPermission
+            CreateMap<GroupPermission, GroupPermissionDTO>().ReverseMap();
+            CreateMap<CreateGroupPermissionDTO, GroupPermission>().ReverseMap();
+            CreateMap<UpdateGroupPermissionDTO, GroupPermission>().ReverseMap();
             #endregion
         }
     }
