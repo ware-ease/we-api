@@ -1,19 +1,19 @@
 ﻿using BusinessLogicLayer.IService;
-using BusinessLogicLayer.Models.AccountPermission;
+using BusinessLogicLayer.Models.GroupPermission;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
 {
-    [Route("api/account-permission")]
+    [Route("api/group-permission")]
     [ApiController]
-    public class AccountPermissionController : ControllerBase
+    public class GroupPermissionController : ControllerBase
     {
-        private readonly IAccountPermissionService _accountPermissionService;
+        private readonly IGroupPermissionService _groupPermissionService;
 
-        public AccountPermissionController(IAccountPermissionService accountPermissionService)
+        public GroupPermissionController(IGroupPermissionService groupPermissionService)
         {
-            _accountPermissionService = accountPermissionService;
+            _groupPermissionService = groupPermissionService;
         }
 
         [HttpGet]
@@ -21,7 +21,7 @@ namespace API.Controllers
         {
             try
             {
-                var data = await _accountPermissionService.GetAllAsync();
+                var data = await _groupPermissionService.GetAllAsync();
                 return Ok(new { StatusCode = 200, Message = "Lấy danh sách thành công", Data = data, IsSuccess = true });
             }
             catch (Exception ex)
@@ -30,12 +30,12 @@ namespace API.Controllers
             }
         }
 
-        [HttpGet("{accountId}/{permissionId}")]
-        public async Task<IActionResult> GetByIdAsync(string accountId, string permissionId)
+        [HttpGet("{groupId}/{permissionId}")]
+        public async Task<IActionResult> GetByIdAsync(string groupId, string permissionId)
         {
             try
             {
-                var data = await _accountPermissionService.GetByIdAsync(accountId, permissionId);
+                var data = await _groupPermissionService.GetByIdAsync(groupId, permissionId);
                 if (data == null)
                     return NotFound(new { StatusCode = 404, Message = "Không tìm thấy dữ liệu", IsSuccess = false });
 
@@ -48,12 +48,16 @@ namespace API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateAsync([FromBody] CreateAccountPermissionDTO model)
+        public async Task<IActionResult> CreateAsync([FromBody] CreateGroupPermissionDTO model)
         {
             try
             {
-                var data = await _accountPermissionService.CreateAsync(model);
+                var data = await _groupPermissionService.CreateAsync(model);
                 return Ok(new { StatusCode = 201, Message = "Tạo thành công", Data = data, IsSuccess = true });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { StatusCode = 400, Message = ex.Message, IsSuccess = false });
             }
             catch (Exception ex)
             {
@@ -61,12 +65,12 @@ namespace API.Controllers
             }
         }
 
-        [HttpDelete("{accountId}/{permissionId}")]
-        public async Task<IActionResult> DeleteAsync(string accountId, string permissionId)
+        [HttpDelete("{groupId}/{permissionId}")]
+        public async Task<IActionResult> DeleteAsync(string groupId, string permissionId)
         {
             try
             {
-                var deleted = await _accountPermissionService.DeleteAsync(accountId, permissionId);
+                var deleted = await _groupPermissionService.DeleteAsync(groupId, permissionId);
                 if (!deleted)
                     return NotFound(new { StatusCode = 404, Message = "Không tìm thấy dữ liệu", IsSuccess = false });
 
@@ -78,12 +82,12 @@ namespace API.Controllers
             }
         }
 
-        [HttpGet("permissions/{accountId}")]
-        public async Task<IActionResult> GetPermissionsByAccountIdAsync(string accountId)
+        [HttpGet("permissions/{groupId}")]
+        public async Task<IActionResult> GetPermissionsByGroupIdAsync(string groupId)
         {
             try
             {
-                var data = await _accountPermissionService.GetPermissionsByAccountIdAsync(accountId);
+                var data = await _groupPermissionService.GetPermissionsByGroupIdAsync(groupId);
                 return Ok(new { StatusCode = 200, Message = "Lấy danh sách quyền thành công", Data = data, IsSuccess = true });
             }
             catch (Exception ex)
@@ -92,13 +96,13 @@ namespace API.Controllers
             }
         }
 
-        [HttpGet("accounts/{permissionId}")]
-        public async Task<IActionResult> GetAccountsByPermissionIdAsync(string permissionId)
+        [HttpGet("groups/{permissionId}")]
+        public async Task<IActionResult> GetGroupsByPermissionIdAsync(string permissionId)
         {
             try
             {
-                var data = await _accountPermissionService.GetAccountsByPermissionIdAsync(permissionId);
-                return Ok(new { StatusCode = 200, Message = "Lấy danh sách tài khoản thành công", Data = data, IsSuccess = true });
+                var data = await _groupPermissionService.GetGroupsByPermissionIdAsync(permissionId);
+                return Ok(new { StatusCode = 200, Message = "Lấy danh sách nhóm thành công", Data = data, IsSuccess = true });
             }
             catch (Exception ex)
             {

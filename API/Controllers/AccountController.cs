@@ -247,7 +247,7 @@ namespace API.Controllers
             }
         }
 
-        [HttpGet("accounts/search")]
+        [HttpGet("search")]
         public async Task<IActionResult> SearchAccounts([FromQuery] string? keyword,
                                                         [FromQuery] int pageIndex = 1,
                                                         [FromQuery] int pageSize = 10)
