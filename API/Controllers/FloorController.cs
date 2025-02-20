@@ -1,7 +1,8 @@
 ﻿using AutoMapper;
 using BusinessLogicLayer.IService;
-using BusinessLogicLayer.Models.PurchaseDetail;
-using BusinessLogicLayer.Models.PurchaseReceipt;
+using BusinessLogicLayer.Models.Floor;
+using BusinessLogicLayer.Models.General;
+using BusinessLogicLayer.Models.Shelf;
 using BusinessLogicLayer.Service;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -11,21 +12,28 @@ namespace API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class PurchaseDetailController : ControllerBase
+    public class FloorController : ControllerBase
     {
-        private readonly IPurchaseDetailService _purchaseDetailService;
+        private readonly IFloorService _floorService;
         private readonly IMapper _mapper;
 
-        public PurchaseDetailController(IPurchaseDetailService purchaseDetailService, IMapper mapper)
+        public FloorController(IFloorService floorService, IMapper mapper)
         {
-            _purchaseDetailService = purchaseDetailService;
+            _floorService = floorService;
             _mapper = mapper;
         }
 
         [HttpGet("GetAll")]
         public async Task<IActionResult> GetAll([FromQuery] int? pageNumber, [FromQuery] int? pageSize)
         {
-            var result = await _purchaseDetailService.GetAllAsync(pageNumber, pageSize);
+            var result = await _floorService.GetAllAsync(pageNumber, pageSize);
+            return Ok(result);
+        }
+
+        [HttpGet("GetAllByShelfId")]
+        public async Task<IActionResult> GetAllByShelfId(string shelfId,[FromQuery] int? pageNumber, [FromQuery] int? pageSize)
+        {
+            var result = await _floorService.GetAllByShelfIdAsync(shelfId, pageNumber, pageSize);
             return Ok(result);
         }
 
@@ -35,8 +43,8 @@ namespace API.Controllers
 
             try
             {
-                var purchaseDetail = await _purchaseDetailService.GetByIdAsync(id);
-                return Ok(new { Data = purchaseDetail });
+                var floor = await _floorService.GetByIdAsync(id);
+                return Ok(new { Data = floor });
             }
             catch (ArgumentException ex)
             {
@@ -57,19 +65,19 @@ namespace API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([Required] string reiceiptId, [Required] string productTypeId, [FromBody] CreatePurchaseDetailDTO createPurchaseDetailDTO)
+        public async Task<IActionResult> Create([Required] string shelfId, [FromBody] CreateFloorDTO createFloorDTO)
         {
 
             try
             {
 
 
-                var purchaseDetail = await _purchaseDetailService.AddAsync(reiceiptId, productTypeId, createPurchaseDetailDTO);
+                var floor = await _floorService.AddAsync(shelfId, createFloorDTO);
                 var response = new
                 {
-                    Data = purchaseDetail
+                    Data = floor
                 };
-                return CreatedAtAction(nameof(GetById), new { id = purchaseDetail.Id }, response);
+                return CreatedAtAction(nameof(GetById), new { id = floor.Id }, response);
             }
             catch (ArgumentException ex)
             {
@@ -90,14 +98,14 @@ namespace API.Controllers
         }
 
         [HttpPut("id")]
-        public async Task<IActionResult> Update(string purchaseDetailId, [FromBody] UpdatePurchaseDetailDTO updatePurchaseDetailDTO)
+        public async Task<IActionResult> Update(string floorId, [FromBody] UpdateFloorDTO updateFloorDTO)
         {
             try
             {
-                var updatePurchaseDetail = await _purchaseDetailService.UpdateAsync(purchaseDetailId, updatePurchaseDetailDTO);
+                var updateFloor = await _floorService.UpdateAsync(floorId, updateFloorDTO);
                 return Ok(new
                 {
-                    Data = updatePurchaseDetail
+                    Data = updateFloor
                 });
             }
             catch (ArgumentException ex)
@@ -119,13 +127,13 @@ namespace API.Controllers
         }
 
         [HttpPut("Delete")]
-        public async Task<IActionResult> Delete(string id, [FromBody] DeletePurchaseDetailDTO deletePurchaseDetailDTO)
+        public async Task<IActionResult> Delete(string id, [FromBody] DeleteDTO deleteDTO)
         {
             try
             {
-                await _purchaseDetailService.DeleteAsync(id, deletePurchaseDetailDTO.DeletedBy);
+                await _floorService.DeleteAsync(id, deleteDTO.DeletedBy);
 
-                return Ok(new { StatusCode = StatusCodes.Status200OK, Message = "Xóa PurchaseDetail thành công", Data = (object)null });
+                return Ok(new { StatusCode = StatusCodes.Status200OK, Message = "Xóa Floor thành công", Data = (object)null });
             }
             catch (ArgumentException ex)
             {

@@ -1,7 +1,8 @@
 ﻿using AutoMapper;
 using BusinessLogicLayer.IService;
-using BusinessLogicLayer.Models.PurchaseDetail;
-using BusinessLogicLayer.Models.PurchaseReceipt;
+using BusinessLogicLayer.Models.Cell;
+using BusinessLogicLayer.Models.Floor;
+using BusinessLogicLayer.Models.General;
 using BusinessLogicLayer.Service;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -11,21 +12,28 @@ namespace API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class PurchaseDetailController : ControllerBase
+    public class CellController : ControllerBase
     {
-        private readonly IPurchaseDetailService _purchaseDetailService;
+        private readonly ICellService _cellService;
         private readonly IMapper _mapper;
 
-        public PurchaseDetailController(IPurchaseDetailService purchaseDetailService, IMapper mapper)
+        public CellController(ICellService cellService, IMapper mapper)
         {
-            _purchaseDetailService = purchaseDetailService;
+            _cellService = cellService;
             _mapper = mapper;
         }
 
         [HttpGet("GetAll")]
         public async Task<IActionResult> GetAll([FromQuery] int? pageNumber, [FromQuery] int? pageSize)
         {
-            var result = await _purchaseDetailService.GetAllAsync(pageNumber, pageSize);
+            var result = await _cellService.GetAllAsync(pageNumber, pageSize);
+            return Ok(result);
+        }
+
+        [HttpGet("GetAllByFloorId")]
+        public async Task<IActionResult> GetAllByFloorId(string floorId, [FromQuery] int? pageNumber, [FromQuery] int? pageSize)
+        {
+            var result = await _cellService.GetAllByFloorIdAsync(floorId, pageNumber, pageSize);
             return Ok(result);
         }
 
@@ -35,8 +43,8 @@ namespace API.Controllers
 
             try
             {
-                var purchaseDetail = await _purchaseDetailService.GetByIdAsync(id);
-                return Ok(new { Data = purchaseDetail });
+                var cell = await _cellService.GetByIdAsync(id);
+                return Ok(new { Data = cell });
             }
             catch (ArgumentException ex)
             {
@@ -57,19 +65,17 @@ namespace API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([Required] string reiceiptId, [Required] string productTypeId, [FromBody] CreatePurchaseDetailDTO createPurchaseDetailDTO)
+        public async Task<IActionResult> Create([Required] string floorId, [FromBody] CreateCellDTO createCellDTO)
         {
 
             try
             {
-
-
-                var purchaseDetail = await _purchaseDetailService.AddAsync(reiceiptId, productTypeId, createPurchaseDetailDTO);
+                var cell = await _cellService.AddAsync(floorId, createCellDTO);
                 var response = new
                 {
-                    Data = purchaseDetail
+                    Data = cell
                 };
-                return CreatedAtAction(nameof(GetById), new { id = purchaseDetail.Id }, response);
+                return CreatedAtAction(nameof(GetById), new { id = cell.Id }, response);
             }
             catch (ArgumentException ex)
             {
@@ -90,14 +96,14 @@ namespace API.Controllers
         }
 
         [HttpPut("id")]
-        public async Task<IActionResult> Update(string purchaseDetailId, [FromBody] UpdatePurchaseDetailDTO updatePurchaseDetailDTO)
+        public async Task<IActionResult> Update(string cellId, [FromBody] UpdateCellDTO updateCellDTO)
         {
             try
             {
-                var updatePurchaseDetail = await _purchaseDetailService.UpdateAsync(purchaseDetailId, updatePurchaseDetailDTO);
+                var updateCell = await _cellService.UpdateAsync(cellId, updateCellDTO);
                 return Ok(new
                 {
-                    Data = updatePurchaseDetail
+                    Data = updateCell
                 });
             }
             catch (ArgumentException ex)
@@ -119,13 +125,13 @@ namespace API.Controllers
         }
 
         [HttpPut("Delete")]
-        public async Task<IActionResult> Delete(string id, [FromBody] DeletePurchaseDetailDTO deletePurchaseDetailDTO)
+        public async Task<IActionResult> Delete(string id, [FromBody] DeleteDTO deleteDTO)
         {
             try
             {
-                await _purchaseDetailService.DeleteAsync(id, deletePurchaseDetailDTO.DeletedBy);
+                await _cellService.DeleteAsync(id, deleteDTO.DeletedBy);
 
-                return Ok(new { StatusCode = StatusCodes.Status200OK, Message = "Xóa PurchaseDetail thành công", Data = (object)null });
+                return Ok(new { StatusCode = StatusCodes.Status200OK, Message = "Xóa Cell thành công", Data = (object)null });
             }
             catch (ArgumentException ex)
             {
