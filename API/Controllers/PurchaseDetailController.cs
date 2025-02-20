@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using BusinessLogicLayer.IService;
+using BusinessLogicLayer.Models.General;
 using BusinessLogicLayer.Models.PurchaseDetail;
 using BusinessLogicLayer.Models.PurchaseReceipt;
 using BusinessLogicLayer.Service;
@@ -119,7 +120,7 @@ namespace API.Controllers
         }
 
         [HttpPut("Delete")]
-        public async Task<IActionResult> Delete(string id, [FromBody] DeletePurchaseDetailDTO deletePurchaseDetailDTO)
+        public async Task<IActionResult> Delete(string id, [FromBody] DeleteDTO deletePurchaseDetailDTO)
         {
             try
             {
