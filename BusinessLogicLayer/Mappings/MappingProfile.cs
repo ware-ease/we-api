@@ -5,6 +5,8 @@ using BusinessLogicLayer.Models.AccountPermission;
 using BusinessLogicLayer.Models.AppAction;
 using BusinessLogicLayer.Models.Authentication;
 using BusinessLogicLayer.Models.Category;
+using BusinessLogicLayer.Models.Cell;
+using BusinessLogicLayer.Models.Floor;
 using BusinessLogicLayer.Models.Group;
 using BusinessLogicLayer.Models.GroupPermission;
 using BusinessLogicLayer.Models.Permission;
@@ -17,6 +19,7 @@ using BusinessLogicLayer.Models.PurchaseDetail;
 using BusinessLogicLayer.Models.PurchaseReceipt;
 using BusinessLogicLayer.Models.ReceivingDetail;
 using BusinessLogicLayer.Models.ReceivingNote;
+using BusinessLogicLayer.Models.Shelf;
 using BusinessLogicLayer.Models.Supplier;
 using BusinessLogicLayer.Models.TypeDetail;
 using BusinessLogicLayer.Models.Warehouse;
@@ -104,6 +107,21 @@ namespace BusinessLogicLayer.Mappings
             #region ProductTypeTypeDetail
             CreateMap<ProductTypeTypeDetail, CreateProductTypeTypeDetailDTO>();
             CreateMap<CreateProductTypeTypeDetailDTO, ProductTypeTypeDetail>();
+            #endregion
+
+            #region Shelf
+            CreateMap<Shelf, CreateShelfDTO>();
+            CreateMap<CreateShelfDTO, Shelf>();
+            #endregion
+
+            #region Floor
+            CreateMap<Floor, CreateFloorDTO>();
+            CreateMap<CreateFloorDTO, Floor>();
+            #endregion
+
+            #region Cell
+            CreateMap<Cell, CreateCellDTO>();
+            CreateMap<CreateCellDTO, Cell>();
             #endregion
 
             #region Group

@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using BusinessLogicLayer.IService;
+using BusinessLogicLayer.Models.Floor;
 using BusinessLogicLayer.Models.General;
-using BusinessLogicLayer.Models.PurchaseReceipt;
-using BusinessLogicLayer.Models.ReceivingNote;
+using BusinessLogicLayer.Models.Shelf;
 using BusinessLogicLayer.Service;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -12,21 +12,28 @@ namespace API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ReceivingNoteController : ControllerBase
+    public class FloorController : ControllerBase
     {
-        private readonly IReceivingNoteService _receivingNoteService;
+        private readonly IFloorService _floorService;
         private readonly IMapper _mapper;
 
-        public ReceivingNoteController(IReceivingNoteService receivingNoteService, IMapper mapper)
+        public FloorController(IFloorService floorService, IMapper mapper)
         {
-            _receivingNoteService = receivingNoteService;
+            _floorService = floorService;
             _mapper = mapper;
         }
 
         [HttpGet("GetAll")]
         public async Task<IActionResult> GetAll([FromQuery] int? pageNumber, [FromQuery] int? pageSize)
         {
-            var result = await _receivingNoteService.GetAllAsync(pageNumber, pageSize);
+            var result = await _floorService.GetAllAsync(pageNumber, pageSize);
+            return Ok(result);
+        }
+
+        [HttpGet("GetAllByShelfId")]
+        public async Task<IActionResult> GetAllByShelfId(string shelfId,[FromQuery] int? pageNumber, [FromQuery] int? pageSize)
+        {
+            var result = await _floorService.GetAllByShelfIdAsync(shelfId, pageNumber, pageSize);
             return Ok(result);
         }
 
@@ -36,8 +43,8 @@ namespace API.Controllers
 
             try
             {
-                var supplier = await _receivingNoteService.GetByIdAsync(id);
-                return Ok(new { Data = supplier });
+                var floor = await _floorService.GetByIdAsync(id);
+                return Ok(new { Data = floor });
             }
             catch (ArgumentException ex)
             {
@@ -58,17 +65,19 @@ namespace API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([Required] string supplierId, [Required] string purchaseId, [FromBody] CreateReceivingNoteDTO createReceivingNoteDTO)
+        public async Task<IActionResult> Create([Required] string shelfId, [FromBody] CreateFloorDTO createFloorDTO)
         {
 
             try
             {
-                var purchaseReceipt = await _receivingNoteService.AddAsync(supplierId, purchaseId, createReceivingNoteDTO);
+
+
+                var floor = await _floorService.AddAsync(shelfId, createFloorDTO);
                 var response = new
                 {
-                    Data = purchaseReceipt
+                    Data = floor
                 };
-                return CreatedAtAction(nameof(GetById), new { id = purchaseReceipt.Id }, response);
+                return CreatedAtAction(nameof(GetById), new { id = floor.Id }, response);
             }
             catch (ArgumentException ex)
             {
@@ -89,14 +98,14 @@ namespace API.Controllers
         }
 
         [HttpPut("id")]
-        public async Task<IActionResult> Update(string noteId, [FromBody] UpdateReceivingNoteDTO updateReceivingNoteDTO)
+        public async Task<IActionResult> Update(string floorId, [FromBody] UpdateFloorDTO updateFloorDTO)
         {
             try
             {
-                var updatePurchaseReceipt = await _receivingNoteService.UpdateAsync(noteId, updateReceivingNoteDTO);
+                var updateFloor = await _floorService.UpdateAsync(floorId, updateFloorDTO);
                 return Ok(new
                 {
-                    Data = updatePurchaseReceipt
+                    Data = updateFloor
                 });
             }
             catch (ArgumentException ex)
@@ -118,13 +127,13 @@ namespace API.Controllers
         }
 
         [HttpPut("Delete")]
-        public async Task<IActionResult> Delete(string id, [FromBody] DeleteDTO deleteReceivingNoteDTO)
+        public async Task<IActionResult> Delete(string id, [FromBody] DeleteDTO deleteDTO)
         {
             try
             {
-                await _receivingNoteService.DeleteAsync(id, deleteReceivingNoteDTO.DeletedBy);
+                await _floorService.DeleteAsync(id, deleteDTO.DeletedBy);
 
-                return Ok(new { StatusCode = StatusCodes.Status200OK, Message = "Xóa PurchaseReceipt thành công", Data = (object)null });
+                return Ok(new { StatusCode = StatusCodes.Status200OK, Message = "Xóa Floor thành công", Data = (object)null });
             }
             catch (ArgumentException ex)
             {

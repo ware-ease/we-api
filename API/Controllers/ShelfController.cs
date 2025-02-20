@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using BusinessLogicLayer.IService;
 using BusinessLogicLayer.Models.General;
-using BusinessLogicLayer.Models.PurchaseReceipt;
-using BusinessLogicLayer.Models.ReceivingNote;
+using BusinessLogicLayer.Models.PurchaseDetail;
+using BusinessLogicLayer.Models.Shelf;
 using BusinessLogicLayer.Service;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -12,21 +12,28 @@ namespace API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ReceivingNoteController : ControllerBase
+    public class ShelfController : ControllerBase
     {
-        private readonly IReceivingNoteService _receivingNoteService;
+        private readonly IShelfService _shelfService;
         private readonly IMapper _mapper;
 
-        public ReceivingNoteController(IReceivingNoteService receivingNoteService, IMapper mapper)
+        public ShelfController(IShelfService shelfService, IMapper mapper)
         {
-            _receivingNoteService = receivingNoteService;
+            _shelfService = shelfService;
             _mapper = mapper;
         }
 
         [HttpGet("GetAll")]
         public async Task<IActionResult> GetAll([FromQuery] int? pageNumber, [FromQuery] int? pageSize)
         {
-            var result = await _receivingNoteService.GetAllAsync(pageNumber, pageSize);
+            var result = await _shelfService.GetAllAsync(pageNumber, pageSize);
+            return Ok(result);
+        }
+
+        [HttpGet("GetAllByWarehouseId")]
+        public async Task<IActionResult> GetAllByWarehouseId([Required]string warehouseId,[FromQuery] int? pageNumber, [FromQuery] int? pageSize)
+        {
+            var result = await _shelfService.GetAllByWarehouseIdAsync(warehouseId, pageNumber, pageSize);
             return Ok(result);
         }
 
@@ -36,8 +43,8 @@ namespace API.Controllers
 
             try
             {
-                var supplier = await _receivingNoteService.GetByIdAsync(id);
-                return Ok(new { Data = supplier });
+                var shelf = await _shelfService.GetByIdAsync(id);
+                return Ok(new { Data = shelf });
             }
             catch (ArgumentException ex)
             {
@@ -58,17 +65,19 @@ namespace API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([Required] string supplierId, [Required] string purchaseId, [FromBody] CreateReceivingNoteDTO createReceivingNoteDTO)
+        public async Task<IActionResult> Create([Required] string warehouseId, [FromBody] CreateShelfDTO createShelfDTO)
         {
 
             try
             {
-                var purchaseReceipt = await _receivingNoteService.AddAsync(supplierId, purchaseId, createReceivingNoteDTO);
+
+
+                var shelf = await _shelfService.AddAsync(warehouseId, createShelfDTO);
                 var response = new
                 {
-                    Data = purchaseReceipt
+                    Data = shelf
                 };
-                return CreatedAtAction(nameof(GetById), new { id = purchaseReceipt.Id }, response);
+                return CreatedAtAction(nameof(GetById), new { id = shelf.Id }, response);
             }
             catch (ArgumentException ex)
             {
@@ -89,14 +98,14 @@ namespace API.Controllers
         }
 
         [HttpPut("id")]
-        public async Task<IActionResult> Update(string noteId, [FromBody] UpdateReceivingNoteDTO updateReceivingNoteDTO)
+        public async Task<IActionResult> Update(string shelfId, [FromBody] UpdateShelfDTO updateShelfDTO)
         {
             try
             {
-                var updatePurchaseReceipt = await _receivingNoteService.UpdateAsync(noteId, updateReceivingNoteDTO);
+                var updateShelf = await _shelfService.UpdateAsync(shelfId, updateShelfDTO);
                 return Ok(new
                 {
-                    Data = updatePurchaseReceipt
+                    Data = updateShelf
                 });
             }
             catch (ArgumentException ex)
@@ -118,13 +127,13 @@ namespace API.Controllers
         }
 
         [HttpPut("Delete")]
-        public async Task<IActionResult> Delete(string id, [FromBody] DeleteDTO deleteReceivingNoteDTO)
+        public async Task<IActionResult> Delete(string id, [FromBody] DeleteDTO deleteShelfDTO)
         {
             try
             {
-                await _receivingNoteService.DeleteAsync(id, deleteReceivingNoteDTO.DeletedBy);
+                await _shelfService.DeleteAsync(id, deleteShelfDTO.DeletedBy);
 
-                return Ok(new { StatusCode = StatusCodes.Status200OK, Message = "Xóa PurchaseReceipt thành công", Data = (object)null });
+                return Ok(new { StatusCode = StatusCodes.Status200OK, Message = "Xóa Shelf thành công", Data = (object)null });
             }
             catch (ArgumentException ex)
             {

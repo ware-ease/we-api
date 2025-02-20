@@ -39,12 +39,12 @@ namespace BusinessLogicLayer.Service
 
         public async Task<PurchaseDetail> GetByIdAsync(string id)
         {
-            var supplier = await _purchaseDetailRepository.GetByIdAsync(id);
-            if (supplier == null)
+            var purchaseDetail = await _purchaseDetailRepository.GetByIdAsync(id);
+            if (purchaseDetail == null)
             {
                 throw new ArgumentException("Không thể tìm thấy Id");
             }
-            return supplier;
+            return purchaseDetail;
         }
 
         public async Task<PurchaseDetail> AddAsync(string receiptId, string productTypeId, CreatePurchaseDetailDTO createPurchaseDetailDTO)

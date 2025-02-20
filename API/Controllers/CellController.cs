@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using BusinessLogicLayer.IService;
+using BusinessLogicLayer.Models.Cell;
+using BusinessLogicLayer.Models.Floor;
 using BusinessLogicLayer.Models.General;
-using BusinessLogicLayer.Models.PurchaseReceipt;
-using BusinessLogicLayer.Models.ReceivingNote;
 using BusinessLogicLayer.Service;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -12,21 +12,28 @@ namespace API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ReceivingNoteController : ControllerBase
+    public class CellController : ControllerBase
     {
-        private readonly IReceivingNoteService _receivingNoteService;
+        private readonly ICellService _cellService;
         private readonly IMapper _mapper;
 
-        public ReceivingNoteController(IReceivingNoteService receivingNoteService, IMapper mapper)
+        public CellController(ICellService cellService, IMapper mapper)
         {
-            _receivingNoteService = receivingNoteService;
+            _cellService = cellService;
             _mapper = mapper;
         }
 
         [HttpGet("GetAll")]
         public async Task<IActionResult> GetAll([FromQuery] int? pageNumber, [FromQuery] int? pageSize)
         {
-            var result = await _receivingNoteService.GetAllAsync(pageNumber, pageSize);
+            var result = await _cellService.GetAllAsync(pageNumber, pageSize);
+            return Ok(result);
+        }
+
+        [HttpGet("GetAllByFloorId")]
+        public async Task<IActionResult> GetAllByFloorId(string floorId, [FromQuery] int? pageNumber, [FromQuery] int? pageSize)
+        {
+            var result = await _cellService.GetAllByFloorIdAsync(floorId, pageNumber, pageSize);
             return Ok(result);
         }
 
@@ -36,8 +43,8 @@ namespace API.Controllers
 
             try
             {
-                var supplier = await _receivingNoteService.GetByIdAsync(id);
-                return Ok(new { Data = supplier });
+                var cell = await _cellService.GetByIdAsync(id);
+                return Ok(new { Data = cell });
             }
             catch (ArgumentException ex)
             {
@@ -58,17 +65,17 @@ namespace API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([Required] string supplierId, [Required] string purchaseId, [FromBody] CreateReceivingNoteDTO createReceivingNoteDTO)
+        public async Task<IActionResult> Create([Required] string floorId, [FromBody] CreateCellDTO createCellDTO)
         {
 
             try
             {
-                var purchaseReceipt = await _receivingNoteService.AddAsync(supplierId, purchaseId, createReceivingNoteDTO);
+                var cell = await _cellService.AddAsync(floorId, createCellDTO);
                 var response = new
                 {
-                    Data = purchaseReceipt
+                    Data = cell
                 };
-                return CreatedAtAction(nameof(GetById), new { id = purchaseReceipt.Id }, response);
+                return CreatedAtAction(nameof(GetById), new { id = cell.Id }, response);
             }
             catch (ArgumentException ex)
             {
@@ -89,14 +96,14 @@ namespace API.Controllers
         }
 
         [HttpPut("id")]
-        public async Task<IActionResult> Update(string noteId, [FromBody] UpdateReceivingNoteDTO updateReceivingNoteDTO)
+        public async Task<IActionResult> Update(string cellId, [FromBody] UpdateCellDTO updateCellDTO)
         {
             try
             {
-                var updatePurchaseReceipt = await _receivingNoteService.UpdateAsync(noteId, updateReceivingNoteDTO);
+                var updateCell = await _cellService.UpdateAsync(cellId, updateCellDTO);
                 return Ok(new
                 {
-                    Data = updatePurchaseReceipt
+                    Data = updateCell
                 });
             }
             catch (ArgumentException ex)
@@ -118,13 +125,13 @@ namespace API.Controllers
         }
 
         [HttpPut("Delete")]
-        public async Task<IActionResult> Delete(string id, [FromBody] DeleteDTO deleteReceivingNoteDTO)
+        public async Task<IActionResult> Delete(string id, [FromBody] DeleteDTO deleteDTO)
         {
             try
             {
-                await _receivingNoteService.DeleteAsync(id, deleteReceivingNoteDTO.DeletedBy);
+                await _cellService.DeleteAsync(id, deleteDTO.DeletedBy);
 
-                return Ok(new { StatusCode = StatusCodes.Status200OK, Message = "Xóa PurchaseReceipt thành công", Data = (object)null });
+                return Ok(new { StatusCode = StatusCodes.Status200OK, Message = "Xóa Cell thành công", Data = (object)null });
             }
             catch (ArgumentException ex)
             {

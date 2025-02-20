@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using BusinessLogicLayer.IService;
+using BusinessLogicLayer.Models.General;
 using BusinessLogicLayer.Models.PurchaseDetail;
 using BusinessLogicLayer.Models.PurchaseReceipt;
 using BusinessLogicLayer.Service;
@@ -119,13 +120,13 @@ namespace API.Controllers
         }
 
         [HttpPut("Delete")]
-        public async Task<IActionResult> Delete(string id, [FromBody] DeletePurchaseDetailDTO deletePurchaseDetailDTO)
+        public async Task<IActionResult> Delete(string id, [FromBody] DeleteDTO deletePurchaseDetailDTO)
         {
             try
             {
                 await _purchaseDetailService.DeleteAsync(id, deletePurchaseDetailDTO.DeletedBy);
 
-                return Ok(new { StatusCode = StatusCodes.Status200OK, Message = "Xóa PurchaseReceipt thành công", Data = (object)null });
+                return Ok(new { StatusCode = StatusCodes.Status200OK, Message = "Xóa PurchaseDetail thành công", Data = (object)null });
             }
             catch (ArgumentException ex)
             {

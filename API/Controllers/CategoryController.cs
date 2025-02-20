@@ -2,6 +2,7 @@
 using BusinessLogicLayer.IService;
 using BusinessLogicLayer.Models;
 using BusinessLogicLayer.Models.Category;
+using BusinessLogicLayer.Models.General;
 using BusinessLogicLayer.Service;
 using Data.Entity;
 using Microsoft.AspNetCore.Http;
@@ -105,7 +106,7 @@ namespace API.Controllers
         }
 
         [HttpPut("Delete")]
-        public async Task<IActionResult> Delete(string id, [FromBody] DeleteCategoryDTO deleteCategoryDTO)
+        public async Task<IActionResult> Delete(string id, [FromBody] DeleteDTO deleteCategoryDTO)
         {
             try
             {
