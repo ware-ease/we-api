@@ -2,6 +2,7 @@
 using AutoMapper;
 using BusinessLogicLayer.IService;
 using BusinessLogicLayer.Mappings;
+using BusinessLogicLayer.Models.General;
 using BusinessLogicLayer.Service;
 using BusinessLogicLayer.Services;
 using DataAccessLayer;
@@ -18,6 +19,8 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
 
 // Add services to the container.
 
