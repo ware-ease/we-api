@@ -2,6 +2,7 @@
 using BusinessLogicLayer.Models.Account;
 using BusinessLogicLayer.Models.AccountGroup;
 using BusinessLogicLayer.Models.AccountPermission;
+using BusinessLogicLayer.Models.AccountWarehouse;
 using BusinessLogicLayer.Models.AppAction;
 using BusinessLogicLayer.Models.Authentication;
 using BusinessLogicLayer.Models.Category;
@@ -178,6 +179,13 @@ namespace BusinessLogicLayer.Mappings
             CreateMap<GroupPermission, GroupPermissionDTO>().ReverseMap();
             CreateMap<CreateGroupPermissionDTO, GroupPermission>().ReverseMap();
             CreateMap<UpdateGroupPermissionDTO, GroupPermission>().ReverseMap();
+            #endregion
+
+            #region AccountWarehouse
+            CreateMap<AccountWarehouse, AccountWarehouseDTO>().ReverseMap();
+            CreateMap<CreateAccountWarehouseDTO, AccountWarehouse>().ReverseMap();
+            CreateMap<UpdateAccountWarehouseDTO, AccountWarehouse>().ReverseMap();
+            CreateMap<DeleteAccountWarehouseDTO, AccountWarehouse>().ReverseMap();
             #endregion
         }
     }

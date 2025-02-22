@@ -97,6 +97,7 @@ builder.Services.AddScoped<IAccountGroupRepository, AccountGroupRepository>();
 builder.Services.AddScoped<IAccountPermissionRepository, AccountPermissionRepository>();
 builder.Services.AddScoped<IPermissionActionRepository, PermissionActionRepository>();
 builder.Services.AddScoped<IGroupPermissionRepository, GroupPermissionRepository>();
+builder.Services.AddScoped<IAccountWarehouseRepository, AccountWarehouseRepository>();
 
 // Register servicies
 builder.Services.AddScoped<IAccountService, AccountService>();
@@ -125,6 +126,7 @@ builder.Services.AddScoped<IAccountGroupService, AccountGroupService>();
 builder.Services.AddScoped<IAccountPermissionService, AccountPermissionService>();
 builder.Services.AddScoped<IPermissionActionService, PermissionActionService>();
 builder.Services.AddScoped<IGroupPermissionService, GroupPermissionService>();
+builder.Services.AddScoped<IAccountWarehouseService, AccountWarehouseService>();
 
 ////Config Jwt Token
 builder.Services.AddAuthentication(options =>
