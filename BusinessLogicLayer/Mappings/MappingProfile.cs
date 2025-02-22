@@ -20,6 +20,8 @@ using BusinessLogicLayer.Models.PurchaseReceipt;
 using BusinessLogicLayer.Models.ReceivingDetail;
 using BusinessLogicLayer.Models.ReceivingNote;
 using BusinessLogicLayer.Models.Shelf;
+using BusinessLogicLayer.Models.StockCard;
+using BusinessLogicLayer.Models.StockCardDetail;
 using BusinessLogicLayer.Models.Supplier;
 using BusinessLogicLayer.Models.TypeDetail;
 using BusinessLogicLayer.Models.Warehouse;
@@ -122,6 +124,16 @@ namespace BusinessLogicLayer.Mappings
             #region Cell
             CreateMap<Cell, CreateCellDTO>();
             CreateMap<CreateCellDTO, Cell>();
+            #endregion
+
+            #region StockCard
+            CreateMap<StockCard, CreateStockCardDTO>();
+            CreateMap<CreateStockCardDTO, StockCard>();
+            #endregion
+
+            #region StockCardDetail
+            CreateMap<StockCardDetail, CreateStockCardDetailDTO>();
+            CreateMap<CreateStockCardDetailDTO, StockCardDetail>();
             #endregion
 
             #region Group

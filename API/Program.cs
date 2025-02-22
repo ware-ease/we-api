@@ -83,6 +83,8 @@ builder.Services.AddScoped<IProductTypeTypeDetailRepository, ProductTypeTypeDeta
 builder.Services.AddScoped<IShelfRepository, ShelfRepository>();
 builder.Services.AddScoped<IFloorRepository, FloorRepository>();
 builder.Services.AddScoped<ICellRepository, CellRepository>();
+builder.Services.AddScoped<IStockCardRepository, StockCardRepository>();
+builder.Services.AddScoped<IStockCardDetailRepository, StockCardDetailRepository>();
 builder.Services.AddScoped<IGroupRepository, GroupRepository>();
 builder.Services.AddScoped<IProfileRepository, ProfileRepository>();
 builder.Services.AddScoped<IAppActionRepository, AppActionRepository>();
@@ -108,6 +110,8 @@ builder.Services.AddScoped<IProductTypeTypeDetailService, ProductTypeTypeDetailS
 builder.Services.AddScoped<IShelfService, ShelfService>();
 builder.Services.AddScoped<IFloorService, FloorService>();
 builder.Services.AddScoped<ICellService, CellService>();
+builder.Services.AddScoped<IStockCardService, StockCardService>();
+builder.Services.AddScoped<IStockCardDetailService, StockCardDetailService>();
 builder.Services.AddScoped<IGenericPaginationService, GenericPaginationService>();
 builder.Services.AddScoped<IGroupService, GroupService>();
 builder.Services.AddScoped<IProfileService, ProfileService>();
