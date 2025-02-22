@@ -19,6 +19,7 @@ namespace DataAccessLayer.UnitOfWork
         private AccountPermissionRepository _accountPermissionRepository;
         private PermissionActionRepository _permissionActionRepository;
         private GroupPermissionRepository _groupPermissionRepository;
+        private AccountWarehouseRepository _accountWarehouseRepository;
 
 
         public UnitOfWork(WaseEaseDbContext context, IConfiguration configuration)
@@ -166,6 +167,17 @@ namespace DataAccessLayer.UnitOfWork
                     this._groupPermissionRepository = new GroupPermissionRepository(_context);
                 }
                 return _groupPermissionRepository;
+            }
+        }
+        AccountWarehouseRepository IUnitOfWork.AccountWarehouseRepository
+        {
+            get
+            {
+                if (_accountWarehouseRepository == null)
+                {
+                    this._accountWarehouseRepository = new AccountWarehouseRepository(_context);
+                }
+                return _accountWarehouseRepository;
             }
         }
     }
