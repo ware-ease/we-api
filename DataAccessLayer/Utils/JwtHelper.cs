@@ -1,4 +1,5 @@
 ﻿using Data.Entity;
+using DotNetEnv;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -57,12 +58,12 @@ namespace DataAccessLayer.Utils
             }
 
 
-
-            var authenKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:SecretKey"]));
+            Env.Load();
+            var authenKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JWT_SECRET_KEY")));
 
             var token = new JwtSecurityToken(
-                issuer: _configuration["JWT:ValidIssuer"],
-                audience: _configuration["JWT:ValidAudience"],
+                issuer: Environment.GetEnvironmentVariable("JWT_VALID_ISSUER"),
+                audience: Environment.GetEnvironmentVariable("JWT_VALID_AUDIENCE"),
                 expires: DateTime.UtcNow.AddMinutes(30),
                 claims: authClaims,
                 signingCredentials: new SigningCredentials(authenKey, SecurityAlgorithms.HmacSha512Signature)

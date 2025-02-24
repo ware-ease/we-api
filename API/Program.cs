@@ -9,6 +9,7 @@ using DataAccessLayer;
 using DataAccessLayer.IRepositories;
 using DataAccessLayer.Repositories;
 using DataAccessLayer.UnitOfWork;
+using DotNetEnv;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -18,17 +19,28 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
+Env.Load();
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Configuration.AddEnvironmentVariables();
 
 builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
 
 // Add services to the container.
 
+builder.Configuration
+    .AddEnvironmentVariables()
+    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+
+var connectionString = Environment.GetEnvironmentVariable("DB_URL");
+
+Console.WriteLine(builder.Configuration.GetConnectionString("Default"));
+
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddDbContext<WaseEaseDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
+    options.UseSqlServer(connectionString));
 
 ////Add kebab
 //builder.Services.AddControllers().AddJsonOptions(options =>

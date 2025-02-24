@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Data.Entity;
 using Data.Entity.Base;
+using DotNetEnv;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
@@ -60,12 +61,9 @@ namespace DataAccessLayer
         {
             if (!optionsBuilder.IsConfigured)
             {
-                var config = new ConfigurationBuilder()
-                    .SetBasePath(Directory.GetCurrentDirectory())
-                    .AddJsonFile("appsettings.json", true, true)
-                    .Build();
+                Env.Load();
 
-                optionsBuilder.UseSqlServer(config.GetConnectionString("Default"));
+                optionsBuilder.UseSqlServer(Environment.GetEnvironmentVariable("DB_URL"));
             }
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
