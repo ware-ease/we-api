@@ -34,8 +34,6 @@ builder.Configuration
 
 var connectionString = Environment.GetEnvironmentVariable("DB_URL");
 
-Console.WriteLine(builder.Configuration.GetConnectionString("Default"));
-
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -107,7 +105,7 @@ builder.Services.AddScoped<IPermissionRepository, PermissionRepository>();
 builder.Services.AddScoped<IWarehouseRepository, WarehouseRepository>();
 builder.Services.AddScoped<IAccountGroupRepository, AccountGroupRepository>();
 builder.Services.AddScoped<IAccountPermissionRepository, AccountPermissionRepository>();
-builder.Services.AddScoped<IPermissionActionRepository, PermissionActionRepository>();
+//builder.Services.AddScoped<IPermissionActionRepository, PermissionActionRepository>();
 builder.Services.AddScoped<IGroupPermissionRepository, GroupPermissionRepository>();
 builder.Services.AddScoped<IAccountWarehouseRepository, AccountWarehouseRepository>();
 
@@ -154,9 +152,9 @@ builder.Services.AddAuthentication(options =>
     {
         ValidateIssuer = true,
         ValidateAudience = true,
-        ValidAudience = builder.Configuration["JWT:ValidAudience"],
-        ValidIssuer = builder.Configuration["JWT:ValidIssuer"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:SecretKey"])),
+        ValidAudience = Environment.GetEnvironmentVariable("JWT_VALID_AUDIENCE"),
+        ValidIssuer = Environment.GetEnvironmentVariable("JWT_VALID_ISSUER"),
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JWT_SECRET_KEY"))),
         ClockSkew = TimeSpan.Zero
     };
 });

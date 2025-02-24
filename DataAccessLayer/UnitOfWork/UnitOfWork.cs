@@ -17,7 +17,7 @@ namespace DataAccessLayer.UnitOfWork
         private WarehouseRepository _warehouseRepo;
         private AccountGroupRepository _accountGroupRepository;
         private AccountPermissionRepository _accountPermissionRepository;
-        private PermissionActionRepository _permissionActionRepository;
+        //private PermissionActionRepository _permissionActionRepository;
         private GroupPermissionRepository _groupPermissionRepository;
         private AccountWarehouseRepository _accountWarehouseRepository;
 
@@ -147,17 +147,17 @@ namespace DataAccessLayer.UnitOfWork
             }
         }
 
-        PermissionActionRepository IUnitOfWork.PermissionActionRepository
-        {
-            get
-            {
-                if (_permissionActionRepository == null)
-                {
-                    this._permissionActionRepository = new PermissionActionRepository(_context);
-                }
-                return _permissionActionRepository;
-            }
-        }
+        //PermissionActionRepository IUnitOfWork.PermissionActionRepository
+        //{
+        //    get
+        //    {
+        //        if (_permissionActionRepository == null)
+        //        {
+        //            this._permissionActionRepository = new PermissionActionRepository(_context);
+        //        }
+        //        return _permissionActionRepository;
+        //    }
+        //}
         GroupPermissionRepository IUnitOfWork.GroupPermissionRepository
         {
             get

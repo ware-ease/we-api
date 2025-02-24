@@ -32,56 +32,64 @@ namespace BusinessLogicLayer.Service
 
         public async Task<GroupPermissionDTO> GetByIdAsync(string groupId, string permissionId)
         {
-            var entity = await _unitOfWork.GroupPermissionRepository.GetByCondition(
-                filter: x => x.GroupId == groupId && x.PermissionId == permissionId);
-            return _mapper.Map<GroupPermissionDTO>(entity);
+            //var entity = await _unitOfWork.GroupPermissionRepository.GetByCondition(
+            //    filter: x => x.GroupId == groupId && x.PermissionId == permissionId);
+            //return _mapper.Map<GroupPermissionDTO>(entity);
+
+            return null;
         }
 
         public async Task<GroupPermissionDTO> CreateAsync(CreateGroupPermissionDTO model)
         {
-            var existingEntity = await _unitOfWork.GroupPermissionRepository.GetByCondition(
-                filter: x => x.GroupId == model.GroupId && x.PermissionId == model.PermissionId);
+            //var existingEntity = await _unitOfWork.GroupPermissionRepository.GetByCondition(
+            //    filter: x => x.GroupId == model.GroupId && x.PermissionId == model.PermissionId);
 
-            if (existingEntity != null)
-            {
-                throw new InvalidOperationException("Quyền này đã được cấp cho nhóm này.");
-            }
+            //if (existingEntity != null)
+            //{
+            //    throw new InvalidOperationException("Quyền này đã được cấp cho nhóm này.");
+            //}
 
-            var entity = _mapper.Map<GroupPermission>(model);
-            entity.CreatedTime = DateTime.Now;
-            await _unitOfWork.GroupPermissionRepository.Insert(entity);
-            await _unitOfWork.SaveAsync();
-            return _mapper.Map<GroupPermissionDTO>(entity);
+            //var entity = _mapper.Map<GroupAction>(model);
+            //entity.CreatedTime = DateTime.Now;
+            //await _unitOfWork.GroupPermissionRepository.Insert(entity);
+            //await _unitOfWork.SaveAsync();
+            //return _mapper.Map<GroupPermissionDTO>(entity);
+
+            return null;
         }
 
         public async Task<bool> DeleteAsync(string groupId, string permissionId)
         {
-            var entity = await _unitOfWork.GroupPermissionRepository.GetByCondition(
-                filter: x => x.GroupId == groupId && x.PermissionId == permissionId);
+            //var entity = await _unitOfWork.GroupPermissionRepository.GetByCondition(
+            //    filter: x => x.GroupId == groupId && x.PermissionId == permissionId);
 
-            if (entity == null) return false;
+            //if (entity == null) return false;
 
-            _unitOfWork.GroupPermissionRepository.Delete(entity);
+            //_unitOfWork.GroupPermissionRepository.Delete(entity);
             await _unitOfWork.SaveAsync();
             return true;
         }
 
         public async Task<IEnumerable<PermissionDTO>> GetPermissionsByGroupIdAsync(string groupId)
         {
-            var groupPermissions = await _unitOfWork.GroupPermissionRepository.Get(x => x.GroupId == groupId);
-            var permissionIds = groupPermissions.Select(x => x.PermissionId).ToList();
+            //var groupPermissions = await _unitOfWork.GroupPermissionRepository.Get(x => x.GroupId == groupId);
+            //var permissionIds = groupPermissions.Select(x => x.PermissionId).ToList();
 
-            var permissions = await _unitOfWork.PermissionRepository.Get(p => permissionIds.Contains(p.Id));
-            return _mapper.Map<IEnumerable<PermissionDTO>>(permissions);
+            //var permissions = await _unitOfWork.PermissionRepository.Get(p => permissionIds.Contains(p.Id));
+            //return _mapper.Map<IEnumerable<PermissionDTO>>(permissions);
+
+            return null;
         }
 
         public async Task<IEnumerable<GroupDTO>> GetGroupsByPermissionIdAsync(string permissionId)
         {
-            var groupPermissions = await _unitOfWork.GroupPermissionRepository.Get(x => x.PermissionId == permissionId);
-            var groupIds = groupPermissions.Select(x => x.GroupId).ToList();
+            //var groupPermissions = await _unitOfWork.GroupPermissionRepository.Get(x => x.PermissionId == permissionId);
+            //var groupIds = groupPermissions.Select(x => x.GroupId).ToList();
 
-            var groups = await _unitOfWork.GroupRepository.Get(g => groupIds.Contains(g.Id));
-            return _mapper.Map<IEnumerable<GroupDTO>>(groups);
+            //var groups = await _unitOfWork.GroupRepository.Get(g => groupIds.Contains(g.Id));
+            //return _mapper.Map<IEnumerable<GroupDTO>>(groups);
+
+            return null;
         }
     }
 }

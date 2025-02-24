@@ -34,16 +34,16 @@ namespace DataAccessLayer.Utils
             }
 
             // Lấy danh sách quyền của user
-            var userPermissions = await _context.AccountPermissions
-                                                .Where(ap => ap.AccountId == user.Id)
-                                                .Include(ap => ap.Permission)
-                                                .Select(ap => ap.Permission.Url)
-                                                .ToListAsync();
+            //var userPermissions = await _context.AccountPermissions
+            //                                    .Where(ap => ap.AccountId == user.Id)
+            //                                    .Include(ap => ap.Permission)
+            //                                    .Select(ap => ap.Permission.Url)
+            //                                    .ToListAsync();
 
-            foreach (var permission in userPermissions)
-            {
-                authClaims.Add(new Claim("Permission", permission));
-            }
+            //foreach (var permission in userPermissions)
+            //{
+            //    authClaims.Add(new Claim("Permission", permission));
+            //}
 
             // Lấy danh sách Warehouse của user
             var userWarehouses = await _context.AccountWarehouses

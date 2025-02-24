@@ -26,7 +26,7 @@ namespace DataAccessLayer.Repositories
                     //        .ThenInclude(gp => gp.Permission) // Truy cập Permission từ GroupPermission
                     //            .ThenInclude(p => p.PermissionActions) // Bao gồm các action của quyền
                     //                .ThenInclude(a =>a.Action)
-                .Include(a => a.AccountPermissions) // Bao gồm quyền riêng của user
+                .Include(a => a.AccountActions) // Bao gồm quyền riêng của user
                     //.ThenInclude(ap => ap.Permission) // Truy cập Permission từ AccountPermission
                     //    .ThenInclude(p => p.PermissionActions) // Bao gồm các action của quyền riêng
                     //        .ThenInclude(a => a.Action)
@@ -40,7 +40,7 @@ namespace DataAccessLayer.Repositories
                 var user = await _context.Accounts
                     .Include(a => a.AccountGroups) // Load nhóm tài khoản
                         //.ThenInclude(ag => ag.Group) // Load thông tin nhóm
-                    .Include(a => a.AccountPermissions) // Load quyền tài khoản
+                    .Include(a => a.AccountActions) // Load quyền tài khoản
                         //.ThenInclude(ap => ap.Permission) // Load chi tiết quyền
                     .Include(a => a.AccountWarehouses) // Load kho tài khoản
                         //.ThenInclude(aw => aw.Warehouse) // Load chi tiết kho

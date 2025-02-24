@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace DataAccessLayer.Repositories
 {
-    public class AccountPermissionRepository : GenericRepository<AccountPermission>, IAccountPermissionRepository
+    public class AccountPermissionRepository : GenericRepository<AccountAction>, IAccountPermissionRepository
     {
         private readonly WaseEaseDbContext _context;
 

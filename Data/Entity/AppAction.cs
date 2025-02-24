@@ -14,6 +14,12 @@ namespace Data.Entity
     {
         public string Code { get; set; }
 
-        public ICollection<PermissionAction> PermissionActions { get; set; }
+        [ForeignKey("Permission")]
+        public string PermissionId { get; set; }
+
+        public Permission Permission { get; set; }
+
+        public ICollection<GroupAction> GroupActions { get; set; }
+        public ICollection<AccountAction> AccountActions { get; set; }
     }
 }

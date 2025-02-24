@@ -8,7 +8,7 @@ namespace Data.Entity
     {
         public string Url { get; set; }
 
-        public ICollection<GroupPermission> GroupPermissions { get; set; }
-        public ICollection<PermissionAction> PermissionActions { get; set; }
+        public ICollection<GroupAction> GroupPermissions { get; set; }
+        public ICollection<AppAction> Actions { get; set; }
     }
 }

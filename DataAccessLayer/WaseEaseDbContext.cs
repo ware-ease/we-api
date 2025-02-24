@@ -28,7 +28,7 @@ namespace DataAccessLayer
 
         public virtual DbSet<Account> Accounts { get; set; }
         public virtual DbSet<AccountGroup> AccountGroups { get; set; }
-        public virtual DbSet<AccountPermission> AccountPermissions { get; set; }
+        public virtual DbSet<AccountAction> AccountActions { get; set; }
         public virtual DbSet<AccountWarehouse> AccountWarehouses { get; set; }
         public virtual DbSet<AppAction> Actions { get; set; }
         public virtual DbSet<Category> Categories { get; set; }
@@ -36,12 +36,11 @@ namespace DataAccessLayer
         public virtual DbSet<Customer> Customers { get; set; }
         public virtual DbSet<Floor> Floors { get; set; }
         public virtual DbSet<Group> Groups { get; set; }
-        public virtual DbSet<GroupPermission> GroupPermissions { get; set; }
+        public virtual DbSet<GroupAction> GroupActions { get; set; }
         public virtual DbSet<IssueNote> IssueNotes { get; set; }
         public virtual DbSet<IssueDetail> NoteDetails { get; set; }
         public virtual DbSet<Notification> Notifications { get; set; }
         public virtual DbSet<Permission> Permissions { get; set; }
-        public virtual DbSet<PermissionAction> PermissionActions { get; set; }
         public virtual DbSet<Product> Products { get; set; }
         public virtual DbSet<ProductType> ProductTypes { get; set; }
         public virtual DbSet<ProductTypeTypeDetail> ProductTypeTypeDetails { get; set; }
@@ -98,32 +97,18 @@ namespace DataAccessLayer
                 .HasForeignKey(ag => ag.GroupId);
 
             // GroupPermission composite key
-            modelBuilder.Entity<GroupPermission>()
-                .HasKey(gp => new { gp.GroupId, gp.PermissionId });
+            modelBuilder.Entity<GroupAction>()
+                .HasKey(gp => new { gp.GroupId, gp.ActionId });
 
-            modelBuilder.Entity<GroupPermission>()
+            modelBuilder.Entity<GroupAction>()
                 .HasOne(gp => gp.Group)
-                .WithMany(g => g.GroupPermissions)
+                .WithMany(g => g.GroupActions)
                 .HasForeignKey(gp => gp.GroupId);
 
-            modelBuilder.Entity<GroupPermission>()
-                .HasOne(gp => gp.Permission)
-                .WithMany(p => p.GroupPermissions)
-                .HasForeignKey(gp => gp.PermissionId);
-
-            // PermissionAction composite key
-            modelBuilder.Entity<PermissionAction>()
-                .HasKey(pa => new { pa.PermissionId, pa.ActionId });
-
-            modelBuilder.Entity<PermissionAction>()
-                .HasOne(pa => pa.Permission)
-                .WithMany(p => p.PermissionActions)
-                .HasForeignKey(pa => pa.PermissionId);
-
-            modelBuilder.Entity<PermissionAction>()
-                .HasOne(pa => pa.Action)
-                .WithMany(a => a.PermissionActions)
-                .HasForeignKey(pa => pa.ActionId);
+            modelBuilder.Entity<GroupAction>()
+                .HasOne(gp => gp.Action)
+                .WithMany(p => p.GroupActions)
+                .HasForeignKey(gp => gp.ActionId);
 
             // AccountWarehouse composite key
             modelBuilder.Entity<AccountWarehouse>()
