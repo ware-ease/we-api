@@ -19,6 +19,13 @@ jobs:
       with:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+    - name: Setup .env file
+      run: |
+        echo "DB_URL=${{ secrets.DB_URL }}" >> .env
+        echo "JWT_VALID_AUDIENCE=${{ secrets.JWT_VALID_AUDIENCE }}" >> .env
+        echo "JWT_VALID_ISSUER=${{ secrets.JWT_VALID_ISSUER }}" >> .env
+        echo "JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}" >> .env
     
     - name: Build the Docker image
       uses: docker/build-push-action@v4
