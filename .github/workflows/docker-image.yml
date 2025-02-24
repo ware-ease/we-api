@@ -12,24 +12,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Log in to Docker Hub
-      uses: docker/login-action@v2
-      with:
-        username: ${{ secrets.DOCKERHUB_USERNAME }}
-        password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-    - name: Setup .env file
-      run: |
-        echo "DB_URL=${{ secrets.DB_URL }}" >> ./API/.env
-        echo "JWT_VALID_AUDIENCE=${{ secrets.JWT_VALID_AUDIENCE }}" >> ./API/.env
-        echo "JWT_VALID_ISSUER=${{ secrets.JWT_VALID_ISSUER }}" >> ./API/.env
-        echo "JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}" >> ./API/.env
-    
-    - name: Build the Docker image
-      uses: docker/build-push-action@v4
-      with:
+      - name: Build the Docker image
+        uses: docker/build-push-action@v4
+        with:
           context: .
           file: ./Dockerfile
           push: true
