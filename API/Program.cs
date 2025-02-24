@@ -1,4 +1,4 @@
-﻿using API.Payloads.Responses;
+using API.Payloads.Responses;
 using AutoMapper;
 using BusinessLogicLayer.IService;
 using BusinessLogicLayer.Mappings;
@@ -150,8 +150,8 @@ builder.Services.AddAuthentication(options =>
     options.RequireHttpsMetadata = false;
     options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
     {
-        ValidateIssuer = true,
-        ValidateAudience = true,
+        ValidateIssuer = false,
+        ValidateAudience = false,
         ValidAudience = Environment.GetEnvironmentVariable("JWT_VALID_AUDIENCE"),
         ValidIssuer = Environment.GetEnvironmentVariable("JWT_VALID_ISSUER"),
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JWT_SECRET_KEY"))),
