@@ -1,0 +1,17 @@
+name: Repull Image & Recreate Container
+
+on:
+  workflow_run:
+    workflows: ["Docker Image CI"]
+    types:
+      - completed
+  workflow_dispatch:
+
+jobs:
+  redeploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Send POST request to webhook
+      run: |
+        curl -X POST "${{ secrets.WEBHOOK_URL }}" -k
