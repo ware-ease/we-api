@@ -44,7 +44,7 @@ namespace DataAccessLayer.Repositories
                         //.ThenInclude(ap => ap.Permission) // Load chi tiết quyền
                     .Include(a => a.AccountWarehouses) // Load kho tài khoản
                         //.ThenInclude(aw => aw.Warehouse) // Load chi tiết kho
-                    .FirstOrDefaultAsync(u => u.UserName == userName && u.Password == password);
+                    .FirstOrDefaultAsync(u => u.Username == userName && u.Password == password);
 
                 return user;
         }

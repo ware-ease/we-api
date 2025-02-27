@@ -70,7 +70,7 @@ namespace BusinessLogicLayer.Services
             {
                 // Kiểm tra xem username đã tồn tại chưa
                 var existingUsername = await _unitOfWork.AccountRepository
-                    .GetByCondition(a => a.UserName == model.UserName);
+                    .GetByCondition(a => a.Username == model.Username);
                 if (existingUsername != null)
                 {
                     throw new Exception("Username đã tồn tại");
@@ -143,7 +143,7 @@ namespace BusinessLogicLayer.Services
 
             if (!string.IsNullOrEmpty(newUsername))
             {
-                account.UserName = newUsername;
+                account.Username = newUsername;
             }
             account.LastUpdatedTime = DateTime.Now;
             account.LastUpdatedBy = LastUpdatedBy;
@@ -180,7 +180,7 @@ namespace BusinessLogicLayer.Services
             // Tạo bộ lọc tìm kiếm theo AccountName hoặc Email
             Expression<Func<Account, bool>> filter = x =>
                 string.IsNullOrEmpty(searchKey) ||
-                x.UserName .ToLower().Contains(searchKey.ToLower()) ||
+                x.Username .ToLower().Contains(searchKey.ToLower()) ||
                 x.Email.ToLower().Contains(searchKey.ToLower());
 
             // Sắp xếp theo AccountId giảm dần

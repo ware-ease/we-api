@@ -8,7 +8,7 @@ namespace BusinessLogicLayer.Models.Account
 {
     public class AccountCreateDTO
     {
-        public string UserName { get; set; } = string.Empty;
+        public string Username { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
         public string? CreatedBy { get; set; }
