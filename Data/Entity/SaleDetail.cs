@@ -18,9 +18,5 @@ namespace Data.Entity
         [ForeignKey("SaleReceipt")]
         public string ReceiptId { get; set; }
         public SaleReceipt SaleReceipt { get; set; }
-
-        [ForeignKey("ProductType")]
-        public string ProductTypeId { get; set; }
-        public ProductType ProductType { get; set; }
     }
 }

@@ -12,8 +12,8 @@ namespace Data.Entity
     [Table("StockCardDetail")]
     public class StockCardDetail : BaseEntity
     {
-        public string? In {  get; set; }
-        public string? Out { get; set; }
+        public string Code { get; set; }
+        public string Action {  get; set; }
         public string Stock {  get; set; }
         public DateTime Date { get; set; }
 
@@ -21,8 +21,8 @@ namespace Data.Entity
         public string StockCardId { get; set; }
         public StockCard StockCard { get; set; }
 
-        [ForeignKey("ProductType")]
-        public string ProductTypeId { get; set; }
-        public ProductType ProductType { get; set; }
+        [ForeignKey("Batch")]
+        public string BatchId { get; set; }
+        public Batch Batch { get; set; }
     }
 }

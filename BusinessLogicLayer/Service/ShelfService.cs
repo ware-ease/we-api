@@ -81,54 +81,56 @@ namespace BusinessLogicLayer.Service
 
             var shelf = _mapper.Map<Shelf>(createShelfDTO);
             shelf.CreatedTime = DateTime.Now;
-            shelf.WarehouseId = warehouseId;
+            //shelf.WarehouseId = warehouseId;
             await _shelfRepository.AddAsync(shelf);
             return shelf;
         }
 
         public async Task<Shelf> UpdateAsync(string shelfId, UpdateShelfDTO updateShelfDTO)
         {
-            var shelf = await _shelfRepository.GetByIdAsync(shelfId);
-            if (shelf == null)
-            {
-                throw new ArgumentException("Không thể tìm thấy Shelf với ID này");
-            }
+            //var shelf = await _shelfRepository.GetByIdAsync(shelfId);
+            //if (shelf == null)
+            //{
+            //    throw new ArgumentException("Không thể tìm thấy Shelf với ID này");
+            //}
 
-            if (updateShelfDTO.Number != shelf.Number)
-            {
-                var warehouse = await _unitOfWork.WarehouseRepository.GetByID(shelf.WarehouseId);
-                var shelfNumber = await _shelfRepository.GetShelfByWarehouseIdAndNumberAsync(shelf.WarehouseId, updateShelfDTO.Number);
-                if (shelfNumber != null)
-                {
-                    throw new ArgumentException($"Shelf có Number là {updateShelfDTO.Number} đã tồn tại trong Warehouse {warehouse.Name}");
-                }
-                shelf.Number = updateShelfDTO.Number;
-            }
+            //if (updateShelfDTO.Number != shelf.Number)
+            //{
+            //    var warehouse = await _unitOfWork.WarehouseRepository.GetByID(shelf.WarehouseId);
+            //    var shelfNumber = await _shelfRepository.GetShelfByWarehouseIdAndNumberAsync(shelf.WarehouseId, updateShelfDTO.Number);
+            //    if (shelfNumber != null)
+            //    {
+            //        throw new ArgumentException($"Shelf có Number là {updateShelfDTO.Number} đã tồn tại trong Warehouse {warehouse.Name}");
+            //    }
+            //    shelf.Number = updateShelfDTO.Number;
+            //}
 
-            if (!string.IsNullOrWhiteSpace(updateShelfDTO.WarehouseId))
-            {
-                var updateWarehouse = await _unitOfWork.WarehouseRepository.GetByID(updateShelfDTO.WarehouseId);
-                if (updateWarehouse == null)
-                {
-                    throw new ArgumentException("Không thể tìm thấy Warehouse với ID này");
-                }
-                if (updateWarehouse.IsDeleted == true)
-                {
-                    throw new ArgumentException("Warehouse này đã bị xóa");
-                }
-                shelf.WarehouseId = updateShelfDTO.WarehouseId;
-            }
+            //if (!string.IsNullOrWhiteSpace(updateShelfDTO.WarehouseId))
+            //{
+            //    var updateWarehouse = await _unitOfWork.WarehouseRepository.GetByID(updateShelfDTO.WarehouseId);
+            //    if (updateWarehouse == null)
+            //    {
+            //        throw new ArgumentException("Không thể tìm thấy Warehouse với ID này");
+            //    }
+            //    if (updateWarehouse.IsDeleted == true)
+            //    {
+            //        throw new ArgumentException("Warehouse này đã bị xóa");
+            //    }
+            //    shelf.WarehouseId = updateShelfDTO.WarehouseId;
+            //}
 
-            if (string.IsNullOrWhiteSpace(updateShelfDTO.LastUpdatedBy))
-            {
-                throw new ArgumentException("Người sửa không được để trống");
-            }
+            //if (string.IsNullOrWhiteSpace(updateShelfDTO.LastUpdatedBy))
+            //{
+            //    throw new ArgumentException("Người sửa không được để trống");
+            //}
 
-            shelf.LastUpdatedBy = updateShelfDTO.LastUpdatedBy;
-            shelf.LastUpdatedTime = DateTime.Now;
+            //shelf.LastUpdatedBy = updateShelfDTO.LastUpdatedBy;
+            //shelf.LastUpdatedTime = DateTime.Now;
 
-            await _shelfRepository.UpdateAsync(shelf);
-            return shelf;
+            //await _shelfRepository.UpdateAsync(shelf);
+            //return shelf;
+
+            return null;
         }
 
         public async Task DeleteAsync(string Id, string deletedBy)

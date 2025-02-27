@@ -75,7 +75,7 @@ namespace BusinessLogicLayer.Service
             var purchaseDetail = _mapper.Map<PurchaseDetail>(createPurchaseDetailDTO);
             purchaseDetail.CreatedTime = DateTime.Now;
             purchaseDetail.ReceiptId = receiptId;
-            purchaseDetail.ProductTypeId = productTypeId;
+            //purchaseDetail.ProductTypeId = productTypeId;
             await _purchaseDetailRepository.AddAsync(purchaseDetail);
             return purchaseDetail;
         }
@@ -114,7 +114,7 @@ namespace BusinessLogicLayer.Service
                 {
                     throw new ArgumentException("Không thể tìm thấy ProductType với ID này");
                 }
-                purchaseDetail.ProductTypeId = updatePurchaseDetailDTO.ProductTypeId;
+                //purchaseDetail.ProductTypeId = updatePurchaseDetailDTO.ProductTypeId;
             }
             if (string.IsNullOrWhiteSpace(updatePurchaseDetailDTO.LastUpdatedBy))
             {

@@ -126,11 +126,11 @@ namespace BusinessLogicLayer.Service
             }
 
             var stockCardDetail = _mapper.Map<StockCardDetail>(createStockCardDetailDTO);
-            stockCardDetail.In = createStockCardDetailDTO.In;
-            stockCardDetail.Out = createStockCardDetailDTO.Out;
-            stockCardDetail.CreatedTime = DateTime.Now;
-            stockCardDetail.StockCardId = stockCardId;
-            stockCardDetail.ProductTypeId = productTypeId;
+            //stockCardDetail.In = createStockCardDetailDTO.In;
+            //stockCardDetail.Out = createStockCardDetailDTO.Out;
+            //stockCardDetail.CreatedTime = DateTime.Now;
+            //stockCardDetail.StockCardId = stockCardId;
+            //stockCardDetail.ProductTypeId = productTypeId;
             await _stockCardDetailRepository.AddAsync(stockCardDetail);
             return stockCardDetail;
         }
@@ -208,8 +208,8 @@ namespace BusinessLogicLayer.Service
                 throw new ArgumentException("Người sửa không được để trống");
             }
 
-            stockCardDetail.In = updateStockCardDetailDTO.In;
-            stockCardDetail.Out = updateStockCardDetailDTO.Out;
+            //stockCardDetail.In = updateStockCardDetailDTO.In;
+            //stockCardDetail.Out = updateStockCardDetailDTO.Out;
             stockCardDetail.LastUpdatedBy = updateStockCardDetailDTO.LastUpdatedBy;
             stockCardDetail.LastUpdatedTime = DateTime.Now;
 

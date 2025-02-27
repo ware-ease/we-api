@@ -21,46 +21,51 @@ namespace DataAccessLayer.Repositories
         // Get all ReceivingDetails as IQueryable for flexibility
         public IQueryable<ReceivingDetail> GetAllQueryable()
         {
-            return _context.ReceiptDetails
-                           .Include(rd => rd.receivingNote)
-                           .Include(rd => rd.ProductType)
-                           .AsQueryable();
+            //return _context.ReceiptDetails
+            //               .Include(rd => rd.receivingNote)
+            //               .Include(rd => rd.ProductType)
+            //               .AsQueryable();
+
+            return null;
         }
 
         public async Task<List<ReceivingDetail>> GetAllAsync()
         {
-            return await _context.ReceiptDetails
-                                  .Include(rd => rd.receivingNote)
-                                  .Include(rd => rd.ProductType)
-                                  .ToListAsync();
+            //return await _context.ReceiptDetails
+            //                      .Include(rd => rd.receivingNote)
+            //                      .Include(rd => rd.ProductType)
+            //                      .ToListAsync();
+            return null;
         }
 
         public async Task<ReceivingDetail> GetByIdAsync(string id)
         {
-            return await _context.ReceiptDetails
-                                  .Include(rd => rd.receivingNote)
-                                  .Include(rd => rd.ProductType)
-                                  .FirstOrDefaultAsync(rd => rd.Id == id);
+            //return await _context.ReceiptDetails
+            //                      .Include(rd => rd.receivingNote)
+            //                      .Include(rd => rd.ProductType)
+            //                      .FirstOrDefaultAsync(rd => rd.Id == id);
+
+            return null;
         }
 
         public async Task AddAsync(ReceivingDetail receivingDetail)
         {
-            await _context.ReceiptDetails.AddAsync(receivingDetail);
-            await _context.SaveChangesAsync();
+            //await _context.ReceiptDetails.AddAsync(receivingDetail);
+            //await _context.SaveChangesAsync();
         }
 
         public async Task UpdateAsync(ReceivingDetail receivingDetail)
         {
-            _context.ReceiptDetails.Update(receivingDetail);
-            await _context.SaveChangesAsync();
+            //_context.ReceiptDetails.Update(receivingDetail);
+            //await _context.SaveChangesAsync();
         }
 
         public async Task DeleteAsync(ReceivingDetail receivingDetail)
         {
-            receivingDetail.IsDeleted = true;
-            receivingDetail.DeletedTime = DateTime.Now;
-            _context.ReceiptDetails.Update(receivingDetail);
-            await _context.SaveChangesAsync();
+            //receivingDetail.IsDeleted = true;
+            //receivingDetail.DeletedTime = DateTime.Now;
+            //_context.ReceiptDetails.Update(receivingDetail);
+            //await _context.SaveChangesAsync();
         }
     }
 }

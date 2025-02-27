@@ -27,10 +27,12 @@ namespace DataAccessLayer.Repositories
         // Get product by Id
         public async Task<Product> GetByIdAsync(string id)
         {
-            return await _context.Products
-                .Include(p => p.Category)
-                .Include(p => p.ProductTypes)
-                .FirstOrDefaultAsync(p => p.Id == id);
+            //return await _context.Products
+            //    .Include(p => p.Category)
+            //    .Include(p => p.ProductTypes)
+            //    .FirstOrDefaultAsync(p => p.Id == id);
+
+            return null;
         }
 
         // Add a new product
@@ -59,11 +61,13 @@ namespace DataAccessLayer.Repositories
         // Get products by category Id
         public IQueryable<Product> GetByCategoryIdQueryable(string categoryId)
         {
-            return _context.Products
-                .Where(p => p.CategoryId == categoryId && !p.IsDeleted)
-                .Include(p => p.Category)
-                .Include(p => p.ProductTypes)
-                .AsQueryable();
+            //return _context.Products
+            //    .Where(p => p.CategoryId == categoryId && !p.IsDeleted)
+            //    .Include(p => p.Category)
+            //    .Include(p => p.ProductTypes)
+            //    .AsQueryable();
+
+            return null;
         }
     }
 }

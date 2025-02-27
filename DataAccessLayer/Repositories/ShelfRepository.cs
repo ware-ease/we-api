@@ -20,35 +20,43 @@ namespace DataAccessLayer.Repositories
 
         public IQueryable<Shelf> GetAllQueryable()
         {
-            return _context.Shelves
-                .Include(s => s.Floors)
-                .Include(s => s.Warehouse)
-                .AsQueryable();
+            //return _context.Shelves
+            //    .Include(s => s.Floors)
+            //    .Include(s => s.Warehouse)
+            //    .AsQueryable();
+
+            return null;
         }
 
         public IQueryable<Shelf> GetShelvesByWarehouseIdQueryable(string warehouseId)
         {
-            return _context.Shelves
-                .Include(s => s.Floors)
-                .Include(s => s.Warehouse)
-                .Where(s => s.WarehouseId == warehouseId)
-                .AsQueryable();
+            //return _context.Shelves
+            //    .Include(s => s.Floors)
+            //    .Include(s => s.Warehouse)
+            //    .Where(s => s.WarehouseId == warehouseId)
+            //    .AsQueryable();
+
+            return null;
         }
 
         public async Task<List<Shelf>> GetAllAsync()
         {
-            return await _context.Shelves
-                .Include(s => s.Floors)
-                .Include(s => s.Warehouse)
-                .ToListAsync();
+            //return await _context.Shelves
+            //    .Include(s => s.Floors)
+            //    .Include(s => s.Warehouse)
+            //    .ToListAsync();
+
+            return null;
         }
 
         public async Task<Shelf> GetByIdAsync(string id)
         {
-            return await _context.Shelves
-                .Include(s => s.Floors)
-                .Include(s => s.Warehouse)
-                .FirstOrDefaultAsync(s => s.Id == id);
+            //return await _context.Shelves
+            //    .Include(s => s.Floors)
+            //    .Include(s => s.Warehouse)
+            //    .FirstOrDefaultAsync(s => s.Id == id);
+
+            return null;
         }
 
         public async Task AddAsync(Shelf shelf)
@@ -73,17 +81,21 @@ namespace DataAccessLayer.Repositories
 
         public async Task<int> GetActiveShelfCountByWarehouseIdAsync(string warehouseId)
         {
-            return await _context.Shelves
-                .Where(s => !s.IsDeleted && s.WarehouseId == warehouseId)
-                .CountAsync();
+            //return await _context.Shelves
+            //    .Where(s => !s.IsDeleted && s.WarehouseId == warehouseId)
+            //    .CountAsync();
+
+            return 0;
         }
 
         public async Task<Shelf> GetShelfByWarehouseIdAndNumberAsync(string warehouseId, int number)
         {
-            return await _context.Shelves
-                .Include(s => s.Floors)
-                .Include(s => s.Warehouse)
-                .FirstOrDefaultAsync(s => s.WarehouseId == warehouseId && s.Number == number && !s.IsDeleted);
+            //return await _context.Shelves
+            //    .Include(s => s.Floors)
+            //    .Include(s => s.Warehouse)
+            //    .FirstOrDefaultAsync(s => s.WarehouseId == warehouseId && s.Number == number && !s.IsDeleted);
+
+            return null;
         }
     }
 }

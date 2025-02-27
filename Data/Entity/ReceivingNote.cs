@@ -12,6 +12,10 @@ namespace Data.Entity
     [Table("ReceivingNote")]
     public class ReceivingNote : BaseEntity
     {
+        public string Reason { get; set; }
+        public string ShpperName { get; set; }
+        public string ReceiverName { get; set; }
+        public string Code { get; set; }
         public DateTime Date { get; set; }
         public ICollection<ReceivingDetail> ReceivingDetails { get; set; }
 

@@ -75,7 +75,7 @@ namespace BusinessLogicLayer.Service
             var receivingDetail = _mapper.Map<ReceivingDetail>(createReceivingDetailDTO);
             receivingDetail.CreatedTime = DateTime.Now;
             receivingDetail.NoteId = noteId;
-            receivingDetail.ProductTypeId = productTypeId;
+            //receivingDetail.ProductTypeId = productTypeId;
             await _receivingDetailRepository.AddAsync(receivingDetail);
             return receivingDetail;
         }
@@ -113,7 +113,7 @@ namespace BusinessLogicLayer.Service
                 {
                     throw new ArgumentException("Không thể tìm thấy ProductType với ID này");
                 }
-                receivingDetail.ProductTypeId = updateReceivingDetailDTO.ProductTypeId;
+                //receivingDetail.ProductTypeId = updateReceivingDetailDTO.ProductTypeId;
             }
 
             if (string.IsNullOrWhiteSpace(updateReceivingDetailDTO.LastUpdatedBy))

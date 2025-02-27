@@ -20,7 +20,8 @@ namespace Data.Entity
         public string? ParentId { get; set; }
 
         public ICollection<AccountWarehouse> AccountWarehouses { get; set; }
-        public ICollection<Shelf> Shelves { get; set; }
+        public ICollection<Area> Areas { get; set; }
+        public ICollection<Inventory> Inventories { get; set; }
 
     }
 }

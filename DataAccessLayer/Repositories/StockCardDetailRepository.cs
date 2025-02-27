@@ -20,7 +20,9 @@ namespace DataAccessLayer.Repositories
 
         public IQueryable<StockCardDetail> GetAllQueryable()
         {
-            return _context.StockCardDetails.Include(scd => scd.StockCard).Include(scd => scd.ProductType).AsQueryable();
+            //return _context.StockCardDetails.Include(scd => scd.StockCard).Include(scd => scd.ProductType).AsQueryable();
+
+            return null;
         }
 
         public IQueryable<StockCardDetail> GetQueryableByStockCardId(string stockCardId)
@@ -32,21 +34,27 @@ namespace DataAccessLayer.Repositories
 
         public IQueryable<StockCardDetail> GetQueryableByProductTypeId(string productTypeId)
         {
-            return _context.StockCardDetails
-                .Where(scd => scd.ProductTypeId == productTypeId)
-                .AsQueryable();
+            //return _context.StockCardDetails
+            //    .Where(scd => scd.ProductTypeId == productTypeId)
+            //    .AsQueryable();
+
+            return null;
         }
 
         public async Task<List<StockCardDetail>> GetAllAsync()
         {
-            return await _context.StockCardDetails.Include(scd => scd.StockCard).Include(scd => scd.ProductType).ToListAsync();
+            //return await _context.StockCardDetails.Include(scd => scd.StockCard).Include(scd => scd.ProductType).ToListAsync();
+
+            return null;
         }
 
         public async Task<StockCardDetail> GetByIdAsync(string stockCardId, string productTypeId)
         {
-            return await _context.StockCardDetails.Include(scd => scd.StockCard)
-                .Include(scd => scd.ProductType)
-                .FirstOrDefaultAsync(scd => scd.StockCardId == stockCardId && scd.ProductTypeId == productTypeId);
+            //return await _context.StockCardDetails.Include(scd => scd.StockCard)
+            //    .Include(scd => scd.ProductType)
+            //    .FirstOrDefaultAsync(scd => scd.StockCardId == stockCardId && scd.ProductTypeId == productTypeId);
+
+            return null;
         }
 
         public async Task AddAsync(StockCardDetail stockCardDetail)

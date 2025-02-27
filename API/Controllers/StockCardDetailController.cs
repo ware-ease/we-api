@@ -85,7 +85,8 @@ namespace API.Controllers
                 };
                 return CreatedAtAction(nameof(GetById), new { 
                     stockCardId = stockCardDetail.StockCardId, 
-                    productTypeId = stockCardDetail.ProductTypeId }, response);
+                    //productTypeId = stockCardDetail.ProductTypeId 
+                }, response);
 
             }
             catch (ArgumentException ex)

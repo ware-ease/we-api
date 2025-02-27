@@ -13,11 +13,24 @@ namespace Data.Entity
     public class Product : BaseEntity
     {
         public string Name { get; set; }
-        public ICollection<ProductType> ProductTypes { get; set; }
+        public string BarCode  { get; set; }
+        public string Sku {  get; set; }
+        public ICollection<Batch> Batches { get; set; }
 
         [ForeignKey("Category")]
         public string CategoryId { get; set; }
         public Category Category { get; set; }
 
+        [ForeignKey("Inventory")]
+        public string InventoryId { get; set; }
+        public Inventory Inventory { get; set; }
+
+        [ForeignKey("Unit")]
+        public string UnitId { get; set; }
+        public Unit Unit { get; set; }
+
+        [ForeignKey("Brand")]
+        public string BrandId { get; set; }
+        public Brand Brand { get; set; }
     }
 }

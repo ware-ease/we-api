@@ -1,23 +1,23 @@
-﻿using System;
+﻿using Data.Entity.Base;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Data.Entity.Base;
 
 namespace Data.Entity
 {
-    [Table("Shelf")]
-    public class Shelf : BaseEntity
+    [Table("ScheduleSetting")]
+    public class ScheduleSetting : BaseEntity
     {
-        public int Number { get; set; }
-        public int FloorNumber { get; set; }
-        public ICollection<Floor> Floors { get; set; }
+        public DateOnly? Day {  get; set; }
+        public TimeOnly? StartTime { get; set; }
+        public TimeOnly? EndTime { get; set; }
 
         [ForeignKey("Area")]
         public string AreaId { get; set; }
         public Area Area { get; set; }
+
     }
 }

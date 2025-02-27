@@ -16,6 +16,7 @@ namespace Data.Entity
         public string Unit { get; set; }
         public DateTime Date { get; set; }
         public ICollection<StockCardDetail> StockCardDetails { get; set; }
+        public ICollection<InventoryCheckDetail> InventoryCheckDetails { get; set; }
 
         [ForeignKey("Cell")]
         public string CellId { get; set; }

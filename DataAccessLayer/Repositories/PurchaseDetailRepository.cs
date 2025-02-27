@@ -20,26 +20,32 @@ namespace DataAccessLayer.Repositories
 
         public IQueryable<PurchaseDetail> GetAllQueryable()
         {
-            return _context.PurchaseDetails
-                           .Include(pd => pd.PurchaseReceipt)
-                           .Include(pd => pd.ProductType)
-                           .AsQueryable();
+            //return _context.PurchaseDetails
+            //               .Include(pd => pd.PurchaseReceipt)
+            //               .Include(pd => pd.ProductType)
+            //               .AsQueryable();
+
+            return null;
         }
 
         public async Task<List<PurchaseDetail>> GetAllAsync()
         {
-            return await _context.PurchaseDetails
-                                 .Include(pd => pd.PurchaseReceipt)
-                                 .Include(pd => pd.ProductType)
-                                 .ToListAsync();
+            //return await _context.PurchaseDetails
+            //                     .Include(pd => pd.PurchaseReceipt)
+            //                     .Include(pd => pd.ProductType)
+            //                     .ToListAsync();
+
+            return null;
         }
 
         public async Task<PurchaseDetail> GetByIdAsync(string id)
         {
-            return await _context.PurchaseDetails
-                                 .Include(pd => pd.PurchaseReceipt)
-                                 .Include(pd => pd.ProductType)
-                                 .FirstOrDefaultAsync(pd => pd.Id == id);
+            //return await _context.PurchaseDetails
+            //                     .Include(pd => pd.PurchaseReceipt)
+            //                     .Include(pd => pd.ProductType)
+            //                     .FirstOrDefaultAsync(pd => pd.Id == id);
+
+            return null;
         }
 
         public async Task AddAsync(PurchaseDetail purchaseDetail)

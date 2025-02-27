@@ -20,46 +20,52 @@ namespace DataAccessLayer.Repositories
 
         public IQueryable<ProductTypeTypeDetail> GetAllQueryable()
         {
-            return _context.ProductTypeTypeDetails
-                .Include(pttd => pttd.TypeDetail)
-                .Include(pttd => pttd.ProductType)
-                .AsQueryable();
+            //return _context.ProductTypeTypeDetails
+            //    .Include(pttd => pttd.TypeDetail)
+            //    .Include(pttd => pttd.ProductType)
+            //    .AsQueryable();
+
+            return null;
         }
 
         public async Task<List<ProductTypeTypeDetail>> GetAllAsync()
         {
-            return await _context.ProductTypeTypeDetails
-                .Include(pttd => pttd.TypeDetail)
-                .Include(pttd => pttd.ProductType)
-                .ToListAsync();
+            //return await _context.ProductTypeTypeDetails
+            //    .Include(pttd => pttd.TypeDetail)
+            //    .Include(pttd => pttd.ProductType)
+            //    .ToListAsync();
+
+            return null;
         }
 
         public async Task<ProductTypeTypeDetail> GetByIdAsync(string id)
         {
-            return await _context.ProductTypeTypeDetails
-                .Include(pttd => pttd.TypeDetail)
-                .Include(pttd => pttd.ProductType)
-                .FirstOrDefaultAsync(pttd => pttd.Id == id);
+            //return await _context.ProductTypeTypeDetails
+            //    .Include(pttd => pttd.TypeDetail)
+            //    .Include(pttd => pttd.ProductType)
+            //    .FirstOrDefaultAsync(pttd => pttd.Id == id);
+
+            return null;
         }
 
         public async Task AddAsync(ProductTypeTypeDetail productTypeTypeDetail)
         {
-            await _context.ProductTypeTypeDetails.AddAsync(productTypeTypeDetail);
-            await _context.SaveChangesAsync();
+            //await _context.ProductTypeTypeDetails.AddAsync(productTypeTypeDetail);
+            //await _context.SaveChangesAsync();
         }
 
         public async Task UpdateAsync(ProductTypeTypeDetail productTypeTypeDetail)
         {
-            _context.ProductTypeTypeDetails.Update(productTypeTypeDetail);
-            await _context.SaveChangesAsync();
+            //_context.ProductTypeTypeDetails.Update(productTypeTypeDetail);
+            //await _context.SaveChangesAsync();
         }
 
         public async Task DeleteAsync(ProductTypeTypeDetail productTypeTypeDetail)
         {
-            productTypeTypeDetail.IsDeleted = true;
-            productTypeTypeDetail.DeletedTime = DateTime.Now;
-            _context.ProductTypeTypeDetails.Update(productTypeTypeDetail);
-            await _context.SaveChangesAsync();
+            //productTypeTypeDetail.IsDeleted = true;
+            //productTypeTypeDetail.DeletedTime = DateTime.Now;
+            //_context.ProductTypeTypeDetails.Update(productTypeTypeDetail);
+            //await _context.SaveChangesAsync();
         }
 
     }
