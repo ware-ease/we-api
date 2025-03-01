@@ -70,6 +70,7 @@ namespace BusinessLogicLayer.Service
             if (existingAction == null) return null;
 
             existingAction.Code = action.Code ?? existingAction.Code;
+            existingAction.PermissionId = action.PermissionId ?? existingAction.PermissionId;
             existingAction.LastUpdatedTime = DateTime.Now;
             existingAction.LastUpdatedBy = action.LastUpdatedBy;
 

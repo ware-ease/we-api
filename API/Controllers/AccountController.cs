@@ -1,6 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using BusinessLogicLayer.IService;
 using BusinessLogicLayer.Models.Account;
+using BusinessLogicLayer.Service;
+using System;
+using BusinessLogicLayer.Models.Profile;
+using BusinessLogicLayer.Models.AccountGroup;
 
 namespace API.Controllers
 {
@@ -10,81 +14,97 @@ namespace API.Controllers
     {
 
         private readonly IAccountService _accountService;
+        private readonly IProfileService _profileService;
+        private readonly IJwtService _jwtService;
 
-        public AccountController(IAccountService appUserService)
+        public AccountController(IAccountService appUserService, IJwtService jwtService, IProfileService profileService)
         {
             _accountService = appUserService;
+            _jwtService = jwtService;
+            _profileService = profileService;
         }
 
-        [HttpGet(Name = "GetUsersAsync")]
-        public async Task<IActionResult> GetAllAsync()
+        private string? GetUserIdFromToken()
         {
-            try
-            {
-                var allAccount = await _accountService.GetAllAccountsAsync(null, null);
-
-                return Ok(new 
-                {
-                    StatusCode = StatusCodes.Status200OK,
-                    Message = "Tải dữ liệu thành công",
-                    Data = allAccount,
-                    IsSuccess = true
-                });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new 
-                {
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    Message = ex.Message,
-                    //Data = null,
-                    IsSuccess = false
-                });
-            }
+            var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+            return _jwtService.ValidateToken(token);
         }
 
-        [HttpGet("{id}", Name = "GetAccountById")]
-        public async Task<IActionResult> GetByIdAsync(string id)
-        {
-            try
-            {
-                var account = await _accountService.GetAccountByIdAsync(id);
-                if (account == null)
-                {
-                    return NotFound(new 
-                    {
-                        StatusCode = StatusCodes.Status404NotFound,
-                        Message = "Tài khoản không tồn tại",
-                        //Data = null,
-                        IsSuccess = false
-                    });
-                }
+        //[HttpGet(Name = "GetUsersAsync")]
+        //public async Task<IActionResult> GetAllAsync()
+        //{
+        //    try
+        //    {
+        //        var allAccount = await _accountService.GetAllAccountsAsync(null, null);
 
-                return Ok(new 
-                {
-                    StatusCode = StatusCodes.Status200OK,
-                    Message = "Tải dữ liệu thành công",
-                    Data = account,
-                    IsSuccess = true
-                });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new 
-                {
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    Message = ex.Message,
-                    //Data = null,
-                    IsSuccess = false
-                });
-            }
-        }
+        //        return Ok(new 
+        //        {
+        //            StatusCode = StatusCodes.Status200OK,
+        //            Message = "Tải dữ liệu thành công",
+        //            Data = allAccount,
+        //            IsSuccess = true
+        //        });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return BadRequest(new 
+        //        {
+        //            StatusCode = StatusCodes.Status400BadRequest,
+        //            Message = ex.Message,
+        //            //Data = null,
+        //            IsSuccess = false
+        //        });
+        //    }
+        //}
+
+        //[HttpGet("{id}", Name = "GetAccountById")]
+        //public async Task<IActionResult> GetByIdAsync(string id)
+        //{
+        //    try
+        //    {
+        //        var account = await _accountService.GetAccountByIdAsync(id);
+        //        if (account == null)
+        //        {
+        //            return NotFound(new 
+        //            {
+        //                StatusCode = StatusCodes.Status404NotFound,
+        //                Message = "Tài khoản không tồn tại",
+        //                //Data = null,
+        //                IsSuccess = false
+        //            });
+        //        }
+
+        //        return Ok(new 
+        //        {
+        //            StatusCode = StatusCodes.Status200OK,
+        //            Message = "Tải dữ liệu thành công",
+        //            Data = account,
+        //            IsSuccess = true
+        //        });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return BadRequest(new 
+        //        {
+        //            StatusCode = StatusCodes.Status400BadRequest,
+        //            Message = ex.Message,
+        //            //Data = null,
+        //            IsSuccess = false
+        //        });
+        //    }
+        //}
 
         [HttpPost()]
         public async Task<IActionResult> CreateAsync([FromBody] AccountCreateDTO model)
         {
             try
             {
+                var userId = GetUserIdFromToken();
+                if (string.IsNullOrEmpty(userId))
+                    return Unauthorized(new { Message = "Không tìm thấy UserId trong token", IsSuccess = false });
+
+                model.CreatedBy = userId; // Gán UserId từ token vào DTO
+
                 var account = await _accountService.CreateAccountAsync(model);
                 return Created("GetAccountById", new 
                 {
@@ -106,148 +126,149 @@ namespace API.Controllers
             }
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateAsync(string id, [FromBody] AccountUpdateDTO model)
-        {
-            try
-            {
-                var updatedAccount = await _accountService.UpdateAccountAsync(id, model);
-                if (updatedAccount == null)
-                {
-                    return NotFound(new 
-                    {
-                        StatusCode = StatusCodes.Status404NotFound,
-                        Message = "Tài khoản không tồn tại",
-                        //Data = null,
-                        IsSuccess = false
-                    });
-                }
+        //[HttpPut("{id}")]
+        //public async Task<IActionResult> UpdateAsync(string id, [FromBody] AccountUpdateDTO model)
+        //{
+        //    try
+        //    {
+        //        var updatedAccount = await _accountService.UpdateAccountAsync(id, model);
+        //        if (updatedAccount == null)
+        //        {
+        //            return NotFound(new 
+        //            {
+        //                StatusCode = StatusCodes.Status404NotFound,
+        //                Message = "Tài khoản không tồn tại",
+        //                //Data = null,
+        //                IsSuccess = false
+        //            });
+        //        }
 
-                return Ok(new 
-                {
-                    StatusCode = StatusCodes.Status200OK,
-                    Message = "Cập nhật tài khoản thành công",
-                    Data = updatedAccount,
-                    IsSuccess = true
-                });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new 
-                {
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    Message = ex.Message,
-                    //Data = null,
-                    IsSuccess = false
-                });
-            }
-        }
+        //        return Ok(new 
+        //        {
+        //            StatusCode = StatusCodes.Status200OK,
+        //            Message = "Cập nhật tài khoản thành công",
+        //            Data = updatedAccount,
+        //            IsSuccess = true
+        //        });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return BadRequest(new 
+        //        {
+        //            StatusCode = StatusCodes.Status400BadRequest,
+        //            Message = ex.Message,
+        //            //Data = null,
+        //            IsSuccess = false
+        //        });
+        //    }
+        //}
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteAsync(string id, [FromBody] DeleteAccountDTO model)
-        {
-            try
-            {
-                var deleted = await _accountService.DeleteAccountAsync(id, model.DeletedBy!);
-                if (!deleted)
-                {
-                    return NotFound(new
-                    {
-                        StatusCode = StatusCodes.Status404NotFound,
-                        Message = "Tài khoản không tồn tại",
-                        IsSuccess = false
-                    });
-                }
+        //[HttpDelete("{id}")]
+        //public async Task<IActionResult> DeleteAsync(string id, [FromBody] DeleteAccountDTO model)
+        //{
+        //    try
+        //    {
+        //        var deleted = await _accountService.DeleteAccountAsync(id, model.DeletedBy!);
+        //        if (!deleted)
+        //        {
+        //            return NotFound(new
+        //            {
+        //                StatusCode = StatusCodes.Status404NotFound,
+        //                Message = "Tài khoản không tồn tại",
+        //                IsSuccess = false
+        //            });
+        //        }
 
-                return Ok(new
-                {
-                    StatusCode = StatusCodes.Status200OK,
-                    Message = "Xóa tài khoản thành công",
-                    IsSuccess = true
-                });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new
-                {
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    Message = ex.Message,
-                    IsSuccess = false
-                });
-            }
-        }
+        //        return Ok(new
+        //        {
+        //            StatusCode = StatusCodes.Status200OK,
+        //            Message = "Xóa tài khoản thành công",
+        //            IsSuccess = true
+        //        });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return BadRequest(new
+        //        {
+        //            StatusCode = StatusCodes.Status400BadRequest,
+        //            Message = ex.Message,
+        //            IsSuccess = false
+        //        });
+        //    }
+        //}
 
 
-        [HttpPut("{id}/username")]
-        public async Task<IActionResult> UpdateUsernameAsync(string id, [FromBody] UpdateUsernameDTO model)
-        {
-            try
-            {
-                var updatedAccount = await _accountService.UpdateUsernameAsync(id, model.NewUsername, model.LastUpdatedBy!);
-                if (updatedAccount == null)
-                {
-                    return NotFound(new
-                    {
-                        StatusCode = StatusCodes.Status404NotFound,
-                        Message = "Tài khoản không tồn tại",
-                        IsSuccess = false
-                    });
-                }
+        //[HttpPut("{id}/username")]
+        //public async Task<IActionResult> UpdateUsernameAsync(string id, [FromBody] UpdateUsernameDTO model)
+        //{
+        //    try
+        //    {
+        //        var updatedAccount = await _accountService.UpdateUsernameAsync(id, model.NewUsername, model.LastUpdatedBy!);
+        //        if (updatedAccount == null)
+        //        {
+        //            return NotFound(new
+        //            {
+        //                StatusCode = StatusCodes.Status404NotFound,
+        //                Message = "Tài khoản không tồn tại",
+        //                IsSuccess = false
+        //            });
+        //        }
 
-                return Ok(new
-                {
-                    StatusCode = StatusCodes.Status200OK,
-                    Message = "Cập nhật username thành công",
-                    Data = updatedAccount,
-                    IsSuccess = true
-                });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new
-                {
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    Message = ex.Message,
-                    IsSuccess = false
-                });
-            }
-        }
+        //        return Ok(new
+        //        {
+        //            StatusCode = StatusCodes.Status200OK,
+        //            Message = "Cập nhật username thành công",
+        //            Data = updatedAccount,
+        //            IsSuccess = true
+        //        });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return BadRequest(new
+        //        {
+        //            StatusCode = StatusCodes.Status400BadRequest,
+        //            Message = ex.Message,
+        //            IsSuccess = false
+        //        });
+        //    }
+        //}
 
-        [HttpPut("{id}/password")]
-        public async Task<IActionResult> UpdatePasswordAsync(string id, [FromBody] UpdatePasswordDTO model)
-        {
-            try
-            {
-                var isUpdated = await _accountService.UpdatePasswordAsync(id, model.CurrentPassword, model.NewPassword, model.LastUpdatedBy!);
-                if (isUpdated == null)
-                {
-                    return BadRequest(new
-                    {
-                        StatusCode = StatusCodes.Status400BadRequest,
-                        Message = "Mật khẩu cũ không đúng hoặc có lỗi xảy ra",
-                        IsSuccess = false
-                    });
-                }
+        //[HttpPut("{id}/password")]
+        //public async Task<IActionResult> UpdatePasswordAsync(string id, [FromBody] UpdatePasswordDTO model)
+        //{
+        //    try
+        //    {
+        //        var isUpdated = await _accountService.UpdatePasswordAsync(id, model.CurrentPassword, model.NewPassword, model.LastUpdatedBy!);
+        //        if (isUpdated == null)
+        //        {
+        //            return BadRequest(new
+        //            {
+        //                StatusCode = StatusCodes.Status400BadRequest,
+        //                Message = "Mật khẩu cũ không đúng hoặc có lỗi xảy ra",
+        //                IsSuccess = false
+        //            });
+        //        }
 
-                return Ok(new
-                {
-                    StatusCode = StatusCodes.Status200OK,
-                    Message = "Cập nhật mật khẩu thành công",
-                    IsSuccess = true
-                });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new
-                {
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    Message = ex.Message,
-                    IsSuccess = false
-                });
-            }
-        }
+        //        return Ok(new
+        //        {
+        //            StatusCode = StatusCodes.Status200OK,
+        //            Message = "Cập nhật mật khẩu thành công",
+        //            IsSuccess = true
+        //        });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return BadRequest(new
+        //        {
+        //            StatusCode = StatusCodes.Status400BadRequest,
+        //            Message = ex.Message,
+        //            IsSuccess = false
+        //        });
+        //    }
+        //}
 
-        [HttpGet("search")]
+        //[HttpGet("search")]
+        [HttpGet()]
         public async Task<IActionResult> SearchAccounts([FromQuery] string? keyword,
                                                         [FromQuery] int pageIndex = 1,
                                                         [FromQuery] int pageSize = 10)
@@ -273,6 +294,106 @@ namespace API.Controllers
                     Error = ex.Message,
                     IsSuccess = false
                 });
+            }
+        }
+
+        [HttpGet("me")]
+        public async Task<IActionResult> GetProfileByIdAsync()
+        {
+            try
+            {
+                var userId = GetUserIdFromToken();
+                if (string.IsNullOrEmpty(userId))
+                    return Unauthorized(new { Message = "Không tìm thấy UserId trong token", IsSuccess = false });
+
+//                model.CreatedBy = userId; // Gán UserId từ token vào DTO
+                var profile = await _profileService.GetProfileByUserIdAsync(userId);
+                if (profile == null)
+                {
+                    return NotFound(new
+                    {
+                        StatusCode = StatusCodes.Status404NotFound,
+                        Message = "Profile không tồn tại",
+                        IsSuccess = false
+                    });
+                }
+
+                return Ok(new
+                {
+                    StatusCode = StatusCodes.Status200OK,
+                    Message = "Lấy dữ liệu thành công",
+                    Data = profile,
+                    IsSuccess = true
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    StatusCode = StatusCodes.Status500InternalServerError,
+                    Message = "Lỗi khi lấy profile",
+                    Error = ex.Message,
+                    IsSuccess = false
+                });
+            }
+        }
+
+        [HttpPatch("me")]
+        public async Task<IActionResult> UpdateByAccountIdAsync([FromBody] ProfileUpdateDTO model)
+        {
+            try
+            {
+                var userId = GetUserIdFromToken();
+                if (string.IsNullOrEmpty(userId))
+                    return Unauthorized(new { Message = "Không tìm thấy UserId trong token", IsSuccess = false });
+
+                var updatedProfile = await _profileService.UpdateProfileByAccountIdAsync(userId, model);
+                if (updatedProfile == null)
+                {
+                    return NotFound(new
+                    {
+                        StatusCode = StatusCodes.Status404NotFound,
+                        Message = "Profile không tồn tại cho tài khoản này",
+                        IsSuccess = false
+                    });
+                }
+
+                return Ok(new
+                {
+                    StatusCode = StatusCodes.Status200OK,
+                    Message = "Cập nhật profile thành công",
+                    Data = updatedProfile,
+                    IsSuccess = true
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    StatusCode = StatusCodes.Status500InternalServerError,
+                    Message = "Lỗi khi cập nhật profile",
+                    Error = ex.Message,
+                    IsSuccess = false
+                });
+            }
+        }
+
+        [HttpPost("groups")]
+        public async Task<IActionResult> CreateAsync([FromBody] CreateAccountGroupDTO model)
+        {
+            try
+            {
+                var userId = GetUserIdFromToken();
+                if (string.IsNullOrEmpty(userId))
+                    return Unauthorized(new { Message = "Không tìm thấy UserId trong token", IsSuccess = false });
+                model.CreatedBy = userId;
+
+                var data = await _accountService.CreateAsync(model);
+                return Ok(new { StatusCode = 201, Message = "Tạo thành công", Data = data, IsSuccess = true });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { StatusCode = 500, Message = ex.Message, IsSuccess = false });
             }
         }
     }

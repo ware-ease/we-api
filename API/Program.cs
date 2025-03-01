@@ -1,3 +1,4 @@
+using API.Middlewares;
 using API.Payloads.Responses;
 using AutoMapper;
 using BusinessLogicLayer.IService;
@@ -110,6 +111,8 @@ builder.Services.AddScoped<IGroupPermissionRepository, GroupPermissionRepository
 builder.Services.AddScoped<IAccountWarehouseRepository, AccountWarehouseRepository>();
 
 // Register servicies
+builder.Services.AddScoped<IJwtService, JwtService>();
+
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<ISupplierService, SupplierService>();
@@ -159,6 +162,8 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+builder.Services.AddMemoryCache();  
+
 // Add CORS
 builder.Services.AddCors(p => p.AddPolicy("Cors", policy =>
 {
@@ -183,6 +188,7 @@ var app = builder.Build();
 app.UseCors("Cors");
 
 // Config Middleware
+app.UseMiddleware<JwtMiddleware>();
 //app.UseMiddleware<AccountStatusMiddleware>();
 //app.UseMiddleware<TokenValidationMiddleware>();
 

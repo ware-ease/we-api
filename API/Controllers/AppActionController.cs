@@ -1,5 +1,7 @@
 ﻿using BusinessLogicLayer.IService;
 using BusinessLogicLayer.Models.AppAction;
+using BusinessLogicLayer.Models.Group;
+using BusinessLogicLayer.Service;
 using Data.Entity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,10 +12,17 @@ namespace API.Controllers
     public class AppActionController : ControllerBase
     {
         private readonly IAppActionService _appActionService;
+        private readonly IJwtService _jwtService;
 
-        public AppActionController(IAppActionService appActionService)
+        public AppActionController(IAppActionService appActionService, IJwtService jwtService)
         {
             _appActionService = appActionService;
+            _jwtService = jwtService;
+        }
+        private string? GetUserIdFromToken()
+        {
+            var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+            return _jwtService.ValidateToken(token);
         }
 
         [HttpGet("app-actions")]
@@ -79,6 +88,12 @@ namespace API.Controllers
         {
             try
             {
+                var userId = GetUserIdFromToken();
+                if (string.IsNullOrEmpty(userId))
+                    return Unauthorized(new { Message = "Không tìm thấy UserId trong token", IsSuccess = false });
+
+                action.CreatedBy = userId; // Gán UserId từ token vào DTO
+
                 var createdAction = await _appActionService.CreateAsync(action);
                 return Ok(new
                 {
@@ -104,6 +119,12 @@ namespace API.Controllers
         {
             try
             {
+                var userId = GetUserIdFromToken();
+                if (string.IsNullOrEmpty(userId))
+                    return Unauthorized(new { Message = "Không tìm thấy UserId trong token", IsSuccess = false });
+
+                action.LastUpdatedBy = userId; // Gán UserId từ token vào DTO
+
                 var updatedAction = await _appActionService.UpdateAsync(id, action);
                 if (updatedAction == null)
                     return NotFound(new
@@ -137,6 +158,12 @@ namespace API.Controllers
         {
             try
             {
+                var userId = GetUserIdFromToken();
+                if (string.IsNullOrEmpty(userId))
+                    return Unauthorized(new { Message = "Không tìm thấy UserId trong token", IsSuccess = false });
+
+                action.DeletedBy = userId; // Gán UserId từ token vào DTO
+
                 var isDeleted = await _appActionService.DeleteAsync(id, action.DeletedBy!);
                 if (!isDeleted)
                     return NotFound(new

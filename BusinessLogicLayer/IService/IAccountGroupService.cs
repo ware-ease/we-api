@@ -13,7 +13,7 @@ namespace BusinessLogicLayer.IService
     {
         Task<IEnumerable<AccountGroupDTO>> GetAllAsync();
         Task<AccountGroupDTO> GetByIdAsync(string accountId, string groupId);
-        Task<AccountGroupDTO> CreateAsync(CreateAccountGroupDTO model);
+        //Task<AccountGroupDTO> CreateAsync(CreateAccountGroupDTO model);
         Task<bool> DeleteAsync(string accountId, string groupId);
         Task<IEnumerable<GroupDTO>> GetGroupsByAccountIdAsync(string accountId);
         Task<IEnumerable<AccountDTO>> GetAccountsByGroupIdAsync(string groupId);

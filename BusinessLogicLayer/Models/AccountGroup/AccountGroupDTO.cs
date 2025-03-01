@@ -15,8 +15,8 @@ namespace BusinessLogicLayer.Models.AccountGroup
 
     public class CreateAccountGroupDTO
     {
-        public string AccountId { get; set; }
-        public string GroupId { get; set; }
+        public List<string> AccountIds { get; set; }
+        public List<string> GroupIds { get; set; }
         public string? CreatedBy { get; set; }
 
     }

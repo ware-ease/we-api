@@ -7,44 +7,55 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using BusinessLogicLayer.Models.Group;
+using Microsoft.AspNetCore.Authorization;
 
 namespace API.Controllers
 {
     [ApiController]
-    [Route("api/group")]
+    [Route("api/groups")]
+    //[Authorize] // Yêu cầu xác thực token
     public class GroupController : ControllerBase
     {
         private readonly IGroupService _groupService;
+        private readonly IJwtService _jwtService;
 
-        public GroupController(IGroupService groupService)
+        public GroupController(IGroupService groupService, IJwtService jwtService)
         {
             _groupService = groupService;
+            _jwtService = jwtService;
         }
 
-        [HttpGet("groups")]
-        public async Task<IActionResult> GetAllAsync()
+        private string? GetUserIdFromToken()
         {
-            try
-            {
-                var groups = await _groupService.GetAllAsync(1,10);
-                return Ok(new
-                {
-                    StatusCode = StatusCodes.Status200OK,
-                    Message = "Tải dữ liệu thành công",
-                    Data = groups,
-                    IsSuccess = true
-                });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new
-                {
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    Message = ex.Message,
-                    IsSuccess = false
-                });
-            }
+            var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+            return _jwtService.ValidateToken(token);
         }
+
+
+        //[HttpGet()]
+        //public async Task<IActionResult> GetAllAsync()
+        //{
+        //    try
+        //    {
+        //        var groups = await _groupService.GetAllAsync(1,10);
+        //        return Ok(new
+        //        {
+        //            StatusCode = StatusCodes.Status200OK,
+        //            Message = "Tải dữ liệu thành công",
+        //            Data = groups,
+        //            IsSuccess = true
+        //        });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return BadRequest(new
+        //        {
+        //            StatusCode = StatusCodes.Status400BadRequest,
+        //            Message = ex.Message,
+        //            IsSuccess = false
+        //        });
+        //    }
+        //}
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetByIdAsync(string id)
@@ -84,7 +95,14 @@ namespace API.Controllers
         {
             try
             {
+                var userId = GetUserIdFromToken();
+                if (string.IsNullOrEmpty(userId))
+                    return Unauthorized(new { Message = "Không tìm thấy UserId trong token", IsSuccess = false });
+
+                groupDto.CreatedBy = userId; // Gán UserId từ token vào DTO
+
                 var createdGroup = await _groupService.CreateGroupAsync(groupDto);
+
                 return Ok(new
                 {
                     StatusCode = StatusCodes.Status201Created,
@@ -109,6 +127,11 @@ namespace API.Controllers
         {
             try
             {
+                var userId = GetUserIdFromToken();
+                if (string.IsNullOrEmpty(userId))
+                    return Unauthorized(new { Message = "Không tìm thấy UserId trong token", IsSuccess = false });
+                groupDto.LastUpdatedBy = userId;
+
                 var updatedGroup = await _groupService.UpdateGroupAsync(id, groupDto);
                 if (updatedGroup == null)
                     return NotFound(new
@@ -142,6 +165,10 @@ namespace API.Controllers
         {
             try
             {
+                var userId = GetUserIdFromToken();
+                if (string.IsNullOrEmpty(userId))
+                    return Unauthorized(new { Message = "Không tìm thấy UserId trong token", IsSuccess = false });
+                groupDto.DeletedBy = userId;
                 var isDeleted = await _groupService.DeleteGroupAsync(id, groupDto.DeletedBy!);
                 if (!isDeleted)
                     return NotFound(new
@@ -169,7 +196,7 @@ namespace API.Controllers
             }
         }
 
-        [HttpGet("search")]
+        [HttpGet()]
         public async Task<IActionResult> SearchAsync([FromQuery] string? searchKey, [FromQuery] int? pageIndex, [FromQuery] int? pageSize)
         {
             try

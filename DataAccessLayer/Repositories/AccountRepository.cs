@@ -38,10 +38,10 @@ namespace DataAccessLayer.Repositories
         {
             //password = PasswordHelper.ConvertToEncrypt(password);           
                 var user = await _context.Accounts
-                    .Include(a => a.AccountGroups) // Load nhóm tài khoản
-                        //.ThenInclude(ag => ag.Group) // Load thông tin nhóm
-                    .Include(a => a.AccountActions) // Load quyền tài khoản
-                        //.ThenInclude(ap => ap.Permission) // Load chi tiết quyền
+                    //.Include(a => a.AccountGroups) // Load nhóm tài khoản
+                    //    //.ThenInclude(ag => ag.Group) // Load thông tin nhóm
+                    //.Include(a => a.AccountActions) // Load quyền tài khoản
+                    //    //.ThenInclude(ap => ap.Permission) // Load chi tiết quyền
                     .Include(a => a.AccountWarehouses) // Load kho tài khoản
                         //.ThenInclude(aw => aw.Warehouse) // Load chi tiết kho
                     .FirstOrDefaultAsync(u => u.Username == userName && u.Password == password);

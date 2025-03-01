@@ -12,7 +12,7 @@ namespace BusinessLogicLayer.IService
     public interface IProfileService
     {
         Task<PageEntity<ProfileDTO>?> GetAllAsync(int? pageIndex, int? pageSize);
-        Task<ProfileDTO?> GetProfileByIdAsync(string id);
+        Task<ProfileDTO?> GetProfileByUserIdAsync(string id);
         Task<ProfileDTO> CreateProfileAsync(ProfileCreateDTO model);
         Task<ProfileDTO?> UpdateProfileAsync(string id, ProfileUpdateDTO model);
         Task<bool> DeleteProfileAsync(string id, string deleteBy);

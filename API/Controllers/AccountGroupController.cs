@@ -47,19 +47,19 @@ namespace API.Controllers
             }
         }
 
-        [HttpPost]
-        public async Task<IActionResult> CreateAsync([FromBody] CreateAccountGroupDTO model)
-        {
-            try
-            {
-                var data = await _accountGroupService.CreateAsync(model);
-                return Ok(new { StatusCode = 201, Message = "Tạo thành công", Data = data, IsSuccess = true });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { StatusCode = 500, Message = ex.Message, IsSuccess = false });
-            }
-        }
+        //[HttpPost]
+        //public async Task<IActionResult> CreateAsync([FromBody] CreateAccountGroupDTO model)
+        //{
+        //    try
+        //    {
+        //        var data = await _accountGroupService.CreateAsync(model);
+        //        return Ok(new { StatusCode = 201, Message = "Tạo thành công", Data = data, IsSuccess = true });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(500, new { StatusCode = 500, Message = ex.Message, IsSuccess = false });
+        //    }
+        //}
 
         [HttpDelete("{accountId}/{groupId}")]
         public async Task<IActionResult> DeleteAsync(string accountId, string groupId)
