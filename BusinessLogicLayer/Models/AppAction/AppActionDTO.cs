@@ -10,6 +10,8 @@ namespace BusinessLogicLayer.Models.AppAction
     public class AppActionDTO : BaseEntity
     {
         public string Code { get; set; }
+        public string PermissionId { get; set; }
+
 
     }
 }

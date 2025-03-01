@@ -1,27 +1,50 @@
 ﻿using AutoMapper;
 using BusinessLogicLayer.IService;
-using BusinessLogicLayer.Models;
 using BusinessLogicLayer.Models.Account;
+using BusinessLogicLayer.Models.AccountGroup;
 using BusinessLogicLayer.Models.Authentication;
 using BusinessLogicLayer.Models.Pagination;
 using BusinessLogicLayer.Utils;
 using Data.Entity;
 using DataAccessLayer.UnitOfWork;
+using DotNetEnv;
+using MailKit.Security;
+using Microsoft.Extensions.Caching.Memory;
+using MimeKit;
 using System.Linq.Expressions;
-using Profile = Data.Entity.Profile;
-
 namespace BusinessLogicLayer.Services
 {
     public class AccountService : IAccountService
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-        public AccountService(IUnitOfWork unitOfWork, IMapper mapper)
+        private readonly IMemoryCache _cache;
+
+        public AccountService(IUnitOfWork unitOfWork, IMapper mapper, IMemoryCache cache)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _cache = cache;
+            Env.Load();
         }
+        public async Task SendEmailAsync(string toEmail, string subject, string body)
+        {
+            var email = new MimeMessage();
+            email.From.Add(new MailboxAddress("Admin WareEaseSystem", Env.GetString("SMTP_FROM")));
+            email.To.Add(new MailboxAddress("", toEmail));
+            email.Subject = subject;
 
+            var builder = new BodyBuilder { HtmlBody = body };
+            email.Body = builder.ToMessageBody();
+
+            using (var smtp = new MailKit.Net.Smtp.SmtpClient())
+            {
+                await smtp.ConnectAsync(Env.GetString("SMTP_HOST"), Env.GetInt("SMTP_PORT"), SecureSocketOptions.StartTls);
+                await smtp.AuthenticateAsync(Env.GetString("SMTP_USER"), Env.GetString("SMTP_PASS"));
+                await smtp.SendAsync(email);
+                await smtp.DisconnectAsync(true);
+            }
+        }
         public async Task<PageEntity<AccountDTO>?> GetAllAccountsAsync(int? pageIndex, int? pageSize)
         {
             // Sắp xếp theo ngày tạo mới nhất
@@ -85,17 +108,33 @@ namespace BusinessLogicLayer.Services
                 }
 
                 var account = _mapper.Map<Account>(model);
-                
-                account.Password = PasswordHelper.ConvertToEncrypt(model.Password);
+
+                string password = Guid.NewGuid().ToString();
+                account.Password = PasswordHelper.ConvertToEncrypt(password);
                 account.CreatedTime = DateTime.Now;
                 account.CreatedBy = model.CreatedBy;
-                //Data.Entity.Profile profile = new Profile();
-                //profile.AccountId = account.Id;
-
+                Data.Entity.Profile profile = new Data.Entity.Profile();
+                profile = _mapper.Map<Data.Entity.Profile>(model.Profile);
                 await _unitOfWork.AccountRepository.Insert(account);
-                //await _unitOfWork.ProfileRepository.Insert(profile);
+
+                profile.AccountId = account.Id;
+                profile.CreatedBy = model.CreatedBy;
+                profile.CreatedTime = DateTime.Now;
+
+                await _unitOfWork.ProfileRepository.Insert(profile);
 
                 await _unitOfWork.SaveAsync();
+                // Gửi email thông tin tài khoản
+                string emailSubject = "Thông tin tài khoản của bạn";
+                string emailBody = $@"<h3>Chào {model.Username},</h3>
+                                        <p>Bạn đã được tạo tài khoản thành công trên hệ thống.</p>
+                                        <p><strong>Username:</strong> {model.Username}</p>
+                                        <p><strong>Password:</strong> {password}</p>
+                                        <p>Vui lòng đăng nhập và đổi mật khẩu để bảo mật hơn.</p>
+                                        <p>Trân trọng,</p>
+                                        <p>Đội ngũ hỗ trợ</p>";
+
+                await SendEmailAsync(model.Email, emailSubject, emailBody);
 
                 return _mapper.Map<AccountDTO>(account);
             }
@@ -127,7 +166,7 @@ namespace BusinessLogicLayer.Services
 
             account.IsDeleted = true;
             account.DeletedTime = DateTime.Now;
-            account.DeletedBy = deletedBy; 
+            account.DeletedBy = deletedBy;
 
             _unitOfWork.AccountRepository.Update(account);
             await _unitOfWork.SaveAsync();
@@ -153,6 +192,7 @@ namespace BusinessLogicLayer.Services
             return _mapper.Map<AccountDTO>(account);
         }
 
+        #region Change password
         public async Task<AccountDTO> UpdatePasswordAsync(string accountId, string currentPassword, string newPassword, string LastUpdatedBy)
         {
             var account = await _unitOfWork.AccountRepository.GetByID(accountId);
@@ -174,13 +214,35 @@ namespace BusinessLogicLayer.Services
             await _unitOfWork.SaveAsync();
             return _mapper.Map<AccountDTO>(account);
         }
+        public async Task SendOtpAsync(string email)
+        {
+            string otp = new Random().Next(100000, 999999).ToString();
+            _cache.Set($"otp_{email}", otp, TimeSpan.FromMinutes(2)); // Lưu cache 2 phút
+
+            string body = $"Mã OTP của bạn là: <b>{otp}</b>. Mã này có hiệu lực trong 2 phút.";
+            await SendEmailAsync(email, "Xác nhận đổi mật khẩu", body);
+        }
+
+        public bool VerifyOtp(string email, string otp)
+        {
+            if (_cache.TryGetValue($"otp_{email}", out string? cachedOtp))
+            {
+                if (cachedOtp == otp)
+                {
+                    _cache.Remove($"otp_{email}"); // Xóa OTP sau khi sử dụng
+                    return true;
+                }
+            }
+            return false;
+        }
+        #endregion
 
         public async Task<PageEntity<AccountDTO>?> SearchAccountAsync(string? searchKey, int? pageIndex, int? pageSize)
         {
             // Tạo bộ lọc tìm kiếm theo AccountName hoặc Email
             Expression<Func<Account, bool>> filter = x =>
                 string.IsNullOrEmpty(searchKey) ||
-                x.Username .ToLower().Contains(searchKey.ToLower()) ||
+                x.Username.ToLower().Contains(searchKey.ToLower()) ||
                 x.Email.ToLower().Contains(searchKey.ToLower());
 
             // Sắp xếp theo AccountId giảm dần
@@ -250,6 +312,37 @@ namespace BusinessLogicLayer.Services
             //}
 
             return permissions;
+        }
+
+        public async Task<bool> CreateAsync(CreateAccountGroupDTO model)
+        {
+            foreach (var accountId in model.AccountIds)
+            {
+                foreach (var groupId in model.GroupIds)
+                {
+                    // Kiểm tra xem nhóm này đã được thêm cho tài khoản này chưa
+                    var existingEntity = await _unitOfWork.AccountGroupRepository.GetByCondition(
+                        filter: x => x.AccountId == accountId && x.GroupId == groupId);
+
+                    if (existingEntity != null)
+                    {
+                        continue; // Nếu đã tồn tại thì bỏ qua
+                    }
+
+                    var entity = new AccountGroup
+                    {
+                        AccountId = accountId,
+                        GroupId = groupId,
+                        CreatedBy = model.CreatedBy,
+                        CreatedTime = DateTime.Now
+                    };
+
+                    await _unitOfWork.AccountGroupRepository.Insert(entity);
+                }
+            }
+
+            await _unitOfWork.SaveAsync(); // Chỉ lưu một lần sau khi insert xong tất cả
+            return true;
         }
 
     }

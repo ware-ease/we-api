@@ -41,41 +41,41 @@ namespace API.Controllers
             }
         }
 
-        [HttpGet("{id}", Name ="GetProfileById")]
-        public async Task<IActionResult> GetByIdAsync(string id)
-        {
-            try
-            {
-                var profile = await _profileService.GetProfileByIdAsync(id);
-                if (profile == null)
-                {
-                    return NotFound(new
-                    {
-                        StatusCode = StatusCodes.Status404NotFound,
-                        Message = "Profile không tồn tại",
-                        IsSuccess = false
-                    });
-                }
+        //[HttpGet("{id}", Name ="GetProfileById")]
+        //public async Task<IActionResult> GetByIdAsync(string id)
+        //{
+        //    try
+        //    {
+        //        var profile = await _profileService.GetProfileByIdAsync(id);
+        //        if (profile == null)
+        //        {
+        //            return NotFound(new
+        //            {
+        //                StatusCode = StatusCodes.Status404NotFound,
+        //                Message = "Profile không tồn tại",
+        //                IsSuccess = false
+        //            });
+        //        }
 
-                return Ok(new
-                {
-                    StatusCode = StatusCodes.Status200OK,
-                    Message = "Lấy dữ liệu thành công",
-                    Data = profile,
-                    IsSuccess = true
-                });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, new
-                {
-                    StatusCode = StatusCodes.Status500InternalServerError,
-                    Message = "Lỗi khi lấy profile",
-                    Error = ex.Message,
-                    IsSuccess = false
-                });
-            }
-        }
+        //        return Ok(new
+        //        {
+        //            StatusCode = StatusCodes.Status200OK,
+        //            Message = "Lấy dữ liệu thành công",
+        //            Data = profile,
+        //            IsSuccess = true
+        //        });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(StatusCodes.Status500InternalServerError, new
+        //        {
+        //            StatusCode = StatusCodes.Status500InternalServerError,
+        //            Message = "Lỗi khi lấy profile",
+        //            Error = ex.Message,
+        //            IsSuccess = false
+        //        });
+        //    }
+        //}
 
         [HttpPost]
         public async Task<IActionResult> CreateAsync([FromBody] ProfileCreateDTO model)

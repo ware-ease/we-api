@@ -14,8 +14,8 @@ namespace BusinessLogicLayer.Models.Profile
         public string Address { get; set; }
         public bool Sex { get; set; }
         public string Nationality { get; set; }
-        public string AccountId { get; set; }
-        public string? CreatedBy { get; set; }
+        //public string AccountId { get; set; }
+        //public string? CreatedBy { get; set; }
 
     }
 }

@@ -9,6 +9,8 @@ namespace BusinessLogicLayer.Models.AppAction
     public class CreateAppActionDTO
     {
         public string Code { get; set; }
+        public string PermissionId { get; set; }
+
         public string? CreatedBy { get; set; }
 
 

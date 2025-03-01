@@ -9,6 +9,8 @@ namespace BusinessLogicLayer.Models.AppAction
     public class UpdateAppActionDTO
     {
         public string Code { get; set; }
+        public string PermissionId { get; set; }
+
         public string? LastUpdatedBy { get; set; }
     }
     public class DeleteAppActionDTO

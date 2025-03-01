@@ -1,4 +1,5 @@
 ﻿using BusinessLogicLayer.IService;
+using BusinessLogicLayer.Models.Group;
 using BusinessLogicLayer.Models.Permission;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -11,10 +12,17 @@ namespace API.Controllers
     {
 
         private readonly IPermissionService _permissionService;
+        private readonly IJwtService _jwtService;
 
-        public PermissionController(IPermissionService permissionService)
+        public PermissionController(IPermissionService permissionService, IJwtService jwtService)
         {
             _permissionService = permissionService;
+            _jwtService = jwtService;
+        }
+        private string? GetUserIdFromToken()
+        {
+            var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+            return _jwtService.ValidateToken(token);
         }
 
         [HttpGet]
@@ -82,6 +90,11 @@ namespace API.Controllers
         {
             try
             {
+                var userId = GetUserIdFromToken();
+                if (string.IsNullOrEmpty(userId))
+                    return Unauthorized(new { Message = "Không tìm thấy UserId trong token", IsSuccess = false });
+                model.CreatedBy = userId;
+
                 var permission = await _permissionService.CreateAsync(model);
                 return Created("GetPermissionById", new
                 {
@@ -108,6 +121,11 @@ namespace API.Controllers
         {
             try
             {
+                var userId = GetUserIdFromToken();
+                if (string.IsNullOrEmpty(userId))
+                    return Unauthorized(new { Message = "Không tìm thấy UserId trong token", IsSuccess = false });
+                model.LastUpdatedBy = userId;
+
                 var updatedPermission = await _permissionService.UpdateAsync(id, model);
                 if (updatedPermission == null)
                     return NotFound(new
@@ -142,6 +160,11 @@ namespace API.Controllers
         {
             try
             {
+                var userId = GetUserIdFromToken();
+                if (string.IsNullOrEmpty(userId))
+                    return Unauthorized(new { Message = "Không tìm thấy UserId trong token", IsSuccess = false });
+                model.DeletedBy = userId;
+
                 var deleted = await _permissionService.DeleteAsync(id, model.DeletedBy!);
                 if (!deleted)
                     return NotFound(new

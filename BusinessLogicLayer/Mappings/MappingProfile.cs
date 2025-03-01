@@ -37,10 +37,10 @@ namespace BusinessLogicLayer.Mappings
         {
             // Mapping classes
             #region Account
-            CreateMap<Account, AccountDTO>()
-                .ForMember(dest => dest.GroupIds, opt => opt.MapFrom(src => src.AccountGroups.Select(ag => ag.GroupId).ToList()))
-                //.ForMember(dest => dest.PermissionIds, opt => opt.MapFrom(src => src.AccountPermissions.Select(ap => ap.PermissionId).ToList()))
-                .ForMember(dest => dest.WarehouseIds, opt => opt.MapFrom(src => src.AccountWarehouses.Select(aw => aw.WarehouseId).ToList()));
+            CreateMap<Account, AccountDTO>().ReverseMap();
+                //.ForMember(dest => dest.GroupIds, opt => opt.MapFrom(src => src.AccountGroups.Select(ag => ag.GroupId).ToList()))
+                ////.ForMember(dest => dest.PermissionIds, opt => opt.MapFrom(src => src.AccountPermissions.Select(ap => ap.PermissionId).ToList()))
+                //.ForMember(dest => dest.WarehouseIds, opt => opt.MapFrom(src => src.AccountWarehouses.Select(aw => aw.WarehouseId).ToList()));
             CreateMap<Account, AccountUpdateDTO>().ReverseMap();
 
             CreateMap<Account, AccountCreateDTO>().ReverseMap();

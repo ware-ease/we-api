@@ -38,6 +38,16 @@ namespace API.Controllers
 
                 var token = await _accountService.GenerateAccessTokenAsync(userDto.Id);
 
+                //// 🌟 Lưu token vào cookie
+                //var cookieOptions = new CookieOptions
+                //{
+                //    HttpOnly = true,  // Ngăn JavaScript truy cập (bảo mật hơn)
+                //    Secure = true,    // Chỉ gửi khi dùng HTTPS
+                //    SameSite = SameSiteMode.Strict, // Chặn gửi cookie từ site khác
+                //    Expires = DateTime.UtcNow.AddHours(1) // Thời gian hết hạn 1 giờ
+                //};
+
+                //Response.Cookies.Append("AuthToken", token.AccessToken!, cookieOptions); // Thêm cookie vào response
 
                 return Ok(new 
                 {
@@ -47,9 +57,7 @@ namespace API.Controllers
                     {
                         token,
                         userDto.Id,
-                        GroupIds = userDto.GroupIds,          
-                        PermissionIds = userDto.PermissionIds,
-                        WarehouseIds = userDto.WarehouseIds
+                        //WarehouseIds = userDto.WarehouseIds
                     },
                     IsSuccess = true
                 });

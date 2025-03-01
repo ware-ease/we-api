@@ -21,42 +21,6 @@ namespace DataAccessLayer.Utils
                 new Claim(ClaimTypes.Email, user.Email),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
-            // Lấy danh sách nhóm của user
-            var userGroups = await _context.AccountGroups
-                                           .Where(ag => ag.AccountId == user.Id)
-                                           .Include(ag => ag.Group)
-                                           .Select(ag => ag.Group.Id)
-                                           .ToListAsync();
-
-            foreach (var group in userGroups)
-            {
-                authClaims.Add(new Claim("Group", group));
-            }
-
-            // Lấy danh sách quyền của user
-            //var userPermissions = await _context.AccountPermissions
-            //                                    .Where(ap => ap.AccountId == user.Id)
-            //                                    .Include(ap => ap.Permission)
-            //                                    .Select(ap => ap.Permission.Url)
-            //                                    .ToListAsync();
-
-            //foreach (var permission in userPermissions)
-            //{
-            //    authClaims.Add(new Claim("Permission", permission));
-            //}
-
-            // Lấy danh sách Warehouse của user
-            var userWarehouses = await _context.AccountWarehouses
-                                               .Where(aw => aw.AccountId == user.Id)
-                                               .Include(aw => aw.Warehouse)
-                                               .Select(aw => aw.Warehouse.Id)
-                                               .ToListAsync();
-
-            foreach (var warehouse in userWarehouses)
-            {
-                authClaims.Add(new Claim("Warehouse", warehouse));
-            }
-
 
             Env.Load();
             var authenKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JWT_SECRET_KEY")));

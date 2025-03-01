@@ -33,23 +33,23 @@ namespace BusinessLogicLayer.Service
             return _mapper.Map<AccountGroupDTO>(entity);
         }
 
-        public async Task<AccountGroupDTO> CreateAsync(CreateAccountGroupDTO model)
-        {
-            // Kiểm tra xem quyền này đã được cấp cho account hay chưa
-            var existingEntity = await _unitOfWork.AccountGroupRepository.GetByCondition(
-                filter: x => x.AccountId == model.AccountId && x.GroupId == model.GroupId);
+        //public async Task<AccountGroupDTO> CreateAsync(CreateAccountGroupDTO model)
+        //{
+        //    // Kiểm tra xem quyền này đã được cấp cho account hay chưa
+        //    var existingEntity = await _unitOfWork.AccountGroupRepository.GetByCondition(
+        //        filter: x => x.AccountId == model.AccountId && x.GroupId == model.GroupId);
 
-            if (existingEntity != null)
-            {
-                throw new InvalidOperationException("Nhóm này đã được thêm cho tài khoản này.");
-            }
+        //    if (existingEntity != null)
+        //    {
+        //        throw new InvalidOperationException("Nhóm này đã được thêm cho tài khoản này.");
+        //    }
 
-            var entity = _mapper.Map<AccountGroup>(model);
-            entity.CreatedTime = DateTime.Now;
-            await _unitOfWork.AccountGroupRepository.Insert(entity);
-            await _unitOfWork.SaveAsync();
-            return _mapper.Map<AccountGroupDTO>(entity);
-        }
+        //    var entity = _mapper.Map<AccountGroup>(model);
+        //    entity.CreatedTime = DateTime.Now;
+        //    await _unitOfWork.AccountGroupRepository.Insert(entity);
+        //    await _unitOfWork.SaveAsync();
+        //    return _mapper.Map<AccountGroupDTO>(entity);
+        //}
 
         public async Task<bool> DeleteAsync(string accountId, string groupId)
         {

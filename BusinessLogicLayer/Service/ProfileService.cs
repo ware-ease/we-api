@@ -49,9 +49,9 @@ namespace BusinessLogicLayer.Service
             return pagin;
         }
 
-        public async Task<ProfileDTO?> GetProfileByIdAsync(string id)
+        public async Task<ProfileDTO?> GetProfileByUserIdAsync(string id)
         {
-            var profile = await _unitOfWork.ProfileRepository.GetByID(id);
+            var profile = await _unitOfWork.ProfileRepository.GetByCondition(p => p.AccountId == id);
             return _mapper.Map<ProfileDTO>(profile);
         }
 
@@ -59,29 +59,30 @@ namespace BusinessLogicLayer.Service
         {
             try
             {
-                // Kiểm tra accountId có hợp lệ không
-                var account = await _unitOfWork.AccountRepository.GetByID(model.AccountId);
-                if (account == null)
-                {
-                    throw new ArgumentException("Account ID không hợp lệ hoặc không tồn tại.");
-                }
+                //// Kiểm tra accountId có hợp lệ không
+                //var account = await _unitOfWork.AccountRepository.GetByID(model.AccountId);
+                //if (account == null)
+                //{
+                //    throw new ArgumentException("Account ID không hợp lệ hoặc không tồn tại.");
+                //}
 
-                // Kiểm tra xem accountId đã có profile chưa
-                var existingProfile = await _unitOfWork.ProfileRepository.GetByCondition(p => p.AccountId == model.AccountId);
-                if (existingProfile != null)
-                {
-                    throw new InvalidOperationException("Tài khoản này đã có profile, không thể tạo mới.");
-                }
+                //// Kiểm tra xem accountId đã có profile chưa
+                //var existingProfile = await _unitOfWork.ProfileRepository.GetByCondition(p => p.AccountId == model.AccountId);
+                //if (existingProfile != null)
+                //{
+                //    throw new InvalidOperationException("Tài khoản này đã có profile, không thể tạo mới.");
+                //}
 
-                // Ánh xạ dữ liệu từ DTO sang entity
-                var profile = _mapper.Map<Data.Entity.Profile>(model);
-                profile.CreatedTime = DateTime.Now;
-                profile.CreatedBy = model.CreatedBy;
-                // Thêm vào database
-                await _unitOfWork.ProfileRepository.Insert(profile);
-                await _unitOfWork.SaveAsync();
+                //// Ánh xạ dữ liệu từ DTO sang entity
+                //var profile = _mapper.Map<Data.Entity.Profile>(model);
+                //profile.CreatedTime = DateTime.Now;
+                //profile.CreatedBy = model.CreatedBy;
+                //// Thêm vào database
+                //await _unitOfWork.ProfileRepository.Insert(profile);
+                //await _unitOfWork.SaveAsync();
 
-                return _mapper.Map<ProfileDTO>(profile);
+                //return _mapper.Map<ProfileDTO>(profile);
+                return null;
             }
             catch (ArgumentException ex)
             {
