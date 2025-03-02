@@ -56,13 +56,27 @@ namespace BusinessLogicLayer.Service
 
         public async Task<AppActionDTO> CreateAsync(CreateAppActionDTO actionCreate)
         {
+            // Kiểm tra xem PermissionId có tồn tại không
+            var permissionExists = await _unitOfWork.PermissionRepository
+                .GetByCondition(p => p.Id == actionCreate.PermissionId);
+
+            if (permissionExists == null)
+            {
+                throw new KeyNotFoundException($"PermissionId '{actionCreate.PermissionId}' không tồn tại.");
+            }
+
+            // Mapping dữ liệu từ DTO sang Entity
             var action = _mapper.Map<AppAction>(actionCreate);
             action.CreatedTime = DateTime.Now;
             action.CreatedBy = actionCreate.CreatedBy;
+
+            // Insert vào DB
             await _unitOfWork.AppActionRepository.Insert(action);
             await _unitOfWork.SaveAsync();
+
             return _mapper.Map<AppActionDTO>(action);
         }
+
 
         public async Task<AppActionDTO> UpdateAsync(string id, UpdateAppActionDTO action)
         {

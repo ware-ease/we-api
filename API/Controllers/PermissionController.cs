@@ -25,31 +25,31 @@ namespace API.Controllers
             return _jwtService.ValidateToken(token);
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetAllAsync([FromQuery] int pageIndex = 1, [FromQuery] int pageSize = 10)
-        {
-            try
-            {
-                var permissions = await _permissionService.GetAllAsync(pageIndex, pageSize);
-                return Ok(new
-                {
-                    StatusCode = 200,
-                    Message = "Lấy danh sách thành công",
-                    Data = permissions,
-                    IsSuccess = true
-                });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new
-                {
-                    StatusCode = 500,
-                    Message = "Lỗi khi lấy danh sách quyền",
-                    Error = ex.Message,
-                    IsSuccess = false
-                });
-            }
-        }
+        //[HttpGet]
+        //public async Task<IActionResult> GetAllAsync([FromQuery] int pageIndex = 1, [FromQuery] int pageSize = 10)
+        //{
+        //    try
+        //    {
+        //        var permissions = await _permissionService.GetAllAsync(pageIndex, pageSize);
+        //        return Ok(new
+        //        {
+        //            StatusCode = 200,
+        //            Message = "Lấy danh sách thành công",
+        //            Data = permissions,
+        //            IsSuccess = true
+        //        });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(500, new
+        //        {
+        //            StatusCode = 500,
+        //            Message = "Lỗi khi lấy danh sách quyền",
+        //            Error = ex.Message,
+        //            IsSuccess = false
+        //        });
+        //    }
+        //}
 
         [HttpGet("{id}", Name ="GetPermissionById")]
         public async Task<IActionResult> GetByIdAsync(string id)
@@ -193,7 +193,7 @@ namespace API.Controllers
             }
         }
 
-        [HttpGet("search")]
+        [HttpGet()]
         public async Task<IActionResult> SearchAsync([FromQuery] string? searchKey, [FromQuery] int? pageIndex, [FromQuery] int? pageSize)
         {
             try

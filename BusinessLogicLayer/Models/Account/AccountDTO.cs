@@ -3,6 +3,9 @@ using System.ComponentModel;
 using Data.Entity;
 using Data.Entity.Base;
 using BusinessLogicLayer.Models.Group;
+using BusinessLogicLayer.Models.Warehouse;
+using BusinessLogicLayer.Models.AccountAction;
+using BusinessLogicLayer.Models.AppAction;
 
 namespace BusinessLogicLayer.Models.Account
 {
@@ -22,8 +25,8 @@ namespace BusinessLogicLayer.Models.Account
         //public DateTime? DeletedTime { get; set; }
         //public ICollection<GroupDTO> AccountGroups { get; set; }
 
-        //public List<string>? GroupIds { get; set; }
-        //public List<string>? PermissionIds { get; set; }
-        //public List<string>? WarehouseIds { get; set; }
+        public IEnumerable<GroupDTO>? Groups { get; set; }
+        public IEnumerable<AppActionDTO>? Actions { get; set; }
+        public IEnumerable<WarehouseDTO>? Warehouses { get; set; }
     }
 }

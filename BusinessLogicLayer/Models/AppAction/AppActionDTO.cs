@@ -12,6 +12,5 @@ namespace BusinessLogicLayer.Models.AppAction
         public string Code { get; set; }
         public string PermissionId { get; set; }
 
-
     }
 }
