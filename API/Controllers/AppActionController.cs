@@ -25,30 +25,30 @@ namespace API.Controllers
             return _jwtService.ValidateToken(token);
         }
 
-        [HttpGet("app-actions")]
-        public async Task<IActionResult> GetAllAsync()
-        {
-            try
-            {
-                var actions = await _appActionService.GetAllAsync(null, null);
-                return Ok(new
-                {
-                    StatusCode = StatusCodes.Status200OK,
-                    Message = "Lấy dữ liệu thành công",
-                    Data = actions,
-                    IsSuccess = true
-                });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new
-                {
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    Message = ex.Message,
-                    IsSuccess = false
-                });
-            }
-        }
+        //[HttpGet("app-actions")]
+        //public async Task<IActionResult> GetAllAsync()
+        //{
+        //    try
+        //    {
+        //        var actions = await _appActionService.GetAllAsync(null, null);
+        //        return Ok(new
+        //        {
+        //            StatusCode = StatusCodes.Status200OK,
+        //            Message = "Lấy dữ liệu thành công",
+        //            Data = actions,
+        //            IsSuccess = true
+        //        });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return BadRequest(new
+        //        {
+        //            StatusCode = StatusCodes.Status400BadRequest,
+        //            Message = ex.Message,
+        //            IsSuccess = false
+        //        });
+        //    }
+        //}
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetByIdAsync(string id)
@@ -191,7 +191,7 @@ namespace API.Controllers
             }
         }
 
-        [HttpGet("search")]
+        [HttpGet()]
         public async Task<IActionResult> SearchAsync([FromQuery] string? searchKey, [FromQuery] int? pageIndex, [FromQuery] int? pageSize)
         {
             try

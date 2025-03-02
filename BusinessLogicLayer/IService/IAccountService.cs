@@ -1,4 +1,5 @@
 ﻿using BusinessLogicLayer.Models.Account;
+using BusinessLogicLayer.Models.AccountAction;
 using BusinessLogicLayer.Models.AccountGroup;
 using BusinessLogicLayer.Models.Authentication;
 using BusinessLogicLayer.Models.Pagination;
@@ -19,5 +20,6 @@ namespace BusinessLogicLayer.IService
         Task<AccountDTO> UpdatePasswordAsync(string accountId, string currentPassword, string newPassword, string updateId);
         Task<PageEntity<AccountDTO>?> SearchAccountAsync(string? searchKey, int? pageIndex, int? pageSize);
         Task<bool> CreateAsync(CreateAccountGroupDTO model);
+        Task<bool> CreateAccountActionAsync(CreateAccountActionDTO model);
     }
 }

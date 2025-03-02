@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using BusinessLogicLayer.Models.Account;
+using BusinessLogicLayer.Models.AccountAction;
 using BusinessLogicLayer.Models.AccountGroup;
 using BusinessLogicLayer.Models.AccountPermission;
 using BusinessLogicLayer.Models.AccountWarehouse;
@@ -37,10 +38,12 @@ namespace BusinessLogicLayer.Mappings
         {
             // Mapping classes
             #region Account
-            CreateMap<Account, AccountDTO>().ReverseMap();
-                //.ForMember(dest => dest.GroupIds, opt => opt.MapFrom(src => src.AccountGroups.Select(ag => ag.GroupId).ToList()))
-                ////.ForMember(dest => dest.PermissionIds, opt => opt.MapFrom(src => src.AccountPermissions.Select(ap => ap.PermissionId).ToList()))
-                //.ForMember(dest => dest.WarehouseIds, opt => opt.MapFrom(src => src.AccountWarehouses.Select(aw => aw.WarehouseId).ToList()));
+            CreateMap<Account, AccountDTO>()
+                .ForMember(dest => dest.Groups, opt => opt.MapFrom(src => src.AccountGroups.Select(ag => ag.Group)))
+                .ForMember(dest => dest.Actions, opt => opt.MapFrom(src => src.AccountActions.Select(ag => ag.Action)))
+                .ForMember(dest => dest.Warehouses, opt => opt.MapFrom(src => src.AccountWarehouses.Select(aw => aw.Warehouse)))
+                .ReverseMap();
+
             CreateMap<Account, AccountUpdateDTO>().ReverseMap();
 
             CreateMap<Account, AccountCreateDTO>().ReverseMap();
@@ -161,6 +164,12 @@ namespace BusinessLogicLayer.Mappings
             CreateMap<AccountGroup, AccountGroupDTO>().ReverseMap();
             CreateMap<AccountGroup, CreateAccountGroupDTO>().ReverseMap();
             CreateMap<AccountGroup, UpdateAccountGroupDTO>().ReverseMap();
+            #endregion
+
+            #region AccountAction
+            CreateMap<AccountAction, AccountActionDTO>().ReverseMap();
+            CreateMap<AccountAction, CreateAccountActionDTO>().ReverseMap();
+            CreateMap<AccountAction, UpdateAccountActionDTO>().ReverseMap();
             #endregion
 
             #region AccountPermission

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using BusinessLogicLayer.IService;
 using BusinessLogicLayer.Models.Account;
+using BusinessLogicLayer.Models.AccountAction;
 using BusinessLogicLayer.Models.AccountGroup;
 using BusinessLogicLayer.Models.Authentication;
 using BusinessLogicLayer.Models.Pagination;
@@ -248,9 +249,11 @@ namespace BusinessLogicLayer.Services
             // Sắp xếp theo AccountId giảm dần
             Func<IQueryable<Account>, IOrderedQueryable<Account>> orderBy = q => q.OrderByDescending(x => x.CreatedTime);
 
+            string includes = "AccountGroups.Group,AccountWarehouses.Warehouse,AccountActions.Action";
+
             // Lấy danh sách tài khoản có phân trang
             var entities = await _unitOfWork.AccountRepository
-                .Get(filter: filter, orderBy: orderBy, pageIndex: pageIndex, pageSize: pageSize);
+                .Get(filter: filter, orderBy: orderBy, includeProperties: includes , pageIndex: pageIndex, pageSize: pageSize);
 
             // Khởi tạo đối tượng PageEntity
             var pagin = new PageEntity<AccountDTO>();
@@ -345,5 +348,35 @@ namespace BusinessLogicLayer.Services
             return true;
         }
 
+        public async Task<bool> CreateAccountActionAsync(CreateAccountActionDTO model)
+        {
+            foreach (var accountId in model.AccountIds)
+            {
+                foreach (var actionId in model.ActionIds)
+                {
+                    // Kiểm tra xem nhóm này đã được thêm cho tài khoản này chưa
+                    var existingEntity = await _unitOfWork.AccountActionRepository.GetByCondition(
+                        filter: x => x.AccountId == accountId && x.ActionId == actionId);
+
+                    if (existingEntity != null)
+                    {
+                        continue; // Nếu đã tồn tại thì bỏ qua
+                    }
+
+                    var entity = new AccountAction
+                    {
+                        AccountId = accountId,
+                        ActionId = actionId,
+                        CreatedBy = model.CreatedBy,
+                        CreatedTime = DateTime.Now
+                    };
+
+                    await _unitOfWork.AccountActionRepository.Insert(entity);
+                }
+            }
+
+            await _unitOfWork.SaveAsync(); // Chỉ lưu một lần sau khi insert xong tất cả
+            return true;
+        }
     }
 }

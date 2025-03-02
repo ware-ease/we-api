@@ -109,6 +109,7 @@ builder.Services.AddScoped<IAccountPermissionRepository, AccountPermissionReposi
 //builder.Services.AddScoped<IPermissionActionRepository, PermissionActionRepository>();
 builder.Services.AddScoped<IGroupPermissionRepository, GroupPermissionRepository>();
 builder.Services.AddScoped<IAccountWarehouseRepository, AccountWarehouseRepository>();
+builder.Services.AddScoped<IAccountActionRepository, AccountActionRepository>();
 
 // Register servicies
 builder.Services.AddScoped<IJwtService, JwtService>();
@@ -188,7 +189,7 @@ var app = builder.Build();
 app.UseCors("Cors");
 
 // Config Middleware
-app.UseMiddleware<JwtMiddleware>();
+//app.UseMiddleware<JwtMiddleware>();
 //app.UseMiddleware<AccountStatusMiddleware>();
 //app.UseMiddleware<TokenValidationMiddleware>();
 

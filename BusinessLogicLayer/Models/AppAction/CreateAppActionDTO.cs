@@ -13,6 +13,5 @@ namespace BusinessLogicLayer.Models.AppAction
 
         public string? CreatedBy { get; set; }
 
-
     }
 }
