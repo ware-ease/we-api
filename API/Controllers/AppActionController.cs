@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace API.Controllers
 {
     [ApiController]
-    [Route("api/app-action")]
+    [Route("api/actions")]
     public class AppActionController : ControllerBase
     {
         private readonly IAppActionService _appActionService;

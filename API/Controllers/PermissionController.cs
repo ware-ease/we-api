@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
 {
-    [Route("api/permission")]
+    [Route("api/permissions")]
     [ApiController]
     public class PermissionController : ControllerBase
     {
