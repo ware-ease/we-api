@@ -9,13 +9,13 @@ using Data.Entity.Base;
 
 namespace Data.Entity
 {
-    [Table("StockCard")]
-    public class StockCard : BaseEntity
+    [Table("CellBatch")]
+    public class CellBatch : BaseEntity
     {
         public string Name { get; set; }
         public string Unit { get; set; }
         public DateTime Date { get; set; }
-        public ICollection<StockCardDetail> StockCardDetails { get; set; }
+        public ICollection<InOutDetail> InOutDetails { get; set; }
         public ICollection<InventoryCheckDetail> InventoryCheckDetails { get; set; }
 
         [ForeignKey("Cell")]

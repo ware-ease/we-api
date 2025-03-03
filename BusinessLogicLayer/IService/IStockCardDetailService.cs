@@ -11,13 +11,13 @@ namespace BusinessLogicLayer.IService
 {
     public interface IStockCardDetailService
     {
-        Task<PagedResult<StockCardDetail>> GetAllAsync(int? pageNumber, int? pageSize);
-        Task<PagedResult<StockCardDetail>> GetQueryableByStockCardId(string stockCardId, int? pageNumber, int? pageSize);
-        Task<PagedResult<StockCardDetail>> GetQueryableByProductTypeId(string productTypeId, int? pageNumber, int? pageSize);
-        Task<StockCardDetail> GetByIdAsync(string stockCardId, string productTypeId);
-        Task<StockCardDetail> AddAsync(string stockCardId, string productTypeId, 
+        Task<PagedResult<InOutDetail>> GetAllAsync(int? pageNumber, int? pageSize);
+        Task<PagedResult<InOutDetail>> GetQueryableByStockCardId(string stockCardId, int? pageNumber, int? pageSize);
+        Task<PagedResult<InOutDetail>> GetQueryableByProductTypeId(string productTypeId, int? pageNumber, int? pageSize);
+        Task<InOutDetail> GetByIdAsync(string stockCardId, string productTypeId);
+        Task<InOutDetail> AddAsync(string stockCardId, string productTypeId, 
             CreateStockCardDetailDTO createStockCardDetailDTO);
-        Task<StockCardDetail> UpdateAsync(string stockCardId, string productTypeId, 
+        Task<InOutDetail> UpdateAsync(string stockCardId, string productTypeId, 
             UpdateStockCardDetailDTO updateStockCardDetailDTO);
         Task DeleteAsync(string stockCardId, string productTypeId, string deletedBy);
     }

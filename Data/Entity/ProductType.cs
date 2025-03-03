@@ -16,7 +16,7 @@ namespace Data.Entity
         public ICollection<PurchaseDetail> PurchaseDetails { get; set; }
         public ICollection<ReceivingDetail> ReceivingDetails { get; set; }
         public ICollection<SaleDetail> SaleDetails { get; set; }
-        public ICollection<StockCardDetail> StockCardDetails { get; set; }
+        public ICollection<InOutDetail> StockCardDetails { get; set; }
         public ICollection<IssueDetail> IssueDetails { get; set; }
 
         [ForeignKey("Product")]

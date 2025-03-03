@@ -22,6 +22,7 @@ namespace Data.Entity
         public ICollection<AccountWarehouse> AccountWarehouses { get; set; }
         public ICollection<Area> Areas { get; set; }
         public ICollection<Inventory> Inventories { get; set; }
+        public ICollection<StockBook> StockBooks { get; set; }
 
     }
 }

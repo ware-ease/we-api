@@ -17,6 +17,9 @@ namespace Data.Entity
         public string Quantity {  get; set; }
         public DateOnly MfgDate { get; set; }
         public DateOnly ExpDate { get; set; }
+        public ICollection<IssueDetail> IssueDetails { get; set; }
+        public ICollection<InOutDetail> InOutDetails { get; set; }
+        public ICollection<ReceivingDetail> ReceivingDetails { get; set; }
 
         [ForeignKey("Product")]
         public string? ProductId { get; set; }

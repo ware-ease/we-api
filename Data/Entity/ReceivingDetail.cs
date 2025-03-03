@@ -19,8 +19,8 @@ namespace Data.Entity
         public string NoteId { get; set; }
         public ReceivingNote receivingNote { get; set; }
 
-        [ForeignKey("Brand")]
-        public string BrandId { get; set; }
-        public Brand Brand { get; set; }
+        [ForeignKey("Batch")]
+        public string BatchId { get; set; }
+        public Batch Batch { get; set; }
     }
 }

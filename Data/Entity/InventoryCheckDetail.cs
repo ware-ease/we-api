@@ -18,5 +18,9 @@ namespace Data.Entity
         [ForeignKey("InventoryCheck")]
         public string InventoryCheckId { get; set; }
         public InventoryCheck InventoryCheck { get; set; }
+
+        [ForeignKey("CellBatch")]
+        public string CellBatchId { get; set; }
+        public CellBatch CellBatch { get; set; }
     }
 }

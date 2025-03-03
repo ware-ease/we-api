@@ -1,4 +1,5 @@
 ﻿using Data.Entity.Base;
+using Data.Enum;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -8,11 +9,12 @@ using System.Threading.Tasks;
 
 namespace Data.Entity
 {
-    [Table("Inventory")]
-    public class Inventory : BaseEntity
+    [Table("StockBook")]
+    public class StockBook : BaseEntity
     {
-        public int MaxQuantity { get; set; }
-        public int MinQuantity { get; set; }
+        public ActionEnum Action { get; set; }
+        public int Quantity { get; set; }
+        public DateTime Date { get; set; }
 
         [ForeignKey("Warehouse")]
         public string WarehouseId { get; set; }

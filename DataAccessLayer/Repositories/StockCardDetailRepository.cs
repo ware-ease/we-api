@@ -18,21 +18,21 @@ namespace DataAccessLayer.Repositories
             _context = context;
         }
 
-        public IQueryable<StockCardDetail> GetAllQueryable()
+        public IQueryable<InOutDetail> GetAllQueryable()
         {
             //return _context.StockCardDetails.Include(scd => scd.StockCard).Include(scd => scd.ProductType).AsQueryable();
 
             return null;
         }
 
-        public IQueryable<StockCardDetail> GetQueryableByStockCardId(string stockCardId)
+        public IQueryable<InOutDetail> GetQueryableByStockCardId(string stockCardId)
         {
             return _context.StockCardDetails
-                .Where(scd => scd.StockCardId == stockCardId)
+                .Where(scd => scd.CellBatchId == stockCardId)
                 .AsQueryable();
         }
 
-        public IQueryable<StockCardDetail> GetQueryableByProductTypeId(string productTypeId)
+        public IQueryable<InOutDetail> GetQueryableByProductTypeId(string productTypeId)
         {
             //return _context.StockCardDetails
             //    .Where(scd => scd.ProductTypeId == productTypeId)
@@ -41,14 +41,14 @@ namespace DataAccessLayer.Repositories
             return null;
         }
 
-        public async Task<List<StockCardDetail>> GetAllAsync()
+        public async Task<List<InOutDetail>> GetAllAsync()
         {
             //return await _context.StockCardDetails.Include(scd => scd.StockCard).Include(scd => scd.ProductType).ToListAsync();
 
             return null;
         }
 
-        public async Task<StockCardDetail> GetByIdAsync(string stockCardId, string productTypeId)
+        public async Task<InOutDetail> GetByIdAsync(string stockCardId, string productTypeId)
         {
             //return await _context.StockCardDetails.Include(scd => scd.StockCard)
             //    .Include(scd => scd.ProductType)
@@ -57,13 +57,13 @@ namespace DataAccessLayer.Repositories
             return null;
         }
 
-        public async Task AddAsync(StockCardDetail stockCardDetail)
+        public async Task AddAsync(InOutDetail stockCardDetail)
         {
             await _context.StockCardDetails.AddAsync(stockCardDetail);
             await _context.SaveChangesAsync();
         }
 
-        public async Task UpdateAsync(StockCardDetail stockCardDetail)
+        public async Task UpdateAsync(InOutDetail stockCardDetail)
         {
             _context.StockCardDetails.Update(stockCardDetail);
             await _context.SaveChangesAsync();

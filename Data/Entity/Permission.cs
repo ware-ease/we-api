@@ -7,8 +7,7 @@ namespace Data.Entity
     public class Permission : BaseEntity
     {
         public string Url { get; set; }
-
-        public ICollection<GroupAction> GroupPermissions { get; set; }
+        public string Code { get; set; }
         public ICollection<AppAction> Actions { get; set; }
     }
 }

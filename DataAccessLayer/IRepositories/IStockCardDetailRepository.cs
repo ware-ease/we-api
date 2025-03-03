@@ -9,13 +9,13 @@ namespace DataAccessLayer.IRepositories
 {
     public interface IStockCardDetailRepository
     {
-        IQueryable<StockCardDetail> GetAllQueryable();
-        IQueryable<StockCardDetail> GetQueryableByStockCardId(string stockCardId);
-        IQueryable<StockCardDetail> GetQueryableByProductTypeId(string productTypeId);
-        Task<List<StockCardDetail>> GetAllAsync();
-        Task<StockCardDetail> GetByIdAsync(string stockCardId, string productTypeId);
-        Task AddAsync(StockCardDetail stockCardDetail);
-        Task UpdateAsync(StockCardDetail stockCardDetail);
+        IQueryable<InOutDetail> GetAllQueryable();
+        IQueryable<InOutDetail> GetQueryableByStockCardId(string stockCardId);
+        IQueryable<InOutDetail> GetQueryableByProductTypeId(string productTypeId);
+        Task<List<InOutDetail>> GetAllAsync();
+        Task<InOutDetail> GetByIdAsync(string stockCardId, string productTypeId);
+        Task AddAsync(InOutDetail stockCardDetail);
+        Task UpdateAsync(InOutDetail stockCardDetail);
         Task DeleteAsync(string stockCardId, string productTypeId);
     }
 }

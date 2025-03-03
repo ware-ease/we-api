@@ -6,20 +6,21 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Data.Entity.Base;
+using Data.Enum;
 
 namespace Data.Entity
 {
-    [Table("StockCardDetail")]
-    public class StockCardDetail : BaseEntity
+    [Table("InOutDetail")]
+    public class InOutDetail : BaseEntity
     {
         public string Code { get; set; }
-        public string Action {  get; set; }
+        public ActionEnum Action {  get; set; }
         public string Stock {  get; set; }
         public DateTime Date { get; set; }
 
-        [ForeignKey("StockCard")]
-        public string StockCardId { get; set; }
-        public StockCard StockCard { get; set; }
+        [ForeignKey("CellBatch")]
+        public string CellBatchId { get; set; }
+        public CellBatch CellBatch { get; set; }
 
         [ForeignKey("Batch")]
         public string BatchId { get; set; }

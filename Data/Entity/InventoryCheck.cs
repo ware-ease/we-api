@@ -30,6 +30,6 @@ namespace Data.Entity
 
         [ForeignKey("StockCard")]
         public string StockCardId { get; set; }
-        public StockCard StockCard { get; set; }
+        public CellBatch StockCard { get; set; }
     }
 }

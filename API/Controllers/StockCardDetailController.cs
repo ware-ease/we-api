@@ -84,7 +84,7 @@ namespace API.Controllers
                     Data = stockCardDetail
                 };
                 return CreatedAtAction(nameof(GetById), new { 
-                    stockCardId = stockCardDetail.StockCardId, 
+                    stockCardId = stockCardDetail.CellBatchId, 
                     //productTypeId = stockCardDetail.ProductTypeId 
                 }, response);
 

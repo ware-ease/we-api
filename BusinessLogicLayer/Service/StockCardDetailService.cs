@@ -35,13 +35,13 @@ namespace BusinessLogicLayer.Service
             _mapper = mapper;
         }
 
-        public async Task<PagedResult<StockCardDetail>> GetAllAsync(int? pageNumber, int? pageSize)
+        public async Task<PagedResult<InOutDetail>> GetAllAsync(int? pageNumber, int? pageSize)
         {
             var query = _stockCardDetailRepository.GetAllQueryable();
             return await _genericPaginationService.GetPagedDataAsync(query, pageNumber, pageSize);
         }
 
-        public async Task<PagedResult<StockCardDetail>> GetQueryableByStockCardId(string stockCardId, 
+        public async Task<PagedResult<InOutDetail>> GetQueryableByStockCardId(string stockCardId, 
             int? pageNumber, int? pageSize)
         {
             var stockCard = await _stockCardRepository.GetByIdAsync(stockCardId);
@@ -53,7 +53,7 @@ namespace BusinessLogicLayer.Service
             return await _genericPaginationService.GetPagedDataAsync(query, pageNumber, pageSize);
         }
 
-        public async Task<PagedResult<StockCardDetail>> GetQueryableByProductTypeId(string productTypeId, 
+        public async Task<PagedResult<InOutDetail>> GetQueryableByProductTypeId(string productTypeId, 
             int? pageNumber, int? pageSize)
         {
             var productType = await _productTypeRepository.GetByIdAsync(productTypeId);
@@ -65,7 +65,7 @@ namespace BusinessLogicLayer.Service
             return await _genericPaginationService.GetPagedDataAsync(query, pageNumber, pageSize);
         }
 
-        public async Task<StockCardDetail> GetByIdAsync(string stockCardId, string productTypeId)
+        public async Task<InOutDetail> GetByIdAsync(string stockCardId, string productTypeId)
         {
             var stockCard = await _stockCardRepository.GetByIdAsync(stockCardId);
             if (stockCard == null)
@@ -86,7 +86,7 @@ namespace BusinessLogicLayer.Service
             return stockCardDetail;
         }
 
-        public async Task<StockCardDetail> AddAsync(string stockCardId, string productTypeId, 
+        public async Task<InOutDetail> AddAsync(string stockCardId, string productTypeId, 
             CreateStockCardDetailDTO createStockCardDetailDTO)
         {
             //===================================================================//
@@ -125,7 +125,7 @@ namespace BusinessLogicLayer.Service
                 throw new ArgumentException("Người tạo không được để trống");
             }
 
-            var stockCardDetail = _mapper.Map<StockCardDetail>(createStockCardDetailDTO);
+            var stockCardDetail = _mapper.Map<InOutDetail>(createStockCardDetailDTO);
             //stockCardDetail.In = createStockCardDetailDTO.In;
             //stockCardDetail.Out = createStockCardDetailDTO.Out;
             //stockCardDetail.CreatedTime = DateTime.Now;
@@ -135,7 +135,7 @@ namespace BusinessLogicLayer.Service
             return stockCardDetail;
         }
 
-        public async Task<StockCardDetail> UpdateAsync(string stockCardId, string productTypeId, 
+        public async Task<InOutDetail> UpdateAsync(string stockCardId, string productTypeId, 
             UpdateStockCardDetailDTO updateStockCardDetailDTO)
         {
             //===================================================================//

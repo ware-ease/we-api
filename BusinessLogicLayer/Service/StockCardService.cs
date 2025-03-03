@@ -29,13 +29,13 @@ namespace BusinessLogicLayer.Service
             _mapper = mapper;
         }
 
-        public async Task<PagedResult<StockCard>> GetAllAsync(int? pageNumber, int? pageSize)
+        public async Task<PagedResult<CellBatch>> GetAllAsync(int? pageNumber, int? pageSize)
         {
             var query = _stockCardRepository.GetAllQueryable();
             return await _genericPaginationService.GetPagedDataAsync(query, pageNumber, pageSize);
         }
 
-        public async Task<PagedResult<StockCard>> GetAllStockCardByCellId(string cellId, int? pageNumber, int? pageSize)
+        public async Task<PagedResult<CellBatch>> GetAllStockCardByCellId(string cellId, int? pageNumber, int? pageSize)
         {
             var cell = await _cellRepository.GetByIdAsync(cellId);
             if (cell == null)
@@ -46,7 +46,7 @@ namespace BusinessLogicLayer.Service
             return await _genericPaginationService.GetPagedDataAsync(query, pageNumber, pageSize);
         }
 
-        public async Task<StockCard> GetByIdAsync(string id)
+        public async Task<CellBatch> GetByIdAsync(string id)
         {
             var stockCard = await _stockCardRepository.GetByIdAsync(id);
             if (stockCard == null)
@@ -56,7 +56,7 @@ namespace BusinessLogicLayer.Service
             return stockCard;
         }
 
-        public async Task<StockCard> AddAsync(string cellId, CreateStockCardDTO createStockCardDTO)
+        public async Task<CellBatch> AddAsync(string cellId, CreateStockCardDTO createStockCardDTO)
         {
             var cell = await _cellRepository.GetByIdAsync(cellId);
             if (cell == null)
@@ -84,14 +84,14 @@ namespace BusinessLogicLayer.Service
                 throw new ArgumentException("Người tạo không được để trống");
             }
 
-            var stockCard = _mapper.Map<StockCard>(createStockCardDTO);
+            var stockCard = _mapper.Map<CellBatch>(createStockCardDTO);
             stockCard.CreatedTime = DateTime.Now;
             stockCard.CellId = cellId;
             await _stockCardRepository.AddAsync(stockCard);
             return stockCard;
         }
 
-        public async Task<StockCard> UpdateAsync(string stockCardId, UpdateStockCardDTO updateStockCardDTO)
+        public async Task<CellBatch> UpdateAsync(string stockCardId, UpdateStockCardDTO updateStockCardDTO)
         {
             var stockCard = await _stockCardRepository.GetByIdAsync(stockCardId);
             if (stockCard == null)

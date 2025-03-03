@@ -16,6 +16,7 @@ namespace Data.Entity
         public string BarCode  { get; set; }
         public string Sku {  get; set; }
         public ICollection<Batch> Batches { get; set; }
+        public ICollection<StockBook> StockBooks { get; set; }
 
         [ForeignKey("Category")]
         public string CategoryId { get; set; }

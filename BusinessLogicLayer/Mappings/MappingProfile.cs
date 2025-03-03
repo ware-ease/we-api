@@ -131,13 +131,13 @@ namespace BusinessLogicLayer.Mappings
             #endregion
 
             #region StockCard
-            CreateMap<StockCard, CreateStockCardDTO>();
-            CreateMap<CreateStockCardDTO, StockCard>();
+            CreateMap<CellBatch, CreateStockCardDTO>();
+            CreateMap<CreateStockCardDTO, CellBatch>();
             #endregion
 
             #region StockCardDetail
-            CreateMap<StockCardDetail, CreateStockCardDetailDTO>();
-            CreateMap<CreateStockCardDetailDTO, StockCardDetail>();
+            CreateMap<InOutDetail, CreateStockCardDetailDTO>();
+            CreateMap<CreateStockCardDetailDTO, InOutDetail>();
             #endregion
 
             #region Group

@@ -18,36 +18,36 @@ namespace DataAccessLayer.Repositories
             _context = context;
         }
 
-        public IQueryable<StockCard> GetAllQueryable()
+        public IQueryable<CellBatch> GetAllQueryable()
         {
-            return _context.StockCards.Include(sc => sc.Cell).Include(sc => sc.StockCardDetails).AsQueryable();
+            return _context.StockCards.Include(sc => sc.Cell).Include(sc => sc.InOutDetails).AsQueryable();
         }
 
-        public async Task<List<StockCard>> GetAllAsync()
+        public async Task<List<CellBatch>> GetAllAsync()
         {
-            return await _context.StockCards.Include(sc => sc.Cell).Include(sc => sc.StockCardDetails).ToListAsync();
+            return await _context.StockCards.Include(sc => sc.Cell).Include(sc => sc.InOutDetails).ToListAsync();
         }
 
-        public async Task<StockCard> GetByIdAsync(string id)
+        public async Task<CellBatch> GetByIdAsync(string id)
         {
             return await _context.StockCards.Include(sc => sc.Cell)
-                .Include(sc => sc.StockCardDetails)
+                .Include(sc => sc.InOutDetails)
                 .FirstOrDefaultAsync(sc => sc.Id == id);
         }
 
-        public async Task AddAsync(StockCard stockCard)
+        public async Task AddAsync(CellBatch stockCard)
         {
             await _context.StockCards.AddAsync(stockCard);
             await _context.SaveChangesAsync();
         }
 
-        public async Task UpdateAsync(StockCard stockCard)
+        public async Task UpdateAsync(CellBatch stockCard)
         {
             _context.StockCards.Update(stockCard);
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeleteAsync(StockCard stockCard)
+        public async Task DeleteAsync(CellBatch stockCard)
         {
             stockCard.IsDeleted = true;
             stockCard.DeletedTime = DateTime.Now;
@@ -55,14 +55,14 @@ namespace DataAccessLayer.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task<List<StockCard>> GetByCellIdAsync(string cellId)
+        public async Task<List<CellBatch>> GetByCellIdAsync(string cellId)
         {
             return await _context.StockCards
                 .Where(sc => sc.CellId == cellId && !sc.IsDeleted)
                 .ToListAsync();
         }
 
-        public IQueryable<StockCard> GetQueryableByCellId(string cellId)
+        public IQueryable<CellBatch> GetQueryableByCellId(string cellId)
         {
             return _context.StockCards
                 .Where(sc => sc.CellId == cellId)
