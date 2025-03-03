@@ -28,4 +28,9 @@ namespace BusinessLogicLayer.Models.AccountAction
         public string? LastUpdatedBy { get; set; }
 
     }
+    public class DeleteAccountActionDTO
+    {
+        public List<string> AccountIds { get; set; }
+        public List<string> ActionIds { get; set; }
+    }
 }

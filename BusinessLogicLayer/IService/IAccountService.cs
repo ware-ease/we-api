@@ -21,5 +21,7 @@ namespace BusinessLogicLayer.IService
         Task<PageEntity<AccountDTO>?> SearchAccountAsync(string? searchKey, int? pageIndex, int? pageSize);
         Task<bool> CreateAsync(CreateAccountGroupDTO model);
         Task<bool> CreateAccountActionAsync(CreateAccountActionDTO model);
+        Task<bool> DeleteMultipleAccountGroupAsync(List<string> accountIds, List<string> groupIds);
+        Task<bool> DeleteMultipleAccountActionsAsync(List<string> accountIds, List<string> actionIds);
     }
 }

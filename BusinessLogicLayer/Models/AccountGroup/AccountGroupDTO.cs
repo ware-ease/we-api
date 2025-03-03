@@ -26,6 +26,11 @@ namespace BusinessLogicLayer.Models.AccountGroup
         public string AccountId { get; set; }
         public string GroupId { get; set; }
         public string? LastUpdatedBy { get; set; }
+    }
 
+    public class DeleteAccountGroupDTO
+    {
+        public List<string> AccountIds { get; set; }
+        public List<string> GroupIds { get; set; }
     }
 }

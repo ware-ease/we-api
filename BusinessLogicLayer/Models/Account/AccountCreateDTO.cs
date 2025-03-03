@@ -9,6 +9,7 @@ namespace BusinessLogicLayer.Models.Account
         public string Email { get; set; } = string.Empty;
         public string? CreatedBy { get; set; }
         public ProfileCreateDTO Profile { get; set; }
+        public List<string>? groupIds { get; set; }
 
     }
 }
