@@ -21,7 +21,7 @@ namespace API.Controllers
         }
         private string? GetUserIdFromToken()
         {
-            HttpContext.Request.Cookies.TryGetValue("AuthToken", out var token);
+            HttpContext.Request.Cookies.TryGetValue("accessToken", out var token);
             return _jwtService.ValidateToken(token);
         }
 
