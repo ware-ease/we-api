@@ -12,19 +12,19 @@ namespace Data.Entity
     [Table("ReceivingNote")]
     public class ReceivingNote : BaseEntity
     {
-        public string Reason { get; set; }
-        public string ShpperName { get; set; }
-        public string ReceiverName { get; set; }
-        public string Code { get; set; }
+        public string? Reason { get; set; }
+        public string? ShipperName { get; set; }
+        public string? ReceiverName { get; set; }
+        public string? Code { get; set; }
         public DateTime Date { get; set; }
-        public ICollection<ReceivingDetail> ReceivingDetails { get; set; }
+        public ICollection<ReceivingDetail> ReceivingDetails { get; set; } = [];
+
+        [ForeignKey("Warehouse")]
+        public string? WarehouseId { get; set; }
+        public Warehouse? Warehouse { get; set; }
 
         [ForeignKey("Supplier")]
         public string? SupplierId { get; set; }
-        public Supplier Supplier { get; set; }
-
-        [ForeignKey("PurchaseReceipt")]
-        public string PurchaseId { get; set; }
-        public PurchaseReceipt PurchaseReceipt { get; set; }
+        public Supplier? Supplier { get; set; }
     }
 }

@@ -10,7 +10,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/shelves")]
     [ApiController]
     public class ShelfController : ControllerBase
     {

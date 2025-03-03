@@ -19,8 +19,6 @@ namespace Data.Entity
         public string AreaId { get; set; }
         public Area Area { get; set; }
 
-        [ForeignKey("InventoryCheck")]
-        public string InventoryCheckId { get; set; }
-        public InventoryCheck InventoryCheck { get; set; }
+        public InventoryCheck? InventoryCheck { get; set; }
     }
 }

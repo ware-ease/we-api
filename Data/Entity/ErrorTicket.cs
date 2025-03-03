@@ -11,10 +11,10 @@ namespace Data.Entity
     [Table("ErrorTicket")]
     public class ErrorTicket : BaseEntity
     {
-        public string Reason { get; set; }
+        public string? Reason { get; set; }
         public bool Status { get; set; }
-        public string Note { get; set; }
-        public string HandelBy { get; set; }
+        public string? Note { get; set; }
+        public string? HandleBy { get; set; }
 
         [ForeignKey("InventoryCheck")]
         public string InventoryCheckId { get; set; }

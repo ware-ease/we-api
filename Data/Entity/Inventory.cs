@@ -11,9 +11,8 @@ namespace Data.Entity
     [Table("Inventory")]
     public class Inventory : BaseEntity
     {
-        public int Quantity { get; set; }
-        public int MaxQuantity { get; set; }
-        public int MinQuantity { get; set; }
+        public int? MaxQuantity { get; set; }
+        public int? MinQuantity { get; set; }
 
         [ForeignKey("Warehouse")]
         public string WarehouseId { get; set; }

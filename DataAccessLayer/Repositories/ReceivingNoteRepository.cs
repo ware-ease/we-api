@@ -24,7 +24,7 @@ namespace DataAccessLayer.Repositories
             return _context.ReceivingNotes
                 .Include(r => r.ReceivingDetails)
                 .Include(r => r.Supplier)
-                .Include(r => r.PurchaseReceipt)
+                //.Include(r => r.PurchaseReceipt)
                 .AsQueryable();
         }
 
@@ -33,7 +33,7 @@ namespace DataAccessLayer.Repositories
             return await _context.ReceivingNotes
                 .Include(r => r.ReceivingDetails)
                 .Include(r => r.Supplier)
-                .Include(r => r.PurchaseReceipt)
+                //.Include(r => r.PurchaseReceipt)
                 .FirstOrDefaultAsync(r => r.Id == id);
         }
 

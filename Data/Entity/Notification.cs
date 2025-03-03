@@ -12,7 +12,7 @@ namespace Data.Entity
     [Table("Notification")]
     public class Notification : BaseEntity
     {
-        public string Title { get; set; }
+        public string? Title { get; set; }
         public string? Content { get; set; }
         public bool Status { get; set; }
 

@@ -11,12 +11,16 @@ namespace Data.Entity
     [Table("InventoryCheckDetail")]
     public class InventoryCheckDetail : BaseEntity
     {
-        public string CheckedQuantity { get; set; }
+        public int? CheckedQuantity { get; set; }
         public bool Status { get; set; }
-        public string Note { get; set; }
+        public string? Note { get; set; }
 
         [ForeignKey("InventoryCheck")]
         public string InventoryCheckId { get; set; }
         public InventoryCheck InventoryCheck { get; set; }
+
+        [ForeignKey("CellBatch")]
+        public string CellBatchId { get; set; }
+        public CellBatch CellBatch { get; set; }
     }
 }

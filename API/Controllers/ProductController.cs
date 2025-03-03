@@ -10,7 +10,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/products")]
     [ApiController]
     public class ProductController : ControllerBase
     {

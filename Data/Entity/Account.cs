@@ -12,17 +12,16 @@ namespace Data.Entity
     [Table("Account")]
     public class Account : BaseEntity
     {
-
         public string Username { get; set; }
         public string Password { get; set; }
         public string Email { get; set; }
+        public string? RefreshToken { get; set; }
 
-        public ICollection<AccountGroup> AccountGroups { get; set; }
-        public ICollection<AccountAction> AccountActions { get; set; }
-        public ICollection<Notification> Notifications { get; set; }
-        public ICollection<AccountWarehouse> AccountWarehouses { get; set; }
+        public Profile? Profile { get; set; }
 
-        public Profile Profile { get; set; }
-
+        public ICollection<AccountGroup> AccountGroups { get; set; } = [];
+        public ICollection<AccountAction> AccountActions { get; set; } = [];
+        public ICollection<Notification> Notifications { get; set; } = [];
+        public ICollection<AccountWarehouse> AccountWarehouses { get; set; } = [];
     }
 }

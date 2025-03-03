@@ -1,5 +1,4 @@
 using API.Middlewares;
-using API.Payloads.Responses;
 using AutoMapper;
 using BusinessLogicLayer.IService;
 using BusinessLogicLayer.Mappings;
@@ -86,19 +85,12 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<ISupplierRepository, SupplierRepository>();
-builder.Services.AddScoped<IPurchaseReceiptRepository, PurchaseReceiptRepository>();
 builder.Services.AddScoped<IReceivingNoteRepository, ReceivingNoteRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
-builder.Services.AddScoped<IProductTypeRepository, ProductTypeRepository>();
-builder.Services.AddScoped<IPurchaseDetailRepository, PurchaseDetailRepository>();
 builder.Services.AddScoped<IReceivingDetailRepository, ReceivingDetailRepository>();
-builder.Services.AddScoped<ITypeDetailRepository, TypeDetailRepository>();
-builder.Services.AddScoped<IProductTypeTypeDetailRepository, ProductTypeTypeDetailRepository>();
 builder.Services.AddScoped<IShelfRepository, ShelfRepository>();
 builder.Services.AddScoped<IFloorRepository, FloorRepository>();
 builder.Services.AddScoped<ICellRepository, CellRepository>();
-builder.Services.AddScoped<IStockCardRepository, StockCardRepository>();
-builder.Services.AddScoped<IStockCardDetailRepository, StockCardDetailRepository>();
 builder.Services.AddScoped<IGroupRepository, GroupRepository>();
 builder.Services.AddScoped<IProfileRepository, ProfileRepository>();
 builder.Services.AddScoped<IAppActionRepository, AppActionRepository>();
@@ -117,19 +109,10 @@ builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<ISupplierService, SupplierService>();
-builder.Services.AddScoped<IPurchaseReceiptService, PurchaseReceiptService>();
-builder.Services.AddScoped<IReceivingNoteService, ReceivingNoteService>();
 builder.Services.AddScoped<IProductService, ProductService>();
-builder.Services.AddScoped<IProductTypeService, ProductTypeService>();
-builder.Services.AddScoped<IPurchaseDetailService, PurchaseDetailService>();
-builder.Services.AddScoped<IReceivingDetailService, ReceivingDetailService>();
-builder.Services.AddScoped<ITypeDetailService, TypeDetailService>();
-builder.Services.AddScoped<IProductTypeTypeDetailService, ProductTypeTypeDetailService>();
 builder.Services.AddScoped<IShelfService, ShelfService>();
 builder.Services.AddScoped<IFloorService, FloorService>();
 builder.Services.AddScoped<ICellService, CellService>();
-builder.Services.AddScoped<IStockCardService, StockCardService>();
-builder.Services.AddScoped<IStockCardDetailService, StockCardDetailService>();
 builder.Services.AddScoped<IGenericPaginationService, GenericPaginationService>();
 builder.Services.AddScoped<IGroupService, GroupService>();
 builder.Services.AddScoped<IProfileService, ProfileService>();
@@ -170,7 +153,8 @@ builder.Services.AddCors(p => p.AddPolicy("Cors", policy =>
 {
     policy.WithOrigins("https://wareease.site", "http://localhost:3000")
           .AllowAnyHeader()
-          .AllowAnyMethod();
+          .AllowAnyMethod()
+          .AllowCredentials();
 }));
 
 // add  json option để tránh vòng lặp tại json khi trả về

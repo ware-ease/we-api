@@ -12,10 +12,10 @@ namespace Data.Entity
     [Table("Customer")]
     public class Customer : BaseEntity
     {
-        public string Name { get; set; }
-        public string Phone { get; set; }
+        public string? Name { get; set; }
+        public string? Phone { get; set; }
         public bool Status { get; set; }
-        public ICollection<IssueNote> IssueNotes { get; set; }
+        public ICollection<IssueNote> IssueNotes { get; set; } = [];
 
     }
 }

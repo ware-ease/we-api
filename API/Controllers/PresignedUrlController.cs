@@ -6,7 +6,7 @@ using Microsoft.Extensions.Options;
 
 namespace API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/cloudinary")]
     [ApiController]
     public class PresignedUrlController : ControllerBase
     {

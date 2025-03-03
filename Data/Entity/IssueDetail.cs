@@ -9,12 +9,9 @@ using Data.Entity.Base;
 
 namespace Data.Entity
 {
-    [Table("NoteDetail")]
+    [Table("IssueDetail")]
     public class IssueDetail : BaseEntity
     {
-        public int Quanlity { get; set; }
-        public float Price { get; set; }
-
         [ForeignKey("IssueNote")]
         public string NoteId { get; set; }
         public IssueNote IssueNote { get; set; }

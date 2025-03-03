@@ -12,9 +12,8 @@ namespace Data.Entity
     [Table("Shelf")]
     public class Shelf : BaseEntity
     {
-        public int Number { get; set; }
-        public int FloorNumber { get; set; }
-        public ICollection<Floor> Floors { get; set; }
+        public string? Code { get; set; }
+        public ICollection<Floor> Floors { get; set; } = [];
 
         [ForeignKey("Area")]
         public string AreaId { get; set; }
