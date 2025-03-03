@@ -43,7 +43,7 @@ namespace API.Controllers
                 {
                     HttpOnly = true,  // Ngăn JavaScript truy cập (bảo mật hơn)
                     Secure = true,    // Chỉ gửi khi dùng HTTPS
-                    SameSite = SameSiteMode.Strict, // Chặn gửi cookie từ site khác
+                    SameSite = SameSiteMode.Lax, // Chặn gửi cookie từ site khác
                     Expires = DateTime.UtcNow.AddHours(1) // Thời gian hết hạn 1 giờ
                 };
 
