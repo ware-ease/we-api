@@ -163,15 +163,16 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-builder.Services.AddMemoryCache();  
+builder.Services.AddMemoryCache();
 
 // Add CORS
 builder.Services.AddCors(p => p.AddPolicy("Cors", policy =>
 {
-    policy.WithOrigins("*")
+    policy.WithOrigins("https://wareease.site", "http://localhost:3000")
           .AllowAnyHeader()
           .AllowAnyMethod();
 }));
+
 // add  json option để tránh vòng lặp tại json khi trả về
 builder.Services.AddControllers().AddJsonOptions(options =>
 {

@@ -47,7 +47,7 @@ namespace API.Controllers
                     Expires = DateTime.UtcNow.AddHours(1) // Thời gian hết hạn 1 giờ
                 };
 
-                Response.Cookies.Append("AuthToken", token.AccessToken!, cookieOptions); // Thêm cookie vào response
+                Response.Cookies.Append("accessToken", token.AccessToken!, cookieOptions); // Thêm cookie vào response
 
                 return Ok(new 
                 {
