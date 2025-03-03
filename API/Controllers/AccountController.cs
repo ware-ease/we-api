@@ -73,11 +73,11 @@ namespace API.Controllers
         {
             try
             {
-                var userId = GetUserIdFromToken();
-                if (string.IsNullOrEmpty(userId))
-                    return Unauthorized(new { Message = "Không tìm thấy UserId trong token", IsSuccess = false });
+                //var userId = GetUserIdFromToken();
+                //if (string.IsNullOrEmpty(userId))
+                //    return Unauthorized(new { Message = "Không tìm thấy UserId trong token", IsSuccess = false });
 
-                model.CreatedBy = userId; // Gán UserId từ token vào DTO
+                //model.CreatedBy = userId; // Gán UserId từ token vào DTO
 
                 var account = await _accountService.CreateAccountAsync(model);
                 return Created("GetAccountById", new 
