@@ -170,7 +170,8 @@ builder.Services.AddCors(p => p.AddPolicy("Cors", policy =>
 {
     policy.WithOrigins("https://wareease.site", "http://localhost:3000")
           .AllowAnyHeader()
-          .AllowAnyMethod();
+          .AllowAnyMethod()
+          .AllowCredentials();
 }));
 
 // add  json option để tránh vòng lặp tại json khi trả về
