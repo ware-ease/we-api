@@ -50,7 +50,6 @@ namespace DataAccessLayer
         public virtual DbSet<CellBatch> StockCards { get; set; }
         public virtual DbSet<InOutDetail> StockCardDetails { get; set; }
         public virtual DbSet<Supplier> Suppliers { get; set; }
-        public virtual DbSet<TypeDetail> TypeDetails { get; set; }
         public virtual DbSet<Warehouse> Warehouses { get; set; }
         public virtual DbSet<Area> Areas { get; set; }
         public virtual DbSet<Batch> Batches { get; set; }

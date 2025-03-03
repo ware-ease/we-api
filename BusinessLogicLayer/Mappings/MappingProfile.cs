@@ -105,15 +105,15 @@ namespace BusinessLogicLayer.Mappings
             CreateMap<CreateReceivingDetailDTO, ReceivingDetail>();
             #endregion
 
-            #region TypeDetail
-            CreateMap<TypeDetail, CreateTypeDetailDTO>();
-            CreateMap<CreateTypeDetailDTO, TypeDetail>();
-            #endregion
+            //#region TypeDetail
+            //CreateMap<TypeDetail, CreateTypeDetailDTO>();
+            //CreateMap<CreateTypeDetailDTO, TypeDetail>();
+            //#endregion
 
-            #region ProductTypeTypeDetail
-            CreateMap<ProductTypeTypeDetail, CreateProductTypeTypeDetailDTO>();
-            CreateMap<CreateProductTypeTypeDetailDTO, ProductTypeTypeDetail>();
-            #endregion
+            //#region ProductTypeTypeDetail
+            //CreateMap<ProductTypeTypeDetail, CreateProductTypeTypeDetailDTO>();
+            //CreateMap<CreateProductTypeTypeDetailDTO, ProductTypeTypeDetail>();
+            //#endregion
 
             #region Shelf
             CreateMap<Shelf, CreateShelfDTO>();
