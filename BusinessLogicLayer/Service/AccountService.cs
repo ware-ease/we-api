@@ -84,7 +84,9 @@ namespace BusinessLogicLayer.Services
         }
         public async Task<AccountDTO?> GetAccountByIdAsync(string id)
         {
-            var account = await _unitOfWork.AccountRepository.GetByID(id);
+            string includes = "AccountGroups.Group,AccountWarehouses.Warehouse,AccountActions.Action";
+
+            var account = await _unitOfWork.AccountRepository.GetByCondition(a => a.Id == id, includeProperties: includes);
             return _mapper.Map<AccountDTO>(account);
         }
 
@@ -123,6 +125,45 @@ namespace BusinessLogicLayer.Services
                 profile.CreatedTime = DateTime.Now;
 
                 await _unitOfWork.ProfileRepository.Insert(profile);
+
+                // **Thêm AccountGroup nếu có groupIds**
+                if (model.groupIds != null && model.groupIds.Any())
+                {
+                    List<string> validGroupIds = new List<string>();
+                    List<string> invalidGroupIds = new List<string>();
+
+                    foreach (var groupId in model.groupIds)
+                    {
+                        var group = await _unitOfWork.GroupRepository.GetByCondition(g => g.Id == groupId);
+                        if (group != null)
+                        {
+                            validGroupIds.Add(groupId);
+                        }
+                        else
+                        {
+                            invalidGroupIds.Add(groupId);
+                        }
+                    }
+
+                    // Kiểm tra nếu có groupId không hợp lệ
+                    if (invalidGroupIds.Any())
+                    {
+                        throw new Exception($"Nhóm không tồn tại: {string.Join(", ", invalidGroupIds)}");
+                    }
+
+                    // Thêm vào AccountGroup từng bản ghi
+                    foreach (var groupId in validGroupIds)
+                    {
+                        var accountGroup = new AccountGroup
+                        {
+                            AccountId = account.Id,
+                            GroupId = groupId,
+                            CreatedBy = model.CreatedBy,
+                            CreatedTime = DateTime.Now
+                        };
+                        await _unitOfWork.AccountGroupRepository.Insert(accountGroup);
+                    }
+                }
 
                 await _unitOfWork.SaveAsync();
                 // Gửi email thông tin tài khoản
@@ -378,5 +419,107 @@ namespace BusinessLogicLayer.Services
             await _unitOfWork.SaveAsync(); // Chỉ lưu một lần sau khi insert xong tất cả
             return true;
         }
+        public async Task<bool> DeleteMultipleAccountGroupAsync(List<string> accountIds, List<string> groupIds)
+        {
+            try
+            {
+                List<AccountGroup> entitiesToDelete = new List<AccountGroup>();
+                List<string> notFoundPairs = new List<string>();
+
+                foreach (var accountId in accountIds)
+                {
+                    foreach (var groupId in groupIds)
+                    {
+                        var entity = await _unitOfWork.AccountGroupRepository.GetByCondition(
+                            x => x.AccountId == accountId && x.GroupId == groupId);
+
+                        if (entity != null)
+                        {
+                            entitiesToDelete.Add(entity);
+                        }
+                        else
+                        {
+                            notFoundPairs.Add($"(AccountId: {accountId}, GroupId: {groupId})");
+                        }
+                    }
+                }
+
+                if (!entitiesToDelete.Any())
+                {
+                    return false; // Không có bản ghi nào để xóa
+                }
+
+                // Nếu có cặp Account-Group không tồn tại, báo lỗi
+                if (notFoundPairs.Any())
+                {
+                    throw new Exception($"Không tìm thấy các cặp Account-Group: {string.Join(", ", notFoundPairs)}");
+                }
+
+                // Xóa từng bản ghi một
+                foreach (var entity in entitiesToDelete)
+                {
+                    _unitOfWork.AccountGroupRepository.Delete(entity);
+                }
+
+                await _unitOfWork.SaveAsync();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Lỗi khi xóa dữ liệu: {ex.Message}");
+            }
+        }
+
+        public async Task<bool> DeleteMultipleAccountActionsAsync(List<string> accountIds, List<string> actionIds)
+        {
+            try
+            {
+                List<AccountAction> entitiesToDelete = new List<AccountAction>();
+                List<string> notFoundPairs = new List<string>();
+
+                foreach (var accountId in accountIds)
+                {
+                    foreach (var actionId in actionIds)
+                    {
+                        var entity = await _unitOfWork.AccountActionRepository.GetByCondition(
+                            x => x.AccountId == accountId && x.ActionId == actionId);
+
+                        if (entity != null)
+                        {
+                            entitiesToDelete.Add(entity);
+                        }
+                        else
+                        {
+                            notFoundPairs.Add($"(AccountId: {accountId}, ActionId: {actionId})");
+                        }
+                    }
+                }
+
+                if (!entitiesToDelete.Any())
+                {
+                    return false; // Không có bản ghi nào để xóa
+                }
+
+                // Nếu có cặp Account-Action không tồn tại, báo lỗi
+                if (notFoundPairs.Any())
+                {
+                    throw new Exception($"Không tìm thấy các cặp Account-Action: {string.Join(", ", notFoundPairs)}");
+                }
+
+                // Xóa từng bản ghi một
+                foreach (var entity in entitiesToDelete)
+                {
+                    _unitOfWork.AccountActionRepository.Delete(entity);
+                }
+
+                await _unitOfWork.SaveAsync();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Lỗi khi xóa dữ liệu: {ex.Message}");
+            }
+        }
+
     }
 }

@@ -29,36 +29,9 @@ namespace API.Controllers
 
         private string? GetUserIdFromToken()
         {
-            var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+            HttpContext.Request.Cookies.TryGetValue("AuthToken", out var token);
             return _jwtService.ValidateToken(token);
         }
-
-        //[HttpGet(Name = "GetUsersAsync")]
-        //public async Task<IActionResult> GetAllAsync()
-        //{
-        //    try
-        //    {
-        //        var allAccount = await _accountService.GetAllAccountsAsync(null, null);
-
-        //        return Ok(new 
-        //        {
-        //            StatusCode = StatusCodes.Status200OK,
-        //            Message = "Tải dữ liệu thành công",
-        //            Data = allAccount,
-        //            IsSuccess = true
-        //        });
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return BadRequest(new 
-        //        {
-        //            StatusCode = StatusCodes.Status400BadRequest,
-        //            Message = ex.Message,
-        //            //Data = null,
-        //            IsSuccess = false
-        //        });
-        //    }
-        //}
 
         [HttpGet("{id}", Name = "GetAccountById")]
         public async Task<IActionResult> GetByIdAsync(string id)
@@ -72,7 +45,6 @@ namespace API.Controllers
                     {
                         StatusCode = StatusCodes.Status404NotFound,
                         Message = "Tài khoản không tồn tại",
-                        //Data = null,
                         IsSuccess = false
                     });
                 }
@@ -91,7 +63,6 @@ namespace API.Controllers
                 {
                     StatusCode = StatusCodes.Status400BadRequest,
                     Message = ex.Message,
-                    //Data = null,
                     IsSuccess = false
                 });
             }
@@ -123,7 +94,6 @@ namespace API.Controllers
                 {
                     StatusCode = StatusCodes.Status400BadRequest,
                     Message = ex.Message,
-                    //Data = null,
                     IsSuccess = false
                 });
             }
@@ -385,6 +355,7 @@ namespace API.Controllers
                 });
             }
         }
+
         [HttpGet("me/groups")]
         public async Task<IActionResult> GetGroupsByAccountIdAsync()
         {
@@ -401,6 +372,7 @@ namespace API.Controllers
                 return StatusCode(500, new { StatusCode = 500, Message = ex.Message, IsSuccess = false });
             }
         }
+
         [HttpPost("groups")]
         public async Task<IActionResult> CreateAccountGroupAsync([FromBody] CreateAccountGroupDTO model)
         {
@@ -413,6 +385,28 @@ namespace API.Controllers
 
                 var data = await _accountService.CreateAsync(model);
                 return Ok(new { StatusCode = 201, Message = "Tạo thành công", Data = data, IsSuccess = true });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { StatusCode = 500, Message = ex.Message, IsSuccess = false });
+            }
+        }
+
+        [HttpDelete("account-group")]
+        public async Task<IActionResult> DeleteMultipleAccountGroupAsync([FromBody] DeleteAccountGroupDTO model)
+        {
+            try
+            {
+                if (model.AccountIds == null || model.GroupIds == null || !model.AccountIds.Any() || !model.GroupIds.Any())
+                {
+                    return BadRequest(new { StatusCode = 400, Message = "Danh sách accountId hoặc groupId không hợp lệ", IsSuccess = false });
+                }
+
+                var deleted = await _accountService.DeleteMultipleAccountGroupAsync(model.AccountIds, model.GroupIds);
+                if (!deleted)
+                    return NotFound(new { StatusCode = 404, Message = "Không tìm thấy dữ liệu phù hợp để xóa", IsSuccess = false });
+
+                return Ok(new { StatusCode = 200, Message = "Xóa thành công", IsSuccess = true });
             }
             catch (Exception ex)
             {
@@ -438,5 +432,28 @@ namespace API.Controllers
                 return StatusCode(500, new { StatusCode = 500, Message = ex.Message, IsSuccess = false });
             }
         }
+
+        [HttpDelete("account-action")]
+        public async Task<IActionResult> DeleteMultipleAccountActionsAsync([FromBody] DeleteAccountActionDTO model)
+        {
+            try
+            {
+                if (model.AccountIds == null || model.ActionIds == null || !model.AccountIds.Any() || !model.ActionIds.Any())
+                {
+                    return BadRequest(new { StatusCode = 400, Message = "Danh sách accountId hoặc actionId không hợp lệ", IsSuccess = false });
+                }
+
+                var deleted = await _accountService.DeleteMultipleAccountActionsAsync(model.AccountIds, model.ActionIds);
+                if (!deleted)
+                    return NotFound(new { StatusCode = 404, Message = "Không tìm thấy dữ liệu phù hợp để xóa", IsSuccess = false });
+
+                return Ok(new { StatusCode = 200, Message = "Xóa thành công", IsSuccess = true });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { StatusCode = 500, Message = ex.Message, IsSuccess = false });
+            }
+        }
+
     }
 }
