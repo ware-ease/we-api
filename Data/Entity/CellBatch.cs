@@ -12,14 +12,16 @@ namespace Data.Entity
     [Table("CellBatch")]
     public class CellBatch : BaseEntity
     {
-        public string Name { get; set; }
-        public string Unit { get; set; }
-        public DateTime Date { get; set; }
-        public ICollection<InOutDetail> InOutDetails { get; set; }
-        public ICollection<InventoryCheckDetail> InventoryCheckDetails { get; set; }
+        public int CurrentStock { get; set; }
+        public ICollection<InOutDetail> InOutDetails { get; set; } = [];
+        public ICollection<InventoryCheckDetail> InventoryCheckDetails { get; set; } = [];
 
         [ForeignKey("Cell")]
         public string CellId { get; set; }
         public Cell Cell { get; set; }
+
+        [ForeignKey("Unit")]
+        public string UnitId { get; set; }
+        public Unit Unit { get; set; }
     }
 }

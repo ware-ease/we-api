@@ -75,11 +75,6 @@ namespace BusinessLogicLayer.Mappings
             CreateMap<CreateSupplierDTO, Supplier>();
             #endregion
 
-            #region PurchaseReceipt
-            CreateMap<PurchaseReceipt, CreatePurchaseReceiptDTO>();
-            CreateMap<CreatePurchaseReceiptDTO, PurchaseReceipt>();
-            #endregion
-
             #region ReceivingNote
             CreateMap<ReceivingNote, CreateReceivingNoteDTO>();
             CreateMap<CreateReceivingNoteDTO, ReceivingNote>();
@@ -89,31 +84,6 @@ namespace BusinessLogicLayer.Mappings
             CreateMap<Product, CreateProductDTO>();
             CreateMap<CreateProductDTO, Product>();
             #endregion
-
-            #region ProductType
-            CreateMap<ProductType, CreateProductTypeDTO>();
-            CreateMap<CreateProductTypeDTO, ProductType>();
-            #endregion
-
-            #region PurchaseDetail
-            CreateMap<PurchaseDetail, CreatePurchaseDetailDTO>();
-            CreateMap<CreatePurchaseDetailDTO, PurchaseDetail>();
-            #endregion
-
-            #region ReceivingDetail
-            CreateMap<ReceivingDetail, CreateReceivingDetailDTO>();
-            CreateMap<CreateReceivingDetailDTO, ReceivingDetail>();
-            #endregion
-
-            //#region TypeDetail
-            //CreateMap<TypeDetail, CreateTypeDetailDTO>();
-            //CreateMap<CreateTypeDetailDTO, TypeDetail>();
-            //#endregion
-
-            //#region ProductTypeTypeDetail
-            //CreateMap<ProductTypeTypeDetail, CreateProductTypeTypeDetailDTO>();
-            //CreateMap<CreateProductTypeTypeDetailDTO, ProductTypeTypeDetail>();
-            //#endregion
 
             #region Shelf
             CreateMap<Shelf, CreateShelfDTO>();

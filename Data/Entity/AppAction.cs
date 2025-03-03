@@ -12,14 +12,13 @@ namespace Data.Entity
     [Table("Action")]
     public class AppAction : BaseEntity
     {
-        public string Code { get; set; }
+        public string? Code { get; set; }
 
         [ForeignKey("Permission")]
         public string PermissionId { get; set; }
-
         public Permission Permission { get; set; }
 
-        public ICollection<GroupAction> GroupActions { get; set; }
-        public ICollection<AccountAction> AccountActions { get; set; }
+        public ICollection<GroupAction> GroupActions { get; set; } = [];
+        public ICollection<AccountAction> AccountActions { get; set; } = [];
     }
 }

@@ -13,6 +13,7 @@ namespace Data.Entity
     public class Floor : BaseEntity
     {
         public int Number { get; set; }
+        public ICollection<Cell> Cells { get; set; } = [];
 
         [ForeignKey("Shelf")]
         public string ShelfId { get; set; }

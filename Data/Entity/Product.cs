@@ -12,19 +12,15 @@ namespace Data.Entity
     [Table("Product")]
     public class Product : BaseEntity
     {
-        public string Name { get; set; }
-        public string BarCode  { get; set; }
-        public string Sku {  get; set; }
-        public ICollection<Batch> Batches { get; set; }
-        public ICollection<StockBook> StockBooks { get; set; }
+        public string? Name { get; set; }
+        public string? Barcode  { get; set; }
+        public string? Sku {  get; set; }
+        public ICollection<Batch> Batches { get; set; } = [];
+        public ICollection<StockBook> StockBooks { get; set; } = [];
 
         [ForeignKey("Category")]
         public string CategoryId { get; set; }
         public Category Category { get; set; }
-
-        [ForeignKey("Inventory")]
-        public string InventoryId { get; set; }
-        public Inventory Inventory { get; set; }
 
         [ForeignKey("Unit")]
         public string UnitId { get; set; }

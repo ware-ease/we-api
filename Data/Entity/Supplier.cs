@@ -12,11 +12,9 @@ namespace Data.Entity
     [Table("Supplier")]
     public class Supplier : BaseEntity
     {
-        public string Name { get; set; }
-        public string Phone { get; set; }
+        public string? Name { get; set; }
+        public string? Phone { get; set; }
         public bool Status { get; set; }
-        public ICollection<ReceivingNote> ReceivingNotes { get; set; }
-        public ICollection<PurchaseReceipt> PurchaseReceipts { get; set; }
-
+        public ICollection<ReceivingNote> ReceivingNotes { get; set; } = [];
     }
 }

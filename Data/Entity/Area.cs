@@ -11,20 +11,14 @@ namespace Data.Entity
     [Table("Area")]
     public class Area : BaseEntity
     {
-        public string Number { get; set; }
-        public int FloorNumber { get; set; }
-        public ICollection<Shelf> Shelves { get; set; }
+        public string? Name { get; set; }
+
+        public ICollection<Shelf> Shelves { get; set; } = [];
+        public ICollection<Schedule> Schedules { get; set; } = [];
+        public ICollection<ScheduleSetting> ScheduleSettings { get; set; } = [];
 
         [ForeignKey("Warehouse")]
         public string WarehouseId { get; set; }
         public Warehouse Warehouse { get; set; }
-
-        [ForeignKey("Schedule")]
-        public string ScheduleId { get; set; }
-        public Schedule Schedule { get; set; }
-
-        [ForeignKey("ScheduleSetting")]
-        public string ScheduleSettingId { get; set; }
-        public ScheduleSetting ScheduleSetting { get; set; }
     }
 }

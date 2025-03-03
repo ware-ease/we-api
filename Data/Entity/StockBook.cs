@@ -13,7 +13,7 @@ namespace Data.Entity
     public class StockBook : BaseEntity
     {
         public ActionEnum Action { get; set; }
-        public int Quantity { get; set; }
+        public int? Quantity { get; set; }
         public DateTime Date { get; set; }
 
         [ForeignKey("Warehouse")]

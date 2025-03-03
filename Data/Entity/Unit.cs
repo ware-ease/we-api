@@ -11,8 +11,8 @@ namespace Data.Entity
     [Table("Unit")]
     public class Unit : BaseEntity
     {
-        public string Name { get; set; }
+        public string? Name { get; set; }
         public string? Note { get; set; }
-        public ICollection<Product> Products { get; set; }
+        public ICollection<Product> Products { get; set; } = [];
     }
 }

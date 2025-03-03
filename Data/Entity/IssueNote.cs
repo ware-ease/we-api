@@ -12,21 +12,20 @@ namespace Data.Entity
     [Table("IssueNote")]
     public class IssueNote : BaseEntity
     {
-        public string Reason { get; set; }
-        public string IssuerName { get; set; }
-        public string ReceiverName { get; set; }
-        public string Code { get; set; }
-        public string Destination {  get; set; }
+        public string? Reason { get; set; }
+        public string? IssuerName { get; set; }
+        public string? ReceiverName { get; set; }
+        public string? Code { get; set; }
+        public string? Destination {  get; set; }
         public DateTime Date { get; set; }
-        public ICollection<IssueDetail> IssueDetails { get; set; }
+        public ICollection<IssueDetail> IssueDetails { get; set; } = [];
+
+        [ForeignKey("Warehouse")]
+        public string? WarehouseId { get; set; }
+        public Warehouse? Warehouse { get; set; }
 
         [ForeignKey("Customer")]
-        public string CustomerId { get; set; }
-        public Customer Customer { get; set; }
-
-        [ForeignKey("SaleReceipt")]
-        public string SaleReceiptId { get; set; }
-        public SaleReceipt SaleReceipt { get; set; }
-
+        public string? CustomerId { get; set; }
+        public Customer? Customer { get; set; }
     }
 }

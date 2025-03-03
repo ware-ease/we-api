@@ -16,7 +16,7 @@ namespace Data.Entity
         public float Length { get; set; }
         public float Height { get; set; }
         public float MaxLoad { get; set; }
-        public ICollection<CellBatch> CellBatches { get; set; }
+        public ICollection<CellBatch> CellBatches { get; set; } = [];
 
         [ForeignKey("Floor")]
         public string FloorId { get; set; }

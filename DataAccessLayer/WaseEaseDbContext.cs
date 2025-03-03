@@ -41,11 +41,8 @@ namespace DataAccessLayer
         public virtual DbSet<Notification> Notifications { get; set; }
         public virtual DbSet<Permission> Permissions { get; set; }
         public virtual DbSet<Product> Products { get; set; }
-        public virtual DbSet<PurchaseReceipt> PurchaseReceipts { get; set; }
         public virtual DbSet<ReceivingDetail> ReceivingDetails { get; set; }
-        public virtual DbSet<PurchaseDetail> PurchaseDetails { get; set; }
         public virtual DbSet<ReceivingNote> ReceivingNotes { get; set; }
-        public virtual DbSet<SaleReceipt> SaleReceipts { get; set; }
         public virtual DbSet<Shelf> Shelves { get; set; }
         public virtual DbSet<CellBatch> StockCards { get; set; }
         public virtual DbSet<InOutDetail> StockCardDetails { get; set; }
@@ -80,28 +77,6 @@ namespace DataAccessLayer
                     foreignKey.DeleteBehavior = DeleteBehavior.NoAction;
                 }
             }
-
-            modelBuilder.Entity<Profile>()
-                .HasOne(p => p.Account)
-                .WithOne(a => a.Profile)
-                .HasForeignKey<Profile>(p => p.AccountId)
-                .OnDelete(DeleteBehavior.NoAction);
-
-            modelBuilder.Entity<AccountGroup>()
-                .HasKey(ag => new { ag.AccountId, ag.GroupId });
-
-            modelBuilder.Entity<AccountGroup>()
-                .HasOne(ag => ag.Account)
-                .WithMany(a => a.AccountGroups)
-                .HasForeignKey(ag => ag.AccountId);
-
-            modelBuilder.Entity<AccountGroup>()
-                .HasOne(ag => ag.Group)
-                .WithMany(g => g.AccountGroups)
-                .HasForeignKey(ag => ag.GroupId);
-
-            modelBuilder.Entity<GroupAction>()
-                .HasKey(gp => new { gp.GroupId, gp.ActionId });
         }
     }
 }
