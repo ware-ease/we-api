@@ -1,7 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using BusinessLogicLayer.IService;
-using API.Payloads.Responses;
-using API.Payloads;
 using Data.Entity;
 using System;
 using System.Collections.Generic;

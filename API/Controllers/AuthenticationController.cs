@@ -1,5 +1,4 @@
-﻿using API.Payloads.Responses;
-using BusinessLogicLayer.IService;
+﻿using BusinessLogicLayer.IService;
 using BusinessLogicLayer.Models.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;

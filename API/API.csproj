@@ -25,8 +25,4 @@
     <ProjectReference Include="..\Data\Data.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Payloads\Requests\" />
-  </ItemGroup>
-
 </Project>
