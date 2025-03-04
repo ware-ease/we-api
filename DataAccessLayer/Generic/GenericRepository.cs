@@ -29,7 +29,20 @@ namespace DataAccessLayer.Generic
 
         public IQueryable<TEntity> Get()
         {
-            return _dbSet.AsQueryable();
+            IQueryable<TEntity> query = _dbSet.AsQueryable();
+            var navigationProperties = _context.Model.FindEntityType(typeof(TEntity))?
+                .GetNavigations()
+                .Select(n => n.Name);
+
+            if (navigationProperties != null)
+            {
+                foreach (var navigationProperty in navigationProperties)
+                {
+                    query = query.Include(navigationProperty);
+                }
+            }
+
+            return query;
         }
 
         public async Task Add(TEntity entity)

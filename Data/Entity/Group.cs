@@ -14,7 +14,7 @@ namespace Data.Entity
     {
         public string? Name { get; set; }
 
-        public ICollection<GroupAction> GroupActions { get; set; } = [];
+        public ICollection<GroupPermission> GroupActions { get; set; } = [];
         public ICollection<AccountGroup> AccountGroups { get; set; } = [];
     }
 }

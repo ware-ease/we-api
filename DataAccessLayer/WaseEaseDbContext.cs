@@ -27,20 +27,20 @@ namespace DataAccessLayer
 
         public virtual DbSet<Account> Accounts { get; set; }
         public virtual DbSet<AccountGroup> AccountGroups { get; set; }
-        public virtual DbSet<AccountAction> AccountActions { get; set; }
+        public virtual DbSet<AccountPermission> AccountPermissions { get; set; }
         public virtual DbSet<AccountWarehouse> AccountWarehouses { get; set; }
-        public virtual DbSet<AppAction> Actions { get; set; }
+        public virtual DbSet<Permission> Permissions { get; set; }
         public virtual DbSet<Category> Categories { get; set; }
         public virtual DbSet<Cell> Cells { get; set; }
         public virtual DbSet<CellBatch> CellBatches { get; set; }
         public virtual DbSet<Customer> Customers { get; set; }
         public virtual DbSet<Floor> Floors { get; set; }
         public virtual DbSet<Group> Groups { get; set; }
-        public virtual DbSet<GroupAction> GroupActions { get; set; }
+        public virtual DbSet<GroupPermission> GroupPermissions { get; set; }
         public virtual DbSet<IssueNote> IssueNotes { get; set; }
         public virtual DbSet<IssueDetail> IssueDetails { get; set; }
         public virtual DbSet<Notification> Notifications { get; set; }
-        public virtual DbSet<Permission> Permissions { get; set; }
+        public virtual DbSet<Route> Routes { get; set; }
         public virtual DbSet<Product> Products { get; set; }
         public virtual DbSet<Profile> Profiles { get; set; }
         public virtual DbSet<ReceivingDetail> ReceivingDetails { get; set; }

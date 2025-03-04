@@ -56,7 +56,7 @@ namespace DataAccessLayer.UnitOfWork
         public IAccountRepository AccountRepository => GetIRepository<IAccountRepository>();
         public IGroupRepository GroupRepository => GetIRepository<IGroupRepository>();
         public IProfileRepository ProfileRepository => GetIRepository<IProfileRepository>();
-        public IAppActionRepository AppActionRepository => GetIRepository<IAppActionRepository>();
+        public IRouteRepository AppActionRepository => GetIRepository<IRouteRepository>();
         public IPermissionRepository PermissionRepository => GetIRepository<IPermissionRepository>();
         public IWarehouseRepository WarehouseRepository => GetIRepository<IWarehouseRepository>();
 

@@ -15,7 +15,7 @@ namespace DataAccessLayer.UnitOfWork
         IAccountRepository AccountRepository { get; }
         IGroupRepository GroupRepository { get; }
         IProfileRepository ProfileRepository { get; }
-        IAppActionRepository AppActionRepository { get; }
+        IRouteRepository AppActionRepository { get; }
         IPermissionRepository PermissionRepository { get; }
         IWarehouseRepository WarehouseRepository { get; }
 

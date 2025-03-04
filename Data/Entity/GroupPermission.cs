@@ -1,7 +1,6 @@
 ﻿using Data.Entity.Base;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
@@ -9,16 +8,15 @@ using System.Threading.Tasks;
 
 namespace Data.Entity
 {
-    [Table("Action")]
-    public class AppAction : BaseEntity
+    [Table("GroupPermission")]
+    public class GroupPermission : BaseEntity
     {
-        public string? Code { get; set; }
+        [ForeignKey("Group")]
+        public string GroupId { get; set; }
+        public Group Group { get; set; }
 
         [ForeignKey("Permission")]
         public string PermissionId { get; set; }
         public Permission Permission { get; set; }
-
-        public ICollection<GroupAction> GroupActions { get; set; } = [];
-        public ICollection<AccountAction> AccountActions { get; set; } = [];
     }
 }

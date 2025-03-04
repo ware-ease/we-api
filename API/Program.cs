@@ -78,8 +78,28 @@ builder.Services.AddSingleton(mapper.CreateMapper());
 
 builder.Services.AddScoped<IGenericRepository<Customer>, GenericRepository<Customer>>();
 builder.Services.AddScoped<IGenericRepository<Account>, GenericRepository<Account>>();
+builder.Services.AddScoped<IGenericRepository<Permission>, GenericRepository<Permission>>();
+builder.Services.AddScoped<IGenericRepository<Data.Entity.Route>, GenericRepository<Data.Entity.Route>>();
 
 #region Services
+builder.Services.AddScoped<IJwtService, JwtService>();
+builder.Services.AddScoped<IAccountService, AccountService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<ISupplierService, SupplierService>();
+builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<IShelfService, ShelfService>();
+builder.Services.AddScoped<IFloorService, FloorService>();
+builder.Services.AddScoped<ICellService, CellService>();
+builder.Services.AddScoped<IGenericPaginationService, GenericPaginationService>();
+builder.Services.AddScoped<IGroupService, GroupService>();
+builder.Services.AddScoped<IProfileService, ProfileService>();
+builder.Services.AddScoped<IPermissionService, PermissionService>();
+builder.Services.AddScoped<IRouteService, RouteService>();
+builder.Services.AddScoped<IWarehouseService, WarehouseService>();
+builder.Services.AddScoped<ICustomerService, CustomerService>();
+#endregion Services
+
+#region Repositories
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
@@ -92,28 +112,10 @@ builder.Services.AddScoped<IFloorRepository, FloorRepository>();
 builder.Services.AddScoped<ICellRepository, CellRepository>();
 builder.Services.AddScoped<IGroupRepository, GroupRepository>();
 builder.Services.AddScoped<IProfileRepository, ProfileRepository>();
-builder.Services.AddScoped<IAppActionRepository, AppActionRepository>();
+builder.Services.AddScoped<IRouteRepository, RouteRepository>();
 builder.Services.AddScoped<IPermissionRepository, PermissionRepository>();
 builder.Services.AddScoped<IWarehouseRepository, WarehouseRepository>();
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
-#endregion Services
-
-#region Repositories
-builder.Services.AddScoped<IJwtService, JwtService>();
-builder.Services.AddScoped<IAccountService, AccountService>();
-builder.Services.AddScoped<ICategoryService, CategoryService>();
-builder.Services.AddScoped<ISupplierService, SupplierService>();
-builder.Services.AddScoped<IProductService, ProductService>();
-builder.Services.AddScoped<IShelfService, ShelfService>();
-builder.Services.AddScoped<IFloorService, FloorService>();
-builder.Services.AddScoped<ICellService, CellService>();
-builder.Services.AddScoped<IGenericPaginationService, GenericPaginationService>();
-builder.Services.AddScoped<IGroupService, GroupService>();
-builder.Services.AddScoped<IProfileService, ProfileService>();
-builder.Services.AddScoped<IAppActionService, AppActionService>();
-builder.Services.AddScoped<IPermissionService, PermissionService>();
-builder.Services.AddScoped<IWarehouseService, WarehouseService>();
-builder.Services.AddScoped<ICustomerService, CustomerService>();
 #endregion Repositories
 
 builder.Services.AddAuthentication(options =>

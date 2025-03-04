@@ -9,13 +9,10 @@ using System.Threading.Tasks;
 
 namespace DataAccessLayer.Repositories
 {
-    public class AppActionRepository : GenericRepository<AppAction>, IAppActionRepository
+    public class RouteRepository : GenericRepository<Route>, IRouteRepository
     {
-        private readonly WaseEaseDbContext _context;
-
-        public AppActionRepository(WaseEaseDbContext context) : base(context)
+        public RouteRepository(WaseEaseDbContext context) : base(context)
         {
-            _context = context;
         }
     }
 }

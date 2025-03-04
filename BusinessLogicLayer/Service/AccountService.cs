@@ -481,7 +481,7 @@ namespace BusinessLogicLayer.Services
         {
             try
             {
-                List<AccountAction> entitiesToDelete = new List<AccountAction>();
+                List<AccountPermission> entitiesToDelete = new List<AccountPermission>();
                 List<string> notFoundPairs = new List<string>();
 
                 foreach (var accountId in accountIds)
