@@ -9,11 +9,10 @@ using System.Threading.Tasks;
 
 namespace DataAccessLayer.Repositories
 {
-    public class GroupRepository : GenericRepository<Group>,IGroupRepository
+    public class GroupRepository : GenericRepository<Group>, IGroupRepository
     {
         public GroupRepository(WaseEaseDbContext context) : base(context)
         {
-            _context = context;
         }
     }
 }

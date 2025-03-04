@@ -26,7 +26,7 @@ namespace DataAccessLayer.Repositories
                     //        .ThenInclude(gp => gp.Permission) // Truy cập Permission từ GroupPermission
                     //            .ThenInclude(p => p.PermissionActions) // Bao gồm các action của quyền
                     //                .ThenInclude(a =>a.Action)
-                .Include(a => a.AccountActions) // Bao gồm quyền riêng của user
+                .Include(a => a.AccountPermissions) // Bao gồm quyền riêng của user
                     //.ThenInclude(ap => ap.Permission) // Truy cập Permission từ AccountPermission
                     //    .ThenInclude(p => p.PermissionActions) // Bao gồm các action của quyền riêng
                     //        .ThenInclude(a => a.Action)

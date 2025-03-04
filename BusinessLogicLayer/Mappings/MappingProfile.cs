@@ -46,7 +46,7 @@ namespace BusinessLogicLayer.Mappings
             #region Account
             CreateMap<Account, Data.Model.DTO.AccountDTO>()
                 .ForMember(dest => dest.Groups, opt => opt.MapFrom(src => src.AccountGroups.Select(ag => ag.Group)))
-                .ForMember(dest => dest.Actions, opt => opt.MapFrom(src => src.AccountActions.Select(ag => ag.Permission)))
+                .ForMember(dest => dest.Actions, opt => opt.MapFrom(src => src.AccountPermissions.Select(ag => ag.Permission)))
                 .ForMember(dest => dest.Warehouses, opt => opt.MapFrom(src => src.AccountWarehouses.Select(aw => aw.Warehouse)))
                 .ReverseMap();
 
@@ -117,7 +117,10 @@ namespace BusinessLogicLayer.Mappings
             #endregion
 
             #region Group
-            CreateMap<Group, Data.Model.DTO.GroupDTO>().ReverseMap();
+            CreateMap<Group, GroupDTO>()
+                .ForMember(dest => dest.Accounts, opt => opt.MapFrom(src => src.AccountGroups.Select(ag => ag.Account)))
+                .ForMember(dest => dest.Permissions, opt => opt.MapFrom(src => src.GroupPermissions.Select(ga => ga.Permission)))
+                .ReverseMap();
             CreateMap<Group, CreateGroupDTO>().ReverseMap();
             #endregion
 

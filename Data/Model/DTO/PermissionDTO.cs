@@ -11,6 +11,5 @@ namespace Data.Model.DTO
         public string Code { get; set; }
         public string Url { get; set; }
         public string RouteCode { get; set; }
-
     }
 }

@@ -10,7 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BusinessLogicLayer.Service
+namespace BusinessLogicLayer.Services
 {
     public class RouteService : GenericService<Route>, IRouteService
     {

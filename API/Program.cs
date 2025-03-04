@@ -78,6 +78,7 @@ builder.Services.AddSingleton(mapper.CreateMapper());
 
 builder.Services.AddScoped<IGenericRepository<Customer>, GenericRepository<Customer>>();
 builder.Services.AddScoped<IGenericRepository<Account>, GenericRepository<Account>>();
+builder.Services.AddScoped<IGenericRepository<Group>, GenericRepository<Group>>();
 builder.Services.AddScoped<IGenericRepository<Permission>, GenericRepository<Permission>>();
 builder.Services.AddScoped<IGenericRepository<Data.Entity.Route>, GenericRepository<Data.Entity.Route>>();
 

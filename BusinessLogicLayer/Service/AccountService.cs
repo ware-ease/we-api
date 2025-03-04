@@ -8,6 +8,7 @@ using BusinessLogicLayer.Models.Authentication;
 using BusinessLogicLayer.Models.Pagination;
 using BusinessLogicLayer.Utils;
 using Data.Entity;
+using Data.Model.DTO;
 using DataAccessLayer.Generic;
 using DataAccessLayer.IRepositories;
 using DataAccessLayer.UnitOfWork;

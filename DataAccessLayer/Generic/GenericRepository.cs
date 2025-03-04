@@ -30,15 +30,26 @@ namespace DataAccessLayer.Generic
         public IQueryable<TEntity> Get()
         {
             IQueryable<TEntity> query = _dbSet.AsQueryable();
-            var navigationProperties = _context.Model.FindEntityType(typeof(TEntity))?
-                .GetNavigations()
-                .Select(n => n.Name);
+            var entityType = _context.Model.FindEntityType(typeof(TEntity));
 
-            if (navigationProperties != null)
+            if (entityType != null)
             {
-                foreach (var navigationProperty in navigationProperties)
+                foreach (var navigation in entityType.GetNavigations())
                 {
-                    query = query.Include(navigationProperty);
+                    query = query.Include(navigation.Name);
+
+                    foreach (var subNavigation in navigation.TargetEntityType.GetNavigations())
+                    {
+                        var secondLevelInclude = $"{navigation.Name}.{subNavigation.Name}";
+
+                        query = query.Include(secondLevelInclude);
+
+                        foreach (var subSubNavigation in subNavigation.TargetEntityType.GetNavigations())
+                        {
+                            var thirdLevelInclude = $"{secondLevelInclude}.{subSubNavigation.Name}";
+                            query = query.Include(thirdLevelInclude);
+                        }
+                    }
                 }
             }
 

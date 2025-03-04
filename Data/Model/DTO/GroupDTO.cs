@@ -7,8 +7,16 @@ using System.Threading.Tasks;
 
 namespace Data.Model.DTO
 {
-    public class GroupDTO : BaseEntity
+    public class GroupDTO
     {
         public string Name { get; set; }
+        public List<PermissionDTO> Permissions { get; set; }
+        public List<GroupDTOAccount> Accounts { get; set; }
+    }
+
+    public class GroupDTOAccount
+    {
+        public string Username { get; set; }
+        public string Email { get; set; }
     }
 }

@@ -7,6 +7,7 @@ using Data.Entity;
 using Data.Entity.Base;
 using DotNetEnv;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 
 namespace DataAccessLayer
@@ -68,6 +69,8 @@ namespace DataAccessLayer
                 Env.Load();
                 optionsBuilder.UseSqlServer(Environment.GetEnvironmentVariable("DB_URL"));
             }
+
+            optionsBuilder.ConfigureWarnings(warnings => warnings.Ignore(CoreEventId.NavigationBaseIncludeIgnored));
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
