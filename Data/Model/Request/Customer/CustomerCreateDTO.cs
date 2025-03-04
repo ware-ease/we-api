@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Data.Model.Request.Customer
 {
-    public class CustomerCreateDTO
+    public class CustomerCreateDTO : BaseCreateDTO
     {
         [Required]
         public string? Name { get; set; }

@@ -1,4 +1,5 @@
-﻿using BusinessLogicLayer.IServices;
+﻿using API.Utils;
+using BusinessLogicLayer.IServices;
 using Data.Entity;
 using Data.Model.DTO;
 using Data.Model.Request.Customer;
@@ -39,6 +40,17 @@ namespace API.Controllers
         [HttpPost]
         public async Task<IActionResult> Add([FromBody] CustomerCreateDTO request)
         {
+            var authUser = AuthHelper.GetCurrentUser(HttpContext.Request);
+
+            if (authUser.id != null) 
+            {
+                request.CreatedBy = authUser.id;
+            }
+            else
+            {
+                return Unauthorized();
+            }
+
             var result = await _customerService.Add<CustomerDTO, CustomerCreateDTO>(request);
 
             return ControllerResponse.Response(result);
