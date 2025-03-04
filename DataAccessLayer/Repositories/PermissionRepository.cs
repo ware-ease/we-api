@@ -1,4 +1,5 @@
 ﻿using Data.Entity;
+using DataAccessLayer.Generic;
 using DataAccessLayer.IRepositories;
 using System;
 using System.Collections.Generic;

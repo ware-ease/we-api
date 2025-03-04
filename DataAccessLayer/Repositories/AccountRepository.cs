@@ -1,4 +1,5 @@
 ﻿using Data.Entity;
+using DataAccessLayer.Generic;
 using DataAccessLayer.IRepositories;
 using DataAccessLayer.Utils;
 using Microsoft.EntityFrameworkCore;
@@ -6,9 +7,8 @@ using Microsoft.Extensions.Configuration;
 
 namespace DataAccessLayer.Repositories
 {
-    public class AccountRepository  : GenericRepository<Account>, IAccountRepository
+    public class AccountRepository : GenericRepository<Account>, IAccountRepository
     {
-        private readonly WaseEaseDbContext _context;
         private readonly IConfiguration _configuration;
 
         public AccountRepository(WaseEaseDbContext context, IConfiguration configuration) : base(context)

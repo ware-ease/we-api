@@ -1,5 +1,9 @@
-﻿using DataAccessLayer.Repositories;
+﻿using Data.Entity.Base;
+using DataAccessLayer.Generic;
+using DataAccessLayer.IRepositories;
+using DataAccessLayer.Repositories;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
 
 namespace DataAccessLayer.UnitOfWork
@@ -7,37 +11,27 @@ namespace DataAccessLayer.UnitOfWork
     public class UnitOfWork : IUnitOfWork
     {
         private readonly IConfiguration _configuration;
+        private readonly IServiceProvider _serviceProvider;
         private WaseEaseDbContext _context;
+        private readonly Dictionary<Type, object> _repositories = new();
 
-        private AccountRepository _accountRepo;
-        private GroupRepository _groupRepo;
-        private ProfileRepository _profileRepo;
-        private AppActionRepository _appActionRepo;
-        private PermissionRepository _permissionRepo;
-        private WarehouseRepository _warehouseRepo;
-        private AccountGroupRepository _accountGroupRepository;
-        private AccountPermissionRepository _accountPermissionRepository;
-        //private PermissionActionRepository _permissionActionRepository;
-        private GroupPermissionRepository _groupPermissionRepository;
-        private AccountWarehouseRepository _accountWarehouseRepository;
-        private AccountActionRepository _accountActionRepository;
-
-
-        public UnitOfWork(WaseEaseDbContext context, IConfiguration configuration)
+        public UnitOfWork(WaseEaseDbContext context, IConfiguration configuration, IServiceProvider serviceProvider)
         {
             _context = context;
             _configuration = configuration;
+            _serviceProvider = serviceProvider;
         }
-
 
         public void Save()
         {
             _context.SaveChanges();
         }
+
         public async Task<int> SaveAsync()
         {
             return await _context.SaveChangesAsync();
         }
+
         private bool disposed = false;
 
         protected virtual void Dispose(bool disposing)
@@ -57,140 +51,45 @@ namespace DataAccessLayer.UnitOfWork
             Dispose(true);
             GC.SuppressFinalize(this);
         }
-        AccountRepository IUnitOfWork.AccountRepository
+
+        public ICustomerRepository CustomerRepository => GetIRepository<ICustomerRepository>();
+        public IAccountRepository AccountRepository => GetIRepository<IAccountRepository>();
+        public IGroupRepository GroupRepository => GetIRepository<IGroupRepository>();
+        public IProfileRepository ProfileRepository => GetIRepository<IProfileRepository>();
+        public IAppActionRepository AppActionRepository => GetIRepository<IAppActionRepository>();
+        public IPermissionRepository PermissionRepository => GetIRepository<IPermissionRepository>();
+        public IWarehouseRepository WarehouseRepository => GetIRepository<IWarehouseRepository>();
+
+        public TRepository GetIRepository<TRepository>()
         {
-            get
+            if (_serviceProvider != null)
             {
-                if (_accountRepo == null)
-                {
-                    this._accountRepo = new AccountRepository(_context, _configuration);
-                }
-                return _accountRepo;
+                var repository = _serviceProvider.GetService<TRepository>();
+                return repository;
             }
-        } 
-        GroupRepository IUnitOfWork.GroupRepository
-        {
-            get
-            {
-                if (_groupRepo == null)
-                {
-                    this._groupRepo = new GroupRepository(_context);
-                }
-                return _groupRepo;
-            }
-        }
-        ProfileRepository IUnitOfWork.ProfileRepository
-        {
-            get
-            {
-                if (_profileRepo == null)
-                {
-                    this._profileRepo = new ProfileRepository(_context);
-                }
-                return _profileRepo;
-            }
-        }
-        AppActionRepository IUnitOfWork.AppActionRepository
-        {
-            get
-            {
-                if (_appActionRepo == null)
-                {
-                    this._appActionRepo = new AppActionRepository(_context);
-                }
-                return _appActionRepo;
-            }
-        }
-        PermissionRepository IUnitOfWork.PermissionRepository
-        {
-            get
-            {
-                if (_permissionRepo == null)
-                {
-                    this._permissionRepo = new PermissionRepository(_context);
-                }
-                return _permissionRepo;
-            }
-        }
-        WarehouseRepository IUnitOfWork.WarehouseRepository
-        {
-            get
-            {
-                if (_warehouseRepo == null)
-                {
-                    this._warehouseRepo = new WarehouseRepository(_context);
-                }
-                return _warehouseRepo;
-            }
+
+            return default;
         }
 
-        AccountGroupRepository IUnitOfWork.AccountGroupRepository
+        public IGenericRepository<TEntity> GetRepository<TEntity>() where TEntity : BaseEntity
         {
-            get
-            {
-                if (_accountGroupRepository == null)
-                {
-                    this._accountGroupRepository = new AccountGroupRepository(_context);
-                }
-                return _accountGroupRepository;
-            }
-        }
+            var specificRepositoryType = typeof(IGenericRepository<TEntity>);
+            var specificRepository = _serviceProvider.GetService(specificRepositoryType);
 
-        AccountPermissionRepository IUnitOfWork.AccountPermissionRepository
-        {
-            get
+            if (specificRepository != null)
             {
-                if (_accountPermissionRepository == null)
-                {
-                    this._accountPermissionRepository = new AccountPermissionRepository(_context);
-                }
-                return _accountPermissionRepository;
+                return (IGenericRepository<TEntity>)specificRepository;
             }
-        }
 
-        //PermissionActionRepository IUnitOfWork.PermissionActionRepository
-        //{
-        //    get
-        //    {
-        //        if (_permissionActionRepository == null)
-        //        {
-        //            this._permissionActionRepository = new PermissionActionRepository(_context);
-        //        }
-        //        return _permissionActionRepository;
-        //    }
-        //}
-        GroupPermissionRepository IUnitOfWork.GroupPermissionRepository
-        {
-            get
+            Type entityType = typeof(TEntity);
+
+            if (!_repositories.ContainsKey(entityType))
             {
-                if (_groupPermissionRepository == null)
-                {
-                    this._groupPermissionRepository = new GroupPermissionRepository(_context);
-                }
-                return _groupPermissionRepository;
+                var repository = _serviceProvider.GetRequiredService<IGenericRepository<TEntity>>();
+                _repositories[entityType] = repository;
             }
-        }
-        AccountWarehouseRepository IUnitOfWork.AccountWarehouseRepository
-        {
-            get
-            {
-                if (_accountWarehouseRepository == null)
-                {
-                    this._accountWarehouseRepository = new AccountWarehouseRepository(_context);
-                }
-                return _accountWarehouseRepository;
-            }
-        } 
-        AccountActionRepository IUnitOfWork.AccountActionRepository
-        {
-            get
-            {
-                if (_accountActionRepository == null)
-                {
-                    this._accountActionRepository = new AccountActionRepository(_context);
-                }
-                return _accountActionRepository;
-            }
+
+            return (IGenericRepository<TEntity>)_repositories[entityType];
         }
     }
 }

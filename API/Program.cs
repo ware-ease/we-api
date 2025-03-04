@@ -1,11 +1,13 @@
-using API.Middlewares;
 using AutoMapper;
 using BusinessLogicLayer.IService;
+using BusinessLogicLayer.IServices;
 using BusinessLogicLayer.Mappings;
 using BusinessLogicLayer.Models.General;
 using BusinessLogicLayer.Service;
 using BusinessLogicLayer.Services;
+using Data.Entity;
 using DataAccessLayer;
+using DataAccessLayer.Generic;
 using DataAccessLayer.IRepositories;
 using DataAccessLayer.Repositories;
 using DataAccessLayer.UnitOfWork;
@@ -16,10 +18,10 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Globalization;
 using System.Text;
-using System.Text.Json;
 using System.Text.Json.Serialization;
 
 Env.Load();
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Configuration.AddEnvironmentVariables();
@@ -35,17 +37,11 @@ builder.Configuration
 var connectionString = Environment.GetEnvironmentVariable("DB_URL");
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddDbContext<WaseEaseDbContext>(options =>
     options.UseSqlServer(connectionString));
 
-////Add kebab
-//builder.Services.AddControllers().AddJsonOptions(options =>
-//{
-//    options.JsonSerializerOptions.PropertyNamingPolicy = new KebabCaseNamingPolicy();
-//    options.JsonSerializerOptions.DictionaryKeyPolicy = new KebabCaseNamingPolicy();
-//});
 builder.Services.AddSwaggerGen(option =>
 {
     option.SwaggerDoc("v1", new OpenApiInfo { Title = "WareEase API", Version = "v1" });
@@ -80,7 +76,10 @@ var mapper = new MapperConfiguration(mc =>
 });
 builder.Services.AddSingleton(mapper.CreateMapper());
 
-// Register repositories
+builder.Services.AddScoped<IGenericRepository<Customer>, GenericRepository<Customer>>();
+builder.Services.AddScoped<IGenericRepository<Account>, GenericRepository<Account>>();
+
+#region Services
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
@@ -96,16 +95,11 @@ builder.Services.AddScoped<IProfileRepository, ProfileRepository>();
 builder.Services.AddScoped<IAppActionRepository, AppActionRepository>();
 builder.Services.AddScoped<IPermissionRepository, PermissionRepository>();
 builder.Services.AddScoped<IWarehouseRepository, WarehouseRepository>();
-builder.Services.AddScoped<IAccountGroupRepository, AccountGroupRepository>();
-builder.Services.AddScoped<IAccountPermissionRepository, AccountPermissionRepository>();
-//builder.Services.AddScoped<IPermissionActionRepository, PermissionActionRepository>();
-builder.Services.AddScoped<IGroupPermissionRepository, GroupPermissionRepository>();
-builder.Services.AddScoped<IAccountWarehouseRepository, AccountWarehouseRepository>();
-builder.Services.AddScoped<IAccountActionRepository, AccountActionRepository>();
+builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+#endregion Services
 
-// Register servicies
+#region Repositories
 builder.Services.AddScoped<IJwtService, JwtService>();
-
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<ISupplierService, SupplierService>();
@@ -119,13 +113,9 @@ builder.Services.AddScoped<IProfileService, ProfileService>();
 builder.Services.AddScoped<IAppActionService, AppActionService>();
 builder.Services.AddScoped<IPermissionService, PermissionService>();
 builder.Services.AddScoped<IWarehouseService, WarehouseService>();
-builder.Services.AddScoped<IAccountGroupService, AccountGroupService>();
-builder.Services.AddScoped<IAccountPermissionService, AccountPermissionService>();
-builder.Services.AddScoped<IPermissionActionService, PermissionActionService>();
-builder.Services.AddScoped<IGroupPermissionService, GroupPermissionService>();
-builder.Services.AddScoped<IAccountWarehouseService, AccountWarehouseService>();
+builder.Services.AddScoped<ICustomerService, CustomerService>();
+#endregion Repositories
 
-////Config Jwt Token
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -157,7 +147,6 @@ builder.Services.AddCors(p => p.AddPolicy("Cors", policy =>
           .AllowCredentials();
 }));
 
-// add  json option để tránh vòng lặp tại json khi trả về
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
     options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;

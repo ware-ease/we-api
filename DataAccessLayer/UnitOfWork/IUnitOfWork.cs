@@ -1,4 +1,7 @@
-﻿using DataAccessLayer.Repositories;
+﻿using Data.Entity.Base;
+using DataAccessLayer.Generic;
+using DataAccessLayer.IRepositories;
+using DataAccessLayer.Repositories;
 
 namespace DataAccessLayer.UnitOfWork
 {
@@ -6,18 +9,16 @@ namespace DataAccessLayer.UnitOfWork
     {
         void Save();
         Task<int> SaveAsync();
-        public AccountRepository AccountRepository { get; }
-        public GroupRepository GroupRepository { get; }
-        public ProfileRepository ProfileRepository { get; }
-        public AppActionRepository AppActionRepository { get; }
-        public PermissionRepository PermissionRepository { get; }
-        public WarehouseRepository WarehouseRepository { get; }
-        public AccountGroupRepository AccountGroupRepository { get; }
-        public AccountPermissionRepository AccountPermissionRepository { get; }
-        //public PermissionActionRepository PermissionActionRepository { get; }
-        public GroupPermissionRepository GroupPermissionRepository { get; }
-        public AccountWarehouseRepository AccountWarehouseRepository { get; }
-        public AccountActionRepository AccountActionRepository { get; }
 
+        IGenericRepository<TEntity> GetRepository<TEntity>() where TEntity : BaseEntity;
+
+        IAccountRepository AccountRepository { get; }
+        IGroupRepository GroupRepository { get; }
+        IProfileRepository ProfileRepository { get; }
+        IAppActionRepository AppActionRepository { get; }
+        IPermissionRepository PermissionRepository { get; }
+        IWarehouseRepository WarehouseRepository { get; }
+
+        ICustomerRepository CustomerRepository { get; }
     }
 }

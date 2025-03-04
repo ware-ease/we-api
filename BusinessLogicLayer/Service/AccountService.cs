@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using BusinessLogicLayer.Generic;
 using BusinessLogicLayer.IService;
 using BusinessLogicLayer.Models.Account;
 using BusinessLogicLayer.Models.AccountAction;
@@ -7,6 +8,8 @@ using BusinessLogicLayer.Models.Authentication;
 using BusinessLogicLayer.Models.Pagination;
 using BusinessLogicLayer.Utils;
 using Data.Entity;
+using DataAccessLayer.Generic;
+using DataAccessLayer.IRepositories;
 using DataAccessLayer.UnitOfWork;
 using DotNetEnv;
 using MailKit.Security;
@@ -15,13 +18,13 @@ using MimeKit;
 using System.Linq.Expressions;
 namespace BusinessLogicLayer.Services
 {
-    public class AccountService : IAccountService
+    public class AccountService : GenericService<Account>, IAccountService
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly IMemoryCache _cache;
 
-        public AccountService(IUnitOfWork unitOfWork, IMapper mapper, IMemoryCache cache)
+        public AccountService(IGenericRepository<Account> genericRepository, IUnitOfWork unitOfWork, IMapper mapper, IMemoryCache cache) : base(genericRepository, mapper, unitOfWork)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
@@ -118,13 +121,17 @@ namespace BusinessLogicLayer.Services
                 account.CreatedBy = model.CreatedBy;
                 Data.Entity.Profile profile = new Data.Entity.Profile();
                 profile = _mapper.Map<Data.Entity.Profile>(model.Profile);
-                await _unitOfWork.AccountRepository.Insert(account);
+
+                //await _unitOfWork.SaveAsync();
 
                 profile.AccountId = account.Id;
                 profile.CreatedBy = model.CreatedBy;
                 profile.CreatedTime = DateTime.Now;
+                account.Profile = profile;
+                profile.Account = account;
 
-                await _unitOfWork.ProfileRepository.Insert(profile);
+                await _unitOfWork.AccountRepository.Add(account);
+                await _unitOfWork.ProfileRepository.Add(profile);
 
                 // **Thêm AccountGroup nếu có groupIds**
                 if (model.groupIds != null && model.groupIds.Any())
@@ -161,7 +168,7 @@ namespace BusinessLogicLayer.Services
                             CreatedBy = model.CreatedBy,
                             CreatedTime = DateTime.Now
                         };
-                        await _unitOfWork.AccountGroupRepository.Insert(accountGroup);
+                        //await _unitOfWork.AccountGroupRepository.Insert(accountGroup);
                     }
                 }
 
@@ -365,23 +372,23 @@ namespace BusinessLogicLayer.Services
                 foreach (var groupId in model.GroupIds)
                 {
                     // Kiểm tra xem nhóm này đã được thêm cho tài khoản này chưa
-                    var existingEntity = await _unitOfWork.AccountGroupRepository.GetByCondition(
-                        filter: x => x.AccountId == accountId && x.GroupId == groupId);
+                    //var existingEntity = await _unitOfWork.AccountGroupRepository.GetByCondition(
+                    //    filter: x => x.AccountId == accountId && x.GroupId == groupId);
 
-                    if (existingEntity != null)
-                    {
-                        continue; // Nếu đã tồn tại thì bỏ qua
-                    }
+                    //if (existingEntity != null)
+                    //{
+                    //    continue; // Nếu đã tồn tại thì bỏ qua
+                    //}
 
-                    var entity = new AccountGroup
-                    {
-                        AccountId = accountId,
-                        GroupId = groupId,
-                        CreatedBy = model.CreatedBy,
-                        CreatedTime = DateTime.Now
-                    };
+                    //var entity = new AccountGroup
+                    //{
+                    //    AccountId = accountId,
+                    //    GroupId = groupId,
+                    //    CreatedBy = model.CreatedBy,
+                    //    CreatedTime = DateTime.Now
+                    //};
 
-                    await _unitOfWork.AccountGroupRepository.Insert(entity);
+                    //await _unitOfWork.AccountGroupRepository.Insert(entity);
                 }
             }
 
@@ -396,23 +403,23 @@ namespace BusinessLogicLayer.Services
                 foreach (var actionId in model.ActionIds)
                 {
                     // Kiểm tra xem nhóm này đã được thêm cho tài khoản này chưa
-                    var existingEntity = await _unitOfWork.AccountActionRepository.GetByCondition(
-                        filter: x => x.AccountId == accountId && x.ActionId == actionId);
+                    //var existingEntity = await _unitOfWork.AccountActionRepository.GetByCondition(
+                    //    filter: x => x.AccountId == accountId && x.ActionId == actionId);
 
-                    if (existingEntity != null)
-                    {
-                        continue; // Nếu đã tồn tại thì bỏ qua
-                    }
+                    //if (existingEntity != null)
+                    //{
+                    //    continue; // Nếu đã tồn tại thì bỏ qua
+                    //}
 
-                    var entity = new AccountAction
-                    {
-                        AccountId = accountId,
-                        ActionId = actionId,
-                        CreatedBy = model.CreatedBy,
-                        CreatedTime = DateTime.Now
-                    };
+                    //var entity = new AccountAction
+                    //{
+                    //    AccountId = accountId,
+                    //    ActionId = actionId,
+                    //    CreatedBy = model.CreatedBy,
+                    //    CreatedTime = DateTime.Now
+                    //};
 
-                    await _unitOfWork.AccountActionRepository.Insert(entity);
+                    //await _unitOfWork.AccountActionRepository.Insert(entity);
                 }
             }
 
@@ -430,17 +437,17 @@ namespace BusinessLogicLayer.Services
                 {
                     foreach (var groupId in groupIds)
                     {
-                        var entity = await _unitOfWork.AccountGroupRepository.GetByCondition(
-                            x => x.AccountId == accountId && x.GroupId == groupId);
+                        //var entity = await _unitOfWork.AccountGroupRepository.GetByCondition(
+                        //    x => x.AccountId == accountId && x.GroupId == groupId);
 
-                        if (entity != null)
-                        {
-                            entitiesToDelete.Add(entity);
-                        }
-                        else
-                        {
-                            notFoundPairs.Add($"(AccountId: {accountId}, GroupId: {groupId})");
-                        }
+                        //if (entity != null)
+                        //{
+                        //    entitiesToDelete.Add(entity);
+                        //}
+                        //else
+                        //{
+                        //    notFoundPairs.Add($"(AccountId: {accountId}, GroupId: {groupId})");
+                        //}
                     }
                 }
 
@@ -458,7 +465,7 @@ namespace BusinessLogicLayer.Services
                 // Xóa từng bản ghi một
                 foreach (var entity in entitiesToDelete)
                 {
-                    _unitOfWork.AccountGroupRepository.Delete(entity);
+                    //_unitOfWork.AccountGroupRepository.Delete(entity);
                 }
 
                 await _unitOfWork.SaveAsync();
@@ -481,17 +488,17 @@ namespace BusinessLogicLayer.Services
                 {
                     foreach (var actionId in actionIds)
                     {
-                        var entity = await _unitOfWork.AccountActionRepository.GetByCondition(
-                            x => x.AccountId == accountId && x.ActionId == actionId);
+                        //var entity = await _unitOfWork.AccountActionRepository.GetByCondition(
+                        //    x => x.AccountId == accountId && x.ActionId == actionId);
 
-                        if (entity != null)
-                        {
-                            entitiesToDelete.Add(entity);
-                        }
-                        else
-                        {
-                            notFoundPairs.Add($"(AccountId: {accountId}, ActionId: {actionId})");
-                        }
+                        //if (entity != null)
+                        //{
+                        //    entitiesToDelete.Add(entity);
+                        //}
+                        //else
+                        //{
+                        //    notFoundPairs.Add($"(AccountId: {accountId}, ActionId: {actionId})");
+                        //}
                     }
                 }
 
@@ -509,7 +516,7 @@ namespace BusinessLogicLayer.Services
                 // Xóa từng bản ghi một
                 foreach (var entity in entitiesToDelete)
                 {
-                    _unitOfWork.AccountActionRepository.Delete(entity);
+                    //_unitOfWork.AccountActionRepository.Delete(entity);
                 }
 
                 await _unitOfWork.SaveAsync();
