@@ -69,18 +69,19 @@ builder.Services.AddSwaggerGen(option =>
     });
 });
 
-// Add Mapping profiles
 var mapper = new MapperConfiguration(mc =>
 {
     mc.AddProfile<MappingProfile>();
 });
 builder.Services.AddSingleton(mapper.CreateMapper());
 
+#region Generic
 builder.Services.AddScoped<IGenericRepository<Customer>, GenericRepository<Customer>>();
 builder.Services.AddScoped<IGenericRepository<Account>, GenericRepository<Account>>();
 builder.Services.AddScoped<IGenericRepository<Group>, GenericRepository<Group>>();
 builder.Services.AddScoped<IGenericRepository<Permission>, GenericRepository<Permission>>();
 builder.Services.AddScoped<IGenericRepository<Data.Entity.Route>, GenericRepository<Data.Entity.Route>>();
+#endregion Generic
 
 #region Services
 builder.Services.AddScoped<IJwtService, JwtService>();
@@ -128,7 +129,7 @@ builder.Services.AddAuthentication(options =>
 {
     options.SaveToken = true;
     options.RequireHttpsMetadata = false;
-    options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+    options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuer = true,
         ValidateAudience = true,
@@ -141,7 +142,6 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddMemoryCache();
 
-// Add CORS
 builder.Services.AddCors(p => p.AddPolicy("Cors", policy =>
 {
     policy.WithOrigins("https://wareease.site", "http://localhost:3000")
@@ -170,17 +170,10 @@ app.UseCors("Cors");
 //app.UseMiddleware<AccountStatusMiddleware>();
 //app.UseMiddleware<TokenValidationMiddleware>();
 
-// Configure the HTTP request pipeline.
-//if (app.Environment.IsDevelopment())
-//{
-//    app.UseSwagger();
-//    app.UseSwaggerUI();
-//}
 app.UseSwagger();
 app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
-//app.UseCors("AllowSpecificOrigins");
 
 app.UseAuthorization();
 

@@ -11,10 +11,15 @@ namespace API.Utils
             public string? refreshToken;
         }
 
-        public static AuthUser GetCurrentUser(HttpRequest request)
+        public static AuthUser? GetCurrentUser(HttpRequest request)
         {
-            request.Cookies.TryGetValue("accessToken", out var accessToken);
-            request.Cookies.TryGetValue("refreshToken", out var refreshToken);
+            request.Cookies.TryGetValue("accessToken", out string? accessToken);
+            request.Cookies.TryGetValue("refreshToken", out string? refreshToken);
+
+            if (accessToken == null)
+            {
+                return null;
+            }
 
             var handler = new JwtSecurityTokenHandler();
             var decodedToken = handler.ReadJwtToken(accessToken);
