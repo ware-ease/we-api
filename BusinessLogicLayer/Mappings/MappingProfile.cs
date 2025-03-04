@@ -28,6 +28,7 @@ using BusinessLogicLayer.Models.Supplier;
 using BusinessLogicLayer.Models.TypeDetail;
 using BusinessLogicLayer.Models.Warehouse;
 using Data.Entity;
+using Data.Model.Request.Customer;
 using Profile = Data.Entity.Profile;
 
 namespace BusinessLogicLayer.Mappings
@@ -36,6 +37,10 @@ namespace BusinessLogicLayer.Mappings
     {
         public MappingProfile()
         {
+            CreateMap<Customer, Data.Model.DTO.CustomerDTO>().ReverseMap();
+            CreateMap<CustomerCreateDTO, Customer>().ReverseMap();
+            CreateMap<CustomerUpdateDTO, Customer>().ReverseMap();
+
             // Mapping classes
             #region Account
             CreateMap<Account, AccountDTO>()

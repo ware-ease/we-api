@@ -1,4 +1,5 @@
 ﻿using Data.Entity;
+using DataAccessLayer.Generic;
 using DataAccessLayer.IRepositories;
 using System;
 using System.Collections.Generic;
@@ -10,8 +11,6 @@ namespace DataAccessLayer.Repositories
 {
     public class GroupRepository : GenericRepository<Group>,IGroupRepository
     {
-        private readonly WaseEaseDbContext _context;
-
         public GroupRepository(WaseEaseDbContext context) : base(context)
         {
             _context = context;

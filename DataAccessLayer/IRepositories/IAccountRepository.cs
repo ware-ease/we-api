@@ -1,11 +1,12 @@
 ﻿using Data.Entity;
+using DataAccessLayer.Generic;
 
 namespace DataAccessLayer.IRepositories
 {
-    public interface IAccountRepository
+    public interface IAccountRepository : IGenericRepository<Account>
     {
         Task<IEnumerable<Account>> GetAccountsAsync();
-        //Task<AppUser?> CheckLoginAsync(String userName, String password);
-        //Task<Token?> GenerateAccessTokenAsync(int id);
+        Task<Account?> CheckLoginAsync(string userName, string password);
+        Task<Token?> GenerateAccessTokenAsync(string id);
     }
 }

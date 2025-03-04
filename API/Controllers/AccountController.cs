@@ -16,15 +16,13 @@ namespace API.Controllers
 
         private readonly IAccountService _accountService;
         private readonly IProfileService _profileService;
-        private readonly IAccountGroupService _accountGroupService;
         private readonly IJwtService _jwtService;
 
-        public AccountController(IAccountService appUserService, IJwtService jwtService, IProfileService profileService, IAccountGroupService accountGroupService)
+        public AccountController(IAccountService appUserService, IJwtService jwtService, IProfileService profileService)
         {
             _accountService = appUserService;
             _jwtService = jwtService;
             _profileService = profileService;
-            _accountGroupService = accountGroupService;
         }
 
         private string? GetUserIdFromToken()
@@ -356,22 +354,22 @@ namespace API.Controllers
             }
         }
 
-        [HttpGet("me/groups")]
-        public async Task<IActionResult> GetGroupsByAccountIdAsync()
-        {
-            try
-            {
-                var userId = GetUserIdFromToken();
-                if (string.IsNullOrEmpty(userId))
-                    return Unauthorized(new { Message = "Không tìm thấy UserId trong token", IsSuccess = false });
-                var data = await _accountGroupService.GetGroupsByAccountIdAsync(userId);
-                return Ok(new { StatusCode = 200, Message = "Lấy danh sách nhóm thành công", Data = data, IsSuccess = true });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { StatusCode = 500, Message = ex.Message, IsSuccess = false });
-            }
-        }
+        //[HttpGet("me/groups")]
+        //public async Task<IActionResult> GetGroupsByAccountIdAsync()
+        //{
+        //    try
+        //    {
+        //        var userId = GetUserIdFromToken();
+        //        if (string.IsNullOrEmpty(userId))
+        //            return Unauthorized(new { Message = "Không tìm thấy UserId trong token", IsSuccess = false });
+        //        var data = await _accountGroupService.GetGroupsByAccountIdAsync(userId);
+        //        return Ok(new { StatusCode = 200, Message = "Lấy danh sách nhóm thành công", Data = data, IsSuccess = true });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(500, new { StatusCode = 500, Message = ex.Message, IsSuccess = false });
+        //    }
+        //}
 
         [HttpPost("groups")]
         public async Task<IActionResult> CreateAccountGroupAsync([FromBody] CreateAccountGroupDTO model)

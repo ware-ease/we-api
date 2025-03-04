@@ -1,22 +1,47 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System.Linq.Expressions;
+﻿using Data.Entity.Base;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Dynamic.Core;
+using System.Linq.Expressions;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace DataAccessLayer.Repositories
+namespace DataAccessLayer.Generic
 {
-    public class GenericRepository<TEntity> where TEntity : class
+    public class GenericRepository<TEntity> : IGenericRepository<TEntity> where TEntity : BaseEntity
     {
-        internal WaseEaseDbContext context;
-        internal DbSet<TEntity> dbSet;
+        internal WaseEaseDbContext _context;
+        internal DbSet<TEntity> _dbSet;
 
         public GenericRepository(WaseEaseDbContext context)
         {
-            this.context = context;
-            this.dbSet = context.Set<TEntity>();
+            _context = context;
+            _dbSet = context.Set<TEntity>();
         }
 
-        // Updated Get method with pagination
+        public async Task<TEntity?> Get(string id)
+        {
+            return await _dbSet.FindAsync(id);
+        }
+
+        public IQueryable<TEntity> Get()
+        {
+            return _dbSet.AsQueryable();
+        }
+
+        public async Task Add(TEntity entity)
+        {
+            await _dbSet.AddAsync(entity);
+        }
+
+        public void Edit(TEntity entity)
+        {
+            _dbSet.Update(entity);
+        }
+
         public virtual async Task<IEnumerable<TEntity>> Get(
             Expression<Func<TEntity, bool>> filter = null!,
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null!,
@@ -24,16 +49,16 @@ namespace DataAccessLayer.Repositories
             int? pageIndex = null, // Optional parameter for pagination (page number)
             int? pageSize = null)  // Optional parameter for pagination (number of records per page)
         {
-            IQueryable<TEntity> query = dbSet;
+            IQueryable<TEntity> query = _dbSet;
 
-                    // Nếu entity có IsDeleted, tự động lọc những bản ghi chưa bị xóa
-                    if (HasIsDeletedProperty())
-                    {
-                        var isDeletedFilter = (Expression<Func<TEntity, bool>>)DynamicExpressionParser.ParseLambda(
-                            typeof(TEntity), typeof(bool), "IsDeleted == false");
+            // Nếu entity có IsDeleted, tự động lọc những bản ghi chưa bị xóa
+            if (HasIsDeletedProperty())
+            {
+                var isDeletedFilter = (Expression<Func<TEntity, bool>>)DynamicExpressionParser.ParseLambda(
+                    typeof(TEntity), typeof(bool), "IsDeleted == false");
 
-                        query = query.Where((Expression<Func<TEntity, bool>>)isDeletedFilter);
-                    }
+                query = query.Where((Expression<Func<TEntity, bool>>)isDeletedFilter);
+            }
 
             if (filter != null)
             {
@@ -69,21 +94,21 @@ namespace DataAccessLayer.Repositories
 
         public virtual async Task<TEntity> GetByID(string id)
         {
-            return await dbSet.FindAsync(id)!;
+            return await _dbSet.FindAsync(id)!;
         }
 
-        public virtual async Task<TEntity> GetByCondition(Expression<Func<TEntity, bool>> filter , string includeProperties = "")
+        public virtual async Task<TEntity> GetByCondition(Expression<Func<TEntity, bool>> filter, string includeProperties = "")
         {
-            IQueryable<TEntity> query = dbSet;
+            IQueryable<TEntity> query = _dbSet;
 
-                    // Nếu entity có IsDeleted, tự động lọc những bản ghi chưa bị xóa
-                    if (HasIsDeletedProperty())
-                    {
-                        var isDeletedFilter = (Expression<Func<TEntity, bool>>)DynamicExpressionParser.ParseLambda(
-                            typeof(TEntity), typeof(bool), "IsDeleted == false");
+            // Nếu entity có IsDeleted, tự động lọc những bản ghi chưa bị xóa
+            if (HasIsDeletedProperty())
+            {
+                var isDeletedFilter = (Expression<Func<TEntity, bool>>)DynamicExpressionParser.ParseLambda(
+                    typeof(TEntity), typeof(bool), "IsDeleted == false");
 
-                        query = query.Where((Expression<Func<TEntity, bool>>)isDeletedFilter);
-                    }
+                query = query.Where((Expression<Func<TEntity, bool>>)isDeletedFilter);
+            }
 
             if (filter != null)
             {
@@ -105,20 +130,20 @@ namespace DataAccessLayer.Repositories
         public virtual async Task<IEnumerable<TEntity>> GetAllNoPaging(
             Expression<Func<TEntity, bool>> filter = null!,
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null!,
-            string includeProperties = "", 
-            string thenIncludeProperties ="")
+            string includeProperties = "",
+            string thenIncludeProperties = "")
         {
-            IQueryable<TEntity> query = dbSet;
+            IQueryable<TEntity> query = _dbSet;
 
 
-                    // Nếu entity có IsDeleted, tự động lọc những bản ghi chưa bị xóa
-                    if (HasIsDeletedProperty())
-                    {
-                        var isDeletedFilter = (Expression<Func<TEntity, bool>>)DynamicExpressionParser.ParseLambda(
-                            typeof(TEntity), typeof(bool), "IsDeleted == false");
+            // Nếu entity có IsDeleted, tự động lọc những bản ghi chưa bị xóa
+            if (HasIsDeletedProperty())
+            {
+                var isDeletedFilter = (Expression<Func<TEntity, bool>>)DynamicExpressionParser.ParseLambda(
+                    typeof(TEntity), typeof(bool), "IsDeleted == false");
 
-                        query = query.Where((Expression<Func<TEntity, bool>>)isDeletedFilter);
-                    }
+                query = query.Where((Expression<Func<TEntity, bool>>)isDeletedFilter);
+            }
 
 
             if (filter != null)
@@ -154,42 +179,42 @@ namespace DataAccessLayer.Repositories
 
         public virtual async Task Insert(TEntity entity)
         {
-            await dbSet.AddAsync(entity);
+            await _dbSet.AddAsync(entity);
         }
 
         public virtual void Delete(object id)
         {
-            TEntity entityToDelete = dbSet.Find(id)!;
+            TEntity entityToDelete = _dbSet.Find(id)!;
             Delete(entityToDelete!);
         }
 
         public virtual void Delete(TEntity entityToDelete)
         {
-            if (context.Entry(entityToDelete).State == EntityState.Detached)
+            if (_context.Entry(entityToDelete).State == EntityState.Detached)
             {
-                dbSet.Attach(entityToDelete);
+                _dbSet.Attach(entityToDelete);
             }
-            dbSet.Remove(entityToDelete);
+            _dbSet.Remove(entityToDelete);
         }
 
         public virtual void Update(TEntity entityToUpdate)
         {
-            dbSet.Attach(entityToUpdate);
-            context.Entry(entityToUpdate).State = EntityState.Modified;
+            _dbSet.Attach(entityToUpdate);
+            _context.Entry(entityToUpdate).State = EntityState.Modified;
         }
 
         public virtual async Task<int> Count(Expression<Func<TEntity, bool>> filter = null!)
         {
-            IQueryable<TEntity> query = dbSet;
+            IQueryable<TEntity> query = _dbSet;
 
-                    // Nếu entity có IsDeleted, tự động lọc những bản ghi chưa bị xóa
-                    if (HasIsDeletedProperty())
-                    {
-                        var isDeletedFilter = (Expression<Func<TEntity, bool>>)DynamicExpressionParser.ParseLambda(
-                            typeof(TEntity), typeof(bool), "IsDeleted == false");
+            // Nếu entity có IsDeleted, tự động lọc những bản ghi chưa bị xóa
+            if (HasIsDeletedProperty())
+            {
+                var isDeletedFilter = (Expression<Func<TEntity, bool>>)DynamicExpressionParser.ParseLambda(
+                    typeof(TEntity), typeof(bool), "IsDeleted == false");
 
-                        query = query.Where((Expression<Func<TEntity, bool>>)isDeletedFilter);
-                    }
+                query = query.Where((Expression<Func<TEntity, bool>>)isDeletedFilter);
+            }
 
 
             if (filter != null)
@@ -203,6 +228,5 @@ namespace DataAccessLayer.Repositories
         {
             return typeof(TEntity).GetProperty("IsDeleted") != null;
         }
-
     }
 }

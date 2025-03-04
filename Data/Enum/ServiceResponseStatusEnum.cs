@@ -4,9 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DataAccessLayer.IRepositories
+namespace Data.Enum
 {
-    public interface IAccountGroupRepository
+    public enum SRStatus
     {
+        Success,
+        Error,
+        NotFound,
     }
 }
