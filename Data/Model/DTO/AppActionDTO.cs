@@ -5,10 +5,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BusinessLogicLayer.Models.Group
+namespace Data.Model.DTO
 {
-    public class GroupDTO : BaseEntity
+    public class AppActionDTO : BaseEntity
     {
-        public string Name { get; set; }
+        public string Code { get; set; }
+        public string PermissionId { get; set; }
+
     }
 }

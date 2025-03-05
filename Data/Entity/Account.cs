@@ -20,7 +20,7 @@ namespace Data.Entity
         public Profile? Profile { get; set; }
 
         public ICollection<AccountGroup> AccountGroups { get; set; } = [];
-        public ICollection<AccountAction> AccountActions { get; set; } = [];
+        public ICollection<AccountPermission> AccountPermissions { get; set; } = [];
         public ICollection<Notification> Notifications { get; set; } = [];
         public ICollection<AccountWarehouse> AccountWarehouses { get; set; } = [];
     }

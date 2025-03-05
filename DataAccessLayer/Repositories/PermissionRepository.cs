@@ -11,11 +11,8 @@ namespace DataAccessLayer.Repositories
 {
     public class PermissionRepository : GenericRepository<Permission>, IPermissionRepository
     {
-        private readonly WaseEaseDbContext _context;
-
         public PermissionRepository(WaseEaseDbContext context) : base(context)
         {
-            _context = context;
         }
     }
 }

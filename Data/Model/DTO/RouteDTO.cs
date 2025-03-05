@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 
 namespace Data.Model.DTO
 {
-    public class TokenDTO
+    public class RouteDTO
     {
+        public string Url { get; set; }
+        public string Code { get; set; }
     }
 }

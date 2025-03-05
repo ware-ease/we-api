@@ -28,6 +28,7 @@ using BusinessLogicLayer.Models.Supplier;
 using BusinessLogicLayer.Models.TypeDetail;
 using BusinessLogicLayer.Models.Warehouse;
 using Data.Entity;
+using Data.Model.DTO;
 using Data.Model.Request.Customer;
 using Profile = Data.Entity.Profile;
 
@@ -43,9 +44,9 @@ namespace BusinessLogicLayer.Mappings
 
             // Mapping classes
             #region Account
-            CreateMap<Account, AccountDTO>()
+            CreateMap<Account, Data.Model.DTO.AccountDTO>()
                 .ForMember(dest => dest.Groups, opt => opt.MapFrom(src => src.AccountGroups.Select(ag => ag.Group)))
-                .ForMember(dest => dest.Actions, opt => opt.MapFrom(src => src.AccountActions.Select(ag => ag.Action)))
+                .ForMember(dest => dest.Actions, opt => opt.MapFrom(src => src.AccountPermissions.Select(ag => ag.Permission)))
                 .ForMember(dest => dest.Warehouses, opt => opt.MapFrom(src => src.AccountWarehouses.Select(aw => aw.Warehouse)))
                 .ReverseMap();
 
@@ -55,7 +56,7 @@ namespace BusinessLogicLayer.Mappings
             #endregion
 
             #region Token
-            CreateMap<Token, TokenDTO>().ReverseMap();
+            CreateMap<Token, BusinessLogicLayer.Models.Authentication.TokenDTO>().ReverseMap();
             #endregion
 
             #region Profile
@@ -116,22 +117,26 @@ namespace BusinessLogicLayer.Mappings
             #endregion
 
             #region Group
-            CreateMap<Group, GroupDTO>().ReverseMap();
+            CreateMap<Group, GroupDTO>()
+                .ForMember(dest => dest.Accounts, opt => opt.MapFrom(src => src.AccountGroups.Select(ag => ag.Account)))
+                .ForMember(dest => dest.Permissions, opt => opt.MapFrom(src => src.GroupPermissions.Select(ga => ga.Permission)))
+                .ReverseMap();
             CreateMap<Group, CreateGroupDTO>().ReverseMap();
             #endregion
 
-            #region AppAction
-            CreateMap<AppAction, AppActionDTO>().ReverseMap();
-            CreateMap<AppAction, CreateAppActionDTO>().ReverseMap();
+            #region Permission
+            CreateMap<Permission, Data.Model.DTO.PermissionDTO>()
+                .ForMember(dest => dest.Url, opt => opt.MapFrom(src => src.Route.Url))
+                .ForMember(dest => dest.RouteCode, opt => opt.MapFrom(src => src.Route.Code))
+                .ReverseMap();
             #endregion
 
-            #region Permission
-            CreateMap<Permission, PermissionDTO>().ReverseMap();
-            CreateMap<Permission, CreatePermissionDTO>().ReverseMap();
+            #region Route
+            CreateMap<Route, RouteDTO>().ReverseMap();
             #endregion
 
             #region Warehouse
-            CreateMap<Warehouse, WarehouseDTO>().ReverseMap();
+            CreateMap<Warehouse, Data.Model.DTO.WarehouseDTO>().ReverseMap();
             CreateMap<Warehouse, CreateWarehouseDTO>().ReverseMap();
             #endregion
 
@@ -142,27 +147,21 @@ namespace BusinessLogicLayer.Mappings
             #endregion
 
             #region AccountAction
-            CreateMap<AccountAction, AccountActionDTO>().ReverseMap();
-            CreateMap<AccountAction, CreateAccountActionDTO>().ReverseMap();
-            CreateMap<AccountAction, UpdateAccountActionDTO>().ReverseMap();
+            CreateMap<AccountPermission, AccountActionDTO>().ReverseMap();
+            CreateMap<AccountPermission, CreateAccountActionDTO>().ReverseMap();
+            CreateMap<AccountPermission, UpdateAccountActionDTO>().ReverseMap();
             #endregion
 
             #region AccountPermission
-            CreateMap<AccountAction, AccountPermissionDTO>().ReverseMap();
-            CreateMap<CreateAccountPermissionDTO, AccountAction>().ReverseMap();
-            CreateMap<UpdateAccountPermissionDTO, AccountAction>().ReverseMap();
-            #endregion
-
-            #region PermissionAction
-            //CreateMap<PermissionAction, PermissionActionDTO>().ReverseMap();
-            //CreateMap<CreatePermissionActionDTO, PermissionAction>().ReverseMap();
-            //CreateMap<UpdatePermissionActionDTO, PermissionAction>().ReverseMap();
+            CreateMap<AccountPermission, AccountPermissionDTO>().ReverseMap();
+            CreateMap<CreateAccountPermissionDTO, AccountPermission>().ReverseMap();
+            CreateMap<UpdateAccountPermissionDTO, AccountPermission>().ReverseMap();
             #endregion
 
             #region GroupPermission
-            CreateMap<GroupAction, GroupPermissionDTO>().ReverseMap();
-            CreateMap<CreateGroupPermissionDTO, GroupAction>().ReverseMap();
-            CreateMap<UpdateGroupPermissionDTO, GroupAction>().ReverseMap();
+            CreateMap<GroupPermission, GroupPermissionDTO>().ReverseMap();
+            CreateMap<CreateGroupPermissionDTO, GroupPermission>().ReverseMap();
+            CreateMap<UpdateGroupPermissionDTO, GroupPermission>().ReverseMap();
             #endregion
 
             #region AccountWarehouse

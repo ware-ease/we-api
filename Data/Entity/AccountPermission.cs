@@ -8,15 +8,15 @@ using System.Threading.Tasks;
 
 namespace Data.Entity
 {
-    [Table("AccountAction")]
-    public class AccountAction : BaseEntity
+    [Table("AccountPermission")]
+    public class AccountPermission : BaseEntity
     {
         [ForeignKey("Account")]
         public string AccountId { get; set; }
         public Account Account { get; set; }
 
-        [ForeignKey("Action")]
-        public string ActionId { get; set; }
-        public AppAction Action { get; set; }
+        [ForeignKey("Permission")]
+        public string PermissionId { get; set; }
+        public Permission Permission { get; set; }
     }
 }

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace DataAccessLayer.IRepositories
 {
-    public interface IAppActionRepository : IGenericRepository<AppAction>
+    public interface IRouteRepository : IGenericRepository<Route>
     {
     }
 }
