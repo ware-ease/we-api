@@ -17,7 +17,11 @@ using BusinessLogicLayer.Models.StockCardDetail;
 using BusinessLogicLayer.Models.Supplier;
 using Data.Entity;
 using Data.Model.DTO;
+using Data.Model.Request.Brand;
+using Data.Model.Request.Category;
 using Data.Model.Request.Customer;
+using Data.Model.Request.Product;
+using Data.Model.Request.Unit;
 using Data.Model.Request.Warehouse;
 using static Data.Model.Request.Warehouse.WarehouseFullInfoDTO;
 using Profile = Data.Entity.Profile;
@@ -56,14 +60,14 @@ namespace BusinessLogicLayer.Mappings
             #endregion
 
             #region Category
-            CreateMap<Category, CategoryDTO>();
-            CreateMap<CategoryDTO, Category>();
+            CreateMap<Category, CategoryDTO>().ReverseMap();
 
-            CreateMap<Category, UpdateCategoryDTO>();
-            CreateMap<UpdateCategoryDTO, Category>();
+            CreateMap<Category, CategoryCreateDTO>().ReverseMap();
+
+            CreateMap<Category, CategoryUpdateDTO>().ReverseMap();
+
 
             CreateMap<Category, DeleteCategoryDTO>();
-            CreateMap<DeleteCategoryDTO, Category>();
             #endregion
 
             #region Supplier
@@ -77,8 +81,27 @@ namespace BusinessLogicLayer.Mappings
             #endregion
 
             #region Product
-            CreateMap<Product, CreateProductDTO>();
-            CreateMap<CreateProductDTO, Product>();
+            CreateMap<Product, ProductDTO>()
+                .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Category.Name))
+                .ForMember(dest => dest.BrandName, opt => opt.MapFrom(src => src.Brand.Name))
+                .ForMember(dest => dest.UnitName, opt => opt.MapFrom(src => src.Unit.Name)).ReverseMap();
+
+            CreateMap<ProductCreateDTO, Product>().ReverseMap();
+            CreateMap<ProductUpdateDTO, Product>().ReverseMap();
+            #endregion
+
+            #region Brand
+            CreateMap<Brand, BrandDTO>().ReverseMap();
+
+            CreateMap<BrandCreateDTO, Brand>().ReverseMap();
+            CreateMap<BrandUpdateDTO, Brand>().ReverseMap();
+            #endregion
+
+            #region Unit
+            CreateMap<Unit, UnitDTO>().ReverseMap();
+
+            CreateMap<UnitCreateDTO, Unit>().ReverseMap();
+            CreateMap<UnitUpdateDTO, Unit>().ReverseMap();
             #endregion
 
             #region Shelf

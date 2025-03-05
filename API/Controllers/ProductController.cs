@@ -1,9 +1,13 @@
 ﻿using AutoMapper;
-using BusinessLogicLayer.IService;
+using BusinessLogicLayer.IServices;
 using BusinessLogicLayer.Models.General;
 using BusinessLogicLayer.Models.Product;
 using BusinessLogicLayer.Models.PurchaseReceipt;
 using BusinessLogicLayer.Service;
+using Data.Enum;
+using Data.Model.Request.Product;
+using Data.Model.Response;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
@@ -15,15 +19,120 @@ namespace API.Controllers
     public class ProductController : ControllerBase
     {
         private readonly IProductService _productService;
-        private readonly IMapper _mapper;
+        //private readonly IMapper _mapper;
 
-        public ProductController(IProductService productService, IMapper mapper)
+        public ProductController(IProductService productService)
         {
             _productService = productService;
-            _mapper = mapper;
+            //_mapper = mapper;
         }
 
-        [HttpGet("GetAll")]
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
+        {
+            try
+            {
+                var products = await _productService.GetAllProducts();
+                // Ở đây, GetAll trả về danh sách Product (thực thể) không ánh xạ thành DTO
+                return ControllerResponse.Response(new ServiceResponse
+                {
+                    Status = SRStatus.Success,
+                    Message = "Products retrieved successfully",
+                    Data = products
+                });
+            }
+            catch (Exception ex)
+            {
+                return ControllerResponse.Response(new ServiceResponse
+                {
+                    Status = SRStatus.Error,
+                    Message = ex.Message,
+                    Data = null
+                });
+            }
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> Get(string id)
+        {
+            try
+            {
+                var productDTO = await _productService.GetProductById(id);
+                return ControllerResponse.Response(new ServiceResponse
+                {
+                    Status = SRStatus.Success,
+                    Message = "Product retrieved successfully",
+                    Data = productDTO
+                });
+            }
+            catch (Exception ex)
+            {
+                return ControllerResponse.Response(new ServiceResponse
+                {
+                    Status = SRStatus.Error,
+                    Message = ex.Message,
+                    Data = null
+                });
+            }
+        }
+
+        //[Authorize]
+        [HttpPost]
+        public async Task<IActionResult> Add([FromBody] ProductCreateDTO request)
+        {
+            try
+            {
+                var productDTO = await _productService.AddProduct(request);
+                return ControllerResponse.Response(new ServiceResponse
+                {
+                    Status = SRStatus.Success,
+                    Message = "Product created successfully",
+                    Data = productDTO
+                });
+            }
+            catch (Exception ex)
+            {
+                return ControllerResponse.Response(new ServiceResponse
+                {
+                    Status = SRStatus.Error,
+                    Message = ex.Message,
+                    Data = null
+                });
+            }
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(string id, [FromBody] ProductUpdateDTO request)
+        {
+            try
+            {
+                request.Id = id; // Gán id từ route cho DTO
+                var updatedProduct = await _productService.UpdateProduct(request);
+                return ControllerResponse.Response(new ServiceResponse
+                {
+                    Status = Data.Enum.SRStatus.Success,
+                    Message = "Product updated successfully",
+                    Data = updatedProduct
+                });
+            }
+            catch (Exception ex)
+            {
+                return ControllerResponse.Response(new ServiceResponse
+                {
+                    Status = Data.Enum.SRStatus.Error,
+                    Message = ex.Message,
+                    Data = null
+                });
+            }
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(string id)
+        {
+            var result = await _productService.Delete(id);
+            return ControllerResponse.Response(result);
+        }
+        /*[HttpGet("GetAll")]
         public async Task<IActionResult> GetAll([FromQuery] int? pageNumber, [FromQuery] int? pageSize)
         {
             var result = await _productService.GetAllAsync(pageNumber, pageSize);
@@ -151,6 +260,6 @@ namespace API.Controllers
                     Message = "Đã xảy ra lỗi: " + ex.Message
                 });
             }
-        }
+        }*/
     }
 }

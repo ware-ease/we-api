@@ -1,29 +1,29 @@
-﻿using BusinessLogicLayer.IService;
+﻿using AutoMapper;
+using BusinessLogicLayer.Generic;
+using BusinessLogicLayer.IService;
 using BusinessLogicLayer.Models.Category;
 using BusinessLogicLayer.Models.Pagination;
 using Data.Entity;
+using DataAccessLayer.Generic;
 using DataAccessLayer.IRepositories;
 using DataAccessLayer.Repositories;
+using DataAccessLayer.UnitOfWork;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BusinessLogicLayer.Service
+namespace BusinessLogicLayer.Services
 {
-    public class CategoryService : ICategoryService
+    public class CategoryService : GenericService<Category>, ICategoryService
     {
-        private readonly ICategoryRepository _repository;
-        private readonly IGenericPaginationService _paginationService;
-
-        public CategoryService(ICategoryRepository repository, IGenericPaginationService paginationService)
+        public CategoryService(IGenericRepository<Category> genericRepository, IMapper mapper, IUnitOfWork unitOfWork)
+            : base(genericRepository, mapper, unitOfWork)
         {
-            _repository = repository;
-            _paginationService = paginationService;
         }
 
-        public async Task<PagedResult<Category>> GetAllAsync(int? pageNumber, int? pageSize)
+        /*public async Task<PagedResult<Category>> GetAllAsync(int? pageNumber, int? pageSize)
         {
             var query = _repository.GetAllQueryable();
             return await _paginationService.GetPagedDataAsync(query, pageNumber, pageSize);
@@ -95,6 +95,6 @@ namespace BusinessLogicLayer.Service
             categoryData.DeletedTime = DateTime.Now;
             categoryData.IsDeleted = true;
             await _repository.UpdateAsync(categoryData);
-        }
+        }*/
     }
 }
