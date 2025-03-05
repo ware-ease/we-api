@@ -24,7 +24,7 @@ namespace BusinessLogicLayer.Generic
             _mapper = mapper;
         }
 
-        public async Task<ServiceResponse> Add<TResult, TRequest>(TRequest request)
+        public virtual async Task<ServiceResponse> Add<TResult, TRequest>(TRequest request)
         {
             TEntity entity = _mapper.Map<TEntity>(request);
 
@@ -54,7 +54,7 @@ namespace BusinessLogicLayer.Generic
             }
         }
 
-        public async Task<ServiceResponse> Delete(string id)
+        public virtual async Task<ServiceResponse> Delete(string id)
         {
             TEntity? entity = await _genericRepository.Get(id);
 
@@ -80,7 +80,7 @@ namespace BusinessLogicLayer.Generic
             };
         }
 
-        public async Task<ServiceResponse> Get<TResult>()
+        public virtual async Task<ServiceResponse> Get<TResult>()
         {
             var results = _genericRepository.Get();
 
@@ -94,7 +94,7 @@ namespace BusinessLogicLayer.Generic
             };
         }
 
-        public async Task<ServiceResponse> Get<TResult>(string id)
+        public virtual async Task<ServiceResponse> Get<TResult>(string id)
         {
             TEntity? entity = await _genericRepository.Get(id);
 
@@ -118,7 +118,7 @@ namespace BusinessLogicLayer.Generic
             };
         }
 
-        public async Task<ServiceResponse> Update<TResult, TRequest>(TRequest request)
+        public virtual async Task<ServiceResponse> Update<TResult, TRequest>(TRequest request)
         {
             TEntity entity = _mapper.Map<TEntity>(request);
 

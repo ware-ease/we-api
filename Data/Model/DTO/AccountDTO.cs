@@ -10,20 +10,36 @@ namespace Data.Model.DTO
     {
         public string Id { get; set; }
         public string Username { get; set; }
-        //public string Password { get; set; }
         public string Email { get; set; }
+        public AccountDTOProfile Profile { get; set; }
 
-        //public bool IsDeleted { get; set; } = false;
-        //public string? CreatedBy { get; set; }
-        //public string? LastUpdatedBy { get; set; }
-        //public string? DeletedBy { get; set; }
-        //public DateTime? CreatedTime { get; set; }
-        //public DateTime? LastUpdatedTime { get; set; }
-        //public DateTime? DeletedTime { get; set; }
-        //public ICollection<GroupDTO> AccountGroups { get; set; }
+        public IEnumerable<AccountDTOGroup>? Groups { get; set; }
+        public IEnumerable<PermissionDTO>? Permissions { get; set; }
+        public IEnumerable<AccountDTOWarehouse>? Warehouses { get; set; }
+    }
 
-        public IEnumerable<GroupDTO>? Groups { get; set; }
-        public IEnumerable<AppActionDTO>? Actions { get; set; }
-        public IEnumerable<WarehouseDTO>? Warehouses { get; set; }
+    public class AccountDTOGroup
+    {
+        public string Id { get; set; }
+        public string Name { get; set; }
+        public List<PermissionDTO> Permissions { get; set; }
+    }
+
+    public class AccountDTOWarehouse
+    {
+
+    }
+
+    public class AccountDTOProfile
+    {
+        public string Id { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public string Phone { get; set; }
+        public string Address { get; set; }
+        public bool Sex { get; set; }
+        public string Nationality { get; set; }
+        public string AvatarUrl { get; set; }
     }
 }
+

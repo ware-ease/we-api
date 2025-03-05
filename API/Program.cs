@@ -19,8 +19,6 @@ using Microsoft.OpenApi.Models;
 using System.Globalization;
 using System.Text;
 using System.Text.Json.Serialization;
-using IWarehouseService = BusinessLogicLayer.IServices.IWarehouseService;
-using WarehouseService = BusinessLogicLayer.Services.WarehouseService;
 
 Env.Load();
 
@@ -95,7 +93,8 @@ builder.Services.AddScoped<IGenericRepository<Data.Entity.Route>, GenericReposit
 
 #region Services
 builder.Services.AddScoped<IJwtService, JwtService>();
-builder.Services.AddScoped<IAccountService, AccountService>();
+builder.Services.AddScoped<BusinessLogicLayer.IService.IAccountService, BusinessLogicLayer.Service.AccountService>();
+builder.Services.AddScoped<BusinessLogicLayer.IServices.IAccountService, BusinessLogicLayer.Services.AccountService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<ISupplierService, SupplierService>();
 builder.Services.AddScoped<IProductService, ProductService>();
@@ -109,7 +108,6 @@ builder.Services.AddScoped<IGroupService, GroupService>();
 builder.Services.AddScoped<IProfileService, ProfileService>();
 builder.Services.AddScoped<IPermissionService, PermissionService>();
 builder.Services.AddScoped<IRouteService, RouteService>();
-//builder.Services.AddScoped<IWarehouseService, WarehouseService>();
 builder.Services.AddScoped<IWarehouseService, WarehouseService>();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
 #endregion Services
@@ -151,6 +149,16 @@ builder.Services.AddAuthentication(options =>
         ValidIssuer = Environment.GetEnvironmentVariable("JWT_VALID_ISSUER"),
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JWT_SECRET_KEY"))),
         ClockSkew = TimeSpan.Zero
+    };
+
+    options.Events = new JwtBearerEvents
+    {
+        OnMessageReceived = context =>
+        {
+            context.Request.Cookies.TryGetValue("accessToken", out var token);
+            context.Token = token;
+            return Task.CompletedTask;
+        }
     };
 });
 

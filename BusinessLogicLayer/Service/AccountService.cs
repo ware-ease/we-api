@@ -17,7 +17,7 @@ using MailKit.Security;
 using Microsoft.Extensions.Caching.Memory;
 using MimeKit;
 using System.Linq.Expressions;
-namespace BusinessLogicLayer.Services
+namespace BusinessLogicLayer.Service
 {
     public class AccountService : GenericService<Account>, IAccountService
     {

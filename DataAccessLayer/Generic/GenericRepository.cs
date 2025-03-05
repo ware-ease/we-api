@@ -22,12 +22,36 @@ namespace DataAccessLayer.Generic
             _dbSet = context.Set<TEntity>();
         }
 
-        public async Task<TEntity?> Get(string id)
+        public virtual async Task<TEntity?> Get(string id)
         {
-            return await _dbSet.FindAsync(id);
+            IQueryable<TEntity> query = _dbSet.AsQueryable();
+            var entityType = _context.Model.FindEntityType(typeof(TEntity));
+
+            if (entityType != null)
+            {
+                foreach (var navigation in entityType.GetNavigations())
+                {
+                    query = query.Include(navigation.Name);
+
+                    foreach (var subNavigation in navigation.TargetEntityType.GetNavigations())
+                    {
+                        var secondLevelInclude = $"{navigation.Name}.{subNavigation.Name}";
+
+                        query = query.Include(secondLevelInclude);
+
+                        foreach (var subSubNavigation in subNavigation.TargetEntityType.GetNavigations())
+                        {
+                            var thirdLevelInclude = $"{secondLevelInclude}.{subSubNavigation.Name}";
+                            query = query.Include(thirdLevelInclude);
+                        }
+                    }
+                }
+            }
+
+            return await query.FirstOrDefaultAsync(x => x.Id == id);
         }
 
-        public IQueryable<TEntity> Get()
+        public virtual IQueryable<TEntity> Get()
         {
             IQueryable<TEntity> query = _dbSet.AsQueryable();
             var entityType = _context.Model.FindEntityType(typeof(TEntity));
@@ -56,12 +80,12 @@ namespace DataAccessLayer.Generic
             return query;
         }
 
-        public async Task Add(TEntity entity)
+        public virtual async Task Add(TEntity entity)
         {
             await _dbSet.AddAsync(entity);
         }
 
-        public void Edit(TEntity entity)
+        public virtual void Edit(TEntity entity)
         {
             _dbSet.Update(entity);
         }
