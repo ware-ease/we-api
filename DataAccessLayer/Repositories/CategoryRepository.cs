@@ -1,4 +1,5 @@
 ﻿using Data.Entity;
+using DataAccessLayer.Generic;
 using DataAccessLayer.IRepositories;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -9,9 +10,11 @@ using System.Threading.Tasks;
 
 namespace DataAccessLayer.Repositories
 {
-    public class CategoryRepository : ICategoryRepository
+    public class CategoryRepository : GenericRepository<Category>, ICategoryRepository
     {
-        private readonly WaseEaseDbContext _context;
+        public CategoryRepository(WaseEaseDbContext context) : base(context) { }
+
+        /*private readonly WaseEaseDbContext _context;
 
         public CategoryRepository(WaseEaseDbContext context)
         {
@@ -46,6 +49,6 @@ namespace DataAccessLayer.Repositories
             category.DeletedTime = DateTime.Now;
             _context.Categories.Update(category);
             await _context.SaveChangesAsync();
-        }
+        }*/
     }
 }

@@ -80,6 +80,10 @@ builder.Services.AddScoped<IGenericRepository<Customer>, GenericRepository<Custo
 builder.Services.AddScoped<IGenericRepository<Account>, GenericRepository<Account>>();
 builder.Services.AddScoped<IGenericRepository<Group>, GenericRepository<Group>>();
 builder.Services.AddScoped<IGenericRepository<Permission>, GenericRepository<Permission>>();
+builder.Services.AddScoped<IGenericRepository<Category>, GenericRepository<Category>>();
+builder.Services.AddScoped<IGenericRepository<Product>, GenericRepository<Product>>();
+builder.Services.AddScoped<IGenericRepository<Brand>, GenericRepository<Brand>>();
+builder.Services.AddScoped<IGenericRepository<Unit>, GenericRepository<Unit>>();
 builder.Services.AddScoped<IGenericRepository<Data.Entity.Route>, GenericRepository<Data.Entity.Route>>();
 #endregion Generic
 
@@ -89,6 +93,8 @@ builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<ISupplierService, SupplierService>();
 builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<IBrandService, BrandService>();
+builder.Services.AddScoped<IUnitService, UnitService>();
 builder.Services.AddScoped<IShelfService, ShelfService>();
 builder.Services.AddScoped<IFloorService, FloorService>();
 builder.Services.AddScoped<ICellService, CellService>();

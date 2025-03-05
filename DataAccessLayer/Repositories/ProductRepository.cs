@@ -1,4 +1,5 @@
 ﻿using Data.Entity;
+using DataAccessLayer.Generic;
 using DataAccessLayer.IRepositories;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -9,9 +10,21 @@ using System.Threading.Tasks;
 
 namespace DataAccessLayer.Repositories
 {
-    public class ProductRepository : IProductRepository
+    public class ProductRepository : GenericRepository<Product>, IProductRepository
     {
-        private readonly WaseEaseDbContext _context;
+
+        public ProductRepository(WaseEaseDbContext context) : base(context)
+        {
+        }
+        public async Task<Product?> GetFullProductById(string id)
+        {
+            return await _dbSet
+                .Include(p => p.Category)
+                .Include(p => p.Brand)
+                .Include(p => p.Unit)
+                .FirstOrDefaultAsync(p => p.Id == id);
+        }
+        /*private readonly WaseEaseDbContext _context;
 
         public ProductRepository(WaseEaseDbContext context)
         {
@@ -68,6 +81,6 @@ namespace DataAccessLayer.Repositories
             //    .AsQueryable();
 
             return null;
-        }
+        }*/
     }
 }

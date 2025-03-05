@@ -1,10 +1,14 @@
-﻿using AutoMapper;
+﻿using API.Utils;
+using AutoMapper;
 using BusinessLogicLayer.IService;
 using BusinessLogicLayer.Models;
 using BusinessLogicLayer.Models.Category;
 using BusinessLogicLayer.Models.General;
 using BusinessLogicLayer.Service;
 using Data.Entity;
+using Data.Model.Request.Category;
+using Data.Model.Response;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Reflection.Metadata;
@@ -16,15 +20,63 @@ namespace API.Controllers
     public class CategoryController : ControllerBase
     {
         private readonly ICategoryService _categoryService;
-        private readonly IMapper _mapper;
+        //private readonly IMapper _mapper;
 
-        public CategoryController(ICategoryService service, IMapper mapper)
+        public CategoryController(ICategoryService service)
         {
             _categoryService = service;
-            _mapper = mapper;
+            //_mapper = mapper;
         }
 
-        //Get all
+        [HttpGet]
+        public async Task<IActionResult> Get()
+        {
+            var result = await _categoryService.Get<CategoryDTO>();
+            return ControllerResponse.Response(result);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> Get(string id)
+        {
+            var result = await _categoryService.Get<CategoryDTO>(id);
+            return ControllerResponse.Response(result);
+        }
+
+        [Authorize]
+        [HttpPost]
+        public async Task<IActionResult> Add([FromBody] CategoryCreateDTO request)
+        {
+            var authUser = AuthHelper.GetCurrentUser(HttpContext.Request);
+
+            if (authUser != null)
+            {
+                request.CreatedBy = authUser.id;
+            }
+            else
+            {
+                return Unauthorized();
+            }
+
+            var result = await _categoryService.Add<CategoryDTO, CategoryCreateDTO>(request);
+            return ControllerResponse.Response(result);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(string id, [FromBody] CategoryUpdateDTO request)
+        {
+            request.Id = id;
+            var result = await _categoryService.Update<CategoryDTO, CategoryUpdateDTO>(request);
+            return ControllerResponse.Response(result);
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(string id)
+        {
+            var result = await _categoryService.Delete(id);
+            return ControllerResponse.Response(result);
+        }
+
+        /*//Get all
         [HttpGet("GetAll")]
         public async Task<IActionResult> GetAll([FromQuery] int? pageNumber, [FromQuery] int? pageSize)
         {
@@ -158,6 +210,6 @@ namespace API.Controllers
                     Message = "Đã xảy ra lỗi: " + ex.Message
                 });
             }
-        }
+        }*/
     }
 }
