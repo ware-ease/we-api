@@ -1,4 +1,5 @@
 ﻿using Data.Entity;
+using DataAccessLayer.Generic;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace DataAccessLayer.IRepositories
 {
-    public interface ICellRepository
+    public interface ICellRepository : IGenericRepository<Cell>
     {
         IQueryable<Cell> GetAllQueryable();
         IQueryable<Cell> GetCellsByFloorId(string floorId);

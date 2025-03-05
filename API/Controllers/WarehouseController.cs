@@ -235,5 +235,25 @@ namespace API.Controllers
 
             return ControllerResponse.Response(result);
         }
+
+        //[Authorize]
+        [HttpPost("{id}/shelves")]
+        public async Task<IActionResult> AddWarehouseInfo([FromRoute] string id, [FromBody] CreateWarehouseStructureRequest request)
+        {
+            //var authUser = AuthHelper.GetCurrentUser(HttpContext.Request);
+
+            //if (authUser != null)
+            //{
+            //    request.CreatedBy = authUser.id;
+            //}
+            //else
+            //{
+            //    return Unauthorized();
+            //}
+            request.Id = id;
+            var result = await _warehouseService.CreateStructureAsync(request);
+
+            return ControllerResponse.Response(result);
+        }
     }
 }

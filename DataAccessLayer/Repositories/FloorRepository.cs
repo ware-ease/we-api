@@ -1,4 +1,5 @@
 ﻿using Data.Entity;
+using DataAccessLayer.Generic;
 using DataAccessLayer.IRepositories;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -9,13 +10,10 @@ using System.Threading.Tasks;
 
 namespace DataAccessLayer.Repositories
 {
-    public class FloorRepository : IFloorRepository
+    public class FloorRepository : GenericRepository<Floor>, IFloorRepository
     {
-        private readonly WaseEaseDbContext _context;
-
-        public FloorRepository(WaseEaseDbContext context)
+        public FloorRepository(WaseEaseDbContext context) : base(context)
         {
-            _context = context;
         }
 
         public IQueryable<Floor> GetAllQueryable()

@@ -2,6 +2,7 @@
 using Data.Entity.Base;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
@@ -39,6 +40,8 @@ namespace Data.Model.Request.Warehouse
         public int? ShelfCount { get; set; }
 
     }
+
+    #region WarehouseDTO Custom
     public class WarehouseFullInfoDTO : BaseEntity
     {
         public string Id { get; set; }
@@ -79,4 +82,39 @@ namespace Data.Model.Request.Warehouse
         public float Height { get; set; }
         public float MaxLoad { get; set; }
     }
+    #endregion
+
+    public class CreateWarehouseStructureRequest
+    {
+        [JsonIgnore]
+        public string? Id { get; set; }
+        public List<CreateAreaDto> Areas { get; set; }
+    }
+
+    public class CreateAreaDto
+    {
+        public string Name { get; set; }
+        public List<CreateShelfDto> Shelves { get; set; }
+    }
+
+    public class CreateShelfDto
+    {
+        public string Code { get; set; }
+        public List<CreateFloorDto> Floors { get; set; }
+    }
+
+    public class CreateFloorDto
+    {
+        public int Number { get; set; }
+        public List<CreateCellDto> Cells { get; set; }
+    }
+
+    public class CreateCellDto
+    {
+        public int Number { get; set; }
+        public float Length { get; set; }
+        public float Height { get; set; }
+        public float MaxLoad { get; set; }
+    }
+
 }
