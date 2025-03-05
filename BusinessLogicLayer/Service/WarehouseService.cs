@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
 using BusinessLogicLayer.IService;
 using BusinessLogicLayer.Models.Pagination;
-using BusinessLogicLayer.Models.Warehouse;
 using BusinessLogicLayer.Utils;
 using Data.Entity;
+using Data.Model.Request.Warehouse;
 using DataAccessLayer.UnitOfWork;
 using System.Linq.Expressions;
 
@@ -62,7 +62,6 @@ namespace BusinessLogicLayer.Service
             {
                 var warehouse = _mapper.Map<Warehouse>(model);
                 warehouse.CreatedTime = DateTime.Now;
-                warehouse.CreatedBy = model.CreatedBy;
 
                 await _unitOfWork.WarehouseRepository.Insert(warehouse);
                 await _unitOfWork.SaveAsync();
@@ -88,7 +87,6 @@ namespace BusinessLogicLayer.Service
                 warehouse.Width = model.Width;
                 warehouse.ShelfCount = model.ShelfCount;
                 warehouse.LastUpdatedTime = DateTime.Now;
-                warehouse.LastUpdatedBy = model.LastUpdatedBy;
 
                 _unitOfWork.WarehouseRepository.Update(warehouse);
                 await _unitOfWork.SaveAsync();
@@ -101,7 +99,7 @@ namespace BusinessLogicLayer.Service
             }
         }
 
-        public async Task<bool> DeleteAsync(string id, string deletedBy)
+        public async Task<bool> DeleteAsync(string id)
         {
             try
             {
@@ -110,7 +108,6 @@ namespace BusinessLogicLayer.Service
 
                 warehouse.IsDeleted = true;
                 warehouse.DeletedTime = DateTime.Now;
-                warehouse.DeletedBy = deletedBy;
 
                 _unitOfWork.WarehouseRepository.Update(warehouse);
                 await _unitOfWork.SaveAsync();

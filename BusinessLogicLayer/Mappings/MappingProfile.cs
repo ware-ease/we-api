@@ -1,35 +1,25 @@
-﻿using AutoMapper;
-using BusinessLogicLayer.Models.Account;
+﻿using BusinessLogicLayer.Models.Account;
 using BusinessLogicLayer.Models.AccountAction;
 using BusinessLogicLayer.Models.AccountGroup;
 using BusinessLogicLayer.Models.AccountPermission;
 using BusinessLogicLayer.Models.AccountWarehouse;
-using BusinessLogicLayer.Models.AppAction;
-using BusinessLogicLayer.Models.Authentication;
 using BusinessLogicLayer.Models.Category;
 using BusinessLogicLayer.Models.Cell;
 using BusinessLogicLayer.Models.Floor;
 using BusinessLogicLayer.Models.Group;
 using BusinessLogicLayer.Models.GroupPermission;
-using BusinessLogicLayer.Models.Permission;
-using BusinessLogicLayer.Models.PermissionAction;
 using BusinessLogicLayer.Models.Product;
-using BusinessLogicLayer.Models.ProductType;
-using BusinessLogicLayer.Models.ProductTypeTypeDetail;
 using BusinessLogicLayer.Models.Profile;
-using BusinessLogicLayer.Models.PurchaseDetail;
-using BusinessLogicLayer.Models.PurchaseReceipt;
-using BusinessLogicLayer.Models.ReceivingDetail;
 using BusinessLogicLayer.Models.ReceivingNote;
 using BusinessLogicLayer.Models.Shelf;
 using BusinessLogicLayer.Models.StockCard;
 using BusinessLogicLayer.Models.StockCardDetail;
 using BusinessLogicLayer.Models.Supplier;
-using BusinessLogicLayer.Models.TypeDetail;
-using BusinessLogicLayer.Models.Warehouse;
 using Data.Entity;
 using Data.Model.DTO;
 using Data.Model.Request.Customer;
+using Data.Model.Request.Warehouse;
+using static Data.Model.Request.Warehouse.WarehouseFullInfoDTO;
 using Profile = Data.Entity.Profile;
 
 namespace BusinessLogicLayer.Mappings
@@ -136,8 +126,22 @@ namespace BusinessLogicLayer.Mappings
             #endregion
 
             #region Warehouse
-            CreateMap<Warehouse, Data.Model.DTO.WarehouseDTO>().ReverseMap();
+            CreateMap<Warehouse, Data.Model.Request.Warehouse.WarehouseDTO>().ReverseMap();
             CreateMap<Warehouse, CreateWarehouseDTO>().ReverseMap();
+            CreateMap<Warehouse, UpdateWarehouseDTO>().ReverseMap();
+            CreateMap<Warehouse, WarehouseFullInfoDTO>()
+           .ForMember(dest => dest.Areas, opt => opt.MapFrom(src => src.Areas));
+
+            CreateMap<Area, AreaDto>()
+                .ForMember(dest => dest.Shelves, opt => opt.MapFrom(src => src.Shelves));
+
+            CreateMap<Shelf, ShelfDto>()
+                .ForMember(dest => dest.Floors, opt => opt.MapFrom(src => src.Floors));
+
+            CreateMap<Floor, FloorDto>()
+                .ForMember(dest => dest.Cells, opt => opt.MapFrom(src => src.Cells));
+
+            CreateMap<Cell, CellDto>();
             #endregion
 
             #region AccountGroup
