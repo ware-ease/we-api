@@ -19,6 +19,8 @@ using Microsoft.OpenApi.Models;
 using System.Globalization;
 using System.Text;
 using System.Text.Json.Serialization;
+using IWarehouseService = BusinessLogicLayer.IServices.IWarehouseService;
+using WarehouseService = BusinessLogicLayer.Services.WarehouseService;
 
 Env.Load();
 
@@ -76,6 +78,10 @@ var mapper = new MapperConfiguration(mc =>
 builder.Services.AddSingleton(mapper.CreateMapper());
 
 #region Generic
+builder.Services.AddScoped<IGenericRepository<Warehouse>, GenericRepository<Warehouse>>();
+builder.Services.AddScoped<IGenericRepository<Area>, GenericRepository<Area>>();
+builder.Services.AddScoped<IGenericRepository<Floor>, GenericRepository<Floor>>();
+builder.Services.AddScoped<IGenericRepository<Cell>, GenericRepository<Cell>>();
 builder.Services.AddScoped<IGenericRepository<Customer>, GenericRepository<Customer>>();
 builder.Services.AddScoped<IGenericRepository<Account>, GenericRepository<Account>>();
 builder.Services.AddScoped<IGenericRepository<Group>, GenericRepository<Group>>();
@@ -103,6 +109,7 @@ builder.Services.AddScoped<IGroupService, GroupService>();
 builder.Services.AddScoped<IProfileService, ProfileService>();
 builder.Services.AddScoped<IPermissionService, PermissionService>();
 builder.Services.AddScoped<IRouteService, RouteService>();
+//builder.Services.AddScoped<IWarehouseService, WarehouseService>();
 builder.Services.AddScoped<IWarehouseService, WarehouseService>();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
 #endregion Services
@@ -123,6 +130,7 @@ builder.Services.AddScoped<IProfileRepository, ProfileRepository>();
 builder.Services.AddScoped<IRouteRepository, RouteRepository>();
 builder.Services.AddScoped<IPermissionRepository, PermissionRepository>();
 builder.Services.AddScoped<IWarehouseRepository, WarehouseRepository>();
+builder.Services.AddScoped<IAreaRepository, AreaRepository>();
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 #endregion Repositories
 

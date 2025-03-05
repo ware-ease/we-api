@@ -1,4 +1,5 @@
 ﻿using Data.Entity;
+using DataAccessLayer.Generic;
 using DataAccessLayer.IRepositories;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -9,13 +10,10 @@ using System.Threading.Tasks;
 
 namespace DataAccessLayer.Repositories
 {
-    public class ShelfRepository : IShelfRepository
+    public class ShelfRepository : GenericRepository<Shelf>, IShelfRepository
     {
-        private readonly WaseEaseDbContext _context;
-
-        public ShelfRepository(WaseEaseDbContext context)
+        public ShelfRepository(WaseEaseDbContext context) : base(context)
         {
-            _context = context;
         }
 
         public IQueryable<Shelf> GetAllQueryable()

@@ -18,6 +18,10 @@ namespace DataAccessLayer.UnitOfWork
         IRouteRepository AppActionRepository { get; }
         IPermissionRepository PermissionRepository { get; }
         IWarehouseRepository WarehouseRepository { get; }
+        IAreaRepository AreaRepository { get; }
+        IShelfRepository ShelfRepository { get; }
+        IFloorRepository FloorRepository { get; }
+        ICellRepository CellRepository { get; }
 
         ICustomerRepository CustomerRepository { get; }
     }

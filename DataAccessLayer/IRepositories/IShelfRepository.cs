@@ -1,4 +1,5 @@
 ﻿using Data.Entity;
+using DataAccessLayer.Generic;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace DataAccessLayer.IRepositories
 {
-    public interface IShelfRepository
+    public interface IShelfRepository : IGenericRepository<Shelf>
     {
         IQueryable<Shelf> GetAllQueryable();
         IQueryable<Shelf> GetShelvesByWarehouseIdQueryable(string warehouseId);
