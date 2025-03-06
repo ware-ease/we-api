@@ -22,6 +22,8 @@ using Data.Model.Request.Brand;
 using Data.Model.Request.Category;
 using Data.Model.Request.Customer;
 using Data.Model.Request.Product;
+using Data.Model.Request.Suppiler;
+using Data.Model.Request.Supplier;
 using Data.Model.Request.Unit;
 using Data.Model.Request.Warehouse;
 using static Data.Model.Request.Warehouse.WarehouseFullInfoDTO;
@@ -74,8 +76,11 @@ namespace BusinessLogicLayer.Mappings
             #endregion
 
             #region Supplier
-            CreateMap<Supplier, CreateSupplierDTO>();
-            CreateMap<CreateSupplierDTO, Supplier>();
+            CreateMap<Supplier, SupplierDTO>().ReverseMap();
+
+            CreateMap<Supplier, SupplierCreateDTO>().ReverseMap();
+
+            CreateMap<Supplier, SupplierUpdateDTO>().ReverseMap();
             #endregion
 
             #region ReceivingNote

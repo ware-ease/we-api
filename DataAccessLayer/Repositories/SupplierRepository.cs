@@ -1,4 +1,5 @@
 ﻿using Data.Entity;
+using DataAccessLayer.Generic;
 using DataAccessLayer.IRepositories;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -9,16 +10,16 @@ using System.Threading.Tasks;
 
 namespace DataAccessLayer.Repositories
 {
-    public class SupplierRepository : ISupplierRepository
+    public class SupplierRepository : GenericRepository<Supplier>, ISupplierRepository
     {
-        private readonly WaseEaseDbContext _context;
+        //private readonly WaseEaseDbContext _context;
 
-        public SupplierRepository(WaseEaseDbContext context)
+        public SupplierRepository(WaseEaseDbContext context) : base(context)
         {
-            _context = context;
+            //_context = context;
         }
 
-        public IQueryable<Supplier> GetAllQueryable()
+        /*public IQueryable<Supplier> GetAllQueryable()
         {
             return _context.Suppliers.AsQueryable();
         }
@@ -56,6 +57,6 @@ namespace DataAccessLayer.Repositories
         public Task<List<Supplier>> GetAllAsync(string supplierId)
         {
             throw new NotImplementedException();
-        }
+        }*/
     }
 }

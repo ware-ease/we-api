@@ -1,9 +1,14 @@
 ﻿using AutoMapper;
+using BusinessLogicLayer.Generic;
 using BusinessLogicLayer.IService;
 using BusinessLogicLayer.Models.Pagination;
 using BusinessLogicLayer.Models.Supplier;
 using Data.Entity;
+using Data.Model.Request.Supplier;
+using Data.Model.Response;
+using DataAccessLayer.Generic;
 using DataAccessLayer.IRepositories;
+using DataAccessLayer.UnitOfWork;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,13 +18,68 @@ using System.Threading.Tasks;
 
 namespace BusinessLogicLayer.Service
 {
-    public class SupplierService : ISupplierService
+    public class SupplierService : GenericService<Supplier>, ISupplierService
     {
-        private readonly ISupplierRepository _repository;
-        private readonly IGenericPaginationService _genericPaginationService;
-        private readonly IMapper _mapper;
 
-        public SupplierService(ISupplierRepository supplierRepository, IGenericPaginationService genericPaginationService, IMapper mapper)
+        /*private readonly ISupplierRepository _repository;
+        private readonly IGenericPaginationService _genericPaginationService;
+        private readonly IMapper _mapper;*/
+        private readonly IGenericRepository<Supplier> _supplierRepository;
+        private readonly IMapper _mapper;
+        private readonly IUnitOfWork _unitOfWork;
+
+
+        public SupplierService(IGenericRepository<Supplier> genericRepository, 
+            IMapper mapper, 
+            IUnitOfWork unitOfWork) : base(genericRepository, mapper, unitOfWork) 
+        {
+            _supplierRepository = genericRepository;
+            _mapper = mapper;
+            _unitOfWork = unitOfWork;
+        }
+
+        public override async Task<ServiceResponse> Update<TResult, TRequest>(TRequest request)
+        {
+            var supplierUpdateDto = request as SupplierUpdateDTO;
+            if (supplierUpdateDto == null || string.IsNullOrEmpty(supplierUpdateDto.Id))
+                throw new Exception("Invalid supplier update request: missing Id");
+            var existingSupplier = await _supplierRepository.Get(supplierUpdateDto.Id);
+            if (existingSupplier == null)
+            {
+                return new ServiceResponse
+                {
+                    Status = Data.Enum.SRStatus.NotFound,
+                    Message = "Không thể tìm thấy Supplier với Id này",
+                    Data = supplierUpdateDto.Id
+                };
+            }
+            _mapper.Map(request, existingSupplier);
+
+            try
+            {
+                _supplierRepository.Update(existingSupplier);
+                await _unitOfWork.SaveAsync();
+
+                TResult result = _mapper.Map<TResult>(existingSupplier);
+                return new ServiceResponse
+                {
+                    Status = Data.Enum.SRStatus.Success,
+                    Message = "Update successfully!",
+                    Data = result
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ServiceResponse
+                {
+                    Status = Data.Enum.SRStatus.Error,
+                    Message = ex.Message,
+                    Data = request
+                };
+            }
+        }
+
+        /*public SupplierService(ISupplierRepository supplierRepository, IGenericPaginationService genericPaginationService, IMapper mapper)
         {
             _repository = supplierRepository;
             _genericPaginationService = genericPaginationService;
@@ -117,6 +177,6 @@ namespace BusinessLogicLayer.Service
             supplier.DeletedTime = DateTime.Now;
             supplier.IsDeleted = true;
             await _repository.UpdateAsync(supplier);
-        }
+        }*/
     }
 }
