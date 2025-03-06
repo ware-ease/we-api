@@ -6,6 +6,7 @@ using BusinessLogicLayer.Models.Category;
 using BusinessLogicLayer.Models.General;
 using BusinessLogicLayer.Service;
 using Data.Entity;
+using Data.Model.Category;
 using Data.Model.Request.Category;
 using Data.Model.Response;
 using Microsoft.AspNetCore.Authorization;

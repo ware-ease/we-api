@@ -16,6 +16,7 @@ using BusinessLogicLayer.Models.StockCard;
 using BusinessLogicLayer.Models.StockCardDetail;
 using BusinessLogicLayer.Models.Supplier;
 using Data.Entity;
+using Data.Model.Category;
 using Data.Model.DTO;
 using Data.Model.Request.Brand;
 using Data.Model.Request.Category;
@@ -84,9 +85,9 @@ namespace BusinessLogicLayer.Mappings
 
             #region Product
             CreateMap<Product, ProductDTO>()
-                .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Category.Name))
-                .ForMember(dest => dest.BrandName, opt => opt.MapFrom(src => src.Brand.Name))
-                .ForMember(dest => dest.UnitName, opt => opt.MapFrom(src => src.Unit.Name)).ReverseMap();
+                .ForMember(dest => dest.Category, opt => opt.MapFrom(src => src.Category))
+                .ForMember(dest => dest.Brand, opt => opt.MapFrom(src => src.Brand))
+                .ForMember(dest => dest.Unit, opt => opt.MapFrom(src => src.Unit)).ReverseMap();
 
             CreateMap<ProductCreateDTO, Product>().ReverseMap();
             CreateMap<ProductUpdateDTO, Product>().ReverseMap();
