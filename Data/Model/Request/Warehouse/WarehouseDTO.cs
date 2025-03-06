@@ -116,5 +116,4 @@ namespace Data.Model.Request.Warehouse
         public float Height { get; set; }
         public float MaxLoad { get; set; }
     }
-
 }
