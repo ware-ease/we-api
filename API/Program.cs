@@ -88,6 +88,7 @@ builder.Services.AddScoped<IGenericRepository<Category>, GenericRepository<Categ
 builder.Services.AddScoped<IGenericRepository<Product>, GenericRepository<Product>>();
 builder.Services.AddScoped<IGenericRepository<Brand>, GenericRepository<Brand>>();
 builder.Services.AddScoped<IGenericRepository<Unit>, GenericRepository<Unit>>();
+builder.Services.AddScoped<IGenericRepository<Supplier>, GenericRepository<Supplier>>();
 builder.Services.AddScoped<IGenericRepository<Data.Entity.Route>, GenericRepository<Data.Entity.Route>>();
 #endregion Generic
 

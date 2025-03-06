@@ -1,10 +1,14 @@
-﻿using AutoMapper;
+﻿using API.Utils;
+using AutoMapper;
 using BusinessLogicLayer.IService;
-using BusinessLogicLayer.Models.Category;
-using BusinessLogicLayer.Models.General;
-using BusinessLogicLayer.Models.Supplier;
-using BusinessLogicLayer.Service;
 using Data.Entity;
+using Data.Model.Category;
+using Data.Model.DTO;
+using Data.Model.Request.Category;
+using Data.Model.Request.Suppiler;
+using Data.Model.Request.Supplier;
+using Data.Model.Response;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,15 +19,63 @@ namespace API.Controllers
     public class SupplierController : ControllerBase
     {
         private readonly ISupplierService _supplierService;
-        private readonly IMapper _mapper;
+        //private readonly IMapper _mapper;
         
-        public SupplierController(ISupplierService supplierService, IMapper mapper)
+        public SupplierController(ISupplierService supplierService)
         {
             _supplierService = supplierService;
-            _mapper = mapper;
+            //_mapper = mapper;
         }
 
-        [HttpGet("GetAll")]
+        [HttpGet]
+        public async Task<IActionResult> Get()
+        {
+            var result = await _supplierService.Get<SupplierDTO>();
+            return ControllerResponse.Response(result);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> Get(string id)
+        {
+            var result = await _supplierService.Get<SupplierDTO>(id);
+            return ControllerResponse.Response(result);
+        }
+
+        [Authorize]
+        [HttpPost]
+        public async Task<IActionResult> Add([FromBody] SupplierCreateDTO request)
+        {
+            var authUser = AuthHelper.GetCurrentUser(HttpContext.Request);
+
+            if (authUser != null)
+            {
+                request.CreatedBy = authUser.id;
+            }
+            else
+            {
+                return Unauthorized();
+            }
+
+            var result = await _supplierService.Add<SupplierDTO, SupplierCreateDTO>(request);
+            return ControllerResponse.Response(result);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(string id, [FromBody] SupplierUpdateDTO request)
+        {
+            request.Id = id;
+            var result = await _supplierService.Update<SupplierDTO, SupplierUpdateDTO>(request);
+            return ControllerResponse.Response(result);
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(string id)
+        {
+            var result = await _supplierService.Delete(id);
+            return ControllerResponse.Response(result);
+        }
+
+        /*[HttpGet("GetAll")]
         public async Task<IActionResult> GetAll([FromQuery] int? pageNumber, [FromQuery] int? pageSize)
         {
             var result = await _supplierService.GetAllAsync(pageNumber, pageSize);
@@ -145,6 +197,6 @@ namespace API.Controllers
                     Message = "Đã xảy ra lỗi: " + ex.Message
                 });
             }
-        }
+        }*/
     }
 }
