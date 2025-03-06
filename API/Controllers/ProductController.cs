@@ -4,7 +4,9 @@ using BusinessLogicLayer.Models.General;
 using BusinessLogicLayer.Models.Product;
 using BusinessLogicLayer.Models.PurchaseReceipt;
 using BusinessLogicLayer.Service;
+using Data.Entity;
 using Data.Enum;
+using Data.Model.DTO;
 using Data.Model.Request.Product;
 using Data.Model.Response;
 using Microsoft.AspNetCore.Authorization;
@@ -28,28 +30,11 @@ namespace API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> Get()
         {
-            try
-            {
-                var products = await _productService.GetAllProducts();
-                // Ở đây, GetAll trả về danh sách Product (thực thể) không ánh xạ thành DTO
-                return ControllerResponse.Response(new ServiceResponse
-                {
-                    Status = SRStatus.Success,
-                    Message = "Products retrieved successfully",
-                    Data = products
-                });
-            }
-            catch (Exception ex)
-            {
-                return ControllerResponse.Response(new ServiceResponse
-                {
-                    Status = SRStatus.Error,
-                    Message = ex.Message,
-                    Data = null
-                });
-            }
+
+                var products = await _productService.Get<ProductDTO>();
+                return ControllerResponse.Response(products);
         }
 
         [HttpGet("{id}")]
