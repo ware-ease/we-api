@@ -18,6 +18,7 @@ using BusinessLogicLayer.Models.Supplier;
 using Data.Entity;
 using Data.Model.Category;
 using Data.Model.DTO;
+using Data.Model.Request.Area;
 using Data.Model.Request.Brand;
 using Data.Model.Request.Category;
 using Data.Model.Request.Customer;
@@ -174,6 +175,11 @@ namespace BusinessLogicLayer.Mappings
                 .ForMember(dest => dest.Cells, opt => opt.MapFrom(src => src.Cells));
 
             CreateMap<Cell, CellDto>();
+            #endregion
+            //Chỉ map riêng cho area
+            CreateMap<Area, AreaDTO>().ReverseMap();
+            #region Area
+
             #endregion
 
             #region AccountGroup
