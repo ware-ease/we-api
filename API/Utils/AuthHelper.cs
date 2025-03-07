@@ -1,4 +1,6 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+﻿using Azure;
+using Microsoft.AspNetCore.Http;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace API.Utils
 {
@@ -24,7 +26,7 @@ namespace API.Utils
             var handler = new JwtSecurityTokenHandler();
             var decodedToken = handler.ReadJwtToken(accessToken);
 
-            var id = decodedToken.Claims.First(c => c.Type == "Id").Value;
+            var id = decodedToken.Claims.First(c => c.Type == "uid").Value;
 
             return new AuthUser
             {
@@ -32,6 +34,24 @@ namespace API.Utils
                 accessToken = accessToken,
                 refreshToken = refreshToken,
             };
+        }
+
+        public static void AppendToCookies(HttpResponse response, string key, string value)
+        {
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.None,
+                Expires = DateTime.UtcNow.AddDays(7)
+            };
+
+            response.Cookies.Append(key, value, cookieOptions);
+        }
+
+        public static void DeleteFromCookies(HttpResponse response, string key)
+        {
+            response.Cookies.Delete(key);
         }
     }
 }

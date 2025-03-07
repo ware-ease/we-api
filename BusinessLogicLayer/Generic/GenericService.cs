@@ -65,7 +65,7 @@ namespace BusinessLogicLayer.Generic
             if (entity != null)
             {
                 entity.IsDeleted = true;
-                _genericRepository.Update(entity);
+                _genericRepository.Delete(entity);
                 await _unitOfWork.SaveAsync();
 
                 return new ServiceResponse

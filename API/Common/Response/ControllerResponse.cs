@@ -33,6 +33,11 @@ namespace Data.Model.Response
                 result.StatusCode = 400;
             }
 
+            if (serviceResponse.Status == Enum.SRStatus.Unauthorized)
+            {
+                result.StatusCode = 401;
+            }
+
             return result;
         }
     }

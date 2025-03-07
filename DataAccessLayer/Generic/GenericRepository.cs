@@ -230,13 +230,25 @@ namespace DataAccessLayer.Generic
             await _dbSet.AddAsync(entity);
         }
 
-        public virtual void Delete(object id)
+        public virtual void Delete(string id)
         {
             TEntity entityToDelete = _dbSet.Find(id)!;
             Delete(entityToDelete!);
         }
 
         public virtual void Delete(TEntity entityToDelete)
+        {
+            entityToDelete.IsDeleted = true;
+            _dbSet.Update(entityToDelete);
+        }
+
+        public virtual void DeletePermanently(string id)
+        {
+            TEntity entityToDelete = _dbSet.Find(id)!;
+            DeletePermanently(entityToDelete!);
+        }
+
+        public virtual void DeletePermanently(TEntity entityToDelete)
         {
             if (_context.Entry(entityToDelete).State == EntityState.Detached)
             {

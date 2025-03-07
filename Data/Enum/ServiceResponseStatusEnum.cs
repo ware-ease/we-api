@@ -12,5 +12,6 @@ namespace Data.Enum
         Error,
         NotFound,
         Duplicated,
+        Unauthorized,
     }
 }

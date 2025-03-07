@@ -48,7 +48,6 @@ namespace BusinessLogicLayer.Mappings
             #endregion
 
             #region Token
-            CreateMap<Token, BusinessLogicLayer.Models.Authentication.TokenDTO>().ReverseMap();
             #endregion
 
             #region Profile

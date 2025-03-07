@@ -1,5 +1,4 @@
 ﻿using BusinessLogicLayer.Generic;
-using BusinessLogicLayer.Models.Authentication;
 using BusinessLogicLayer.Models.Pagination;
 using Data.Model.DTO;
 using Data.Model.Request.Account;
@@ -14,8 +13,6 @@ namespace BusinessLogicLayer.IServices
 {
     public interface IAccountService : IGenericService
     {
-        Task<AccountDTO?> CheckLoginAsync(string userName, string password);
-        Task<TokenDTO> GenerateAccessTokenAsync(string id);
         Task<ServiceResponse> Add(AccountCreateDTO request);
     }
 }

@@ -29,8 +29,10 @@ namespace DataAccessLayer.Generic
             string includeProperties = "",
             string thenIncludeProperties = "");
         Task Insert(TEntity entity);
-        void Delete(object id);
+        void Delete(string id);
         void Delete(TEntity entityToDelete);
+        void DeletePermanently(string id);
+        void DeletePermanently(TEntity entityToDelete);
         void Update(TEntity entityToUpdate);
         Task<int> Count(Expression<Func<TEntity, bool>> filter = null!);
     }

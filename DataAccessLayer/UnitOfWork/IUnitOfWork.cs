@@ -22,7 +22,7 @@ namespace DataAccessLayer.UnitOfWork
         IShelfRepository ShelfRepository { get; }
         IFloorRepository FloorRepository { get; }
         ICellRepository CellRepository { get; }
-
+        IRefreshTokenRepository RefreshTokenRepository { get; }
         ICustomerRepository CustomerRepository { get; }
     }
 }

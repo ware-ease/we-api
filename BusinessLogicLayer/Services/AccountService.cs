@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using BusinessLogicLayer.Generic;
 using BusinessLogicLayer.IServices;
-using BusinessLogicLayer.Models.Authentication;
 using BusinessLogicLayer.Utils;
 using Data.Entity;
 using Data.Model.DTO;
@@ -25,20 +24,6 @@ namespace BusinessLogicLayer.Services
     {
         public AccountService(IGenericRepository<Data.Entity.Account> genericRepository, IMapper mapper, IUnitOfWork unitOfWork) : base(genericRepository, mapper, unitOfWork)
         {
-        }
-
-        public async Task<AccountDTO?> CheckLoginAsync(string userName, string password)
-        {
-            var user = await _unitOfWork.AccountRepository
-                .CheckLoginAsync(userName, PasswordHelper.ConvertToEncrypt(password));
-            return _mapper.Map<AccountDTO>(user);
-        }
-
-        public async Task<TokenDTO> GenerateAccessTokenAsync(string id)
-        {
-            var token = await _unitOfWork.AccountRepository.GenerateAccessTokenAsync(id);
-            var tokentDTO = _mapper.Map<TokenDTO>(token);
-            return tokentDTO;
         }
 
         public async Task<ServiceResponse> Add(AccountCreateDTO request)
