@@ -116,5 +116,32 @@ namespace BusinessLogicLayer.Services
                 await smtp.DisconnectAsync(true);
             }
         }
+
+        public async Task<ServiceResponse> ChangePassword(string id, string password)
+        {
+            var account = await _unitOfWork.AccountRepository.GetByCondition(a => a.Id == id);
+
+            if (account == null)
+            {
+                return new ServiceResponse
+                {
+                    Status = Data.Enum.SRStatus.NotFound,
+                    Message = "Account not found!",
+                    Data = id,
+                };
+            }
+
+            account.Password = PasswordHelper.ConvertToEncrypt(password);
+
+            _unitOfWork.AccountRepository.Update(account);
+            await _unitOfWork.SaveAsync();
+
+            return new ServiceResponse
+            {
+                Status = Data.Enum.SRStatus.Success,
+                Message = "Update successfully!",
+                Data = { }
+            };
+        }
     }
 }

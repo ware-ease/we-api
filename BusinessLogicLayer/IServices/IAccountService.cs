@@ -14,5 +14,6 @@ namespace BusinessLogicLayer.IServices
     public interface IAccountService : IGenericService
     {
         Task<ServiceResponse> Add(AccountCreateDTO request);
+        Task<ServiceResponse> ChangePassword(string id, string password);
     }
 }

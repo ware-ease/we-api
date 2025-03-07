@@ -7,6 +7,8 @@ using Data.Model.Response;
 using API.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Data.Model.Request.Account;
+using BusinessLogicLayer.IServices;
+using BusinessLogicLayer.Services;
 
 namespace API.Controllers
 {
@@ -15,9 +17,9 @@ namespace API.Controllers
     public class AccountController : ControllerBase
     {
 
-        private readonly BusinessLogicLayer.IServices.IAccountService _accountService;
+        private readonly IAccountService _accountService;
 
-        public AccountController(BusinessLogicLayer.IServices.IAccountService appUserService)
+        public AccountController(IAccountService appUserService)
         {
             _accountService = appUserService;
         }
@@ -70,6 +72,22 @@ namespace API.Controllers
             var result = await _accountService.Delete(id);
 
             return ControllerResponse.Response(result);
+        }
+
+        [Authorize]
+        [HttpPut("password")]
+        public async Task<IActionResult> ChangePassword([FromBody] AccountPasswordUpdateDTO request)
+        {
+            AuthHelper.AuthUser? authUser = AuthHelper.GetCurrentUser(Request);
+
+            if (authUser != null && authUser.id != null)
+            {
+                var result = await _accountService.ChangePassword(authUser.id, request.Password!);
+
+                return ControllerResponse.Response(result);
+            }
+
+            return BadRequest();
         }
     }
 }
