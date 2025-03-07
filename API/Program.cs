@@ -94,8 +94,7 @@ builder.Services.AddScoped<IGenericRepository<Data.Entity.Route>, GenericReposit
 
 #region Services
 builder.Services.AddScoped<IJwtService, JwtService>();
-builder.Services.AddScoped<BusinessLogicLayer.IService.IAccountService, BusinessLogicLayer.Service.AccountService>();
-builder.Services.AddScoped<BusinessLogicLayer.IServices.IAccountService, BusinessLogicLayer.Services.AccountService>();
+builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<ISupplierService, SupplierService>();
 builder.Services.AddScoped<IProductService, ProductService>();
@@ -106,7 +105,6 @@ builder.Services.AddScoped<IFloorService, FloorService>();
 builder.Services.AddScoped<ICellService, CellService>();
 builder.Services.AddScoped<IGenericPaginationService, GenericPaginationService>();
 builder.Services.AddScoped<IGroupService, GroupService>();
-builder.Services.AddScoped<IProfileService, ProfileService>();
 builder.Services.AddScoped<IPermissionService, PermissionService>();
 builder.Services.AddScoped<IRouteService, RouteService>();
 builder.Services.AddScoped<IWarehouseService, WarehouseService>();

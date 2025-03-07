@@ -1,12 +1,11 @@
 ﻿using API.Utils;
 using BusinessLogicLayer.IServices;
-using BusinessLogicLayer.Models.AccountWarehouse;
+using Data.Model.DTO;
 using Data.Model.Request.Area;
 using Data.Model.Request.Customer;
 using Data.Model.Request.Warehouse;
 using Data.Model.Response;
 using Microsoft.AspNetCore.Mvc;
-using WarehouseDTO = Data.Model.Request.Warehouse.WarehouseDTO;
 
 namespace API.Controllers
 {

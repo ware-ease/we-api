@@ -24,7 +24,7 @@ namespace DataAccessLayer.Generic
 
         public virtual async Task<TEntity?> Get(string id)
         {
-            IQueryable<TEntity> query = _dbSet.AsQueryable();
+            IQueryable<TEntity> query = _dbSet.AsQueryable().Where(e => e.IsDeleted == false);
             var entityType = _context.Model.FindEntityType(typeof(TEntity));
 
             if (entityType != null)
@@ -53,7 +53,7 @@ namespace DataAccessLayer.Generic
 
         public virtual IQueryable<TEntity> Get()
         {
-            IQueryable<TEntity> query = _dbSet.AsQueryable();
+            IQueryable<TEntity> query = _dbSet.AsQueryable().Where(e => e.IsDeleted == false);
             var entityType = _context.Model.FindEntityType(typeof(TEntity));
 
             if (entityType != null)

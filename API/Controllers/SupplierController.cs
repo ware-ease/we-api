@@ -2,7 +2,6 @@
 using AutoMapper;
 using BusinessLogicLayer.IService;
 using Data.Entity;
-using Data.Model.Category;
 using Data.Model.DTO;
 using Data.Model.Request.Category;
 using Data.Model.Request.Suppiler;

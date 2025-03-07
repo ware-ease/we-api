@@ -1,5 +1,5 @@
 ﻿using Data.Entity;
-using Data.Model.Category;
+using Data.Model.DTO.Base;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Data.Model.DTO
 {
-    public class ProductDTO
+    public class ProductDTO : BaseDTO
     {
         public string Id { get; set; }
         public string Name { get; set; }

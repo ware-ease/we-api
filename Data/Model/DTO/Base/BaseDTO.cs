@@ -4,13 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BusinessLogicLayer.Models.Permission
+namespace Data.Model.DTO.Base
 {
-    public class CreatePermissionDTO
+    public class BaseDTO
     {
-        public string Url { get; set; }
-
+        public string? Id { get; set; }
         public string? CreatedBy { get; set; }
-
+        public string? CreatedTime { get; set; }
     }
 }

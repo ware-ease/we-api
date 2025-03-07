@@ -1,4 +1,4 @@
-﻿using BusinessLogicLayer.IService;
+﻿using BusinessLogicLayer.IServices;
 using BusinessLogicLayer.Models.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;

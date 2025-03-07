@@ -1,11 +1,11 @@
 ﻿using AutoMapper;
 using BusinessLogicLayer.Generic;
 using BusinessLogicLayer.IServices;
-using BusinessLogicLayer.Models.Account;
 using BusinessLogicLayer.Models.Authentication;
 using BusinessLogicLayer.Utils;
 using Data.Entity;
 using Data.Model.DTO;
+using Data.Model.Request.Account;
 using Data.Model.Response;
 using DataAccessLayer.Generic;
 using DataAccessLayer.Migrations;
@@ -23,13 +23,8 @@ namespace BusinessLogicLayer.Services
 {
     public class AccountService : GenericService<Data.Entity.Account>, IAccountService
     {
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly IMapper _mapper;
-
         public AccountService(IGenericRepository<Data.Entity.Account> genericRepository, IMapper mapper, IUnitOfWork unitOfWork) : base(genericRepository, mapper, unitOfWork)
         {
-            _unitOfWork = unitOfWork;
-            _mapper = mapper;
         }
 
         public async Task<AccountDTO?> CheckLoginAsync(string userName, string password)
@@ -50,83 +45,45 @@ namespace BusinessLogicLayer.Services
         {
             try
             {
-                // Kiểm tra xem username đã tồn tại chưa
                 var existingUsername = await _unitOfWork.AccountRepository
                     .GetByCondition(a => a.Username == request.Username);
                 if (existingUsername != null)
                 {
-                    throw new Exception("Username đã tồn tại");
+                    return new ServiceResponse
+                    {
+                        Status = Data.Enum.SRStatus.Duplicated,
+                        Message = "Username is existed!",
+                        Data = _mapper.Map<AccountDTO>(request)
+                    };
                 }
 
-                // Kiểm tra xem email đã tồn tại chưa
                 var existingEmail = await _unitOfWork.AccountRepository
                     .GetByCondition(a => a.Email == request.Email);
                 if (existingEmail != null)
                 {
-                    throw new Exception("Email đã tồn tại");
+                    return new ServiceResponse
+                    {
+                        Status = Data.Enum.SRStatus.Duplicated,
+                        Message = "Email is existed!",
+                        Data = _mapper.Map<AccountDTO>(request)
+                    };
                 }
 
                 var account = _mapper.Map<Data.Entity.Account>(request);
 
-                string password = Guid.NewGuid().ToString();
+                account.Id = Guid.NewGuid().ToString();
+                account.Profile!.Id = Guid.NewGuid().ToString();
+                string password = account.Username;
                 account.Password = PasswordHelper.ConvertToEncrypt(password);
+                account.Profile.CreatedTime = DateTime.Now;
                 account.CreatedTime = DateTime.Now;
+                account.Profile.CreatedBy = request.CreatedBy;
                 account.CreatedBy = request.CreatedBy;
-                Data.Entity.Profile profile = new Data.Entity.Profile();
-                profile = _mapper.Map<Data.Entity.Profile>(request.Profile);
-
-                //await _unitOfWork.SaveAsync();
-
-                profile.AccountId = account.Id;
-                profile.CreatedBy = request.CreatedBy;
-                profile.CreatedTime = DateTime.Now;
-                account.Profile = profile;
-                profile.Account = account;
 
                 await _unitOfWork.AccountRepository.Add(account);
-                await _unitOfWork.ProfileRepository.Add(profile);
-
-                // **Thêm AccountGroup nếu có groupIds**
-                if (request.groupIds != null && request.groupIds.Any())
-                {
-                    List<string> validGroupIds = new List<string>();
-                    List<string> invalidGroupIds = new List<string>();
-
-                    foreach (var groupId in request.groupIds)
-                    {
-                        var group = await _unitOfWork.GroupRepository.GetByCondition(g => g.Id == groupId);
-                        if (group != null)
-                        {
-                            validGroupIds.Add(groupId);
-                        }
-                        else
-                        {
-                            invalidGroupIds.Add(groupId);
-                        }
-                    }
-
-                    // Kiểm tra nếu có groupId không hợp lệ
-                    if (invalidGroupIds.Any())
-                    {
-                        throw new Exception($"Nhóm không tồn tại: {string.Join(", ", invalidGroupIds)}");
-                    }
-
-                    // Thêm vào AccountGroup từng bản ghi
-                    foreach (var groupId in validGroupIds)
-                    {
-                        var accountGroup = new AccountGroup
-                        {
-                            AccountId = account.Id,
-                            GroupId = groupId,
-                            CreatedBy = request.CreatedBy,
-                            CreatedTime = DateTime.Now
-                        };
-                        //await _unitOfWork.AccountGroupRepository.Insert(accountGroup);
-                    }
-                }
 
                 await _unitOfWork.SaveAsync();
-                // Gửi email thông tin tài khoản
+
                 string emailSubject = "Thông tin tài khoản của bạn";
                 string emailBody = $@"<h3>Chào {request.Username},</h3>
                                         <p>Bạn đã được tạo tài khoản thành công trên hệ thống.</p>
@@ -136,7 +93,7 @@ namespace BusinessLogicLayer.Services
                                         <p>Trân trọng,</p>
                                         <p>Đội ngũ hỗ trợ</p>";
 
-                await SendEmailAsync(request.Email, emailSubject, emailBody);
+                await SendEmailAsync(request.Email!, emailSubject, emailBody);
 
                 return new ServiceResponse
                 {

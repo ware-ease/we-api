@@ -10,15 +10,6 @@ using System.Threading.Tasks;
 
 namespace Data.Model.Request.Warehouse
 {
-    public class WarehouseDTO : BaseEntity
-    {
-        public string? Name { get; set; }
-        public string? Address { get; set; }
-        public float Length { get; set; }
-        public float Width { get; set; }
-        public int? ShelfCount { get; set; }
-    }
-
     public class CreateWarehouseDTO
     {
         public string? Name { get; set; }

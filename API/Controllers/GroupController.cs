@@ -4,7 +4,6 @@ using Data.Entity;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using BusinessLogicLayer.Models.Group;
 using Microsoft.AspNetCore.Authorization;
 using BusinessLogicLayer.IServices;
 using Data.Model.Response;

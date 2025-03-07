@@ -25,7 +25,12 @@ namespace Data.Model.Response
 
             if (serviceResponse.Status == Enum.SRStatus.Error)
             {
-                result.StatusCode = 404;
+                result.StatusCode = 500;
+            }
+
+            if (serviceResponse.Status == Enum.SRStatus.Duplicated)
+            {
+                result.StatusCode = 400;
             }
 
             return result;

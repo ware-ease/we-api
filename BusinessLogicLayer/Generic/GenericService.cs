@@ -1,8 +1,11 @@
 ﻿using AutoMapper;
+using Data.Entity;
 using Data.Entity.Base;
+using Data.Model.DTO.Base;
 using Data.Model.Response;
 using DataAccessLayer.Generic;
 using DataAccessLayer.UnitOfWork;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,9 +16,9 @@ namespace BusinessLogicLayer.Generic
 {
     public abstract class GenericService<TEntity> : IGenericService where TEntity : BaseEntity
     {
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly IGenericRepository<TEntity> _genericRepository;
-        private readonly IMapper _mapper;
+        protected readonly IUnitOfWork _unitOfWork;
+        protected readonly IGenericRepository<TEntity> _genericRepository;
+        protected readonly IMapper _mapper;
 
         public GenericService(IGenericRepository<TEntity> genericRepository, IMapper mapper, IUnitOfWork unitOfWork)
         {
@@ -33,6 +36,7 @@ namespace BusinessLogicLayer.Generic
             try
             {
                 entity.Id = Guid.NewGuid().ToString();
+                entity.CreatedTime = DateTime.Now;
                 await _genericRepository.Add(entity);
                 await _unitOfWork.SaveAsync();
 
@@ -80,11 +84,20 @@ namespace BusinessLogicLayer.Generic
             };
         }
 
-        public virtual async Task<ServiceResponse> Get<TResult>()
+        public virtual async Task<ServiceResponse> Get<TResult>() where TResult : BaseDTO
         {
             var results = _genericRepository.Get();
 
             List<TResult> mappedResults = _mapper.Map<List<TResult>>(results);
+
+            foreach (var mappedResult in mappedResults)
+            {
+                if (mappedResult.CreatedBy != null)
+                {
+                    var createdBy = await GetCreatedBy(mappedResult.CreatedBy);
+                    mappedResult.CreatedBy = createdBy!.Username;
+                }
+            }
 
             return new ServiceResponse
             {
@@ -145,6 +158,11 @@ namespace BusinessLogicLayer.Generic
                     Data = request
                 };
             }
+        }
+
+        protected async Task<Account?> GetCreatedBy(string id)
+        {
+            return await _unitOfWork.AccountRepository.Get(id);
         }
     }
 }

@@ -1,15 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using BusinessLogicLayer.IService;
-using BusinessLogicLayer.Models.Account;
 using BusinessLogicLayer.Service;
 using System;
-using BusinessLogicLayer.Models.Profile;
-using BusinessLogicLayer.Models.AccountGroup;
-using BusinessLogicLayer.Models.AccountAction;
 using Data.Model.DTO;
 using Data.Model.Response;
 using API.Utils;
 using Microsoft.AspNetCore.Authorization;
+using Data.Model.Request.Account;
 
 namespace API.Controllers
 {

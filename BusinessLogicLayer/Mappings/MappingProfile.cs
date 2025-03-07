@@ -1,23 +1,15 @@
-﻿using BusinessLogicLayer.Models.Account;
-using BusinessLogicLayer.Models.AccountAction;
-using BusinessLogicLayer.Models.AccountGroup;
-using BusinessLogicLayer.Models.AccountPermission;
-using BusinessLogicLayer.Models.AccountWarehouse;
-using BusinessLogicLayer.Models.Category;
+﻿using BusinessLogicLayer.Models.Category;
 using BusinessLogicLayer.Models.Cell;
 using BusinessLogicLayer.Models.Floor;
-using BusinessLogicLayer.Models.Group;
-using BusinessLogicLayer.Models.GroupPermission;
 using BusinessLogicLayer.Models.Product;
-using BusinessLogicLayer.Models.Profile;
 using BusinessLogicLayer.Models.ReceivingNote;
 using BusinessLogicLayer.Models.Shelf;
 using BusinessLogicLayer.Models.StockCard;
 using BusinessLogicLayer.Models.StockCardDetail;
 using BusinessLogicLayer.Models.Supplier;
 using Data.Entity;
-using Data.Model.Category;
 using Data.Model.DTO;
+using Data.Model.Request.Account;
 using Data.Model.Request.Area;
 using Data.Model.Request.Brand;
 using Data.Model.Request.Category;
@@ -60,9 +52,8 @@ namespace BusinessLogicLayer.Mappings
             #endregion
 
             #region Profile
-            CreateMap<Profile, BusinessLogicLayer.Models.Profile.ProfileDTO>().ReverseMap();
             CreateMap<Profile, ProfileCreateDTO>().ReverseMap();
-            CreateMap<Profile, ProfileUpdateDTO>().ReverseMap();
+            //CreateMap<Profile, ProfileUpdateDTO>().ReverseMap();
             #endregion
 
             #region Category
@@ -143,7 +134,7 @@ namespace BusinessLogicLayer.Mappings
                 .ForMember(dest => dest.Accounts, opt => opt.MapFrom(src => src.AccountGroups.Select(ag => ag.Account)))
                 .ForMember(dest => dest.Permissions, opt => opt.MapFrom(src => src.GroupPermissions.Select(ga => ga.Permission)))
                 .ReverseMap();
-            CreateMap<Group, CreateGroupDTO>().ReverseMap();
+            //CreateMap<Group, CreateGroupDTO>().ReverseMap();
             CreateMap<Account, GroupDTOAccount>().ReverseMap();
             #endregion
 
@@ -159,7 +150,7 @@ namespace BusinessLogicLayer.Mappings
             #endregion
 
             #region Warehouse
-            CreateMap<Warehouse, Data.Model.Request.Warehouse.WarehouseDTO>().ReverseMap();
+            CreateMap<Warehouse, WarehouseDTO>().ReverseMap();
             CreateMap<Warehouse, CreateWarehouseDTO>().ReverseMap();
             CreateMap<Warehouse, UpdateWarehouseDTO>().ReverseMap();
             CreateMap<Warehouse, WarehouseFullInfoDTO>()
@@ -180,37 +171,6 @@ namespace BusinessLogicLayer.Mappings
             CreateMap<Area, AreaDTO>().ReverseMap();
             #region Area
 
-            #endregion
-
-            #region AccountGroup
-            CreateMap<AccountGroup, AccountGroupDTO>().ReverseMap();
-            CreateMap<AccountGroup, CreateAccountGroupDTO>().ReverseMap();
-            CreateMap<AccountGroup, UpdateAccountGroupDTO>().ReverseMap();
-            #endregion
-
-            #region AccountAction
-            CreateMap<AccountPermission, AccountActionDTO>().ReverseMap();
-            CreateMap<AccountPermission, CreateAccountActionDTO>().ReverseMap();
-            CreateMap<AccountPermission, UpdateAccountActionDTO>().ReverseMap();
-            #endregion
-
-            #region AccountPermission
-            CreateMap<AccountPermission, AccountPermissionDTO>().ReverseMap();
-            CreateMap<CreateAccountPermissionDTO, AccountPermission>().ReverseMap();
-            CreateMap<UpdateAccountPermissionDTO, AccountPermission>().ReverseMap();
-            #endregion
-
-            #region GroupPermission
-            CreateMap<GroupPermission, GroupPermissionDTO>().ReverseMap();
-            CreateMap<CreateGroupPermissionDTO, GroupPermission>().ReverseMap();
-            CreateMap<UpdateGroupPermissionDTO, GroupPermission>().ReverseMap();
-            #endregion
-
-            #region AccountWarehouse
-            CreateMap<AccountWarehouse, AccountWarehouseDTO>().ReverseMap();
-            CreateMap<CreateAccountWarehouseDTO, AccountWarehouse>().ReverseMap();
-            CreateMap<UpdateAccountWarehouseDTO, AccountWarehouse>().ReverseMap();
-            CreateMap<DeleteAccountWarehouseDTO, AccountWarehouse>().ReverseMap();
             #endregion
         }
     }
