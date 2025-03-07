@@ -95,7 +95,15 @@ namespace BusinessLogicLayer.Generic
                 if (mappedResult.CreatedBy != null)
                 {
                     var createdBy = await GetCreatedBy(mappedResult.CreatedBy);
-                    mappedResult.CreatedBy = createdBy!.Username;
+
+                    if (createdBy != null)
+                    {
+                        mappedResult.CreatedBy = createdBy!.Username;
+                    }
+                    else
+                    {
+                        mappedResult.CreatedBy = "Deleted user";
+                    }
                 }
             }
 
