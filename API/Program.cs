@@ -179,11 +179,6 @@ builder.Services.AddControllers().AddJsonOptions(options =>
     options.JsonSerializerOptions.WriteIndented = true;
 });
 
-// Đặt múi giờ VN cho toàn bộ ứng dụng
-TimeZoneInfo vnTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
-CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("vi-VN");
-CultureInfo.DefaultThreadCurrentUICulture = new CultureInfo("vi-VN");
-
 var app = builder.Build();
 
 app.UseCors("Cors");
