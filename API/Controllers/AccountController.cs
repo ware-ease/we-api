@@ -92,6 +92,9 @@ namespace API.Controllers
             {
                 var result = await _accountService.ChangePassword(authUser.id, request.OldPassword!, request.Password!);
 
+                AuthHelper.DeleteFromCookies(Response, "accessToken");
+                AuthHelper.DeleteFromCookies(Response, "refreshToken");
+
                 return ControllerResponse.Response(result);
             }
 
