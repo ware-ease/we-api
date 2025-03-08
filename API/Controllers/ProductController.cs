@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using API.Utils;
+using AutoMapper;
 using BusinessLogicLayer.IServices;
 using BusinessLogicLayer.Models.General;
 using BusinessLogicLayer.Models.Product;
@@ -33,8 +34,8 @@ namespace API.Controllers
         public async Task<IActionResult> Get()
         {
 
-                var products = await _productService.Get<ProductDTO>();
-                return ControllerResponse.Response(products);
+            var products = await _productService.Get<ProductDTO>();
+            return ControllerResponse.Response(products);
         }
 
         [HttpGet("{id}")]
@@ -61,12 +62,19 @@ namespace API.Controllers
             }
         }
 
-        //[Authorize]
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> Add([FromBody] ProductCreateDTO request)
         {
             try
             {
+                var authUser = AuthHelper.GetCurrentUser(HttpContext.Request);
+
+                if (authUser != null)
+                {
+                    request.CreatedBy = authUser.id;
+                }
+
                 var productDTO = await _productService.AddProduct(request);
                 return ControllerResponse.Response(new ServiceResponse
                 {

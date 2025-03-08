@@ -21,7 +21,6 @@ namespace DataAccessLayer.Generic
             string includeProperties = "",
             int? pageIndex = null,
             int? pageSize = null);
-        Task<TEntity> GetByID(string id);
         Task<TEntity> GetByCondition(Expression<Func<TEntity, bool>> filter, string includeProperties = "");
         Task<IEnumerable<TEntity>> GetAllNoPaging(
             Expression<Func<TEntity, bool>> filter = null!,

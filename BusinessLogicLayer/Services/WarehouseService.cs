@@ -54,7 +54,7 @@ namespace BusinessLogicLayer.Services
         }
         public async Task<ServiceResponse> CreateStructureAsync(CreateWarehouseStructureRequest request)
         {
-            var warehouse = await _unitOfWork.WarehouseRepository.GetByID(request.Id!);
+            var warehouse = await _unitOfWork.WarehouseRepository.Get(request.Id!);
 
             if (warehouse == null)
             {
@@ -159,7 +159,7 @@ namespace BusinessLogicLayer.Services
 
         public async Task<ServiceResponse> AddWarehouseArea(CreateAREADto request)
         {
-            var warehouse = await _unitOfWork.WarehouseRepository.GetByID(request.WarehouseId!);
+            var warehouse = await _unitOfWork.WarehouseRepository.Get(request.WarehouseId!);
 
             if (warehouse == null)
             {
@@ -216,7 +216,7 @@ namespace BusinessLogicLayer.Services
 
         public async Task<ServiceResponse> AddShelfWithStructure(CreateShelfDto request, string areaId)
         {
-            var area = await _unitOfWork.AreaRepository.GetByID(areaId);
+            var area = await _unitOfWork.AreaRepository.Get(areaId);
 
             if (area == null)
             {
@@ -278,9 +278,9 @@ namespace BusinessLogicLayer.Services
                 includeProperties: "Floors.Cells"
             );
 
-            var area = await _unitOfWork.AreaRepository.GetByID(shelf.AreaId);
+            var area = await _unitOfWork.AreaRepository.Get(shelf.AreaId);
             area.Shelves.Add(shelf);
-            var warehouse = await _unitOfWork.WarehouseRepository.GetByID(area.WarehouseId);
+            var warehouse = await _unitOfWork.WarehouseRepository.Get(area.WarehouseId);
             warehouse.Areas.Add(area);
 
             if (shelf == null)

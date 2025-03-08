@@ -56,7 +56,7 @@ namespace BusinessLogicLayer.Services
 
                 var account = _mapper.Map<Data.Entity.Account>(request);
 
-                account.Id = Guid.NewGuid().ToString();
+                //account.Id = Guid.NewGuid().ToString();
                 account.Profile!.Id = Guid.NewGuid().ToString();
                 string password = account.Username;
                 account.Password = PasswordHelper.ConvertToEncrypt(password);

@@ -38,7 +38,7 @@ namespace BusinessLogicLayer.Service
 
         public async Task<PagedResult<Shelf>> GetAllByWarehouseIdAsync(string warehouseId, int? pageNumber, int? pageSize)
         {
-            var warehouse = await _unitOfWork.WarehouseRepository.GetByID(warehouseId);
+            var warehouse = await _unitOfWork.WarehouseRepository.Get(warehouseId);
             if (warehouse == null)
             {
                 throw new ArgumentException("Không tìm thấy Warehouse Id");
@@ -59,7 +59,7 @@ namespace BusinessLogicLayer.Service
 
         public async Task<Shelf> AddAsync(string warehouseId, CreateShelfDTO createShelfDTO)
         {
-            var warehouse = await _unitOfWork.WarehouseRepository.GetByID(warehouseId);
+            var warehouse = await _unitOfWork.WarehouseRepository.Get(warehouseId);
             if (warehouse == null)
             {
                 throw new ArgumentException("Không tìm thấy Warehouse Id");

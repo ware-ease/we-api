@@ -140,11 +140,6 @@ namespace DataAccessLayer.Generic
             return await query.AsNoTracking().ToListAsync();
         }
 
-        public virtual async Task<TEntity> GetByID(string id)
-        {
-            return await _dbSet.FindAsync(id)!;
-        }
-
         public virtual async Task<TEntity> GetByCondition(Expression<Func<TEntity, bool>> filter, string includeProperties = "")
         {
             IQueryable<TEntity> query = _dbSet;

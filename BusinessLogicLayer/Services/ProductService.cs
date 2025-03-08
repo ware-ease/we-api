@@ -51,15 +51,15 @@ namespace BusinessLogicLayer.Services
         public async Task<ProductDTO> AddProduct(ProductCreateDTO request)
         {
             // Kiểm tra sự tồn tại của Category, Brand, Unit theo id
-            var category = await _categoryRepository.GetByID(request.CategoryId);
+            var category = await _categoryRepository.Get(request.CategoryId);
             if (category == null)
                 throw new Exception("Category không tồn tại");
 
-            var brand = await _brandRepository.GetByID(request.BrandId);
+            var brand = await _brandRepository.Get(request.BrandId);
             if (brand == null)
                 throw new Exception("Brand không tồn tại");
 
-            var unit = await _unitRepository.GetByID(request.UnitId);
+            var unit = await _unitRepository.Get(request.UnitId);
             if (unit == null)
                 throw new Exception("Unit không tồn tại");
 
@@ -95,7 +95,7 @@ namespace BusinessLogicLayer.Services
 
         public async Task<ProductDTO> UpdateProduct(ProductUpdateDTO request)
         {
-            var existingProduct = await _productRepository.GetByID(request.Id);
+            var existingProduct = await _productRepository.Get(request.Id);
             if (existingProduct == null)
                 throw new Exception("Product not found");
 
@@ -115,7 +115,7 @@ namespace BusinessLogicLayer.Services
 
             if (!string.IsNullOrEmpty(request.CategoryId))
             {
-                var category = await _categoryRepository.GetByID(request.CategoryId);
+                var category = await _categoryRepository.Get(request.CategoryId);
                 if (category == null)
                     throw new Exception("Category not found");
                 existingProduct.CategoryId = request.CategoryId;
@@ -123,7 +123,7 @@ namespace BusinessLogicLayer.Services
 
             if (!string.IsNullOrEmpty(request.BrandId))
             {
-                var brand = await _brandRepository.GetByID(request.BrandId);
+                var brand = await _brandRepository.Get(request.BrandId);
                 if (brand == null)
                     throw new Exception("Brand not found");
                 existingProduct.BrandId = request.BrandId;
@@ -131,7 +131,7 @@ namespace BusinessLogicLayer.Services
 
             if (!string.IsNullOrEmpty(request.UnitId))
             {
-                var unit = await _unitRepository.GetByID(request.UnitId);
+                var unit = await _unitRepository.Get(request.UnitId);
                 if (unit == null)
                     throw new Exception("Unit not found");
                 existingProduct.UnitId = request.UnitId;
