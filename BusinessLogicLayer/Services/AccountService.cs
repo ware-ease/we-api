@@ -31,7 +31,7 @@ namespace BusinessLogicLayer.Services
             try
             {
                 var existingUsername = await _unitOfWork.AccountRepository
-                    .GetByCondition(a => a.Username == request.Username);
+                    .GetByCondition(a => a.Username.Normalize() == request.Username!.Normalize());
                 if (existingUsername != null)
                 {
                     return new ServiceResponse
@@ -43,7 +43,7 @@ namespace BusinessLogicLayer.Services
                 }
 
                 var existingEmail = await _unitOfWork.AccountRepository
-                    .GetByCondition(a => a.Email == request.Email);
+                    .GetByCondition(a => a.Email.Normalize() == request.Email!.Normalize());
                 if (existingEmail != null)
                 {
                     return new ServiceResponse
@@ -117,16 +117,16 @@ namespace BusinessLogicLayer.Services
             }
         }
 
-        public async Task<ServiceResponse> ChangePassword(string id, string password)
+        public async Task<ServiceResponse> ChangePassword(string id, string oldPassword, string password)
         {
-            var account = await _unitOfWork.AccountRepository.GetByCondition(a => a.Id == id);
+            var account = await _unitOfWork.AccountRepository.GetByCondition(a => a.Id == id && a.Password == PasswordHelper.ConvertToEncrypt(oldPassword));
 
             if (account == null)
             {
                 return new ServiceResponse
                 {
-                    Status = Data.Enum.SRStatus.NotFound,
-                    Message = "Account not found!",
+                    Status = Data.Enum.SRStatus.Unauthorized,
+                    Message = "Wrong password!",
                     Data = id,
                 };
             }

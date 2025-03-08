@@ -32,9 +32,17 @@ namespace API.Controllers
             return ControllerResponse.Response(result);
         }
 
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> Add([FromBody] AccountCreateDTO request)
         {
+            var authUser = AuthHelper.GetCurrentUser(HttpContext.Request);
+
+            if (authUser != null)
+            {
+                request.CreatedBy = authUser.id;
+            }
+
             var result = await _accountService.Add(request);
 
             return ControllerResponse.Response(result);
@@ -82,7 +90,7 @@ namespace API.Controllers
 
             if (authUser != null && authUser.id != null)
             {
-                var result = await _accountService.ChangePassword(authUser.id, request.Password!);
+                var result = await _accountService.ChangePassword(authUser.id, request.OldPassword!, request.Password!);
 
                 return ControllerResponse.Response(result);
             }

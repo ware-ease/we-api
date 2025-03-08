@@ -14,6 +14,9 @@ namespace Data.Model.Request.Account
     public class AccountPasswordUpdateDTO
     {
         [Required]
+        public string? OldPassword { get; set; }
+
+        [Required]
         public string? Password { get; set; }
     }
 }

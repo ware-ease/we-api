@@ -48,10 +48,6 @@ namespace API.Controllers
             {
                 request.CreatedBy = authUser.id;
             }
-            else
-            {
-                return Unauthorized();
-            }
 
             var result = await _customerService.Add<CustomerDTO, CustomerCreateDTO>(request);
 
