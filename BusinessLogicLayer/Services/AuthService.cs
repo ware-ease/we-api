@@ -33,7 +33,7 @@ namespace BusinessLogicLayer.Services
         public async Task<ServiceResponse> Login(string username, string password)
         {
             var user = await _unitOfWork.AccountRepository
-                .GetByCondition(a => a.Username.Normalize() == username.Normalize() && a.Password == PasswordHelper.ConvertToEncrypt(password));
+                .GetByCondition(a => a.Username.ToLower() == username.ToLower() && a.Password == PasswordHelper.ConvertToEncrypt(password));
 
             if (user == null)
             {

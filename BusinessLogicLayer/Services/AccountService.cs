@@ -31,7 +31,7 @@ namespace BusinessLogicLayer.Services
             try
             {
                 var existingUsername = await _unitOfWork.AccountRepository
-                    .GetByCondition(a => a.Username.Normalize() == request.Username!.Normalize());
+                    .GetByCondition(a => a.Username.ToLower() == request.Username!.ToLower());
                 if (existingUsername != null)
                 {
                     return new ServiceResponse
@@ -43,7 +43,7 @@ namespace BusinessLogicLayer.Services
                 }
 
                 var existingEmail = await _unitOfWork.AccountRepository
-                    .GetByCondition(a => a.Email.Normalize() == request.Email!.Normalize());
+                    .GetByCondition(a => a.Email.ToLower() == request.Email!.ToLower());
                 if (existingEmail != null)
                 {
                     return new ServiceResponse
