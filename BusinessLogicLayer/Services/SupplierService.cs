@@ -16,7 +16,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace BusinessLogicLayer.Service
+namespace BusinessLogicLayer.Services
 {
     public class SupplierService : GenericService<Supplier>, ISupplierService
     {
@@ -29,9 +29,9 @@ namespace BusinessLogicLayer.Service
         private readonly IUnitOfWork _unitOfWork;
 
 
-        public SupplierService(IGenericRepository<Supplier> genericRepository, 
-            IMapper mapper, 
-            IUnitOfWork unitOfWork) : base(genericRepository, mapper, unitOfWork) 
+        public SupplierService(IGenericRepository<Supplier> genericRepository,
+            IMapper mapper,
+            IUnitOfWork unitOfWork) : base(genericRepository, mapper, unitOfWork)
         {
             _supplierRepository = genericRepository;
             _mapper = mapper;

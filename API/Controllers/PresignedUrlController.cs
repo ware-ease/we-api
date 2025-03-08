@@ -1,4 +1,5 @@
-﻿using BusinessLogicLayer.Models.General;
+﻿using BusinessLogicLayer.IServices;
+using BusinessLogicLayer.Models.General;
 using CloudinaryDotNet;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -10,23 +11,24 @@ namespace API.Controllers
     [ApiController]
     public class PresignedUrlController : ControllerBase
     {
-        private readonly Cloudinary _cloudinary;
-        private readonly CloudinarySettings _cloudinarySettings;
+        //private readonly Cloudinary _cloudinary;
+        //private readonly CloudinarySettings _cloudinarySettings;
+        private readonly ICloudinaryService _cloudinaryService;
 
-        public PresignedUrlController(IOptions<CloudinarySettings> cloudinarySettings)
+
+        public PresignedUrlController(ICloudinaryService cloudinaryService)
         {
-            _cloudinarySettings = cloudinarySettings.Value;
-
-            var account = new Account(
-                _cloudinarySettings.CloudName,
-                _cloudinarySettings.ApiKey,
-                _cloudinarySettings.ApiSecret
-            );
-
-            _cloudinary = new Cloudinary(account);
+            _cloudinaryService = cloudinaryService;
         }
 
         [HttpGet("generate")]
+        public async Task<IActionResult> GeneratePresignedUrl()
+        {
+            var presignedUrl = await _cloudinaryService.GeneratePresignedUrl();
+            return Ok(presignedUrl);
+        }
+
+        /*[HttpGet("generate")]
         public IActionResult GeneratePresignedUrl()
         {
             var timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds() + 600;
@@ -50,7 +52,7 @@ namespace API.Controllers
             };
 
             return Ok(presignedUrl);
-        }
+        }*/
 
     }
 }
