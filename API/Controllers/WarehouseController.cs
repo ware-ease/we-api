@@ -184,13 +184,6 @@ namespace API.Controllers
             return ControllerResponse.Response(result);
         }
 
-        [HttpGet("{id}")]
-        public async Task<IActionResult> Get(string id)
-        {
-            var result = await _warehouseService.Get<WarehouseDTO>(id);
-
-            return ControllerResponse.Response(result);
-        }
         //[Authorize]
         [HttpPost]
         public async Task<IActionResult> Add([FromBody] CreateWarehouseDTO request)
@@ -228,7 +221,7 @@ namespace API.Controllers
             return ControllerResponse.Response(result);
         }
 
-        [HttpGet("{id}/full-info")]
+        [HttpGet("{id}")]
         public async Task<IActionResult> GetWarehouseShelves(string id)
         {
             var result = await _warehouseService.GetFullWarehouseInfo<WarehouseFullInfoDTO>(id);
@@ -237,7 +230,7 @@ namespace API.Controllers
         }
 
         //[Authorize]
-        [HttpPost("{id}/full-info")]
+        [HttpPost("{id}")]
         public async Task<IActionResult> AddWarehouseInfo([FromRoute] string id, [FromBody] CreateWarehouseStructureRequest request)
         {
             //var authUser = AuthHelper.GetCurrentUser(HttpContext.Request);
