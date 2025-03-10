@@ -205,16 +205,15 @@ namespace API.Controllers
         }
 
         [HttpPatch("{id}")]
-        public async Task<IActionResult> Update(string id, [FromBody] UpdateWarehouseDTO request)
+        public async Task<IActionResult> Update([FromRoute] string id, [FromBody] UpdateWarehouseDTO request)
         {
             request.Id = id;
             var result = await _warehouseService.Update<WarehouseDTO, UpdateWarehouseDTO>(request);
-
             return ControllerResponse.Response(result);
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(string id)
+        public async Task<IActionResult> Delete([FromRoute] string id)
         {
             var result = await _warehouseService.Delete(id);
 
@@ -222,7 +221,7 @@ namespace API.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetWarehouseShelves(string id)
+        public async Task<IActionResult> GetWarehouseShelves([FromRoute] string id)
         {
             var result = await _warehouseService.GetFullWarehouseInfo<WarehouseFullInfoDTO>(id);
 
@@ -250,7 +249,7 @@ namespace API.Controllers
         }
 
         [HttpGet("{id}/areas")]
-        public async Task<IActionResult> GetWarehouseAreas(string id)
+        public async Task<IActionResult> GetWarehouseAreas([FromRoute] string id)
         {
             var result = await _warehouseService.GetWarehouseAreas(id);
             return ControllerResponse.Response(result);
@@ -265,7 +264,7 @@ namespace API.Controllers
         }
 
         [HttpGet("areas/{id}/shelves")]
-        public async Task<IActionResult> GetShelvesByArea(string id)
+        public async Task<IActionResult> GetShelvesByArea([FromRoute] string id)
         {
             var result = await _warehouseService.GetShelvesByArea(id);
             return ControllerResponse.Response(result);
@@ -279,7 +278,7 @@ namespace API.Controllers
         }
 
         [HttpGet("shelves/{id}")]
-        public async Task<IActionResult> GetShelfDetails(string id)
+        public async Task<IActionResult> GetShelfDetails([FromRoute] string id)
         {
             var result = await _warehouseService.GetShelfDetails(id);
             return ControllerResponse.Response(result);
