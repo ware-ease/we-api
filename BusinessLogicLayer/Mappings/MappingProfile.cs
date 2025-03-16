@@ -29,9 +29,9 @@ namespace BusinessLogicLayer.Mappings
     {
         public MappingProfile()
         {
-            CreateMap<Customer, Data.Model.DTO.CustomerDTO>().ReverseMap();
-            CreateMap<CustomerCreateDTO, Customer>().ReverseMap();
-            CreateMap<CustomerUpdateDTO, Customer>().ReverseMap();
+            CreateMap<Partner, Data.Model.DTO.CustomerDTO>().ReverseMap();
+            CreateMap<CustomerCreateDTO, Partner>().ReverseMap();
+            CreateMap<CustomerUpdateDTO, Partner>().ReverseMap();
 
             // Mapping classes
             #region Account
@@ -73,11 +73,11 @@ namespace BusinessLogicLayer.Mappings
             #endregion
 
             #region Supplier
-            CreateMap<Supplier, SupplierDTO>().ReverseMap();
+            CreateMap<Partner, SupplierDTO>().ReverseMap();
 
-            CreateMap<Supplier, SupplierCreateDTO>().ReverseMap();
+            CreateMap<Partner, SupplierCreateDTO>().ReverseMap();
 
-            CreateMap<Supplier, SupplierUpdateDTO>().ReverseMap();
+            CreateMap<Partner, SupplierUpdateDTO>().ReverseMap();
             #endregion
 
             #region ReceivingNote

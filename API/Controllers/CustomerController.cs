@@ -25,7 +25,7 @@ namespace API.Controllers
         public async Task<IActionResult> Get()
         {
             var result = await _customerService.Get<CustomerDTO>();
-            _customerService.Test();
+            //_customerService.Test();
 
             return ControllerResponse.Response(result);
         }

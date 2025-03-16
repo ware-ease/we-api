@@ -80,7 +80,7 @@ builder.Services.AddScoped<IGenericRepository<Warehouse>, GenericRepository<Ware
 builder.Services.AddScoped<IGenericRepository<Area>, GenericRepository<Area>>();
 builder.Services.AddScoped<IGenericRepository<Floor>, GenericRepository<Floor>>();
 builder.Services.AddScoped<IGenericRepository<Cell>, GenericRepository<Cell>>();
-builder.Services.AddScoped<IGenericRepository<Customer>, GenericRepository<Customer>>();
+builder.Services.AddScoped<IGenericRepository<Partner>, GenericRepository<Partner>>();
 builder.Services.AddScoped<IGenericRepository<Account>, GenericRepository<Account>>();
 builder.Services.AddScoped<IGenericRepository<Group>, GenericRepository<Group>>();
 builder.Services.AddScoped<IGenericRepository<Permission>, GenericRepository<Permission>>();
