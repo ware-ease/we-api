@@ -15,8 +15,9 @@ namespace Data.Entity
         public string? Name { get; set; }
         public string? Code { get; set; }
 
-        public ICollection<ScheduleSetting> ScheduleSettings { get; set; }
-        public ICollection<Schedule> Schedules { get; set; }
+        public ICollection<ScheduleSetting> ScheduleSettings { get; set; } = [];
+        public ICollection<Schedule> Schedules { get; set; } = [];
+        public ICollection<LocationLog> LocationLogs { get; set; } = [];
 
         [ForeignKey("Warehouse")]
         public string WarehouseId { get; set; }

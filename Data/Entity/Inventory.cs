@@ -11,15 +11,16 @@ namespace Data.Entity
     [Table("Inventory")]
     public class Inventory : BaseEntity
     {
-        public int? MaxQuantity { get; set; }
-        public int? MinQuantity { get; set; }
+        public float CurrentQuantity { get; set; }
+
+        public ICollection<LocationLog> LocationLogs { get; set; } = [];
 
         [ForeignKey("Warehouse")]
         public string WarehouseId { get; set; }
         public Warehouse Warehouse { get; set; }
 
-        [ForeignKey("Product")]
-        public string ProductId { get; set; }
-        public Product Product { get; set; }
+        [ForeignKey("Batch")]
+        public string BatchId { get; set; }
+        public Batch Batch { get; set; }
     }
 }
