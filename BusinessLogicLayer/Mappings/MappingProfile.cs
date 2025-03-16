@@ -15,6 +15,7 @@ using Data.Model.Request.Brand;
 using Data.Model.Request.Category;
 using Data.Model.Request.Customer;
 using Data.Model.Request.Product;
+using Data.Model.Request.ProductType;
 using Data.Model.Request.Suppiler;
 using Data.Model.Request.Supplier;
 using Data.Model.Request.Unit;
@@ -57,6 +58,7 @@ namespace BusinessLogicLayer.Mappings
 
             #region ProductType
             CreateMap<ProductType, ProductTypeDTO>().ReverseMap();
+            CreateMap<ProductType, ProductTypeCreateDTO>().ReverseMap();
             #endregion ProductType
 
             #region Category
