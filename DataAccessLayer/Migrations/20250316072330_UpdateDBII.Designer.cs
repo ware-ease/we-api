@@ -4,6 +4,7 @@ using DataAccessLayer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccessLayer.Migrations
 {
     [DbContext(typeof(WaseEaseDbContext))]
-    partial class WaseEaseDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250316072330_UpdateDBII")]
+    partial class UpdateDBII
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -284,6 +287,9 @@ namespace DataAccessLayer.Migrations
                     b.Property<string>("ProductId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Quantity")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SupplierId")
                         .HasColumnType("nvarchar(max)");
@@ -591,108 +597,6 @@ namespace DataAccessLayer.Migrations
                     b.ToTable("Floor");
                 });
 
-            modelBuilder.Entity("Data.Entity.GoodNote", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("Code")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("CreatedTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("Date")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("DeletedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("DeletedTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("GoodRequestId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("LastUpdatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("LastUpdatedTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("NoteType")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ReceiverName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ShipperName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("GoodRequestId")
-                        .IsUnique();
-
-                    b.ToTable("GoodNote");
-                });
-
-            modelBuilder.Entity("Data.Entity.GoodNoteDetail", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("BatchId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("CreatedTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("DeletedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("DeletedTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("GoodNoteId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("LastUpdatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("LastUpdatedTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Note")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<float>("Quantity")
-                        .HasColumnType("real");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("BatchId");
-
-                    b.HasIndex("GoodNoteId");
-
-                    b.ToTable("GoodNoteDetail");
-                });
-
             modelBuilder.Entity("Data.Entity.GoodRequest", b =>
                 {
                     b.Property<string>("Id")
@@ -719,20 +623,23 @@ namespace DataAccessLayer.Migrations
                     b.Property<DateTime?>("LastUpdatedTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Note")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("PartnerId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("RequestType")
-                        .HasColumnType("int");
-
                     b.Property<string>("RequestedWarehouseId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("WarehouseId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("note")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("requestType")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -743,52 +650,6 @@ namespace DataAccessLayer.Migrations
                     b.HasIndex("WarehouseId");
 
                     b.ToTable("GoodRequest");
-                });
-
-            modelBuilder.Entity("Data.Entity.GoodRequestDetail", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("CreatedTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("DeletedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("DeletedTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("GoodRequestId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("LastUpdatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("LastUpdatedTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("ProductId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<float>("Quantity")
-                        .HasColumnType("real");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("GoodRequestId");
-
-                    b.HasIndex("ProductId");
-
-                    b.ToTable("GoodRequestDetails");
                 });
 
             modelBuilder.Entity("Data.Entity.Group", b =>
@@ -2082,77 +1943,31 @@ namespace DataAccessLayer.Migrations
                     b.Navigation("Shelf");
                 });
 
-            modelBuilder.Entity("Data.Entity.GoodNote", b =>
-                {
-                    b.HasOne("Data.Entity.GoodRequest", "GoodRequest")
-                        .WithOne("GoodNote")
-                        .HasForeignKey("Data.Entity.GoodNote", "GoodRequestId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("GoodRequest");
-                });
-
-            modelBuilder.Entity("Data.Entity.GoodNoteDetail", b =>
-                {
-                    b.HasOne("Data.Entity.Batch", "Batch")
-                        .WithMany("GoodNoteDetails")
-                        .HasForeignKey("BatchId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("Data.Entity.GoodNote", "GoodNote")
-                        .WithMany()
-                        .HasForeignKey("GoodNoteId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("Batch");
-
-                    b.Navigation("GoodNote");
-                });
-
             modelBuilder.Entity("Data.Entity.GoodRequest", b =>
                 {
                     b.HasOne("Data.Entity.Partner", "Partner")
                         .WithMany("GoodRequests")
                         .HasForeignKey("PartnerId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
 
                     b.HasOne("Data.Entity.Warehouse", "RequestedWarehouse")
                         .WithMany("RequestedGoodRequests")
                         .HasForeignKey("RequestedWarehouseId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
 
                     b.HasOne("Data.Entity.Warehouse", "Warehouse")
                         .WithMany("GoodRequests")
                         .HasForeignKey("WarehouseId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
 
                     b.Navigation("Partner");
 
                     b.Navigation("RequestedWarehouse");
 
                     b.Navigation("Warehouse");
-                });
-
-            modelBuilder.Entity("Data.Entity.GoodRequestDetail", b =>
-                {
-                    b.HasOne("Data.Entity.GoodRequest", "GoodRequest")
-                        .WithMany("GoodRequestDetails")
-                        .HasForeignKey("GoodRequestId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("Data.Entity.Product", "Product")
-                        .WithMany("GoodRequestDetails")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("GoodRequest");
-
-                    b.Navigation("Product");
                 });
 
             modelBuilder.Entity("Data.Entity.GroupPermission", b =>
@@ -2472,8 +2287,6 @@ namespace DataAccessLayer.Migrations
 
             modelBuilder.Entity("Data.Entity.Batch", b =>
                 {
-                    b.Navigation("GoodNoteDetails");
-
                     b.Navigation("InOutDetails");
 
                     b.Navigation("IssueDetails");
@@ -2513,13 +2326,6 @@ namespace DataAccessLayer.Migrations
                     b.Navigation("Cells");
                 });
 
-            modelBuilder.Entity("Data.Entity.GoodRequest", b =>
-                {
-                    b.Navigation("GoodNote");
-
-                    b.Navigation("GoodRequestDetails");
-                });
-
             modelBuilder.Entity("Data.Entity.Group", b =>
                 {
                     b.Navigation("AccountGroups");
@@ -2554,8 +2360,6 @@ namespace DataAccessLayer.Migrations
             modelBuilder.Entity("Data.Entity.Product", b =>
                 {
                     b.Navigation("Batches");
-
-                    b.Navigation("GoodRequestDetails");
 
                     b.Navigation("StockBooks");
                 });

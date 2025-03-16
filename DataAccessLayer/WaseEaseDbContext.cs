@@ -61,6 +61,12 @@ namespace DataAccessLayer
         public virtual DbSet<Schedule> Schedules { get; set; }
         public virtual DbSet<ScheduleSetting> ScheduleSettings { get; set; }
         public virtual DbSet<Unit> Units { get; set; }
+        public virtual DbSet<ProductType> ProductTypes { get; set; }
+        public virtual DbSet<GoodNote> GoodNotes { get; set; }
+        public virtual DbSet<GoodNoteDetail> GoodNoteDetails { get; set; }
+        public virtual DbSet<GoodRequest> GoodRequests { get; set; }
+        public virtual DbSet<GoodRequestDetail> GoodRequestDetails { get; set; }
+        public virtual DbSet<Partner> Partners { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

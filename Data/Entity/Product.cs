@@ -16,10 +16,12 @@ namespace Data.Entity
         public string? Sku {  get; set; }
         public ICollection<Batch> Batches { get; set; } = [];
         public ICollection<StockBook> StockBooks { get; set; } = [];
+        public ICollection<GoodRequestDetail> GoodRequestDetails { get; set; } = [];
 
         [ForeignKey("ProductType")]
         public string ProductTypeId { get; set; }
         public ProductType ProductType { get; set; }
+
         [ForeignKey("Unit")]
         public string UnitId { get; set; }
         public Unit Unit { get; set; }

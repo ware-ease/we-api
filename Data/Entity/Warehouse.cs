@@ -22,8 +22,9 @@ namespace Data.Entity
         public ICollection<Area> Areas { get; set; } = [];
         public ICollection<ReceivingNote> ReceivingNotes { get; set; }
         public ICollection<IssueNote> IssueNotes { get; set; } = [];
-        public ICollection<Inventory> Inventories { get; set; }
-        public ICollection<StockBook> StockBooks { get; set; }
-
+        public ICollection<Inventory> Inventories { get; set; } = [];
+        public ICollection<StockBook> StockBooks { get; set; } = [];
+        public ICollection<GoodRequest> GoodRequests { get; set; } = [];
+        public ICollection<GoodRequest> RequestedGoodRequests { get; set; } = [];
     }
 }
