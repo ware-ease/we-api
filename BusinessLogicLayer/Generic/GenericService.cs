@@ -35,7 +35,7 @@ namespace BusinessLogicLayer.Generic
 
             try
             {
-                entity.Id = Guid.NewGuid().ToString();
+                //entity.Id = Guid.NewGuid().ToString();
                 entity.CreatedTime = DateTime.Now;
                 await _genericRepository.Add(entity);
                 await _unitOfWork.SaveAsync();

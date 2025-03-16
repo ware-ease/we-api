@@ -53,7 +53,6 @@ namespace BusinessLogicLayer.Services
 
         public async Task<ProductDTO> AddProduct(ProductCreateDTO request)
         {
-            // Kiểm tra sự tồn tại của Category, Brand, Unit theo id
             var productType = await _productTypeRepository.Get(request.ProductTypeId);
             if (productType == null)
                 throw new Exception("Category không tồn tại");
