@@ -33,7 +33,6 @@ namespace DataAccessLayer
         public virtual DbSet<Permission> Permissions { get; set; }
         public virtual DbSet<Category> Categories { get; set; }
         public virtual DbSet<Cell> Cells { get; set; }
-        public virtual DbSet<CellBatch> CellBatches { get; set; }
         public virtual DbSet<Customer> Customers { get; set; }
         public virtual DbSet<Floor> Floors { get; set; }
         public virtual DbSet<Group> Groups { get; set; }
@@ -47,8 +46,6 @@ namespace DataAccessLayer
         public virtual DbSet<ReceivingDetail> ReceivingDetails { get; set; }
         public virtual DbSet<ReceivingNote> ReceivingNotes { get; set; }
         public virtual DbSet<Shelf> Shelves { get; set; }
-        public virtual DbSet<CellBatch> StockCards { get; set; }
-        public virtual DbSet<InOutDetail> StockCardDetails { get; set; }
         public virtual DbSet<Supplier> Suppliers { get; set; }
         public virtual DbSet<Warehouse> Warehouses { get; set; }
         public virtual DbSet<Area> Areas { get; set; }
@@ -56,8 +53,8 @@ namespace DataAccessLayer
         public virtual DbSet<Brand> Brands { get; set; }
         public virtual DbSet<ErrorTicket> ErrorTickets { get; set; }
         public virtual DbSet<Inventory> Inventories { get; set; }
-        public virtual DbSet<InventoryCheck> InventoryChecks { get; set; }
-        public virtual DbSet<InventoryCheckDetail> InventoryCheckDetails { get; set; }
+        public virtual DbSet<InventoryCount> InventoryChecks { get; set; }
+        public virtual DbSet<InventoryCountDetail> InventoryCheckDetails { get; set; }
         public virtual DbSet<Schedule> Schedules { get; set; }
         public virtual DbSet<ScheduleSetting> ScheduleSettings { get; set; }
         public virtual DbSet<Unit> Units { get; set; }
@@ -69,6 +66,10 @@ namespace DataAccessLayer
         public virtual DbSet<Partner> Partners { get; set; }
         public virtual DbSet<Location> Locations { get; set; }
         public virtual DbSet<LocationLog> LocationLogs { get; set; }
+        public virtual DbSet<InventoryAdjustment> InventoryAdjustments { get; set; }
+        public virtual DbSet<InventoryAdjustmentDetail> InventoryAdjustmentDetails { get; set; }
+        public virtual DbSet<InventoryCount> InventoryCounts { get; set; }
+        public virtual DbSet<InventoryCountDetail> InventoryCountDetails { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

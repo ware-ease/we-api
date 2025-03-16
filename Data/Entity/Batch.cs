@@ -17,7 +17,6 @@ namespace Data.Entity
         public DateOnly MfgDate { get; set; }
         public DateOnly ExpDate { get; set; }
         public ICollection<IssueDetail> IssueDetails { get; set; } = [];
-        public ICollection<InOutDetail> InOutDetails { get; set; } = [];
         public ICollection<ReceivingDetail> ReceivingDetails { get; set; } = [];
         public ICollection<GoodNoteDetail> GoodNoteDetails { get; set; } = [];
 

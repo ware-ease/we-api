@@ -8,20 +8,24 @@ using System.Threading.Tasks;
 
 namespace Data.Entity
 {
-    [Table ("InventoryCheck")]
-    public class InventoryCheck : BaseEntity
+    [Table ("InventoryCount")]
+    public class InventoryCount : BaseEntity
     {
         public bool Status { get; set; }
+        public string? Code { get; set; }
+        public string? Note { get; set; }
         public DateOnly? Date {  get; set; }
         public TimeOnly? StartTime { get; set; }
         public TimeOnly? EndTime { get; set; }
 
-        public ICollection<InventoryCheckDetail> InventoryCheckDetails { get; set; } = [];
+        public ICollection<InventoryCountDetail> InventoryCheckDetails { get; set; } = [];
 
         [ForeignKey("Schedule")]
         public string ScheduleId { get; set; }
         public Schedule Schedule { get; set; }
 
-        public ErrorTicket? ErrorTicket { get; set; }
+        [ForeignKey("Location")]
+        public string LocationId { get; set; }
+        public Location Location { get; set; } //level 0 only
     }
 }

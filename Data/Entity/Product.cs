@@ -17,6 +17,7 @@ namespace Data.Entity
         public ICollection<Batch> Batches { get; set; } = [];
         public ICollection<StockBook> StockBooks { get; set; } = [];
         public ICollection<GoodRequestDetail> GoodRequestDetails { get; set; } = [];
+        public ICollection<InventoryCountDetail> InventoryCountDetails { get; set; } = [];
 
         [ForeignKey("ProductType")]
         public string ProductTypeId { get; set; }

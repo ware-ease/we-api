@@ -12,12 +12,12 @@ namespace Data.Entity
     public class ErrorTicket : BaseEntity
     {
         public string? Reason { get; set; }
-        public bool Status { get; set; }
+        public string? Code { get; set; }
         public string? Note { get; set; }
         public string? HandleBy { get; set; }
 
-        [ForeignKey("InventoryCheck")]
-        public string InventoryCheckId { get; set; }
-        public InventoryCheck InventoryCheck { get; set; }
+        [ForeignKey("InventoryCountDetail")]
+        public string InventoryCountDetailId { get; set; }
+        public InventoryCountDetail InventoryCountDetail { get; set; }
     }
 }

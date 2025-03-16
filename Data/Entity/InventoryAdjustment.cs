@@ -8,20 +8,17 @@ using System.Threading.Tasks;
 
 namespace Data.Entity
 {
-    [Table("Inventory")]
-    public class Inventory : BaseEntity
+    [Table("InventoryAdjustment")]
+    public class InventoryAdjustment : BaseEntity
     {
-        public float CurrentQuantity { get; set; }
+        public DateTime? Date { get; set; }
+        public string? Reason { get; set; }
+        public string? Note { get; set; }
 
-        public ICollection<LocationLog> LocationLogs { get; set; } = [];
         public ICollection<InventoryAdjustmentDetail> InventoryAdjustmentDetails { get; set; } = [];
 
         [ForeignKey("Warehouse")]
         public string WarehouseId { get; set; }
         public Warehouse Warehouse { get; set; }
-
-        [ForeignKey("Batch")]
-        public string BatchId { get; set; }
-        public Batch Batch { get; set; }
     }
 }

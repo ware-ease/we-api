@@ -123,16 +123,6 @@ namespace BusinessLogicLayer.Mappings
             CreateMap<CreateCellDTO, Cell>();
             #endregion
 
-            #region StockCard
-            CreateMap<CellBatch, CreateStockCardDTO>();
-            CreateMap<CreateStockCardDTO, CellBatch>();
-            #endregion
-
-            #region StockCardDetail
-            CreateMap<InOutDetail, CreateStockCardDetailDTO>();
-            CreateMap<CreateStockCardDetailDTO, InOutDetail>();
-            #endregion
-
             #region Group
             CreateMap<Group, GroupDTO>()
                 .ForMember(dest => dest.Accounts, opt => opt.MapFrom(src => src.AccountGroups.Select(ag => ag.Account)))

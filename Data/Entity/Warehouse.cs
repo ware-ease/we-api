@@ -27,5 +27,6 @@ namespace Data.Entity
         public ICollection<StockBook> StockBooks { get; set; } = [];
         public ICollection<GoodRequest> GoodRequests { get; set; } = [];
         public ICollection<GoodRequest> RequestedGoodRequests { get; set; } = [];
+        public ICollection<InventoryAdjustment> InventoryAdjustments { get; set; } = [];
     }
 }

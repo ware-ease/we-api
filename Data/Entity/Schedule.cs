@@ -19,6 +19,6 @@ namespace Data.Entity
         public string LocationId { get; set; }
         public Location Location { get; set; }
 
-        public InventoryCheck? InventoryCheck { get; set; }
+        public InventoryCount? InventoryCount { get; set; }
     }
 }
