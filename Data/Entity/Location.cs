@@ -8,15 +8,22 @@ using System.Threading.Tasks;
 
 namespace Data.Entity
 {
-    [Table("Area")]
-    public class Area : BaseEntity
+    [Table("Location")]
+    public class Location : BaseEntity
     {
+        public int Level { get; set; }
         public string? Name { get; set; }
+        public string? Code { get; set; }
 
-        public ICollection<Shelf> Shelves { get; set; } = [];
+        public ICollection<ScheduleSetting> ScheduleSettings { get; set; }
+        public ICollection<Schedule> Schedules { get; set; }
 
         [ForeignKey("Warehouse")]
         public string WarehouseId { get; set; }
         public Warehouse Warehouse { get; set; }
+
+        [ForeignKey("Parent")]
+        public string? ParentId { get; set; }
+        public Location? Parent { get; set; }
     }
 }

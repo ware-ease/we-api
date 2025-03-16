@@ -11,13 +11,12 @@ namespace Data.Entity
     [Table("ScheduleSetting")]
     public class ScheduleSetting : BaseEntity
     {
-        public DateOnly? Day {  get; set; }
+        public string DaysOfWeek {  get; set; }
         public TimeOnly? StartTime { get; set; }
         public TimeOnly? EndTime { get; set; }
 
-        [ForeignKey("Area")]
-        public string AreaId { get; set; }
-        public Area Area { get; set; }
-
+        [ForeignKey("Location")]
+        public string LocationId { get; set; }
+        public Location Location { get; set; }
     }
 }

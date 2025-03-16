@@ -15,9 +15,9 @@ namespace Data.Entity
         public TimeOnly? StartTime { get; set; }
         public TimeOnly? EndTime { get; set; }
 
-        [ForeignKey("Area")]
-        public string AreaId { get; set; }
-        public Area Area { get; set; }
+        [ForeignKey("Location")]
+        public string LocationId { get; set; }
+        public Location Location { get; set; }
 
         public InventoryCheck? InventoryCheck { get; set; }
     }

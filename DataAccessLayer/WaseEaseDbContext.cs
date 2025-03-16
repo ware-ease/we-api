@@ -67,6 +67,7 @@ namespace DataAccessLayer
         public virtual DbSet<GoodRequest> GoodRequests { get; set; }
         public virtual DbSet<GoodRequestDetail> GoodRequestDetails { get; set; }
         public virtual DbSet<Partner> Partners { get; set; }
+        public virtual DbSet<Location> Locations { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
