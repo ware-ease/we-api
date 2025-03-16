@@ -14,6 +14,7 @@ namespace Data.Model.DTO
         public string Name { get; set; }
         public string Barcode { get; set; }
         public string Sku { get; set; }
+        public ProductTypeDTO ProductType { get; set; }
         public CategoryDTO Category { get; set; }
         public BrandDTO Brand { get; set; }
         public UnitDTO Unit { get; set; }

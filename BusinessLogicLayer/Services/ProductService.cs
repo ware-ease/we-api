@@ -26,6 +26,7 @@ namespace BusinessLogicLayer.Services
 
         private readonly IProductRepository _productRepository;
         private readonly IGenericRepository<Category> _categoryRepository;
+        private readonly IGenericRepository<ProductType> _productTypeRepository;
         private readonly IGenericRepository<Brand> _brandRepository;
         private readonly IGenericRepository<Unit> _unitRepository;
         private readonly IMapper _mapper;
@@ -36,6 +37,7 @@ namespace BusinessLogicLayer.Services
                               IGenericRepository<Category> categoryRepository,
                               IGenericRepository<Brand> brandRepository,
                               IGenericRepository<Unit> unitRepository,
+                              IGenericRepository<ProductType> productTypeRepository,
                               IUnitOfWork unitOfWork,
                               IMapper mapper)
             : base(genericRepository, mapper, unitOfWork)
@@ -44,6 +46,7 @@ namespace BusinessLogicLayer.Services
             _unitOfWork = unitOfWork;
             _productRepository = productRepository;
             _categoryRepository = categoryRepository;
+            _productTypeRepository = productTypeRepository;
             _brandRepository = brandRepository;
             _unitRepository = unitRepository;
         }
@@ -51,8 +54,8 @@ namespace BusinessLogicLayer.Services
         public async Task<ProductDTO> AddProduct(ProductCreateDTO request)
         {
             // Kiểm tra sự tồn tại của Category, Brand, Unit theo id
-            var category = await _categoryRepository.Get(request.CategoryId);
-            if (category == null)
+            var productType = await _productTypeRepository.Get(request.ProductTypeId);
+            if (productType == null)
                 throw new Exception("Category không tồn tại");
 
             var brand = await _brandRepository.Get(request.BrandId);
@@ -65,10 +68,10 @@ namespace BusinessLogicLayer.Services
 
 
             var product = _mapper.Map<Product>(request);
-            product.Category = category;
+            product.ProductType = productType;
             product.Brand = brand;
             product.Unit = unit;
-            product.CategoryId = category.Id;
+            product.ProductTypeId = productType.Id;
             product.BrandId = brand.Id;
             product.UnitId = unit.Id;
 
@@ -103,22 +106,18 @@ namespace BusinessLogicLayer.Services
             {
                 existingProduct.Name = request.Name;
             }
-            if (!string.IsNullOrEmpty(request.Barcode))
-            {
-                existingProduct.Barcode = request.Barcode;
-            }
             if (!string.IsNullOrEmpty(request.Sku))
             {
                 existingProduct.Sku = request.Sku;
             }
 
 
-            if (!string.IsNullOrEmpty(request.CategoryId))
+            if (!string.IsNullOrEmpty(request.ProductTypeId))
             {
-                var category = await _categoryRepository.Get(request.CategoryId);
+                var category = await _categoryRepository.Get(request.ProductTypeId);
                 if (category == null)
                     throw new Exception("Category not found");
-                existingProduct.CategoryId = request.CategoryId;
+                existingProduct.ProductTypeId = request.ProductTypeId;
             }
 
             if (!string.IsNullOrEmpty(request.BrandId))

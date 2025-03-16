@@ -13,10 +13,9 @@ namespace Data.Model.Request.Product
         [JsonIgnore]
         public string? Id { get; set; }
         public string? Name { get; set; }
-        public string? Barcode { get; set; }
         public string? Sku { get; set; }
         //[Required(ErrorMessage = "CategoryId không được để trống")]
-        public string CategoryId { get; set; }
+        public string ProductTypeId { get; set; }
         //[Required(ErrorMessage = "BrandId không được để trống")]
         public string BrandId { get; set; }
         //[Required(ErrorMessage = "UnitId không được để trống")]

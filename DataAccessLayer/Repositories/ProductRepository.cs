@@ -19,7 +19,7 @@ namespace DataAccessLayer.Repositories
         public async Task<Product?> GetFullProductById(string id)
         {
             return await _dbSet
-                .Include(p => p.Category)
+                .Include(p => p.ProductType)
                 .Include(p => p.Brand)
                 .Include(p => p.Unit)
                 .FirstOrDefaultAsync(p => p.Id == id);

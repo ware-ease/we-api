@@ -55,6 +55,10 @@ namespace BusinessLogicLayer.Mappings
             //CreateMap<Profile, ProfileUpdateDTO>().ReverseMap();
             #endregion
 
+            #region ProductType
+            CreateMap<ProductType, ProductTypeDTO>().ReverseMap();
+            #endregion ProductType
+
             #region Category
             CreateMap<Category, CategoryDTO>().ReverseMap();
 
@@ -81,7 +85,8 @@ namespace BusinessLogicLayer.Mappings
 
             #region Product
             CreateMap<Product, ProductDTO>()
-                .ForMember(dest => dest.Category, opt => opt.MapFrom(src => src.Category))
+                .ForMember(dest => dest.ProductType, opt => opt.MapFrom(src => src.ProductType))
+                .ForMember(dest => dest.Category, opt => opt.MapFrom(src => src.ProductType.Category))
                 .ForMember(dest => dest.Brand, opt => opt.MapFrom(src => src.Brand))
                 .ForMember(dest => dest.Unit, opt => opt.MapFrom(src => src.Unit)).ReverseMap();
 

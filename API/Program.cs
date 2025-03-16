@@ -86,6 +86,7 @@ builder.Services.AddScoped<IGenericRepository<Group>, GenericRepository<Group>>(
 builder.Services.AddScoped<IGenericRepository<Permission>, GenericRepository<Permission>>();
 builder.Services.AddScoped<IGenericRepository<Category>, GenericRepository<Category>>();
 builder.Services.AddScoped<IGenericRepository<Product>, GenericRepository<Product>>();
+builder.Services.AddScoped<IGenericRepository<ProductType>, GenericRepository<ProductType>>();
 builder.Services.AddScoped<IGenericRepository<Brand>, GenericRepository<Brand>>();
 builder.Services.AddScoped<IGenericRepository<Unit>, GenericRepository<Unit>>();
 builder.Services.AddScoped<IGenericRepository<Supplier>, GenericRepository<Supplier>>();
