@@ -2,6 +2,7 @@
 using BusinessLogicLayer.Models.Pagination;
 using BusinessLogicLayer.Models.Supplier;
 using Data.Entity;
+using Data.Model.DTO.Base;
 using Data.Model.Response;
 using System;
 using System.Collections.Generic;
@@ -13,6 +14,8 @@ namespace BusinessLogicLayer.IService
 {
     public interface ISupplierService : IGenericService
     {
+        Task<ServiceResponse> Get<TResult>() where TResult : BaseDTO;
+        Task<ServiceResponse> Add<TResult, TRequest>(TRequest request);
         Task<ServiceResponse> Update<SupplierDTO, SupplierUpdateDTO>(SupplierUpdateDTO request);
         /*Task<PagedResult<Supplier>> GetAllAsync(int? pageNumber, int? pageSize);
         Task<Supplier> GetByIdAsync(string id);

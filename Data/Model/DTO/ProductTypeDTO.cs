@@ -12,7 +12,7 @@ namespace Data.Model.DTO
     {
         public string Name { get; set; }
         public string Note { get; set; }
-        public Category Category { get; set; }
+        public string CategoryName { get; set; }
 
     }
 }

@@ -4,6 +4,7 @@ using BusinessLogicLayer.IService;
 using BusinessLogicLayer.Models.Pagination;
 using BusinessLogicLayer.Models.Supplier;
 using Data.Entity;
+using Data.Enum;
 using Data.Model.Request.Supplier;
 using Data.Model.Response;
 using DataAccessLayer.Generic;
@@ -18,32 +19,81 @@ using System.Threading.Tasks;
 
 namespace BusinessLogicLayer.Services
 {
-    public class SupplierService : GenericService<Supplier>, ISupplierService
+    public class SupplierService : GenericService<Partner>, ISupplierService
     {
 
         /*private readonly ISupplierRepository _repository;
         private readonly IGenericPaginationService _genericPaginationService;
         private readonly IMapper _mapper;*/
-        private readonly IGenericRepository<Supplier> _supplierRepository;
+        //private readonly IGenericRepository<Partner> _partnerRepository;
         private readonly IMapper _mapper;
         private readonly IUnitOfWork _unitOfWork;
 
 
-        public SupplierService(IGenericRepository<Supplier> genericRepository,
+        public SupplierService(IGenericRepository<Partner> genericRepository,
             IMapper mapper,
             IUnitOfWork unitOfWork) : base(genericRepository, mapper, unitOfWork)
         {
-            _supplierRepository = genericRepository;
             _mapper = mapper;
             _unitOfWork = unitOfWork;
         }
+
+        public override async Task<ServiceResponse> Get<TResult>()
+        {
+            var entities = await _genericRepository.Get(p => p.PartnerType == PartnerEnum.Supplier);
+
+            List<TResult> mappedResults = _mapper.Map<List<TResult>>(entities);
+
+            return new ServiceResponse
+            {
+                Status = Data.Enum.SRStatus.Success,
+                Message = "Get successfully!",
+                Data = mappedResults
+            };
+        }
+
+
+        public override async Task<ServiceResponse> Add<TResult, TRequest>(TRequest request)
+        {
+            Partner entity = _mapper.Map<Partner>(request);
+
+            // Gán giá trị cụ thể cho biến mong muốn
+            entity.PartnerType = PartnerEnum.Supplier;
+
+            TResult result = _mapper.Map<TResult>(entity);
+
+            try
+            {
+                entity.CreatedTime = DateTime.Now;
+                await _genericRepository.Add(entity);
+                await _unitOfWork.SaveAsync();
+
+                return new ServiceResponse
+                {
+                    Status = Data.Enum.SRStatus.Success,
+                    Message = "Add successfully!",
+                    Data = result
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ServiceResponse
+                {
+                    Status = Data.Enum.SRStatus.Error,
+                    Message = ex.Message,
+                    Data = request
+                };
+            }
+        }
+
+
 
         public override async Task<ServiceResponse> Update<TResult, TRequest>(TRequest request)
         {
             var supplierUpdateDto = request as SupplierUpdateDTO;
             if (supplierUpdateDto == null || string.IsNullOrEmpty(supplierUpdateDto.Id))
                 throw new Exception("Invalid supplier update request: missing Id");
-            var existingSupplier = await _supplierRepository.Get(supplierUpdateDto.Id);
+            var existingSupplier = await _genericRepository.Get(supplierUpdateDto.Id);
             if (existingSupplier == null)
             {
                 return new ServiceResponse
@@ -57,7 +107,7 @@ namespace BusinessLogicLayer.Services
 
             try
             {
-                _supplierRepository.Update(existingSupplier);
+                _genericRepository.Update(existingSupplier);
                 await _unitOfWork.SaveAsync();
 
                 TResult result = _mapper.Map<TResult>(existingSupplier);
