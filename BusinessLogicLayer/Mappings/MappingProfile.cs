@@ -62,7 +62,9 @@ namespace BusinessLogicLayer.Mappings
             #endregion ProductType
 
             #region Category
-            CreateMap<Category, CategoryDTO>().ReverseMap();
+            CreateMap<Category, CategoryDTO>()
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => $"{src.Name} {src.Note}".Trim()))
+                .ReverseMap();
 
             CreateMap<Category, CategoryCreateDTO>().ReverseMap();
 
@@ -87,24 +89,29 @@ namespace BusinessLogicLayer.Mappings
 
             #region Product
             CreateMap<Product, ProductDTO>()
-                .ForMember(dest => dest.ProductType, opt => opt.MapFrom(src => src.ProductType))
-                .ForMember(dest => dest.Category, opt => opt.MapFrom(src => src.ProductType.Category))
-                .ForMember(dest => dest.Brand, opt => opt.MapFrom(src => src.Brand))
-                .ForMember(dest => dest.Unit, opt => opt.MapFrom(src => src.Unit)).ReverseMap();
+                .ForMember(dest => dest.ProductType, opt => opt.MapFrom(src => $"{src.ProductType.Name} {src.ProductType.Note}".Trim()))
+                .ForMember(dest => dest.Category, opt => opt.MapFrom(src => $"{src.ProductType.Category.Name} {src.ProductType.Category.Note}".Trim()))
+                .ForMember(dest => dest.Brand, opt => opt.MapFrom(src => $"{src.Brand.Name}".Trim()))
+                .ForMember(dest => dest.Unit, opt => opt.MapFrom(src => $"{src.Unit.Name} {src.Unit.Note}".Trim()))
+                .ReverseMap();
 
             CreateMap<ProductCreateDTO, Product>().ReverseMap();
             CreateMap<ProductUpdateDTO, Product>().ReverseMap();
             #endregion
 
             #region Brand
-            CreateMap<Brand, BrandDTO>().ReverseMap();
+            CreateMap<Brand, BrandDTO>()
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => $"{src.Name}".Trim()))
+                .ReverseMap();
 
             CreateMap<BrandCreateDTO, Brand>().ReverseMap();
             CreateMap<BrandUpdateDTO, Brand>().ReverseMap();
             #endregion
 
             #region Unit
-            CreateMap<Unit, UnitDTO>().ReverseMap();
+            CreateMap<Unit, UnitDTO>()
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => $"{src.Name} {src.Note}".Trim()))
+                .ReverseMap();
 
             CreateMap<UnitCreateDTO, Unit>().ReverseMap();
             CreateMap<UnitUpdateDTO, Unit>().ReverseMap();
