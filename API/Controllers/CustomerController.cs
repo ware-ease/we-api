@@ -55,7 +55,7 @@ namespace API.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(string id, [FromBody] CustomerUpdateDTO request)
+        public async Task<IActionResult> Update([FromRoute] string id, [FromBody] CustomerUpdateDTO request)
         {
             request.Id = id;
             var result = await _customerService.Update<CustomerDTO, CustomerUpdateDTO>(request);

@@ -13,6 +13,7 @@ namespace Data.Model.Request.Product
         public string? Name { get; set; }
         [Required(ErrorMessage = "Sku không được để trống")]
         public string? Sku { get; set; }
+        public string? imageUrl { get; set; }
         [Required(ErrorMessage = "ProductTypeId không được để trống")]
         public string ProductTypeId { get; set; }
         [Required(ErrorMessage = "BrandId không được để trống")]

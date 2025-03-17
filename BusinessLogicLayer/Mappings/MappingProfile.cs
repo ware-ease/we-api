@@ -82,6 +82,14 @@ namespace BusinessLogicLayer.Mappings
             CreateMap<Partner, SupplierUpdateDTO>().ReverseMap();
             #endregion
 
+            #region Customer
+            CreateMap<Partner, CustomerDTO>().ReverseMap();
+
+            CreateMap<Partner, CustomerCreateDTO>().ReverseMap();
+
+            CreateMap<Partner, CustomerUpdateDTO>().ReverseMap();
+            #endregion
+
             #region ReceivingNote
             CreateMap<ReceivingNote, CreateReceivingNoteDTO>();
             CreateMap<CreateReceivingNoteDTO, ReceivingNote>();
