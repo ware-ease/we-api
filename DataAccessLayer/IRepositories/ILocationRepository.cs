@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace DataAccessLayer.IRepositories
 {
-    public interface IAreaRepository : IGenericRepository<Area>
+    public interface ILocationRepository : IGenericRepository<Location>
     {
     }
 }

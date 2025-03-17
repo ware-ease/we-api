@@ -221,7 +221,7 @@ namespace API.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetWarehouseShelves([FromRoute] string id)
+        public async Task<IActionResult> GetFullWarehouseInfo([FromRoute] string id)
         {
             var result = await _warehouseService.GetFullWarehouseInfo<WarehouseFullInfoDTO>(id);
 
@@ -229,8 +229,8 @@ namespace API.Controllers
         }
 
         //[Authorize]
-        [HttpPost("{id}")]
-        public async Task<IActionResult> AddWarehouseInfo([FromRoute] string id, [FromBody] CreateWarehouseStructureRequest request)
+        [HttpPost("{id}/location")]
+        public async Task<IActionResult> AddWarehouseLocation([FromRoute] string id, [FromBody] CreateWarehouseStructureRequest request)
         {
             //var authUser = AuthHelper.GetCurrentUser(HttpContext.Request);
 
@@ -247,42 +247,5 @@ namespace API.Controllers
 
             return ControllerResponse.Response(result);
         }
-
-        [HttpGet("{id}/areas")]
-        public async Task<IActionResult> GetWarehouseAreas([FromRoute] string id)
-        {
-            var result = await _warehouseService.GetWarehouseAreas(id);
-            return ControllerResponse.Response(result);
-        }
-
-        [HttpPost("{id}/areas")]
-        public async Task<IActionResult> AddWarehouseArea([FromRoute] string id, [FromBody] CreateAREADto request)
-        {
-            request.WarehouseId = id;
-            var result = await _warehouseService.AddWarehouseArea(request);
-            return ControllerResponse.Response(result);
-        }
-
-        [HttpGet("areas/{id}/shelves")]
-        public async Task<IActionResult> GetShelvesByArea([FromRoute] string id)
-        {
-            var result = await _warehouseService.GetShelvesByArea(id);
-            return ControllerResponse.Response(result);
-        }
-
-        [HttpPost("areas/{id}/shelves")]
-        public async Task<IActionResult> AddShelfWithStructure([FromRoute] string id, [FromBody] CreateShelfDto request)
-        {
-            var result = await _warehouseService.AddShelfWithStructure(request,id);
-            return ControllerResponse.Response(result);
-        }
-
-        [HttpGet("shelves/{id}")]
-        public async Task<IActionResult> GetShelfDetails([FromRoute] string id)
-        {
-            var result = await _warehouseService.GetShelfDetails(id);
-            return ControllerResponse.Response(result);
-        }
-
     }
 }

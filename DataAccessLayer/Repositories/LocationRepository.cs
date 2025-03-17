@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace DataAccessLayer.Repositories
 {
-    public class AreaRepository : GenericRepository<Area>, IAreaRepository
+    public class LocationRepository : GenericRepository<Location>, ILocationRepository
     {
-        public AreaRepository(WaseEaseDbContext context) : base(context)
+        public LocationRepository(WaseEaseDbContext context) : base(context)
         {
         }
     }

@@ -14,6 +14,5 @@ namespace Data.Model.DTO
         public string? Address { get; set; }
         public float Length { get; set; }
         public float Width { get; set; }
-        public int? ShelfCount { get; set; }
     }
 }
