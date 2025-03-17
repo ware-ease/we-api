@@ -28,9 +28,7 @@ namespace BusinessLogicLayer.Services
         {
             var warehouse = await _unitOfWork.WarehouseRepository.GetByCondition(
                 w => w.Id == id,
-                includeProperties: "Areas.Shelves.Floors.Cells"
-            //includeProperties: "Areas,Areas.Shelves,Areas.Shelves.Floors,Areas.Shelves.Floors.Cells,AccountWarehouses,ReceivingNotes,IssueNotes,Inventories,StockBooks"
-
+                includeProperties: "Locations"
             );
 
             if (warehouse == null)
@@ -68,51 +66,29 @@ namespace BusinessLogicLayer.Services
 
             try
             {
-                foreach (var areaDto in request.Areas)
+                foreach (var locationDto in request.Locations)
                 {
-                    var area = new Area
+                    // 🔥 Kiểm tra nếu location có ParentId thì phải tồn tại trong DB
+                    if (!string.IsNullOrWhiteSpace(locationDto.ParentId))
                     {
-                        Name = areaDto.Name,
-                        WarehouseId = warehouse.Id
-                    };
-
-                    await _unitOfWork.AreaRepository.Add(area);
-
-                    foreach (var shelfDto in areaDto.Shelves)
-                    {
-                        var shelf = new Shelf
+                        var parentExists = await _unitOfWork.LocationRepository.GetByCondition(l => l.Id == locationDto.ParentId);
+                        if (parentExists == null)
                         {
-                            Code = shelfDto.Code,
-                            AreaId = area.Id
-                        };
-
-                        await _unitOfWork.ShelfRepository.Add(shelf);
-
-                        foreach (var floorDto in shelfDto.Floors)
-                        {
-                            var floor = new Floor
+                            return new ServiceResponse
                             {
-                                Number = floorDto.Number,
-                                ShelfId = shelf.Id
+                                Status = Data.Enum.SRStatus.Error,
+                                Message = $"Parent location with ID '{locationDto.ParentId}' not found.",
+                                Data = locationDto.ParentId
                             };
-
-                            await _unitOfWork.FloorRepository.Add(floor);
-
-                            foreach (var cellDto in floorDto.Cells)
-                            {
-                                var cell = new Cell
-                                {
-                                    Number = cellDto.Number,
-                                    Length = cellDto.Length,
-                                    Height = cellDto.Height,
-                                    MaxLoad = cellDto.MaxLoad,
-                                    FloorId = floor.Id
-                                };
-
-                                await _unitOfWork.CellRepository.Add(cell);
-                            }
                         }
                     }
+                    var location = _mapper.Map<Location>(locationDto);
+                    location.WarehouseId = request.Id!;
+                    location.Warehouse = warehouse;
+                    // 🔥 Kiểm tra ParentId: nếu là "" thì chuyển thành null
+                    location.ParentId = string.IsNullOrWhiteSpace(locationDto.ParentId) ? null : locationDto.ParentId;
+                    await _unitOfWork.LocationRepository.Add(location);
+                                                             
                 }
 
                 await _unitOfWork.SaveAsync();
@@ -133,175 +109,175 @@ namespace BusinessLogicLayer.Services
             }
         }
 
-        public async Task<ServiceResponse> GetWarehouseAreas(string warehouseId)
-        {
-            var areas = await _unitOfWork.AreaRepository.GetAllNoPaging(a => a.WarehouseId == warehouseId);
+        //public async Task<ServiceResponse> GetWarehouseAreas(string warehouseId)
+        //{
+        //    var areas = await _unitOfWork.AreaRepository.GetAllNoPaging(a => a.WarehouseId == warehouseId);
 
-            if (areas == null)
-            {
-                return new ServiceResponse
-                {
-                    Status = Data.Enum.SRStatus.NotFound,
-                    Message = "No areas found for this warehouse",
-                    Data = warehouseId
-                };
-            }
+        //    if (areas == null)
+        //    {
+        //        return new ServiceResponse
+        //        {
+        //            Status = Data.Enum.SRStatus.NotFound,
+        //            Message = "No areas found for this warehouse",
+        //            Data = warehouseId
+        //        };
+        //    }
 
-            var result = _mapper.Map<List<AreaDTO>>(areas);
+        //    var result = _mapper.Map<List<AreaDTO>>(areas);
 
-            return new ServiceResponse
-            {
-                Status = Data.Enum.SRStatus.Success,
-                Message = "Warehouse areas retrieved successfully",
-                Data = result
-            };
-        }
+        //    return new ServiceResponse
+        //    {
+        //        Status = Data.Enum.SRStatus.Success,
+        //        Message = "Warehouse areas retrieved successfully",
+        //        Data = result
+        //    };
+        //}
 
-        public async Task<ServiceResponse> AddWarehouseArea(CreateAREADto request)
-        {
-            var warehouse = await _unitOfWork.WarehouseRepository.Get(request.WarehouseId!);
+//        public async Task<ServiceResponse> AddWarehouseArea(CreateAREADto request)
+//        {
+//            var warehouse = await _unitOfWork.WarehouseRepository.Get(request.WarehouseId!);
 
-            if (warehouse == null)
-            {
-                return new ServiceResponse
-                {
-                    Status = Data.Enum.SRStatus.NotFound,
-                    Message = "Warehouse not found",
-                    Data = request.WarehouseId
-                };
-            }
+//            if (warehouse == null)
+//            {
+//                return new ServiceResponse
+//                {
+//                    Status = Data.Enum.SRStatus.NotFound,
+//                    Message = "Warehouse not found",
+//                    Data = request.WarehouseId
+//                };
+//            }
 
-            var area = new Area
-            {
-                Name = request.Name,
-                WarehouseId = request.WarehouseId
-            };
+//            var area = new Area
+//            {
+//                Name = request.Name,
+//                WarehouseId = request.WarehouseId
+//            };
 
-            await _unitOfWork.AreaRepository.Add(area);
-            await _unitOfWork.SaveAsync();
+//            await _unitOfWork.AreaRepository.Add(area);
+//            await _unitOfWork.SaveAsync();
 
-            return new ServiceResponse
-            {
-                Status = Data.Enum.SRStatus.Success,
-                Message = "Area added successfully",
-                Data = area.Id
-            };
-        }
+//            return new ServiceResponse
+//            {
+//                Status = Data.Enum.SRStatus.Success,
+//                Message = "Area added successfully",
+//                Data = area.Id
+//            };
+//        }
 
-        public async Task<ServiceResponse> GetShelvesByArea(string areaId)
-        {
+//        public async Task<ServiceResponse> GetShelvesByArea(string areaId)
+//        {
 
-            var shelves = await _unitOfWork.ShelfRepository.GetAllNoPaging(s => s.AreaId == areaId, includeProperties: "Floors.Cells"
-);
+//            var shelves = await _unitOfWork.ShelfRepository.GetAllNoPaging(s => s.AreaId == areaId, includeProperties: "Floors.Cells"
+//);
 
-            if (shelves == null || !shelves.Any())
-            {
-                return new ServiceResponse
-                {
-                    Status = Data.Enum.SRStatus.NotFound,
-                    Message = "No shelves found for this area",
-                    Data = areaId
-                };
-            }
+//            if (shelves == null || !shelves.Any())
+//            {
+//                return new ServiceResponse
+//                {
+//                    Status = Data.Enum.SRStatus.NotFound,
+//                    Message = "No shelves found for this area",
+//                    Data = areaId
+//                };
+//            }
 
-            var result = _mapper.Map<List<ShelfDto>>(shelves);
+//            var result = _mapper.Map<List<ShelfDto>>(shelves);
 
-            return new ServiceResponse
-            {
-                Status = Data.Enum.SRStatus.Success,
-                Message = "Shelves retrieved successfully",
-                Data = result
-            };
-        }
+//            return new ServiceResponse
+//            {
+//                Status = Data.Enum.SRStatus.Success,
+//                Message = "Shelves retrieved successfully",
+//                Data = result
+//            };
+//        }
 
-        public async Task<ServiceResponse> AddShelfWithStructure(CreateShelfDto request, string areaId)
-        {
-            var area = await _unitOfWork.AreaRepository.Get(areaId);
+//        public async Task<ServiceResponse> AddShelfWithStructure(CreateShelfDto request, string areaId)
+//        {
+//            var area = await _unitOfWork.AreaRepository.Get(areaId);
 
-            if (area == null)
-            {
-                return new ServiceResponse
-                {
-                    Status = Data.Enum.SRStatus.NotFound,
-                    Message = "Area not found",
-                    Data = areaId
-                };
-            }
+//            if (area == null)
+//            {
+//                return new ServiceResponse
+//                {
+//                    Status = Data.Enum.SRStatus.NotFound,
+//                    Message = "Area not found",
+//                    Data = areaId
+//                };
+//            }
 
-            var shelf = new Shelf
-            {
-                Code = request.Code,
-                AreaId = areaId
-            };
+//            var shelf = new Shelf
+//            {
+//                Code = request.Code,
+//                AreaId = areaId
+//            };
 
-            await _unitOfWork.ShelfRepository.Add(shelf);
+//            await _unitOfWork.ShelfRepository.Add(shelf);
 
-            foreach (var floorDto in request.Floors)
-            {
-                var floor = new Floor
-                {
-                    Number = floorDto.Number,
-                    ShelfId = shelf.Id
-                };
+//            foreach (var floorDto in request.Floors)
+//            {
+//                var floor = new Floor
+//                {
+//                    Number = floorDto.Number,
+//                    ShelfId = shelf.Id
+//                };
 
-                await _unitOfWork.FloorRepository.Add(floor);
+//                await _unitOfWork.FloorRepository.Add(floor);
 
-                foreach (var cellDto in floorDto.Cells)
-                {
-                    var cell = new Cell
-                    {
-                        Number = cellDto.Number,
-                        Length = cellDto.Length,
-                        Height = cellDto.Height,
-                        MaxLoad = cellDto.MaxLoad,
-                        FloorId = floor.Id
-                    };
+//                foreach (var cellDto in floorDto.Cells)
+//                {
+//                    var cell = new Cell
+//                    {
+//                        Number = cellDto.Number,
+//                        Length = cellDto.Length,
+//                        Height = cellDto.Height,
+//                        MaxLoad = cellDto.MaxLoad,
+//                        FloorId = floor.Id
+//                    };
 
-                    await _unitOfWork.CellRepository.Add(cell);
-                }
-            }
+//                    await _unitOfWork.CellRepository.Add(cell);
+//                }
+//            }
 
-            await _unitOfWork.SaveAsync();
+//            await _unitOfWork.SaveAsync();
 
-            return new ServiceResponse
-            {
-                Status = Data.Enum.SRStatus.Success,
-                Message = "Shelf structure created successfully",
-                Data = shelf.Id
-            };
-        }
+//            return new ServiceResponse
+//            {
+//                Status = Data.Enum.SRStatus.Success,
+//                Message = "Shelf structure created successfully",
+//                Data = shelf.Id
+//            };
+//        }
 
-        public async Task<ServiceResponse> GetShelfDetails(string shelfId)
-        {
-            var shelf = await _unitOfWork.ShelfRepository.GetByCondition(
-                s => s.Id == shelfId,
-                includeProperties: "Floors.Cells"
-            );
+//        public async Task<ServiceResponse> GetShelfDetails(string shelfId)
+//        {
+//            var shelf = await _unitOfWork.ShelfRepository.GetByCondition(
+//                s => s.Id == shelfId,
+//                includeProperties: "Floors.Cells"
+//            );
 
-            var area = await _unitOfWork.AreaRepository.Get(shelf.AreaId);
-            area.Shelves.Add(shelf);
-            var warehouse = await _unitOfWork.WarehouseRepository.Get(area.WarehouseId);
-            warehouse.Areas.Add(area);
+//            var area = await _unitOfWork.AreaRepository.Get(shelf.AreaId);
+//            area.Shelves.Add(shelf);
+//            var warehouse = await _unitOfWork.WarehouseRepository.Get(area.WarehouseId);
+//            warehouse.Areas.Add(area);
 
-            if (shelf == null)
-            {
-                return new ServiceResponse
-                {
-                    Status = Data.Enum.SRStatus.NotFound,
-                    Message = "Shelf not found",
-                    Data = shelfId
-                };
-            }
+//            if (shelf == null)
+//            {
+//                return new ServiceResponse
+//                {
+//                    Status = Data.Enum.SRStatus.NotFound,
+//                    Message = "Shelf not found",
+//                    Data = shelfId
+//                };
+//            }
 
-            var result = _mapper.Map<WarehouseFullInfoDTO>(warehouse);
+//            var result = _mapper.Map<WarehouseFullInfoDTO>(warehouse);
 
-            return new ServiceResponse
-            {
-                Status = Data.Enum.SRStatus.Success,
-                Message = "Shelf details retrieved successfully",
-                Data = result
-            };
-        }
+//            return new ServiceResponse
+//            {
+//                Status = Data.Enum.SRStatus.Success,
+//                Message = "Shelf details retrieved successfully",
+//                Data = result
+//            };
+//        }
 
     }
 }

@@ -60,10 +60,7 @@ namespace DataAccessLayer.UnitOfWork
         public IRouteRepository AppActionRepository => GetIRepository<IRouteRepository>();
         public IPermissionRepository PermissionRepository => GetIRepository<IPermissionRepository>();
         public IWarehouseRepository WarehouseRepository => GetIRepository<IWarehouseRepository>();
-        public IAreaRepository AreaRepository => GetIRepository<IAreaRepository>();
-        public IShelfRepository ShelfRepository => GetIRepository<IShelfRepository>();
-        public IFloorRepository FloorRepository => GetIRepository<IFloorRepository>();
-        public ICellRepository CellRepository => GetIRepository<ICellRepository>();
+        public ILocationRepository LocationRepository => GetIRepository<ILocationRepository>();
 
         public TRepository GetIRepository<TRepository>()
         {

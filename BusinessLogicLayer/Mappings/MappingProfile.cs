@@ -110,21 +110,6 @@ namespace BusinessLogicLayer.Mappings
             CreateMap<UnitUpdateDTO, Unit>().ReverseMap();
             #endregion
 
-            #region Shelf
-            CreateMap<Shelf, CreateShelfDTO>();
-            CreateMap<CreateShelfDTO, Shelf>();
-            #endregion
-
-            #region Floor
-            CreateMap<Floor, CreateFloorDTO>();
-            CreateMap<CreateFloorDTO, Floor>();
-            #endregion
-
-            #region Cell
-            CreateMap<Cell, CreateCellDTO>();
-            CreateMap<CreateCellDTO, Cell>();
-            #endregion
-
             #region Group
             CreateMap<Group, GroupDTO>()
                 .ForMember(dest => dest.Accounts, opt => opt.MapFrom(src => src.AccountGroups.Select(ag => ag.Account)))
@@ -149,24 +134,9 @@ namespace BusinessLogicLayer.Mappings
             CreateMap<Warehouse, WarehouseDTO>().ReverseMap();
             CreateMap<Warehouse, CreateWarehouseDTO>().ReverseMap();
             CreateMap<Warehouse, UpdateWarehouseDTO>().ReverseMap();
-            CreateMap<Warehouse, WarehouseFullInfoDTO>()
-           .ForMember(dest => dest.Areas, opt => opt.MapFrom(src => src.Areas));
-
-            CreateMap<Area, AreaDto>()
-                .ForMember(dest => dest.Shelves, opt => opt.MapFrom(src => src.Shelves));
-
-            CreateMap<Shelf, ShelfDto>()
-                .ForMember(dest => dest.Floors, opt => opt.MapFrom(src => src.Floors));
-
-            CreateMap<Floor, FloorDto>()
-                .ForMember(dest => dest.Cells, opt => opt.MapFrom(src => src.Cells));
-
-            CreateMap<Cell, CellDto>();
-            #endregion
-            //Chỉ map riêng cho area
-            CreateMap<Area, AreaDTO>().ReverseMap();
-            #region Area
-
+            CreateMap<Warehouse, WarehouseFullInfoDTO>().ReverseMap();
+            CreateMap<Location, LocationDto>().ReverseMap();
+            CreateMap<Location, LocationCreateDto>().ReverseMap();
             #endregion
         }
     }

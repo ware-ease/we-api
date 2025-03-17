@@ -19,7 +19,6 @@ namespace Data.Entity
         public int? ShelfCount { get; set; }
 
         public ICollection<AccountWarehouse> AccountWarehouses { get; set; } = [];
-        public ICollection<Area> Areas { get; set; } = [];
         public ICollection<Location> Locations { get; set; } = [];
         public ICollection<ReceivingNote> ReceivingNotes { get; set; }
         public ICollection<IssueNote> IssueNotes { get; set; } = [];

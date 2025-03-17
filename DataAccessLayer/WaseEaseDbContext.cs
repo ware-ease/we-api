@@ -32,9 +32,9 @@ namespace DataAccessLayer
         public virtual DbSet<AccountWarehouse> AccountWarehouses { get; set; }
         public virtual DbSet<Permission> Permissions { get; set; }
         public virtual DbSet<Category> Categories { get; set; }
-        public virtual DbSet<Cell> Cells { get; set; }
+        //public virtual DbSet<Cell> Cells { get; set; }
         public virtual DbSet<Customer> Customers { get; set; }
-        public virtual DbSet<Floor> Floors { get; set; }
+        //public virtual DbSet<Floor> Floors { get; set; }
         public virtual DbSet<Group> Groups { get; set; }
         public virtual DbSet<GroupPermission> GroupPermissions { get; set; }
         public virtual DbSet<IssueNote> IssueNotes { get; set; }
@@ -45,10 +45,10 @@ namespace DataAccessLayer
         public virtual DbSet<Profile> Profiles { get; set; }
         public virtual DbSet<ReceivingDetail> ReceivingDetails { get; set; }
         public virtual DbSet<ReceivingNote> ReceivingNotes { get; set; }
-        public virtual DbSet<Shelf> Shelves { get; set; }
+        //public virtual DbSet<Shelf> Shelves { get; set; }
         public virtual DbSet<Supplier> Suppliers { get; set; }
         public virtual DbSet<Warehouse> Warehouses { get; set; }
-        public virtual DbSet<Area> Areas { get; set; }
+        //public virtual DbSet<Area> Areas { get; set; }
         public virtual DbSet<Batch> Batches { get; set; }
         public virtual DbSet<Brand> Brands { get; set; }
         public virtual DbSet<ErrorTicket> ErrorTickets { get; set; }
