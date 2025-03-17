@@ -14,6 +14,7 @@ namespace Data.Entity
     {
         public string? Name { get; set; }
         public string? Sku {  get; set; }
+        public string? imageUrl { get; set; }
         public ICollection<Batch> Batches { get; set; } = [];
         public ICollection<StockBook> StockBooks { get; set; } = [];
         public ICollection<GoodRequestDetail> GoodRequestDetails { get; set; } = [];

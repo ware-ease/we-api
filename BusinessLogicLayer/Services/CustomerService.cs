@@ -4,6 +4,7 @@ using BusinessLogicLayer.IServices;
 using Data.Entity;
 using Data.Entity.Base;
 using Data.Enum;
+using Data.Model.Request.Customer;
 using Data.Model.Request.Supplier;
 using Data.Model.Response;
 using DataAccessLayer.Generic;
@@ -80,27 +81,27 @@ namespace BusinessLogicLayer.Services
 
         public override async Task<ServiceResponse> Update<TResult, TRequest>(TRequest request)
         {
-            var supplierUpdateDto = request as SupplierUpdateDTO;
-            if (supplierUpdateDto == null || string.IsNullOrEmpty(supplierUpdateDto.Id))
+            var customerUpdateDto = request as CustomerUpdateDTO;
+            if (customerUpdateDto == null || string.IsNullOrEmpty(customerUpdateDto.Id))
                 throw new Exception("Invalid supplier update request: missing Id");
-            var existingSupplier = await _genericRepository.Get(supplierUpdateDto.Id);
-            if (existingSupplier == null)
+            var existingCustomer = await _genericRepository.Get(customerUpdateDto.Id);
+            if (existingCustomer == null)
             {
                 return new ServiceResponse
                 {
                     Status = Data.Enum.SRStatus.NotFound,
-                    Message = "Không thể tìm thấy Supplier với Id này",
-                    Data = supplierUpdateDto.Id
+                    Message = "Không thể tìm thấy Customer với Id này",
+                    Data = customerUpdateDto.Id
                 };
             }
-            _mapper.Map(request, existingSupplier);
+            _mapper.Map(request, existingCustomer);
 
             try
             {
-                _genericRepository.Update(existingSupplier);
+                _genericRepository.Update(existingCustomer);
                 await _unitOfWork.SaveAsync();
 
-                TResult result = _mapper.Map<TResult>(existingSupplier);
+                TResult result = _mapper.Map<TResult>(existingCustomer);
                 return new ServiceResponse
                 {
                     Status = Data.Enum.SRStatus.Success,
