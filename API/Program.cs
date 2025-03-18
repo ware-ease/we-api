@@ -67,6 +67,11 @@ builder.Services.AddSwaggerGen(option =>
             new string[]{}
         }
     });
+    option.MapType<DateOnly>(() => new Microsoft.OpenApi.Models.OpenApiSchema
+    {
+        Type = "string",
+        Format = "date"
+    });
 });
 
 var mapper = new MapperConfiguration(mc =>
@@ -83,6 +88,7 @@ builder.Services.AddScoped<IGenericRepository<Group>, GenericRepository<Group>>(
 builder.Services.AddScoped<IGenericRepository<Permission>, GenericRepository<Permission>>();
 builder.Services.AddScoped<IGenericRepository<Category>, GenericRepository<Category>>();
 builder.Services.AddScoped<IGenericRepository<Product>, GenericRepository<Product>>();
+builder.Services.AddScoped<IGenericRepository<Batch>, GenericRepository<Batch>>();
 builder.Services.AddScoped<IGenericRepository<ProductType>, GenericRepository<ProductType>>();
 builder.Services.AddScoped<IGenericRepository<Brand>, GenericRepository<Brand>>();
 builder.Services.AddScoped<IGenericRepository<Unit>, GenericRepository<Unit>>();
@@ -98,6 +104,7 @@ builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<ISupplierService, SupplierService>();
 builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<IBatchService, BatchService>();
 builder.Services.AddScoped<IProductTypesService, ProductTypesService>();
 builder.Services.AddScoped<IBrandService, BrandService>();
 builder.Services.AddScoped<IUnitService, UnitService>();
