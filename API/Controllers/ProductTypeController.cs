@@ -55,23 +55,57 @@ namespace API.Controllers
         [HttpPost]
         public async Task<IActionResult> Add([FromBody] ProductTypeCreateDTO request)
         {
-            var authUser = AuthHelper.GetCurrentUser(HttpContext.Request);
-
-            if (authUser != null)
+            try
             {
-                request.CreatedBy = authUser.id;
-            }
+                var authUser = AuthHelper.GetCurrentUser(HttpContext.Request);
 
-            var result = await _productTypeService.Add<ProductTypeDTO, ProductTypeCreateDTO>(request);
-            return ControllerResponse.Response(result);
+                if (authUser != null)
+                {
+                    request.CreatedBy = authUser.id;
+                }
+
+                var result = await _productTypeService.AddProductType(request);
+                return ControllerResponse.Response(new ServiceResponse
+                {
+                    Status = SRStatus.Success,
+                    Message = "ProductType created successfully",
+                    Data = result
+                });
+            }
+            catch (Exception ex)
+            {
+                return ControllerResponse.Response(new ServiceResponse
+                {
+                    Status = SRStatus.Error,
+                    Message = ex.Message,
+                    Data = null
+                });
+            }
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(string id, [FromBody] ProductTypeUpdateDTO request)
         {
-            request.Id = id;
-            var result = await _productTypeService.Update<ProductTypeDTO, ProductTypeUpdateDTO>(request);
-            return ControllerResponse.Response(result);
+            try
+            {
+                request.Id = id;
+                var result = await _productTypeService.UpdateProductType(request);
+                return ControllerResponse.Response(new ServiceResponse
+                {
+                    Status = Data.Enum.SRStatus.Success,
+                    Message = "ProductType updated successfully",
+                    Data = result
+                });
+            }
+            catch (Exception ex)
+            {
+                return ControllerResponse.Response(new ServiceResponse
+                {
+                    Status = Data.Enum.SRStatus.Error,
+                    Message = ex.Message,
+                    Data = null
+                });
+            }
         }
 
         [HttpDelete("{id}")]

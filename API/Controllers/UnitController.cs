@@ -1,8 +1,10 @@
-﻿using BusinessLogicLayer.IServices;
+﻿using API.Utils;
+using BusinessLogicLayer.IServices;
 using Data.Model.DTO;
 using Data.Model.Request.Brand;
 using Data.Model.Request.Unit;
 using Data.Model.Response;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -33,20 +35,16 @@ namespace API.Controllers
             return ControllerResponse.Response(result);
         }
 
-        //[Authorize]
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> Add([FromBody] UnitCreateDTO request)
         {
-            /*var authUser = AuthHelper.GetCurrentUser(HttpContext.Request);
+            var authUser = AuthHelper.GetCurrentUser(HttpContext.Request);
 
             if (authUser != null)
             {
                 request.CreatedBy = authUser.id;
             }
-            else
-            {
-                return Unauthorized();
-            }*/
 
             var result = await _unitService.Add<UnitDTO, UnitCreateDTO>(request);
             return ControllerResponse.Response(result);
