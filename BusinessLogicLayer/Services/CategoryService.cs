@@ -7,6 +7,7 @@ using Data.Entity;
 using Data.Model.DTO;
 using Data.Model.Request.Batch;
 using Data.Model.Request.Category;
+using Data.Model.Response;
 using DataAccessLayer.Generic;
 using DataAccessLayer.IRepositories;
 using DataAccessLayer.Repositories;
@@ -24,6 +25,44 @@ namespace BusinessLogicLayer.Services
         public CategoryService(IGenericRepository<Category> genericRepository, IMapper mapper, IUnitOfWork unitOfWork)
             : base(genericRepository, mapper, unitOfWork)
         {
+        }
+
+        public override async Task<ServiceResponse> Get<TResult>()
+        {
+            var categories = await _genericRepository.GetAllNoPaging();
+
+            List<TResult> mappedResults = _mapper.Map<List<TResult>>(categories);
+
+            return new ServiceResponse
+            {
+                Status = Data.Enum.SRStatus.Success,
+                Message = "Get successfully!",
+                Data = mappedResults
+            };
+        }
+
+        public override async Task<ServiceResponse> Get<TResult>(string id)
+        {
+            var category = await _genericRepository.GetByCondition(b => b.Id == id);
+
+            if (category == null)
+            {
+                return new ServiceResponse
+                {
+                    Status = Data.Enum.SRStatus.NotFound,
+                    Message = "Category not found!",
+                    Data = id
+                };
+            }
+
+            TResult result = _mapper.Map<TResult>(category);
+
+            return new ServiceResponse
+            {
+                Status = Data.Enum.SRStatus.Success,
+                Message = "Get successfully!",
+                Data = result
+            };
         }
 
         public async Task<int> Count()

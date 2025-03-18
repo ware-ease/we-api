@@ -1,4 +1,6 @@
 ﻿using BusinessLogicLayer.Generic;
+using Data.Model.DTO.Base;
+using Data.Model.Response;
 using System;
 using System.Collections.Generic;
 using System.Linq;

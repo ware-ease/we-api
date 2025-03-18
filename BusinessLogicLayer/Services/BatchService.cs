@@ -42,6 +42,44 @@ namespace BusinessLogicLayer.Services
             return batches.Count(b => !b.IsDeleted);
         }
 
+        public override async Task<ServiceResponse> Get<TResult>()
+        {
+            var batches = await _genericRepository.GetAllNoPaging();
+
+            List<TResult> mappedResults = _mapper.Map<List<TResult>>(batches);
+
+            return new ServiceResponse
+            {
+                Status = Data.Enum.SRStatus.Success,
+                Message = "Get successfully!",
+                Data = mappedResults
+            };
+        }
+
+        public override async Task<ServiceResponse> Get<TResult>(string id)
+        {
+            var batch = await _genericRepository.GetByCondition(b => b.Id == id);
+
+            if (batch == null)
+            {
+                return new ServiceResponse
+                {
+                    Status = Data.Enum.SRStatus.NotFound,
+                    Message = "Batch not found!",
+                    Data = id
+                };
+            }
+
+            TResult result = _mapper.Map<TResult>(batch);
+
+            return new ServiceResponse
+            {
+                Status = Data.Enum.SRStatus.Success,
+                Message = "Get successfully!",
+                Data = result
+            };
+        }
+
         public async Task<BatchDTO> AddBatch(BatchCreateDTO request)
         {
             /*var supplier = await _partnerRepository.Get(request.SupplierId);

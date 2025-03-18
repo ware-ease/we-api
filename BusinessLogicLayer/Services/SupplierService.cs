@@ -55,6 +55,31 @@ namespace BusinessLogicLayer.Services
         }
 
 
+        public override async Task<ServiceResponse> Get<TResult>(string id)
+        {
+            var supplier = await _genericRepository.GetByCondition(b => b.Id == id);
+
+            if (supplier == null)
+            {
+                return new ServiceResponse
+                {
+                    Status = Data.Enum.SRStatus.NotFound,
+                    Message = "Supplier not found!",
+                    Data = id
+                };
+            }
+
+            TResult result = _mapper.Map<TResult>(supplier);
+
+            return new ServiceResponse
+            {
+                Status = Data.Enum.SRStatus.Success,
+                Message = "Get successfully!",
+                Data = result
+            };
+        }
+
+
         public override async Task<ServiceResponse> Add<TResult, TRequest>(TRequest request)
         {
             Partner entity = _mapper.Map<Partner>(request);

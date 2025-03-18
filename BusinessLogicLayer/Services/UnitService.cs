@@ -5,6 +5,7 @@ using Data.Entity;
 using Data.Model.DTO;
 using Data.Model.Request.ProductType;
 using Data.Model.Request.Unit;
+using Data.Model.Response;
 using DataAccessLayer.Generic;
 using DataAccessLayer.UnitOfWork;
 using System;
@@ -22,6 +23,44 @@ namespace BusinessLogicLayer.Services
             IUnitOfWork unitOfWork) : base(genericRepository, mapper, unitOfWork)
         {
 
+        }
+
+        public override async Task<ServiceResponse> Get<TResult>()
+        {
+            var units = await _genericRepository.GetAllNoPaging();
+
+            List<TResult> mappedResults = _mapper.Map<List<TResult>>(units);
+
+            return new ServiceResponse
+            {
+                Status = Data.Enum.SRStatus.Success,
+                Message = "Get successfully!",
+                Data = mappedResults
+            };
+        }
+
+        public override async Task<ServiceResponse> Get<TResult>(string id)
+        {
+            var unit = await _genericRepository.GetByCondition(b => b.Id == id);
+
+            if (unit == null)
+            {
+                return new ServiceResponse
+                {
+                    Status = Data.Enum.SRStatus.NotFound,
+                    Message = "Unit not found!",
+                    Data = id
+                };
+            }
+
+            TResult result = _mapper.Map<TResult>(unit);
+
+            return new ServiceResponse
+            {
+                Status = Data.Enum.SRStatus.Success,
+                Message = "Get successfully!",
+                Data = result
+            };
         }
 
         public async Task<UnitDTO> UpdateUnit(UnitUpdateDTO request)
