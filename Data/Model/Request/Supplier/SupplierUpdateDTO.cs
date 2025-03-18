@@ -15,7 +15,7 @@ namespace Data.Model.Request.Supplier
         public string? Name { get; set; }
         [Phone]
         public string? Phone { get; set; }
-        [Required]
-        public bool Status { get; set; }
+        [JsonIgnore]
+        public bool? Status { get; set; }
     }
 }

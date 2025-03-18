@@ -16,10 +16,10 @@ namespace Data.Model.Request.Product
         public string? Sku { get; set; }
         public string? imageUrl { get; set; }
         //[Required(ErrorMessage = "CategoryId không được để trống")]
-        public string ProductTypeId { get; set; }
+        public string? ProductTypeId { get; set; }
         //[Required(ErrorMessage = "BrandId không được để trống")]
-        public string BrandId { get; set; }
+        public string? BrandId { get; set; }
         //[Required(ErrorMessage = "UnitId không được để trống")]
-        public string UnitId { get; set; }
+        public string? UnitId { get; set; }
     }
 }

@@ -4,6 +4,8 @@ using BusinessLogicLayer.IServices;
 using Data.Entity;
 using Data.Entity.Base;
 using Data.Enum;
+using Data.Model.DTO;
+using Data.Model.Request.Category;
 using Data.Model.Request.Customer;
 using Data.Model.Request.Supplier;
 using Data.Model.Response;
@@ -79,45 +81,31 @@ namespace BusinessLogicLayer.Services
 
 
 
-        public override async Task<ServiceResponse> Update<TResult, TRequest>(TRequest request)
+        public async Task<CustomerDTO> UpdateCustomer(CustomerUpdateDTO request)
         {
-            var customerUpdateDto = request as CustomerUpdateDTO;
-            if (customerUpdateDto == null || string.IsNullOrEmpty(customerUpdateDto.Id))
-                throw new Exception("Invalid supplier update request: missing Id");
-            var existingCustomer = await _genericRepository.Get(customerUpdateDto.Id);
+            var existingCustomer = await _genericRepository.Get(request.Id);
             if (existingCustomer == null)
-            {
-                return new ServiceResponse
-                {
-                    Status = Data.Enum.SRStatus.NotFound,
-                    Message = "Không thể tìm thấy Customer với Id này",
-                    Data = customerUpdateDto.Id
-                };
-            }
-            _mapper.Map(request, existingCustomer);
+                throw new Exception("Customer not found");
 
-            try
+            if (!string.IsNullOrEmpty(request.Name))
             {
-                _genericRepository.Update(existingCustomer);
-                await _unitOfWork.SaveAsync();
+                existingCustomer.Name = request.Name;
+            }
+            if (!string.IsNullOrEmpty(request.Phone))
+            {
+                existingCustomer.Phone = request.Phone;
+            }
+            if (request.Status.HasValue)
+                existingCustomer.Status = request.Status.Value;
 
-                TResult result = _mapper.Map<TResult>(existingCustomer);
-                return new ServiceResponse
-                {
-                    Status = Data.Enum.SRStatus.Success,
-                    Message = "Update successfully!",
-                    Data = result
-                };
-            }
-            catch (Exception ex)
-            {
-                return new ServiceResponse
-                {
-                    Status = Data.Enum.SRStatus.Error,
-                    Message = ex.Message,
-                    Data = request
-                };
-            }
+            _genericRepository.Update(existingCustomer);
+            await _unitOfWork.SaveAsync();
+
+            var updatedCustomer = await _genericRepository.Get(existingCustomer.Id);
+            if (updatedCustomer == null)
+                throw new Exception("Update failed, customer not found after update");
+
+            return _mapper.Map<CustomerDTO>(updatedCustomer);
         }
     }
 }

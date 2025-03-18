@@ -12,7 +12,6 @@ namespace Data.Model.Request.Unit
     {
         [JsonIgnore]
         public string? Id { get; set; }
-        [Required]
         public string? Name { get; set; }
         public string? Note { get; set; }
     }

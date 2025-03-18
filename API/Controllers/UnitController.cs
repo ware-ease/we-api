@@ -1,7 +1,9 @@
 ﻿using API.Utils;
 using BusinessLogicLayer.IServices;
+using BusinessLogicLayer.Services;
 using Data.Model.DTO;
 using Data.Model.Request.Brand;
+using Data.Model.Request.Product;
 using Data.Model.Request.Unit;
 using Data.Model.Response;
 using Microsoft.AspNetCore.Authorization;
@@ -50,12 +52,29 @@ namespace API.Controllers
             return ControllerResponse.Response(result);
         }
 
-        [HttpPut("{id}")]
+        [HttpPatch("{id}")]
         public async Task<IActionResult> Update(string id, [FromBody] UnitUpdateDTO request)
         {
-            request.Id = id;
-            var result = await _unitService.Update<UnitDTO, UnitUpdateDTO>(request);
-            return ControllerResponse.Response(result);
+            try
+            {
+                request.Id = id;
+                var updatedUnit = await _unitService.UpdateUnit(request);
+                return ControllerResponse.Response(new ServiceResponse
+                {
+                    Status = Data.Enum.SRStatus.Success,
+                    Message = "Product updated successfully",
+                    Data = updatedUnit
+                });
+            }
+            catch (Exception ex)
+            {
+                return ControllerResponse.Response(new ServiceResponse
+                {
+                    Status = Data.Enum.SRStatus.Error,
+                    Message = ex.Message,
+                    Data = null
+                });
+            }
         }
 
         [HttpDelete("{id}")]
