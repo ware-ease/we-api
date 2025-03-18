@@ -52,12 +52,7 @@ namespace API.Controllers
             try
             {
                 var batch = await _batchService.Get<BatchDTO>(id);
-                return ControllerResponse.Response(new ServiceResponse
-                {
-                    Status = SRStatus.Success,
-                    Message = "Batch retrieved successfully",
-                    Data = batch
-                });
+                return ControllerResponse.Response(batch);
             }
             catch (Exception ex)
             {

@@ -11,7 +11,7 @@ namespace Data.Model.Request.Batch
     public class BatchUpdateDTO
     {
         [JsonIgnore]
-        public string Id { get; set; }
+        public string? Id { get; set; }
         public string? SupplierId { get; set; }
         public string ProductId { get; set; }
         public string? Code { get; set; }
