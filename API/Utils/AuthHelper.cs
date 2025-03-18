@@ -51,7 +51,15 @@ namespace API.Utils
 
         public static void DeleteFromCookies(HttpResponse response, string key)
         {
-            response.Cookies.Delete(key);
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.None,
+                Expires = DateTime.UtcNow.AddDays(-7)
+            };
+
+            response.Cookies.Delete(key, cookieOptions);
         }
     }
 }
