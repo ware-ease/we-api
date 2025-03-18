@@ -13,15 +13,15 @@ namespace Data.Model.Request.Batch
         [JsonIgnore]
         public string? Id { get; set; }
         public string? SupplierId { get; set; }
-        public string ProductId { get; set; }
+        public string? ProductId { get; set; }
         public string? Code { get; set; }
         public string? Name { get; set; }
-        [Required(ErrorMessage = "MfgDate không được để trống")]
+        //[Required(ErrorMessage = "MfgDate không được để trống")]
         [DataType(DataType.Date)]
-        public DateOnly MfgDate { get; set; }
-        [Required(ErrorMessage = "ExpDate không được để trống")]
+        public DateOnly? MfgDate { get; set; }
+        //[Required(ErrorMessage = "ExpDate không được để trống")]
         [DataType(DataType.Date)]
-        public DateOnly ExpDate { get; set; }
+        public DateOnly? ExpDate { get; set; }
         public string? InventoryId { get; set; }
     }
 }

@@ -51,7 +51,7 @@ namespace API.Controllers
             return ControllerResponse.Response(result);
         }
 
-        [HttpPut("{id}")]
+        [HttpPatch("{id}")]
         public async Task<IActionResult> Update(string id, [FromBody] BrandUpdateDTO request)
         {
             request.Id = id;

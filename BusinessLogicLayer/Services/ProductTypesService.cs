@@ -60,6 +60,15 @@ namespace BusinessLogicLayer.Services
             if (existedProductType == null)
                 throw new Exception("ProductType không tồn tại");
 
+            if (!string.IsNullOrEmpty(request.Name))
+            {
+                existedProductType.Name = request.Name;
+            }
+            if (!string.IsNullOrEmpty(request.Note))
+            {
+                existedProductType.Note = request.Note;
+            }
+
             if (!string.IsNullOrEmpty(request.CategoryId))
             {
                 var category = await _categoryRepository.Get(request.CategoryId);

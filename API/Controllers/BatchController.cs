@@ -97,7 +97,7 @@ namespace API.Controllers
             }
         }
 
-        [HttpPut("{id}")]
+        [HttpPatch("{id}")]
         public async Task<IActionResult> Update(string id, [FromBody] BatchUpdateDTO request)
         {
             try

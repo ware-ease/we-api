@@ -26,8 +26,8 @@ namespace BusinessLogicLayer.Services
         public BatchService(IGenericRepository<Batch> genericService,
             IGenericRepository<Partner> partnerRepository,
             IGenericRepository<Product> productRepository,
-            IMapper mapper, 
-            IUnitOfWork unitOfWork) : base(genericService, mapper, unitOfWork) 
+            IMapper mapper,
+            IUnitOfWork unitOfWork) : base(genericService, mapper, unitOfWork)
         {
             _batchRepository = genericService;
             _partnerRepository = partnerRepository;
@@ -73,6 +73,21 @@ namespace BusinessLogicLayer.Services
             if (existingBatch == null)
                 throw new Exception("Batch not found");
 
+            if (!string.IsNullOrEmpty(request.SupplierId))
+            {
+                var supplier = await _partnerRepository.Get(request.SupplierId);
+                if (supplier == null)
+                    throw new Exception("Supplier not found");
+                existingBatch.SupplierId = request.SupplierId;
+            }
+            if (!string.IsNullOrEmpty(request.ProductId))
+            {
+                var product = await _productRepository.Get(request.ProductId);
+                if (product == null)
+                    throw new Exception("Product not found");
+                existingBatch.ProductId = request.ProductId;
+            }
+
             if (!string.IsNullOrEmpty(request.Code))
             {
                 existingBatch.Code = request.Code;
@@ -81,13 +96,18 @@ namespace BusinessLogicLayer.Services
             {
                 existingBatch.Name = request.Name;
             }
-
-            if (!string.IsNullOrEmpty(request.ProductId))
+            if (request.MfgDate.HasValue)
             {
-                var product = await _productRepository.Get(request.ProductId);
-                if (product == null)
-                    throw new Exception("Product not found");
-                existingBatch.ProductId = request.ProductId;
+                existingBatch.MfgDate = request.MfgDate.Value;
+            }
+            if (request.ExpDate.HasValue)
+            {
+                existingBatch.ExpDate = request.ExpDate.Value;
+            }
+
+            if (!string.IsNullOrEmpty(request.InventoryId))
+            {
+                existingBatch.InventoryId = request.InventoryId;
             }
 
             _batchRepository.Update(existingBatch);

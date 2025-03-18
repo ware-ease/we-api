@@ -4,6 +4,9 @@ using BusinessLogicLayer.IService;
 using BusinessLogicLayer.Models.Category;
 using BusinessLogicLayer.Models.Pagination;
 using Data.Entity;
+using Data.Model.DTO;
+using Data.Model.Request.Batch;
+using Data.Model.Request.Category;
 using DataAccessLayer.Generic;
 using DataAccessLayer.IRepositories;
 using DataAccessLayer.Repositories;
@@ -27,6 +30,31 @@ namespace BusinessLogicLayer.Services
         {
             var batches = await _genericRepository.GetAllNoPaging();
             return batches.Count(b => !b.IsDeleted);
+        }
+
+        public async Task<CategoryDTO> UpdateCategory(CategoryUpdateDTO request)
+        {
+            var existingCategory = await _genericRepository.Get(request.Id);
+            if (existingCategory == null)
+                throw new Exception("Category not found");
+
+            if (!string.IsNullOrEmpty(request.Name))
+            {
+                existingCategory.Name = request.Name;
+            }
+            if (!string.IsNullOrEmpty(request.Note))
+            {
+                existingCategory.Note = request.Note;
+            }
+
+            _genericRepository.Update(existingCategory);
+            await _unitOfWork.SaveAsync();
+
+            var updatedCategory = await _genericRepository.Get(existingCategory.Id);
+            if (updatedCategory == null)
+                throw new Exception("Update failed, category not found after update");
+
+            return _mapper.Map<CategoryDTO>(updatedCategory);
         }
 
         /*public async Task<PagedResult<Category>> GetAllAsync(int? pageNumber, int? pageSize)

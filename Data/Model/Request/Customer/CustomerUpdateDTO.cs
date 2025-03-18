@@ -12,9 +12,10 @@ namespace Data.Model.Request.Customer
     {
         [JsonIgnore]
         public string? Id { get; set; }
-        [Required]
         public string? Name { get; set; }
+        [Phone]
         public string? Phone { get; set; }
-        public bool Status { get; set; }
+        [JsonIgnore]
+        public bool? Status { get; set; }
     }
 }
