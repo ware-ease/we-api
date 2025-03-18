@@ -48,8 +48,7 @@ namespace API.Controllers
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-
-            var products = await _productService.Get<ProductDTO>();
+            var products = await _productService.GetAllProducts();
             return ControllerResponse.Response(products);
         }
 

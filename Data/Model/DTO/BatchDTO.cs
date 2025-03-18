@@ -11,6 +11,7 @@ namespace Data.Model.DTO
     {
         public string? SupplierName { get; set; }
         public string ProductName { get; set; }
+        public string ProductId { get; set; }
         public string? Code { get; set; }
         public string? Name { get; set; }
         public DateOnly MfgDate { get; set; }

@@ -17,7 +17,7 @@ namespace BusinessLogicLayer.IServices
     {
         Task<int> Count();
         Task<ProductDTO> GetProductById(string id);
-        Task<IEnumerable<Product>> GetAllProducts();
+        Task<ServiceResponse> GetAllProducts();
         Task<ProductDTO> AddProduct(ProductCreateDTO request);
         Task<ProductDTO> UpdateProduct(ProductUpdateDTO request);
 

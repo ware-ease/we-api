@@ -1,10 +1,12 @@
 ﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using BusinessLogicLayer.Generic;
 using BusinessLogicLayer.IServices;
 using BusinessLogicLayer.Models.Pagination;
 using BusinessLogicLayer.Models.Product;
 using BusinessLogicLayer.Models.PurchaseReceipt;
 using Data.Entity;
+using Data.Enum;
 using Data.Model.DTO;
 using Data.Model.Request.Product;
 using Data.Model.Response;
@@ -13,6 +15,7 @@ using DataAccessLayer.IRepositories;
 using DataAccessLayer.Migrations;
 using DataAccessLayer.Repositories;
 using DataAccessLayer.UnitOfWork;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -57,6 +60,21 @@ namespace BusinessLogicLayer.Services
             return batches.Count(b => !b.IsDeleted);
         }
 
+        public async Task<ServiceResponse> GetAllProducts()
+        {
+            var query = _genericRepository.Get();
+
+            var products = await query
+                .ProjectTo<ProductDTO>(_mapper.ConfigurationProvider).ToListAsync();
+
+            return new ServiceResponse
+            {
+                Status = Data.Enum.SRStatus.Success,
+                Message = "Get successfully!",
+                Data = products
+            };
+        }
+
         public async Task<ProductDTO> AddProduct(ProductCreateDTO request)
         {
             var productType = await _productTypeRepository.Get(request.ProductTypeId);
@@ -95,11 +113,6 @@ namespace BusinessLogicLayer.Services
             return _mapper.Map<ProductDTO>(product);
         }
 
-        public async Task<IEnumerable<Product>> GetAllProducts()
-        {
-            var products = await _productRepository.GetAllNoPaging();
-            return products;
-        }
 
         public async Task<ProductDTO> UpdateProduct(ProductUpdateDTO request)
         {
