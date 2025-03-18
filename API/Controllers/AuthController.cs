@@ -60,11 +60,16 @@ namespace API.Controllers
             return ControllerResponse.Response(result);
         }
 
-        [Authorize]
         [HttpPost("refresh")]
         public async Task<IActionResult> Refresh()
         {
             AuthHelper.AuthUser? authUser = AuthHelper.GetCurrentUser(Request);
+
+            if (authUser == null)
+            {
+                return Unauthorized();
+            }
+
             AuthHelper.DeleteFromCookies(Response, "accessToken");
             AuthHelper.DeleteFromCookies(Response, "refreshToken");
 

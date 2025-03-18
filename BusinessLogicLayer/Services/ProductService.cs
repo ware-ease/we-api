@@ -51,6 +51,12 @@ namespace BusinessLogicLayer.Services
             _unitRepository = unitRepository;
         }
 
+        public async Task<int> Count()
+        {
+            var batches = await _productRepository.GetAllNoPaging();
+            return batches.Count(b => !b.IsDeleted);
+        }
+
         public async Task<ProductDTO> AddProduct(ProductCreateDTO request)
         {
             var productType = await _productTypeRepository.Get(request.ProductTypeId);
@@ -109,6 +115,10 @@ namespace BusinessLogicLayer.Services
             {
                 existingProduct.Sku = request.Sku;
             }
+            if (!string.IsNullOrEmpty(request.imageUrl))
+            {
+                existingProduct.imageUrl = request.imageUrl;
+            }
 
 
             if (!string.IsNullOrEmpty(request.ProductTypeId))
@@ -140,7 +150,7 @@ namespace BusinessLogicLayer.Services
             _productRepository.Update(existingProduct);
             await _unitOfWork.SaveAsync();
 
-            // Sau khi update, lấy lại product với đầy đủ thông tin để trả về
+
             var updatedProduct = await _productRepository.GetFullProductById(existingProduct.Id);
             if (updatedProduct == null)
                 throw new Exception("Update failed, product not found after update");

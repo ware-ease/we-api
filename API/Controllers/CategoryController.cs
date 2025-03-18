@@ -6,6 +6,7 @@ using BusinessLogicLayer.Models.Category;
 using BusinessLogicLayer.Models.General;
 using BusinessLogicLayer.Service;
 using Data.Entity;
+using Data.Enum;
 using Data.Model.DTO;
 using Data.Model.Request.Category;
 using Data.Model.Response;
@@ -27,6 +28,20 @@ namespace API.Controllers
         {
             _categoryService = service;
             //_mapper = mapper;
+        }
+
+        [HttpGet("count")]
+        public async Task<IActionResult> Count()
+        {
+            var count = await _categoryService.Count();
+            var response = new ServiceResponse
+            {
+                Data = count,
+                Status = SRStatus.Success,
+                Message = "Total category count retrieved successfully"
+            };
+
+            return ControllerResponse.Response(response);
         }
 
         [HttpGet]
@@ -62,12 +77,29 @@ namespace API.Controllers
             return ControllerResponse.Response(result);
         }
 
-        [HttpPut("{id}")]
+        [HttpPatch("{id}")]
         public async Task<IActionResult> Update(string id, [FromBody] CategoryUpdateDTO request)
         {
-            request.Id = id;
-            var result = await _categoryService.Update<CategoryDTO, CategoryUpdateDTO>(request);
-            return ControllerResponse.Response(result);
+            try
+            {
+                request.Id = id;
+                var result = await _categoryService.UpdateCategory(request);
+                return ControllerResponse.Response(new ServiceResponse
+                {
+                    Status = Data.Enum.SRStatus.Success,
+                    Message = "Category updated successfully",
+                    Data = result
+                });
+            }
+            catch (Exception ex)
+            {
+                return ControllerResponse.Response(new ServiceResponse
+                {
+                    Status = Data.Enum.SRStatus.Error,
+                    Message = ex.Message,
+                    Data = null
+                });
+            }
         }
 
         [HttpDelete("{id}")]

@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
 {
-    [Route("api/batchs")]
+    [Route("api/batches")]
     [ApiController]
     public class BatchController : ControllerBase
     {
@@ -22,6 +22,20 @@ namespace API.Controllers
         public BatchController(IBatchService batchService)
         {
             _batchService = batchService;
+        }
+
+        [HttpGet("count")]
+        public async Task<IActionResult> Count()
+        {
+            var count = await _batchService.CountBatch();
+            var response = new ServiceResponse
+            {
+                Data = count,
+                Status = SRStatus.Success,
+                Message = "Total batch count retrieved successfully"
+            };
+
+            return ControllerResponse.Response(response);
         }
 
         [HttpGet]
@@ -38,12 +52,7 @@ namespace API.Controllers
             try
             {
                 var batch = await _batchService.Get<BatchDTO>(id);
-                return ControllerResponse.Response(new ServiceResponse
-                {
-                    Status = SRStatus.Success,
-                    Message = "Batch retrieved successfully",
-                    Data = batch
-                });
+                return ControllerResponse.Response(batch);
             }
             catch (Exception ex)
             {
@@ -88,7 +97,7 @@ namespace API.Controllers
             }
         }
 
-        [HttpPut("{id}")]
+        [HttpPatch("{id}")]
         public async Task<IActionResult> Update(string id, [FromBody] BatchUpdateDTO request)
         {
             try

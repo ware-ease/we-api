@@ -15,6 +15,7 @@ namespace BusinessLogicLayer.IServices
 {
     public interface IProductService : IGenericService
     {
+        Task<int> Count();
         Task<ProductDTO> GetProductById(string id);
         Task<IEnumerable<Product>> GetAllProducts();
         Task<ProductDTO> AddProduct(ProductCreateDTO request);

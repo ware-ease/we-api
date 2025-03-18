@@ -1,14 +1,18 @@
-﻿using BusinessLogicLayer.IServices;
+﻿using API.Utils;
+using BusinessLogicLayer.IServices;
+using BusinessLogicLayer.Services;
+using Data.Enum;
 using Data.Model.DTO;
 using Data.Model.Request.Brand;
 using Data.Model.Request.ProductType;
 using Data.Model.Response;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
 {
-    [Route("api/productTypes")]
+    [Route("api/product-types")]
     [ApiController]
     public class ProductTypeController : ControllerBase
     {
@@ -17,6 +21,20 @@ namespace API.Controllers
         public ProductTypeController(IProductTypesService productTypesService)
         {
             _productTypeService = productTypesService;
+        }
+
+        [HttpGet("count")]
+        public async Task<IActionResult> Count()
+        {
+            var count = await _productTypeService.Count();
+            var response = new ServiceResponse
+            {
+                Data = count,
+                Status = SRStatus.Success,
+                Message = "Total product type count retrieved successfully"
+            };
+
+            return ControllerResponse.Response(response);
         }
 
         [HttpGet]
@@ -33,31 +51,61 @@ namespace API.Controllers
             return ControllerResponse.Response(result);
         }
 
-        //[Authorize]
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> Add([FromBody] ProductTypeCreateDTO request)
         {
-            /*var authUser = AuthHelper.GetCurrentUser(HttpContext.Request);
-
-            if (authUser != null)
+            try
             {
-                request.CreatedBy = authUser.id;
+                var authUser = AuthHelper.GetCurrentUser(HttpContext.Request);
+
+                if (authUser != null)
+                {
+                    request.CreatedBy = authUser.id;
+                }
+
+                var result = await _productTypeService.AddProductType(request);
+                return ControllerResponse.Response(new ServiceResponse
+                {
+                    Status = SRStatus.Success,
+                    Message = "ProductType created successfully",
+                    Data = result
+                });
             }
-            else
+            catch (Exception ex)
             {
-                return Unauthorized();
-            }*/
-
-            var result = await _productTypeService.Add<ProductTypeDTO, ProductTypeCreateDTO>(request);
-            return ControllerResponse.Response(result);
+                return ControllerResponse.Response(new ServiceResponse
+                {
+                    Status = SRStatus.Error,
+                    Message = ex.Message,
+                    Data = null
+                });
+            }
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(string id, [FromBody] BrandUpdateDTO request)
+        public async Task<IActionResult> Update(string id, [FromBody] ProductTypeUpdateDTO request)
         {
-            request.Id = id;
-            var result = await _productTypeService.Update<BrandDTO, BrandUpdateDTO>(request);
-            return ControllerResponse.Response(result);
+            try
+            {
+                request.Id = id;
+                var result = await _productTypeService.UpdateProductType(request);
+                return ControllerResponse.Response(new ServiceResponse
+                {
+                    Status = Data.Enum.SRStatus.Success,
+                    Message = "ProductType updated successfully",
+                    Data = result
+                });
+            }
+            catch (Exception ex)
+            {
+                return ControllerResponse.Response(new ServiceResponse
+                {
+                    Status = Data.Enum.SRStatus.Error,
+                    Message = ex.Message,
+                    Data = null
+                });
+            }
         }
 
         [HttpDelete("{id}")]

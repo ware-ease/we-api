@@ -5,6 +5,8 @@ using BusinessLogicLayer.Models.Pagination;
 using BusinessLogicLayer.Models.Supplier;
 using Data.Entity;
 using Data.Enum;
+using Data.Model.DTO;
+using Data.Model.Request.Customer;
 using Data.Model.Request.Supplier;
 using Data.Model.Response;
 using DataAccessLayer.Generic;
@@ -88,45 +90,31 @@ namespace BusinessLogicLayer.Services
 
 
 
-        public override async Task<ServiceResponse> Update<TResult, TRequest>(TRequest request)
+        public async Task<SupplierDTO> UpdateSupplier(SupplierUpdateDTO request)
         {
-            var supplierUpdateDto = request as SupplierUpdateDTO;
-            if (supplierUpdateDto == null || string.IsNullOrEmpty(supplierUpdateDto.Id))
-                throw new Exception("Invalid supplier update request: missing Id");
-            var existingSupplier = await _genericRepository.Get(supplierUpdateDto.Id);
+            var existingSupplier = await _genericRepository.Get(request.Id);
             if (existingSupplier == null)
-            {
-                return new ServiceResponse
-                {
-                    Status = Data.Enum.SRStatus.NotFound,
-                    Message = "Không thể tìm thấy Supplier với Id này",
-                    Data = supplierUpdateDto.Id
-                };
-            }
-            _mapper.Map(request, existingSupplier);
+                throw new Exception("Supplier not found");
 
-            try
+            if (!string.IsNullOrEmpty(request.Name))
             {
-                _genericRepository.Update(existingSupplier);
-                await _unitOfWork.SaveAsync();
+                existingSupplier.Name = request.Name;
+            }
+            if (!string.IsNullOrEmpty(request.Phone))
+            {
+                existingSupplier.Phone = request.Phone;
+            }
+            if (request.Status.HasValue)
+                existingSupplier.Status = request.Status.Value;
 
-                TResult result = _mapper.Map<TResult>(existingSupplier);
-                return new ServiceResponse
-                {
-                    Status = Data.Enum.SRStatus.Success,
-                    Message = "Update successfully!",
-                    Data = result
-                };
-            }
-            catch (Exception ex)
-            {
-                return new ServiceResponse
-                {
-                    Status = Data.Enum.SRStatus.Error,
-                    Message = ex.Message,
-                    Data = request
-                };
-            }
+            _genericRepository.Update(existingSupplier);
+            await _unitOfWork.SaveAsync();
+
+            var updatedSupplier = await _genericRepository.Get(existingSupplier.Id);
+            if (updatedSupplier == null)
+                throw new Exception("Update failed, supplier not found after update");
+
+            return _mapper.Map<SupplierDTO>(updatedSupplier);
         }
 
         /*public SupplierService(ISupplierRepository supplierRepository, IGenericPaginationService genericPaginationService, IMapper mapper)

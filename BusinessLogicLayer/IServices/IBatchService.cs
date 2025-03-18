@@ -11,6 +11,7 @@ namespace BusinessLogicLayer.IServices
 {
     public interface IBatchService : IGenericService
     {
+        Task<int> CountBatch();
         Task<BatchDTO> AddBatch(BatchCreateDTO request);
         Task<BatchDTO> UpdateBatch(BatchUpdateDTO request);
     }

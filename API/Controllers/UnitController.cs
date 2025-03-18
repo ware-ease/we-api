@@ -1,8 +1,12 @@
-﻿using BusinessLogicLayer.IServices;
+﻿using API.Utils;
+using BusinessLogicLayer.IServices;
+using BusinessLogicLayer.Services;
 using Data.Model.DTO;
 using Data.Model.Request.Brand;
+using Data.Model.Request.Product;
 using Data.Model.Request.Unit;
 using Data.Model.Response;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -33,31 +37,44 @@ namespace API.Controllers
             return ControllerResponse.Response(result);
         }
 
-        //[Authorize]
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> Add([FromBody] UnitCreateDTO request)
         {
-            /*var authUser = AuthHelper.GetCurrentUser(HttpContext.Request);
+            var authUser = AuthHelper.GetCurrentUser(HttpContext.Request);
 
             if (authUser != null)
             {
                 request.CreatedBy = authUser.id;
             }
-            else
-            {
-                return Unauthorized();
-            }*/
 
             var result = await _unitService.Add<UnitDTO, UnitCreateDTO>(request);
             return ControllerResponse.Response(result);
         }
 
-        [HttpPut("{id}")]
+        [HttpPatch("{id}")]
         public async Task<IActionResult> Update(string id, [FromBody] UnitUpdateDTO request)
         {
-            request.Id = id;
-            var result = await _unitService.Update<UnitDTO, UnitUpdateDTO>(request);
-            return ControllerResponse.Response(result);
+            try
+            {
+                request.Id = id;
+                var updatedUnit = await _unitService.UpdateUnit(request);
+                return ControllerResponse.Response(new ServiceResponse
+                {
+                    Status = Data.Enum.SRStatus.Success,
+                    Message = "Product updated successfully",
+                    Data = updatedUnit
+                });
+            }
+            catch (Exception ex)
+            {
+                return ControllerResponse.Response(new ServiceResponse
+                {
+                    Status = Data.Enum.SRStatus.Error,
+                    Message = ex.Message,
+                    Data = null
+                });
+            }
         }
 
         [HttpDelete("{id}")]

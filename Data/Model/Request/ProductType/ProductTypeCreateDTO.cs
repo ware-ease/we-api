@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Data.Model.Request.ProductType
 {
-    public class ProductTypeCreateDTO
+    public class ProductTypeCreateDTO : BaseCreateDTO
     {
         public string Name { get; set; }
         public string Note { get; set; }
