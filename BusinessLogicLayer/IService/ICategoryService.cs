@@ -13,6 +13,7 @@ namespace BusinessLogicLayer.IService
 {
     public interface ICategoryService : IGenericService
     {
+        Task<int> Count();
         /*Task<PagedResult<Category>> GetAllAsync(int? pageNumber, int? pageSize);
         Task<Category> GetByIdAsync(string id);
         Task AddAsync(Category category);

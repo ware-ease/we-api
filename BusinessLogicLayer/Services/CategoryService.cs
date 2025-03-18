@@ -23,6 +23,12 @@ namespace BusinessLogicLayer.Services
         {
         }
 
+        public async Task<int> Count()
+        {
+            var batches = await _genericRepository.GetAllNoPaging();
+            return batches.Count(b => !b.IsDeleted);
+        }
+
         /*public async Task<PagedResult<Category>> GetAllAsync(int? pageNumber, int? pageSize)
         {
             var query = _repository.GetAllQueryable();

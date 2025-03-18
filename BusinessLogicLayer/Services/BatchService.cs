@@ -36,6 +36,12 @@ namespace BusinessLogicLayer.Services
             _unitOfWork = unitOfWork;
         }
 
+        public async Task<int> CountBatch()
+        {
+            var batches = await _batchRepository.GetAllNoPaging();
+            return batches.Count(b => !b.IsDeleted);
+        }
+
         public async Task<BatchDTO> AddBatch(BatchCreateDTO request)
         {
             /*var supplier = await _partnerRepository.Get(request.SupplierId);

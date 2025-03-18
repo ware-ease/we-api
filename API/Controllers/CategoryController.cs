@@ -6,6 +6,7 @@ using BusinessLogicLayer.Models.Category;
 using BusinessLogicLayer.Models.General;
 using BusinessLogicLayer.Service;
 using Data.Entity;
+using Data.Enum;
 using Data.Model.DTO;
 using Data.Model.Request.Category;
 using Data.Model.Response;
@@ -27,6 +28,20 @@ namespace API.Controllers
         {
             _categoryService = service;
             //_mapper = mapper;
+        }
+
+        [HttpGet("count")]
+        public async Task<IActionResult> Count()
+        {
+            var count = await _categoryService.Count();
+            var response = new ServiceResponse
+            {
+                Data = count,
+                Status = SRStatus.Success,
+                Message = "Total category count retrieved successfully"
+            };
+
+            return ControllerResponse.Response(response);
         }
 
         [HttpGet]
