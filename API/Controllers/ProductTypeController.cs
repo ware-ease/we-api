@@ -1,10 +1,12 @@
-﻿using BusinessLogicLayer.IServices;
+﻿using API.Utils;
+using BusinessLogicLayer.IServices;
 using BusinessLogicLayer.Services;
 using Data.Enum;
 using Data.Model.DTO;
 using Data.Model.Request.Brand;
 using Data.Model.Request.ProductType;
 using Data.Model.Response;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -49,30 +51,26 @@ namespace API.Controllers
             return ControllerResponse.Response(result);
         }
 
-        //[Authorize]
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> Add([FromBody] ProductTypeCreateDTO request)
         {
-            /*var authUser = AuthHelper.GetCurrentUser(HttpContext.Request);
+            var authUser = AuthHelper.GetCurrentUser(HttpContext.Request);
 
             if (authUser != null)
             {
                 request.CreatedBy = authUser.id;
             }
-            else
-            {
-                return Unauthorized();
-            }*/
 
             var result = await _productTypeService.Add<ProductTypeDTO, ProductTypeCreateDTO>(request);
             return ControllerResponse.Response(result);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(string id, [FromBody] BrandUpdateDTO request)
+        public async Task<IActionResult> Update(string id, [FromBody] ProductTypeUpdateDTO request)
         {
             request.Id = id;
-            var result = await _productTypeService.Update<BrandDTO, BrandUpdateDTO>(request);
+            var result = await _productTypeService.Update<ProductTypeDTO, ProductTypeUpdateDTO>(request);
             return ControllerResponse.Response(result);
         }
 

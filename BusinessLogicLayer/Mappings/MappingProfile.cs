@@ -61,6 +61,7 @@ namespace BusinessLogicLayer.Mappings
             #region ProductType
             CreateMap<ProductType, ProductTypeDTO>().ReverseMap();
             CreateMap<ProductType, ProductTypeCreateDTO>().ReverseMap();
+            CreateMap<ProductType, ProductTypeUpdateDTO>().ReverseMap();
             #endregion ProductType
 
             #region Category

@@ -54,5 +54,30 @@ namespace BusinessLogicLayer.Services
             return _mapper.Map<ProductTypeDTO>(productType);
         }
 
+        public async Task<ProductTypeDTO> UpdateProductType(ProductTypeCreateDTO request)
+        {
+            var existedProductType = await _productTypeRepository.Get(request.CategoryId);
+            if (existedProductType == null)
+                throw new Exception("ProductType không tồn tại");
+
+            if (!string.IsNullOrEmpty(request.CategoryId))
+            {
+                var category = await _categoryRepository.Get(request.CategoryId);
+                if (category == null)
+                    throw new Exception("Category not found");
+                existedProductType.CategoryId = request.CategoryId;
+            }
+
+            _productTypeRepository.Update(existedProductType);
+            await _unitOfWork.SaveAsync();
+
+
+            var updatedProductType = await _productTypeRepository.Get(existedProductType.Id);
+            if (updatedProductType == null)
+                throw new Exception("Update failed, ProductType not found after update");
+
+            return _mapper.Map<ProductTypeDTO>(updatedProductType);
+        }
+
     }
 }
