@@ -48,7 +48,7 @@ namespace API.Controllers
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            var products = await _productService.GetAllProducts();
+            var products = await _productService.Get<ProductDTO>();
             return ControllerResponse.Response(products);
         }
 
@@ -57,13 +57,8 @@ namespace API.Controllers
         {
             try
             {
-                var productDTO = await _productService.GetProductById(id);
-                return ControllerResponse.Response(new ServiceResponse
-                {
-                    Status = SRStatus.Success,
-                    Message = "Product retrieved successfully",
-                    Data = productDTO
-                });
+                var productDTO = await _productService.Get<ProductDTO>(id);
+                return ControllerResponse.Response(productDTO);
             }
             catch (Exception ex)
             {

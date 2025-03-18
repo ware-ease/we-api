@@ -60,6 +60,50 @@ namespace BusinessLogicLayer.Services
             return batches.Count(b => !b.IsDeleted);
         }
 
+        public override async Task<ServiceResponse> Get<TResult>()
+        {
+            var products = await _genericRepository.GetAllNoPaging(
+                includeProperties: "ProductType,ProductType.Category,Brand,Unit"
+            );
+
+            List<TResult> mappedResults = _mapper.Map<List<TResult>>(products);
+
+            return new ServiceResponse
+            {
+                Status = Data.Enum.SRStatus.Success,
+                Message = "Get successfully!",
+                Data = mappedResults
+            };
+        }
+
+        public override async Task<ServiceResponse> Get<TResult>(string id)
+        {
+            var product = await _genericRepository.GetByCondition(
+                p => p.Id == id,
+                includeProperties: "ProductType,ProductType.Category,Brand,Unit"
+            );
+
+            if (product == null)
+            {
+                return new ServiceResponse
+                {
+                    Status = Data.Enum.SRStatus.NotFound,
+                    Message = "Product not found!",
+                    Data = id
+                };
+            }
+
+            TResult result = _mapper.Map<TResult>(product);
+
+            return new ServiceResponse
+            {
+                Status = Data.Enum.SRStatus.Success,
+                Message = "Get successfully!",
+                Data = result
+            };
+        }
+
+
         public async Task<ServiceResponse> GetAllProducts()
         {
             var query = _genericRepository.Get();
