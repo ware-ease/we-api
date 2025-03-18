@@ -77,12 +77,29 @@ namespace API.Controllers
             return ControllerResponse.Response(result);
         }
 
-        [HttpPut("{id}")]
+        [HttpPatch("{id}")]
         public async Task<IActionResult> Update(string id, [FromBody] CategoryUpdateDTO request)
         {
-            request.Id = id;
-            var result = await _categoryService.Update<CategoryDTO, CategoryUpdateDTO>(request);
-            return ControllerResponse.Response(result);
+            try
+            {
+                request.Id = id;
+                var result = await _categoryService.UpdateCategory(request);
+                return ControllerResponse.Response(new ServiceResponse
+                {
+                    Status = Data.Enum.SRStatus.Success,
+                    Message = "Category updated successfully",
+                    Data = result
+                });
+            }
+            catch (Exception ex)
+            {
+                return ControllerResponse.Response(new ServiceResponse
+                {
+                    Status = Data.Enum.SRStatus.Error,
+                    Message = ex.Message,
+                    Data = null
+                });
+            }
         }
 
         [HttpDelete("{id}")]

@@ -4,6 +4,7 @@ using BusinessLogicLayer.IService;
 using Data.Entity;
 using Data.Model.DTO;
 using Data.Model.Request.Category;
+using Data.Model.Request.Customer;
 using Data.Model.Request.Suppiler;
 using Data.Model.Request.Supplier;
 using Data.Model.Response;
@@ -59,12 +60,30 @@ namespace API.Controllers
             return ControllerResponse.Response(result);
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Update(string id, [FromBody] SupplierUpdateDTO request)
+        [HttpPatch("{id}")]
+        public async Task<IActionResult> Update([FromRoute] string id, [FromBody] SupplierUpdateDTO request)
         {
-            request.Id = id;
-            var result = await _supplierService.Update<SupplierDTO, SupplierUpdateDTO>(request);
-            return ControllerResponse.Response(result);
+            try
+            {
+                request.Id = id;
+                var result = await _supplierService.UpdateSupplier(request);
+
+                return ControllerResponse.Response(new ServiceResponse
+                {
+                    Status = Data.Enum.SRStatus.Success,
+                    Message = "Supplier updated successfully",
+                    Data = result
+                });
+            }
+            catch (Exception ex)
+            {
+                return ControllerResponse.Response(new ServiceResponse
+                {
+                    Status = Data.Enum.SRStatus.Error,
+                    Message = ex.Message,
+                    Data = null
+                });
+            }
         }
 
         [HttpDelete("{id}")]
