@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
 {
-    [Route("api/productTypes")]
+    [Route("api/product-types")]
     [ApiController]
     public class ProductTypeController : ControllerBase
     {
