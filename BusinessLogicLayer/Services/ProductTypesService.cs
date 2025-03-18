@@ -104,7 +104,7 @@ namespace BusinessLogicLayer.Services
 
         public async Task<ProductTypeDTO> AddProductType(ProductTypeCreateDTO request)
         {
-            var category = await _categoryRepository.Get(request.CategoryId);
+            var category = await _categoryRepository.GetByCondition(p => p.Id == request.CategoryId);
             if (category == null)
                 throw new Exception("Category không tồn tại");
 
@@ -118,7 +118,7 @@ namespace BusinessLogicLayer.Services
 
         public async Task<ProductTypeDTO> UpdateProductType(ProductTypeUpdateDTO request)
         {
-            var existedProductType = await _productTypeRepository.Get(request.Id);
+            var existedProductType = await _productTypeRepository.GetByCondition(p => p.Id == request.Id);
             if (existedProductType == null)
                 throw new Exception("ProductType không tồn tại");
 
@@ -133,7 +133,7 @@ namespace BusinessLogicLayer.Services
 
             if (!string.IsNullOrEmpty(request.CategoryId))
             {
-                var category = await _categoryRepository.Get(request.CategoryId);
+                var category = await _categoryRepository.GetByCondition(p => p.Id == request.CategoryId);
                 if (category == null)
                     throw new Exception("Category not found");
                 existedProductType.CategoryId = request.CategoryId;
@@ -143,7 +143,7 @@ namespace BusinessLogicLayer.Services
             await _unitOfWork.SaveAsync();
 
 
-            var updatedProductType = await _productTypeRepository.Get(existedProductType.Id);
+            var updatedProductType = await _productTypeRepository.GetByCondition(p => p.Id == existedProductType.Id);
             if (updatedProductType == null)
                 throw new Exception("Update failed, ProductType not found after update");
 

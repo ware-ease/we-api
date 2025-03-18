@@ -117,7 +117,7 @@ namespace BusinessLogicLayer.Services
 
         public async Task<SupplierDTO> UpdateSupplier(SupplierUpdateDTO request)
         {
-            var existingSupplier = await _genericRepository.Get(request.Id);
+            var existingSupplier = await _genericRepository.GetByCondition(p => p.Id == request.Id);
             if (existingSupplier == null)
                 throw new Exception("Supplier not found");
 
@@ -135,7 +135,7 @@ namespace BusinessLogicLayer.Services
             _genericRepository.Update(existingSupplier);
             await _unitOfWork.SaveAsync();
 
-            var updatedSupplier = await _genericRepository.Get(existingSupplier.Id);
+            var updatedSupplier = await _genericRepository.GetByCondition(p => p.Id == existingSupplier.Id);
             if (updatedSupplier == null)
                 throw new Exception("Update failed, supplier not found after update");
 

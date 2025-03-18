@@ -121,15 +121,19 @@ namespace BusinessLogicLayer.Services
 
         public async Task<ProductDTO> AddProduct(ProductCreateDTO request)
         {
-            var productType = await _productTypeRepository.Get(request.ProductTypeId);
+            var existingProduct = await _productRepository.GetByCondition(p => p.Sku == request.Sku);
+            if (existingProduct != null)
+                throw new Exception("SKU đã tồn tại trong hệ thống!");
+
+            var productType = await _productTypeRepository.GetByCondition(p => p.Id == request.ProductTypeId);
             if (productType == null)
                 throw new Exception("ProductType không tồn tại");
 
-            var brand = await _brandRepository.Get(request.BrandId);
+            var brand = await _brandRepository.GetByCondition(p => p.Id == request.BrandId);
             if (brand == null)
                 throw new Exception("Brand không tồn tại");
 
-            var unit = await _unitRepository.Get(request.UnitId);
+            var unit = await _unitRepository.GetByCondition(p => p.Id == request.UnitId);
             if (unit == null)
                 throw new Exception("Unit không tồn tại");
 
@@ -160,7 +164,7 @@ namespace BusinessLogicLayer.Services
 
         public async Task<ProductDTO> UpdateProduct(ProductUpdateDTO request)
         {
-            var existingProduct = await _productRepository.Get(request.Id);
+            var existingProduct = await _productRepository.GetByCondition(p => p.Id == request.Id);
             if (existingProduct == null)
                 throw new Exception("Product not found");
 
@@ -170,6 +174,10 @@ namespace BusinessLogicLayer.Services
             }
             if (!string.IsNullOrEmpty(request.Sku))
             {
+                var existingSku = await _productRepository.GetByCondition(p => p.Sku == request.Sku);
+                if (existingSku != null)
+                    throw new Exception("SKU đã tồn tại trong hệ thống!");
+
                 existingProduct.Sku = request.Sku;
             }
             if (!string.IsNullOrEmpty(request.imageUrl))
@@ -180,7 +188,7 @@ namespace BusinessLogicLayer.Services
 
             if (!string.IsNullOrEmpty(request.ProductTypeId))
             {
-                var category = await _categoryRepository.Get(request.ProductTypeId);
+                var category = await _categoryRepository.GetByCondition(p => p.Id == request.ProductTypeId);
                 if (category == null)
                     throw new Exception("Category not found");
                 existingProduct.ProductTypeId = request.ProductTypeId;
@@ -188,7 +196,7 @@ namespace BusinessLogicLayer.Services
 
             if (!string.IsNullOrEmpty(request.BrandId))
             {
-                var brand = await _brandRepository.Get(request.BrandId);
+                var brand = await _brandRepository.GetByCondition(p => p.Id == request.BrandId);
                 if (brand == null)
                     throw new Exception("Brand not found");
                 existingProduct.BrandId = request.BrandId;
@@ -196,7 +204,7 @@ namespace BusinessLogicLayer.Services
 
             if (!string.IsNullOrEmpty(request.UnitId))
             {
-                var unit = await _unitRepository.Get(request.UnitId);
+                var unit = await _unitRepository.GetByCondition(p => p.Id == request.UnitId);
                 if (unit == null)
                     throw new Exception("Unit not found");
                 existingProduct.UnitId = request.UnitId;
@@ -208,7 +216,8 @@ namespace BusinessLogicLayer.Services
             await _unitOfWork.SaveAsync();
 
 
-            var updatedProduct = await _productRepository.GetFullProductById(existingProduct.Id);
+            var updatedProduct = await _productRepository.GetByCondition(p => p.Id == existingProduct.Id,
+                includeProperties: "ProductType,Brand,Unit");
             if (updatedProduct == null)
                 throw new Exception("Update failed, product not found after update");
 

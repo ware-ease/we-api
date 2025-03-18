@@ -73,7 +73,7 @@ namespace BusinessLogicLayer.Services
 
         public async Task<CategoryDTO> UpdateCategory(CategoryUpdateDTO request)
         {
-            var existingCategory = await _genericRepository.Get(request.Id);
+            var existingCategory = await _genericRepository.GetByCondition(p => p.Id == request.Id);
             if (existingCategory == null)
                 throw new Exception("Category not found");
 
@@ -89,7 +89,7 @@ namespace BusinessLogicLayer.Services
             _genericRepository.Update(existingCategory);
             await _unitOfWork.SaveAsync();
 
-            var updatedCategory = await _genericRepository.Get(existingCategory.Id);
+            var updatedCategory = await _genericRepository.GetByCondition(p => p.Id == existingCategory.Id);
             if (updatedCategory == null)
                 throw new Exception("Update failed, category not found after update");
 
