@@ -1,13 +1,16 @@
 ﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using BusinessLogicLayer.Generic;
 using BusinessLogicLayer.IServices;
 using Data.Entity;
 using Data.Model.DTO;
 using Data.Model.Request.ProductType;
+using Data.Model.Response;
 using DataAccessLayer.Generic;
 using DataAccessLayer.IRepositories;
 using DataAccessLayer.Repositories;
 using DataAccessLayer.UnitOfWork;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,6 +41,21 @@ namespace BusinessLogicLayer.Services
         {
             var batches = await _productTypeRepository.GetAllNoPaging();
             return batches.Count(b => !b.IsDeleted);
+        }
+
+        public async Task<ServiceResponse> GetAllProducts()
+        {
+            var query = _genericRepository.Get();
+
+            var products = await query
+                .ProjectTo<ProductTypeDTO>(_mapper.ConfigurationProvider).ToListAsync();
+
+            return new ServiceResponse
+            {
+                Status = Data.Enum.SRStatus.Success,
+                Message = "Get successfully!",
+                Data = products
+            };
         }
 
         public async Task<ProductTypeDTO> AddProductType(ProductTypeCreateDTO request)
