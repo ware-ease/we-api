@@ -21,5 +21,9 @@ namespace DataAccessLayer.UnitOfWork
         IRefreshTokenRepository RefreshTokenRepository { get; }
         ICustomerRepository CustomerRepository { get; }
         ILocationRepository LocationRepository { get; }
+        IGoodRequestRepository GoodRequestRepository { get; }
+        IGoodRequestDetailRepository GoodRequestDetailRepository { get; }
+        IProductRepository ProductRepository { get; }
+        IPartnerRepository PartnerRepository { get; }
     }
 }
