@@ -89,7 +89,7 @@ namespace BusinessLogicLayer.Services
             if (supplier.PartnerType != Data.Enum.PartnerEnum.Supplier)
                 throw new Exception("Partner này không phải là Supplier");*/
 
-            var product = await _productRepository.Get(request.ProductId);
+            var product = await _productRepository.GetByCondition(p => p.Id == request.ProductId);
             if (product == null)
                 throw new Exception("Product không tồn tại");
 
@@ -107,20 +107,20 @@ namespace BusinessLogicLayer.Services
 
         public async Task<BatchDTO> UpdateBatch(BatchUpdateDTO request)
         {
-            var existingBatch = await _batchRepository.Get(request.Id);
+            var existingBatch = await _batchRepository.GetByCondition(p => p.Id == request.Id);
             if (existingBatch == null)
                 throw new Exception("Batch not found");
 
             if (!string.IsNullOrEmpty(request.SupplierId))
             {
-                var supplier = await _partnerRepository.Get(request.SupplierId);
+                var supplier = await _partnerRepository.GetByCondition(p => p.Id == request.SupplierId);
                 if (supplier == null)
                     throw new Exception("Supplier not found");
                 existingBatch.SupplierId = request.SupplierId;
             }
             if (!string.IsNullOrEmpty(request.ProductId))
             {
-                var product = await _productRepository.Get(request.ProductId);
+                var product = await _productRepository.GetByCondition(p => p.Id == request.ProductId);
                 if (product == null)
                     throw new Exception("Product not found");
                 existingBatch.ProductId = request.ProductId;
@@ -151,7 +151,7 @@ namespace BusinessLogicLayer.Services
             _batchRepository.Update(existingBatch);
             await _unitOfWork.SaveAsync();
 
-            var updatedBatch = await _batchRepository.Get(existingBatch.Id);
+            var updatedBatch = await _batchRepository.GetByCondition(p => p.Id == existingBatch.Id);
             if (updatedBatch == null)
                 throw new Exception("Update failed, batch not found after update");
 

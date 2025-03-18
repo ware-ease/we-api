@@ -65,7 +65,7 @@ namespace BusinessLogicLayer.Services
 
         public async Task<UnitDTO> UpdateUnit(UnitUpdateDTO request)
         {
-            var existedUnit = await _genericRepository.Get(request.Id);
+            var existedUnit = await _genericRepository.GetByCondition(p => p.Id == request.Id);
             if (existedUnit == null)
                 throw new Exception("Unit không tồn tại");
 
@@ -82,7 +82,7 @@ namespace BusinessLogicLayer.Services
             await _unitOfWork.SaveAsync();
 
 
-            var updatedUnit = await _genericRepository.Get(existedUnit.Id);
+            var updatedUnit = await _genericRepository.GetByCondition(p => p.Id == existedUnit.Id);
             if (updatedUnit == null)
                 throw new Exception("Update failed, Unit not found after update");
 
