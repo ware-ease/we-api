@@ -36,20 +36,16 @@ namespace API.Controllers
             return ControllerResponse.Response(result);
         }
 
-        //[Authorize]
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> Add([FromBody] BrandCreateDTO request)
         {
-            /*var authUser = AuthHelper.GetCurrentUser(HttpContext.Request);
+            var authUser = AuthHelper.GetCurrentUser(HttpContext.Request);
 
             if (authUser != null)
             {
                 request.CreatedBy = authUser.id;
             }
-            else
-            {
-                return Unauthorized();
-            }*/
 
             var result = await _brandService.Add<BrandDTO, BrandCreateDTO>(request);
             return ControllerResponse.Response(result);
