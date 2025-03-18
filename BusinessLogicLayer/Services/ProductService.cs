@@ -55,7 +55,7 @@ namespace BusinessLogicLayer.Services
         {
             var productType = await _productTypeRepository.Get(request.ProductTypeId);
             if (productType == null)
-                throw new Exception("Category không tồn tại");
+                throw new Exception("ProductType không tồn tại");
 
             var brand = await _brandRepository.Get(request.BrandId);
             if (brand == null)

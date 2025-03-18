@@ -11,6 +11,7 @@ using Data.Entity;
 using Data.Model.DTO;
 using Data.Model.Request.Account;
 using Data.Model.Request.Area;
+using Data.Model.Request.Batch;
 using Data.Model.Request.Brand;
 using Data.Model.Request.Category;
 using Data.Model.Request.Customer;
@@ -105,6 +106,14 @@ namespace BusinessLogicLayer.Mappings
 
             CreateMap<ProductCreateDTO, Product>().ReverseMap();
             CreateMap<ProductUpdateDTO, Product>().ReverseMap();
+            #endregion
+
+            #region Batch
+            CreateMap<Batch, BatchDTO>()
+                .ForMember(dest => dest.ProductName, opt => opt.MapFrom(src => src.Product.Name))
+                .ReverseMap();
+            CreateMap<Batch, BatchCreateDTO>().ReverseMap();
+            CreateMap<Batch, BatchUpdateDTO>().ReverseMap();
             #endregion
 
             #region Brand
