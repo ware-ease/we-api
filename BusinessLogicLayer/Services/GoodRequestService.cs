@@ -179,11 +179,16 @@ namespace BusinessLogicLayer.Services
                     Data = id
                 };
             }
+            // 2️⃣ Kiểm tra và gán dữ liệu (nếu request null thì giữ nguyên giá trị cũ)
+            request.Note = request.Note ?? entity.Note;
+            request.PartnerId = request.PartnerId ?? entity.PartnerId;
+            request.WarehouseId = request.WarehouseId ?? entity.WarehouseId;
+            request.RequestedWarehouseId = request.RequestedWarehouseId ?? entity.RequestedWarehouseId;
 
             // 2️⃣ Cập nhật thông tin chung
             if (!string.IsNullOrEmpty(request.PartnerId))
             {
-                var partnerExists = await _unitOfWork.PartnerRepository.Get(request.PartnerId);
+                var partnerExists = await _unitOfWork.PartnerRepository.GetByCondition(x => x.Id == request.PartnerId);
                 if (partnerExists == null)
                 {
                     return new ServiceResponse
@@ -213,7 +218,7 @@ namespace BusinessLogicLayer.Services
             // 4️⃣ Kiểm tra RequestedWarehouseId có tồn tại không
             if (!string.IsNullOrEmpty(request.RequestedWarehouseId))
             {
-                var requestedWarehouseExists = await _unitOfWork.WarehouseRepository.Get(request.RequestedWarehouseId);
+                var requestedWarehouseExists = await _unitOfWork.WarehouseRepository.GetByCondition(x => x.Id == request.RequestedWarehouseId);
                 if (requestedWarehouseExists == null)
                 {
                     return new ServiceResponse
@@ -265,6 +270,7 @@ namespace BusinessLogicLayer.Services
             try
             {
                 _mapper.Map(request, entity);
+                _unitOfWork.GoodRequestRepository.Update(entity);
                 await _unitOfWork.SaveAsync();
                 var result = _mapper.Map<TResult>(entity);
 

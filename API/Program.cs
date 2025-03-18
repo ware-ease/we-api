@@ -118,6 +118,7 @@ builder.Services.AddScoped<IRouteService, RouteService>();
 builder.Services.AddScoped<IWarehouseService, WarehouseService>();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddScoped<IGoodRequestService, GoodRequestService>();
+builder.Services.AddScoped<IPartnerService, PartnerService>();
 #endregion Services
 
 #region Repositories

@@ -16,6 +16,7 @@ using Data.Model.Request.Brand;
 using Data.Model.Request.Category;
 using Data.Model.Request.Customer;
 using Data.Model.Request.GoodRequest;
+using Data.Model.Request.Partner;
 using Data.Model.Request.Product;
 using Data.Model.Request.ProductType;
 using Data.Model.Request.Suppiler;
@@ -171,6 +172,18 @@ namespace BusinessLogicLayer.Mappings
             CreateMap<GoodRequestCreateDTO, GoodRequest>().ReverseMap();
             CreateMap<GoodRequestUpdateDTO, GoodRequest>().ReverseMap();
             CreateMap<GoodRequestDetail, GoodRequestDetailDTO>().ReverseMap();
+            #endregion
+
+            #region Partner
+            // Map từ Entity -> DTO
+            CreateMap<Partner, PartnerDTO>();
+
+            // Map từ CreateDTO -> Entity
+            CreateMap<PartnerCreateDTO, Partner>();
+
+            // Map từ UpdateDTO -> Entity (không ghi đè `Id`)
+            CreateMap<PartnerUpdateDTO, Partner>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore());
             #endregion
         }
     }
