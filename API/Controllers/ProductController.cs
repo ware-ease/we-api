@@ -114,7 +114,7 @@ namespace API.Controllers
         {
             try
             {
-                request.Id = id; // Gán id từ route cho DTO
+                request.Id = id;
                 var updatedProduct = await _productService.UpdateProduct(request);
                 return ControllerResponse.Response(new ServiceResponse
                 {
