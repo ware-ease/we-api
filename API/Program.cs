@@ -95,6 +95,8 @@ builder.Services.AddScoped<IGenericRepository<Unit>, GenericRepository<Unit>>();
 builder.Services.AddScoped<IGenericRepository<Supplier>, GenericRepository<Supplier>>();
 builder.Services.AddScoped<IGenericRepository<Data.Entity.Route>, GenericRepository<Data.Entity.Route>>();
 builder.Services.AddScoped<IGenericRepository<Location>, GenericRepository<Location>>();
+builder.Services.AddScoped<IGenericRepository<GoodRequest>, GenericRepository<GoodRequest>>();
+builder.Services.AddScoped<IGenericRepository<GoodRequestDetail>, GenericRepository<GoodRequestDetail>>();
 #endregion Generic
 
 #region Services
@@ -115,6 +117,7 @@ builder.Services.AddScoped<IPermissionService, PermissionService>();
 builder.Services.AddScoped<IRouteService, RouteService>();
 builder.Services.AddScoped<IWarehouseService, WarehouseService>();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
+builder.Services.AddScoped<IGoodRequestService, GoodRequestService>();
 #endregion Services
 
 #region Repositories
@@ -133,6 +136,9 @@ builder.Services.AddScoped<IWarehouseRepository, WarehouseRepository>();
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 builder.Services.AddScoped<ILocationRepository, LocationRepository>();
+builder.Services.AddScoped<IGoodRequestRepository, GoodRequestRepository>();
+builder.Services.AddScoped<IGoodRequestDetailRepository, GoodRequestDetailRepository>();
+builder.Services.AddScoped<IPartnerRepository, PartnerRepository>();
 #endregion Repositories
 
 builder.Services.AddAuthentication(options =>

@@ -15,6 +15,7 @@ using Data.Model.Request.Batch;
 using Data.Model.Request.Brand;
 using Data.Model.Request.Category;
 using Data.Model.Request.Customer;
+using Data.Model.Request.GoodRequest;
 using Data.Model.Request.Product;
 using Data.Model.Request.ProductType;
 using Data.Model.Request.Suppiler;
@@ -161,6 +162,14 @@ namespace BusinessLogicLayer.Mappings
             CreateMap<Warehouse, WarehouseFullInfoDTO>().ReverseMap();
             CreateMap<Location, LocationDto>().ReverseMap();
             CreateMap<Location, LocationCreateDto>().ReverseMap();
+            #endregion
+
+            #region GoodRequest
+            CreateMap<GoodRequest, GoodRequestDTO>()
+                           .ForMember(dest => dest.GoodRequestDetails, opt => opt.MapFrom(src => src.GoodRequestDetails)).ReverseMap();
+            CreateMap<GoodRequestCreateDTO, GoodRequest>().ReverseMap();
+            CreateMap<GoodRequestUpdateDTO, GoodRequest>().ReverseMap();
+            CreateMap<GoodRequestDetail, GoodRequestDetailDTO>().ReverseMap();
             #endregion
         }
     }

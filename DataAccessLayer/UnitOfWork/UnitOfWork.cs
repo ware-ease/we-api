@@ -61,6 +61,10 @@ namespace DataAccessLayer.UnitOfWork
         public IPermissionRepository PermissionRepository => GetIRepository<IPermissionRepository>();
         public IWarehouseRepository WarehouseRepository => GetIRepository<IWarehouseRepository>();
         public ILocationRepository LocationRepository => GetIRepository<ILocationRepository>();
+        public IGoodRequestRepository GoodRequestRepository => GetIRepository<IGoodRequestRepository>();
+        public IGoodRequestDetailRepository GoodRequestDetailRepository => GetIRepository<IGoodRequestDetailRepository>();
+        public IProductRepository ProductRepository => GetIRepository<IProductRepository>();
+        public IPartnerRepository PartnerRepository => GetIRepository<IPartnerRepository>();
 
         public TRepository GetIRepository<TRepository>()
         {
