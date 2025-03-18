@@ -14,8 +14,8 @@ namespace Data.Entity
     {
         public string? Name { get; set; }
         public string? Address { get; set; }
-        public float Length { get; set; }
-        public float Width { get; set; }
+        public float Area { get; set; }
+        public DateTime OperateFrom { get; set; }
         public int? ShelfCount { get; set; }
 
         public ICollection<AccountWarehouse> AccountWarehouses { get; set; } = [];
