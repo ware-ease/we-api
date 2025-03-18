@@ -9,5 +9,6 @@ namespace BusinessLogicLayer.IServices
 {
     public interface IProductTypesService : IGenericService
     {
+        Task<int> Count();
     }
 }

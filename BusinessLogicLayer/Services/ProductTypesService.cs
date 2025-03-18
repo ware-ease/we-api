@@ -33,7 +33,14 @@ namespace BusinessLogicLayer.Services
             _categoryRepository = categoryRepository;
             _productTypeRepository = genericRepository;
         }
-         public async Task<ProductTypeDTO> AddProductType(ProductTypeCreateDTO request)
+
+        public async Task<int> Count()
+        {
+            var batches = await _productTypeRepository.GetAllNoPaging();
+            return batches.Count(b => !b.IsDeleted);
+        }
+
+        public async Task<ProductTypeDTO> AddProductType(ProductTypeCreateDTO request)
         {
             var category = await _categoryRepository.Get(request.CategoryId);
             if (category == null)

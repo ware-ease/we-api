@@ -5,6 +5,7 @@ using BusinessLogicLayer.Models.General;
 using BusinessLogicLayer.Models.Product;
 using BusinessLogicLayer.Models.PurchaseReceipt;
 using BusinessLogicLayer.Service;
+using BusinessLogicLayer.Services;
 using Data.Entity;
 using Data.Enum;
 using Data.Model.DTO;
@@ -28,6 +29,20 @@ namespace API.Controllers
         {
             _productService = productService;
             //_mapper = mapper;
+        }
+
+        [HttpGet("count")]
+        public async Task<IActionResult> Count()
+        {
+            var count = await _productService.Count();
+            var response = new ServiceResponse
+            {
+                Data = count,
+                Status = SRStatus.Success,
+                Message = "Total product count retrieved successfully"
+            };
+
+            return ControllerResponse.Response(response);
         }
 
         [HttpGet]

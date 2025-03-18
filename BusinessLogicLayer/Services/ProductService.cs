@@ -51,6 +51,12 @@ namespace BusinessLogicLayer.Services
             _unitRepository = unitRepository;
         }
 
+        public async Task<int> Count()
+        {
+            var batches = await _productRepository.GetAllNoPaging();
+            return batches.Count(b => !b.IsDeleted);
+        }
+
         public async Task<ProductDTO> AddProduct(ProductCreateDTO request)
         {
             var productType = await _productTypeRepository.Get(request.ProductTypeId);

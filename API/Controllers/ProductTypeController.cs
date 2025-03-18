@@ -1,4 +1,6 @@
 ﻿using BusinessLogicLayer.IServices;
+using BusinessLogicLayer.Services;
+using Data.Enum;
 using Data.Model.DTO;
 using Data.Model.Request.Brand;
 using Data.Model.Request.ProductType;
@@ -17,6 +19,20 @@ namespace API.Controllers
         public ProductTypeController(IProductTypesService productTypesService)
         {
             _productTypeService = productTypesService;
+        }
+
+        [HttpGet("count")]
+        public async Task<IActionResult> Count()
+        {
+            var count = await _productTypeService.Count();
+            var response = new ServiceResponse
+            {
+                Data = count,
+                Status = SRStatus.Success,
+                Message = "Total product type count retrieved successfully"
+            };
+
+            return ControllerResponse.Response(response);
         }
 
         [HttpGet]
