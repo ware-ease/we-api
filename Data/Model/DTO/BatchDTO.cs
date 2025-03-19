@@ -9,7 +9,7 @@ namespace Data.Model.DTO
 {
     public class BatchDTO : BaseDTO
     {
-        public string? SupplierName { get; set; }
+        //public string? SupplierName { get; set; }
         public string ProductName { get; set; }
         public string ProductId { get; set; }
         public string? Code { get; set; }

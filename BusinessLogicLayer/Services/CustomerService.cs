@@ -15,6 +15,7 @@ using DataAccessLayer.UnitOfWork;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -130,6 +131,40 @@ namespace BusinessLogicLayer.Services
                 throw new Exception("Update failed, customer not found after update");
 
             return _mapper.Map<CustomerDTO>(updatedCustomer);
+        }
+
+        public async Task<ServiceResponse> Search<TResult>(int? pageIndex = null, int? pageSize = null,
+                                                                   string? keyword = null)
+        {
+
+            Expression<Func<Partner, bool>> filter = p =>
+            (p.PartnerType == PartnerEnum.Customer &&
+            (string.IsNullOrEmpty(keyword) 
+            || p.Name.Contains(keyword)
+            || p.Phone.Contains(keyword)));
+
+            var totalRecords = await _genericRepository.Count(filter);
+
+            var results = await _genericRepository.Search(
+                filter: filter, pageIndex: pageIndex, pageSize: pageSize);
+
+            var mappedResults = _mapper.Map<IEnumerable<TResult>>(results);
+
+            int totalPages = (int)Math.Ceiling((double)totalRecords / (pageSize ?? totalRecords));
+
+            return new ServiceResponse
+            {
+                Status = Data.Enum.SRStatus.Success,
+                Message = "Search successful!",
+                Data = new
+                {
+                    TotalRecords = totalRecords,
+                    TotalPages = totalPages,
+                    PageIndex = pageIndex ?? 1,
+                    PageSize = pageSize ?? totalRecords,
+                    Records = mappedResults
+                }
+            };
         }
     }
 }

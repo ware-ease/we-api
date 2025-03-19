@@ -11,5 +11,7 @@ namespace BusinessLogicLayer.IServices
 {
     public interface IBrandService : IGenericService
     {
+        Task<ServiceResponse> Search<TResult>(int? pageIndex = null, int? pageSize = null,
+                                                                   string? keyword = null);
     }
 }

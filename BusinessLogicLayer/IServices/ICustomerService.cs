@@ -18,5 +18,7 @@ namespace BusinessLogicLayer.IServices
         Task<ServiceResponse> Get<TResult>() where TResult : BaseDTO;
         Task<ServiceResponse> Add<TResult, TRequest>(TRequest request);
         Task<CustomerDTO> UpdateCustomer(CustomerUpdateDTO request);
+        Task<ServiceResponse> Search<TResult>(int? pageIndex = null, int? pageSize = null,
+                                                                   string? keyword = null);
     }
 }

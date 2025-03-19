@@ -9,6 +9,7 @@ using BusinessLogicLayer.Services;
 using Data.Entity;
 using Data.Enum;
 using Data.Model.DTO;
+using Data.Model.Request.Partner;
 using Data.Model.Request.Product;
 using Data.Model.Response;
 using Microsoft.AspNetCore.Authorization;
@@ -45,11 +46,22 @@ namespace API.Controllers
             return ControllerResponse.Response(response);
         }
 
-        [HttpGet]
+        [NonAction]
         public async Task<IActionResult> Get()
         {
             var products = await _productService.Get<ProductDTO>();
             return ControllerResponse.Response(products);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> SearchPartners([FromQuery] int pageIndex = 1,
+                                                        [FromQuery] int pageSize = 5,
+                                                        [FromQuery] string? keyword = null)
+        {
+            var response = await _productService.Search<ProductDTO>(
+                pageIndex, pageSize, keyword);
+
+            return ControllerResponse.Response(response);
         }
 
         [HttpGet("{id}")]
@@ -134,6 +146,8 @@ namespace API.Controllers
             var result = await _productService.Delete(id);
             return ControllerResponse.Response(result);
         }
+
+        
         /*[HttpGet("GetAll")]
         public async Task<IActionResult> GetAll([FromQuery] int? pageNumber, [FromQuery] int? pageSize)
         {
