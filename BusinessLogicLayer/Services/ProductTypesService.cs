@@ -1,13 +1,16 @@
 ﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using BusinessLogicLayer.Generic;
 using BusinessLogicLayer.IServices;
 using Data.Entity;
 using Data.Model.DTO;
 using Data.Model.Request.ProductType;
+using Data.Model.Response;
 using DataAccessLayer.Generic;
 using DataAccessLayer.IRepositories;
 using DataAccessLayer.Repositories;
 using DataAccessLayer.UnitOfWork;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -40,9 +43,68 @@ namespace BusinessLogicLayer.Services
             return batches.Count(b => !b.IsDeleted);
         }
 
+        public override async Task<ServiceResponse> Get<TResult>()
+        {
+            var productTypes = await _genericRepository.GetAllNoPaging(
+                includeProperties: "Category"
+            );
+
+            List<TResult> mappedResults = _mapper.Map<List<TResult>>(productTypes);
+
+            return new ServiceResponse
+            {
+                Status = Data.Enum.SRStatus.Success,
+                Message = "Get successfully!",
+                Data = mappedResults
+            };
+        }
+
+        // Lấy ProductType theo ID
+        public override async Task<ServiceResponse> Get<TResult>(string id)
+        {
+            var productType = await _genericRepository.GetByCondition(
+                pt => pt.Id == id,
+                includeProperties: "Category"
+            );
+
+            if (productType == null)
+            {
+                return new ServiceResponse
+                {
+                    Status = Data.Enum.SRStatus.NotFound,
+                    Message = "ProductType not found!",
+                    Data = id
+                };
+            }
+
+            TResult result = _mapper.Map<TResult>(productType);
+
+            return new ServiceResponse
+            {
+                Status = Data.Enum.SRStatus.Success,
+                Message = "Get successfully!",
+                Data = result
+            };
+        }
+
+        public async Task<ServiceResponse> GetAllProducts()
+        {
+            var query = _genericRepository.Get();
+
+            var products = await query
+                .ProjectTo<ProductTypeDTO>(_mapper.ConfigurationProvider).ToListAsync();
+
+            return new ServiceResponse
+            {
+                Status = Data.Enum.SRStatus.Success,
+                Message = "Get successfully!",
+                Data = products
+            };
+        }
+
         public async Task<ProductTypeDTO> AddProductType(ProductTypeCreateDTO request)
         {
-            var category = await _categoryRepository.Get(request.CategoryId);
+            var category = await _categoryRepository.GetByCondition(p => p.Id == request.CategoryId);
             if (category == null)
                 throw new Exception("Category không tồn tại");
 
@@ -56,7 +118,7 @@ namespace BusinessLogicLayer.Services
 
         public async Task<ProductTypeDTO> UpdateProductType(ProductTypeUpdateDTO request)
         {
-            var existedProductType = await _productTypeRepository.Get(request.Id);
+            var existedProductType = await _productTypeRepository.GetByCondition(p => p.Id == request.Id);
             if (existedProductType == null)
                 throw new Exception("ProductType không tồn tại");
 
@@ -71,7 +133,7 @@ namespace BusinessLogicLayer.Services
 
             if (!string.IsNullOrEmpty(request.CategoryId))
             {
-                var category = await _categoryRepository.Get(request.CategoryId);
+                var category = await _categoryRepository.GetByCondition(p => p.Id == request.CategoryId);
                 if (category == null)
                     throw new Exception("Category not found");
                 existedProductType.CategoryId = request.CategoryId;
@@ -81,7 +143,7 @@ namespace BusinessLogicLayer.Services
             await _unitOfWork.SaveAsync();
 
 
-            var updatedProductType = await _productTypeRepository.Get(existedProductType.Id);
+            var updatedProductType = await _productTypeRepository.GetByCondition(p => p.Id == existedProductType.Id);
             if (updatedProductType == null)
                 throw new Exception("Update failed, ProductType not found after update");
 

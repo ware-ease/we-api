@@ -5,6 +5,7 @@ using Data.Entity;
 using Data.Model.DTO;
 using Data.Model.Request.ProductType;
 using Data.Model.Request.Unit;
+using Data.Model.Response;
 using DataAccessLayer.Generic;
 using DataAccessLayer.UnitOfWork;
 using System;
@@ -24,9 +25,47 @@ namespace BusinessLogicLayer.Services
 
         }
 
+        public override async Task<ServiceResponse> Get<TResult>()
+        {
+            var units = await _genericRepository.GetAllNoPaging();
+
+            List<TResult> mappedResults = _mapper.Map<List<TResult>>(units);
+
+            return new ServiceResponse
+            {
+                Status = Data.Enum.SRStatus.Success,
+                Message = "Get successfully!",
+                Data = mappedResults
+            };
+        }
+
+        public override async Task<ServiceResponse> Get<TResult>(string id)
+        {
+            var unit = await _genericRepository.GetByCondition(b => b.Id == id);
+
+            if (unit == null)
+            {
+                return new ServiceResponse
+                {
+                    Status = Data.Enum.SRStatus.NotFound,
+                    Message = "Unit not found!",
+                    Data = id
+                };
+            }
+
+            TResult result = _mapper.Map<TResult>(unit);
+
+            return new ServiceResponse
+            {
+                Status = Data.Enum.SRStatus.Success,
+                Message = "Get successfully!",
+                Data = result
+            };
+        }
+
         public async Task<UnitDTO> UpdateUnit(UnitUpdateDTO request)
         {
-            var existedUnit = await _genericRepository.Get(request.Id);
+            var existedUnit = await _genericRepository.GetByCondition(p => p.Id == request.Id);
             if (existedUnit == null)
                 throw new Exception("Unit không tồn tại");
 
@@ -43,7 +82,7 @@ namespace BusinessLogicLayer.Services
             await _unitOfWork.SaveAsync();
 
 
-            var updatedUnit = await _genericRepository.Get(existedUnit.Id);
+            var updatedUnit = await _genericRepository.GetByCondition(p => p.Id == existedUnit.Id);
             if (updatedUnit == null)
                 throw new Exception("Update failed, Unit not found after update");
 

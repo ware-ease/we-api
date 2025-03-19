@@ -40,15 +40,39 @@ namespace API.Controllers
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            var result = await _productTypeService.Get<ProductTypeDTO>();
-            return ControllerResponse.Response(result);
+            try
+            {
+                var result = await _productTypeService.Get<ProductTypeDTO>();
+                return ControllerResponse.Response(result);
+            }
+            catch (Exception ex)
+            {
+                return ControllerResponse.Response(new ServiceResponse
+                {
+                    Status = SRStatus.Error,
+                    Message = ex.Message,
+                    Data = null
+                });
+            }
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(string id)
         {
-            var result = await _productTypeService.Get<ProductTypeDTO>(id);
-            return ControllerResponse.Response(result);
+            try
+            {
+                var result = await _productTypeService.Get<ProductTypeDTO>(id);
+                return ControllerResponse.Response(result);
+            }
+            catch (Exception ex)
+            {
+                return ControllerResponse.Response(new ServiceResponse
+                {
+                    Status = SRStatus.Error,
+                    Message = ex.Message,
+                    Data = null
+                });
+            }
         }
 
         [Authorize]

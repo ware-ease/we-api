@@ -7,6 +7,7 @@ using Data.Entity;
 using Data.Model.DTO;
 using Data.Model.Request.Batch;
 using Data.Model.Request.Category;
+using Data.Model.Response;
 using DataAccessLayer.Generic;
 using DataAccessLayer.IRepositories;
 using DataAccessLayer.Repositories;
@@ -26,6 +27,44 @@ namespace BusinessLogicLayer.Services
         {
         }
 
+        public override async Task<ServiceResponse> Get<TResult>()
+        {
+            var categories = await _genericRepository.GetAllNoPaging();
+
+            List<TResult> mappedResults = _mapper.Map<List<TResult>>(categories);
+
+            return new ServiceResponse
+            {
+                Status = Data.Enum.SRStatus.Success,
+                Message = "Get successfully!",
+                Data = mappedResults
+            };
+        }
+
+        public override async Task<ServiceResponse> Get<TResult>(string id)
+        {
+            var category = await _genericRepository.GetByCondition(b => b.Id == id);
+
+            if (category == null)
+            {
+                return new ServiceResponse
+                {
+                    Status = Data.Enum.SRStatus.NotFound,
+                    Message = "Category not found!",
+                    Data = id
+                };
+            }
+
+            TResult result = _mapper.Map<TResult>(category);
+
+            return new ServiceResponse
+            {
+                Status = Data.Enum.SRStatus.Success,
+                Message = "Get successfully!",
+                Data = result
+            };
+        }
+
         public async Task<int> Count()
         {
             var batches = await _genericRepository.GetAllNoPaging();
@@ -34,7 +73,7 @@ namespace BusinessLogicLayer.Services
 
         public async Task<CategoryDTO> UpdateCategory(CategoryUpdateDTO request)
         {
-            var existingCategory = await _genericRepository.Get(request.Id);
+            var existingCategory = await _genericRepository.GetByCondition(p => p.Id == request.Id);
             if (existingCategory == null)
                 throw new Exception("Category not found");
 
@@ -50,7 +89,7 @@ namespace BusinessLogicLayer.Services
             _genericRepository.Update(existingCategory);
             await _unitOfWork.SaveAsync();
 
-            var updatedCategory = await _genericRepository.Get(existingCategory.Id);
+            var updatedCategory = await _genericRepository.GetByCondition(p => p.Id == existingCategory.Id);
             if (updatedCategory == null)
                 throw new Exception("Update failed, category not found after update");
 

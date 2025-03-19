@@ -45,6 +45,30 @@ namespace BusinessLogicLayer.Services
             };
         }
 
+        public override async Task<ServiceResponse> Get<TResult>(string id)
+        {
+            var customer = await _genericRepository.GetByCondition(b => b.Id == id);
+
+            if (customer == null)
+            {
+                return new ServiceResponse
+                {
+                    Status = Data.Enum.SRStatus.NotFound,
+                    Message = "Customer not found!",
+                    Data = id
+                };
+            }
+
+            TResult result = _mapper.Map<TResult>(customer);
+
+            return new ServiceResponse
+            {
+                Status = Data.Enum.SRStatus.Success,
+                Message = "Get successfully!",
+                Data = result
+            };
+        }
+
 
         public override async Task<ServiceResponse> Add<TResult, TRequest>(TRequest request)
         {
@@ -83,7 +107,7 @@ namespace BusinessLogicLayer.Services
 
         public async Task<CustomerDTO> UpdateCustomer(CustomerUpdateDTO request)
         {
-            var existingCustomer = await _genericRepository.Get(request.Id);
+            var existingCustomer = await _genericRepository.GetByCondition(p => p.Id == request.Id);
             if (existingCustomer == null)
                 throw new Exception("Customer not found");
 
@@ -101,7 +125,7 @@ namespace BusinessLogicLayer.Services
             _genericRepository.Update(existingCustomer);
             await _unitOfWork.SaveAsync();
 
-            var updatedCustomer = await _genericRepository.Get(existingCustomer.Id);
+            var updatedCustomer = await _genericRepository.GetByCondition(p => p.Id == existingCustomer.Id);
             if (updatedCustomer == null)
                 throw new Exception("Update failed, customer not found after update");
 
