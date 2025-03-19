@@ -11,7 +11,7 @@ namespace Data.Model.Request.Batch
     public class BatchCreateDTO : BaseCreateDTO
     {
         //[Required(ErrorMessage = "SupplierId không được để trống")]
-        public string? SupplierId { get; set; }
+        //public string? SupplierId { get; set; }
         [Required(ErrorMessage = "ProductId không được để trống")]
         public string ProductId { get; set; }
         [Required(ErrorMessage = "Code không được để trống")]

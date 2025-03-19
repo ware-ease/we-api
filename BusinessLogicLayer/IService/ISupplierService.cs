@@ -19,6 +19,8 @@ namespace BusinessLogicLayer.IService
         Task<ServiceResponse> Get<TResult>() where TResult : BaseDTO;
         Task<ServiceResponse> Add<TResult, TRequest>(TRequest request);
         Task<SupplierDTO> UpdateSupplier(SupplierUpdateDTO request);
+        Task<ServiceResponse> Search<TResult>(int? pageIndex = null, int? pageSize = null,
+                                                                   string? keyword = null);
         /*Task<PagedResult<Supplier>> GetAllAsync(int? pageNumber, int? pageSize);
         Task<Supplier> GetByIdAsync(string id);
         Task<Supplier> AddAsync(CreateSupplierDTO supplierDTO);

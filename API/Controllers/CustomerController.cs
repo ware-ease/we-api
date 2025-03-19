@@ -1,5 +1,6 @@
 ﻿using API.Utils;
 using BusinessLogicLayer.IServices;
+using BusinessLogicLayer.Services;
 using Data.Entity;
 using Data.Model.DTO;
 using Data.Model.Request.Customer;
@@ -21,13 +22,24 @@ namespace API.Controllers
             _customerService = customerService;
         }
 
-        [HttpGet]
+        [NonAction]
         public async Task<IActionResult> Get()
         {
             var result = await _customerService.Get<CustomerDTO>();
             //_customerService.Test();
 
             return ControllerResponse.Response(result);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> SearchPartners([FromQuery] int pageIndex = 1,
+                                                        [FromQuery] int pageSize = 5,
+                                                        [FromQuery] string? keyword = null)
+        {
+            var response = await _customerService.Search<CustomerDTO>(
+                pageIndex, pageSize, keyword);
+
+            return ControllerResponse.Response(response);
         }
 
         [HttpGet("{id}")]

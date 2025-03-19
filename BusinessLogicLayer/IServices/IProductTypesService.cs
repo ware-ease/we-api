@@ -16,5 +16,7 @@ namespace BusinessLogicLayer.IServices
         Task<ProductTypeDTO> AddProductType(ProductTypeCreateDTO request);
         Task<ProductTypeDTO> UpdateProductType(ProductTypeUpdateDTO request);
         Task<ServiceResponse> GetAllProducts();
+        Task<ServiceResponse> Search<TResult>(int? pageIndex = null, int? pageSize = null,
+                                                                   string? keyword = null);
     }
 }

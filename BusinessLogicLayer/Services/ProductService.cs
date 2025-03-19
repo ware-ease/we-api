@@ -19,6 +19,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -224,6 +225,41 @@ namespace BusinessLogicLayer.Services
             return _mapper.Map<ProductDTO>(updatedProduct);
         }
 
+        public async Task<ServiceResponse> Search<TResult>(int? pageIndex = null, int? pageSize = null,
+                                                                   string? keyword = null)
+        {
+
+            Expression<Func<Product, bool>> filter = p =>
+                (string.IsNullOrEmpty(keyword) || p.Name.Contains(keyword) 
+                || p.Sku.Contains(keyword) 
+                || p.ProductType.Name.Contains(keyword)
+                || p.Brand.Name.Contains(keyword)
+                || (p.ProductType.Category.Name + " " + p.ProductType.Category.Note).Contains(keyword));
+
+            var totalRecords = await _genericRepository.Count(filter);
+
+            var results = await _genericRepository.Search(
+                filter: filter, pageIndex: pageIndex, pageSize: pageSize,
+                includeProperties: "ProductType,ProductType.Category,Brand,Unit");
+
+            var mappedResults = _mapper.Map<IEnumerable<TResult>>(results);
+
+            int totalPages = (int)Math.Ceiling((double)totalRecords / (pageSize ?? totalRecords));
+
+            return new ServiceResponse
+            {
+                Status = Data.Enum.SRStatus.Success,
+                Message = "Search successful!",
+                Data = new
+                {
+                    TotalRecords = totalRecords,
+                    TotalPages = totalPages,
+                    PageIndex = pageIndex ?? 1,
+                    PageSize = pageSize ?? totalRecords,
+                    Records = mappedResults
+                }
+            };
+        }
         /*private readonly IProductRepository _productRepository;
         private readonly ICategoryRepository _categoryRepository;
         private readonly IGenericPaginationService _genericPaginationService;
