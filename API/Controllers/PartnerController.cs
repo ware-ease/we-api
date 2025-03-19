@@ -2,6 +2,7 @@
 using Data.Model.Request.Partner;
 using Data.Model.Response;
 using Microsoft.AspNetCore.Mvc;
+using Sprache;
 
 namespace API.Controllers
 {
@@ -49,6 +50,17 @@ namespace API.Controllers
         {
             var result = await _partnerService.DeleteAsync(id);
             return ControllerResponse.Response(result);
+        }
+        [HttpGet("search")]
+        public async Task<IActionResult> SearchPartners([FromQuery] int pageIndex = 1,
+                                                        [FromQuery] int pageSize = 5,
+                                                        [FromQuery] string? keyword = null,
+                                                        [FromQuery] int? partnerType = null)
+        {
+            var response = await _partnerService.SearchPartners<PartnerDTO>(
+                pageIndex, pageSize, keyword, partnerType);
+
+            return ControllerResponse.Response(response);
         }
     }
 }

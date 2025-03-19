@@ -20,58 +20,71 @@ namespace Data.Model.Request.GoodRequest
     public class GoodRequestCreateDTO : BaseCreateDTO
     {
         public string? Note { get; set; }
-
         public GoodRequestEnum RequestType { get; set; }
 
+        private string? _partnerId;
         public string? PartnerId
         {
-            get => PartnerId;
-            set => PartnerId = string.IsNullOrEmpty(value) ? null : value;
+            get => _partnerId;
+            set => _partnerId = string.IsNullOrEmpty(value) ? null : value;
         }
+
+        private string? _warehouseId;
         public string? WarehouseId
         {
-            get => WarehouseId;
-            set => WarehouseId = string.IsNullOrEmpty(value) ? null : value;
+            get => _warehouseId;
+            set => _warehouseId = string.IsNullOrEmpty(value) ? null : value;
         }
+
+        private string? _requestedWarehouseId;
         public string? RequestedWarehouseId
         {
-            get => RequestedWarehouseId;
-            set => RequestedWarehouseId = string.IsNullOrEmpty(value) ? null : value;
+            get => _requestedWarehouseId;
+            set => _requestedWarehouseId = string.IsNullOrEmpty(value) ? null : value;
         }
+
         public List<GoodRequestDetailDTO>? GoodRequestDetails { get; set; }
     }
+
     public class GoodRequestUpdateDTO
     {
         [JsonIgnore]
         public string? Id { get; set; }
         public string? Note { get; set; }
+
+        private string? _partnerId;
         public string? PartnerId
         {
-            get => PartnerId;
-            set => PartnerId = string.IsNullOrEmpty(value) ? null : value;
+            get => _partnerId;
+            set => _partnerId = string.IsNullOrEmpty(value) ? null : value;
         }
+
+        private string? _warehouseId;
         public string? WarehouseId
         {
-            get => WarehouseId;
-            set => WarehouseId = string.IsNullOrEmpty(value) ? null : value;
+            get => _warehouseId;
+            set => _warehouseId = string.IsNullOrEmpty(value) ? null : value;
         }
+
+        private string? _requestedWarehouseId;
         public string? RequestedWarehouseId
         {
-            get => RequestedWarehouseId;
-            set => RequestedWarehouseId = string.IsNullOrEmpty(value) ? null : value;
+            get => _requestedWarehouseId;
+            set => _requestedWarehouseId = string.IsNullOrEmpty(value) ? null : value;
         }
-        public List<GoodRequestDetailDTO>? GoodRequestDetails { get; set; }
 
+        public List<GoodRequestDetailDTO>? GoodRequestDetails { get; set; }
     }
 
     public class GoodRequestDetailDTO : BaseCreateDTO
     {
         public float Quantity { get; set; }
 
+        private string? _productId;
         public string? ProductId
         {
-            get => ProductId;
-            set => ProductId = string.IsNullOrEmpty(value) ? null : value;
+            get => _productId;
+            set => _productId = string.IsNullOrEmpty(value) ? null : value;
         }
     }
 }

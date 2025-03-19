@@ -11,6 +11,7 @@ using DataAccessLayer.UnitOfWork;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -27,6 +28,36 @@ namespace BusinessLogicLayer.Services
             _goodRequestRepository = unitOfWork.GoodRequestRepository;
             _mapper = mapper;
             _unitOfWork = unitOfWork;
+        }
+        public override async Task<ServiceResponse> Get<TResult>()
+        {
+            var results = await _genericRepository.Search();
+
+            IEnumerable<TResult> mappedResults = _mapper.Map<IEnumerable<TResult>>(results);
+
+            foreach (var mappedResult in mappedResults)
+            {
+                if (mappedResult.CreatedBy != null)
+                {
+                    var createdBy = await GetCreatedBy(mappedResult.CreatedBy);
+
+                    if (createdBy != null)
+                    {
+                        mappedResult.CreatedBy = createdBy!.Username;
+                    }
+                    else
+                    {
+                        mappedResult.CreatedBy = "Deleted user";
+                    }
+                }
+            }
+
+            return new ServiceResponse
+            {
+                Status = Data.Enum.SRStatus.Success,
+                Message = "Get successfully!",
+                Data = mappedResults
+            };
         }
 
         public async Task<ServiceResponse> GetAll<TResult>()
@@ -326,5 +357,44 @@ namespace BusinessLogicLayer.Services
                 };
             }
         }
+        public async Task<ServiceResponse> SearchGoodRequests<TResult>(int? pageIndex = null, int? pageSize = null,
+                                                                       string? keyword = null, string? warehouseName = null,
+                                                                       string? partnerName = null, GoodRequestEnum? requestType = null)
+        {
+            Expression<Func<GoodRequest, bool>> filter = g =>
+                (string.IsNullOrEmpty(keyword) || g.Note.Contains(keyword)) &&
+                (string.IsNullOrEmpty(warehouseName) || (g.Warehouse != null && g.Warehouse.Name.Contains(warehouseName))) &&
+                (string.IsNullOrEmpty(warehouseName) || (g.RequestedWarehouse != null && g.RequestedWarehouse.Name.Contains(warehouseName))) &&
+                (string.IsNullOrEmpty(partnerName) || (g.Partner != null && g.Partner.Name.Contains(partnerName))) &&
+                (!requestType.HasValue || g.RequestType == requestType.Value); // 🔥 Lọc theo loại yêu cầu
+
+            var totalRecords = await _goodRequestRepository.Count(filter);
+
+            var results = await _goodRequestRepository.Search(
+                filter: filter,
+                includeProperties: "Warehouse,Partner",
+                pageIndex: pageIndex,
+                pageSize: pageSize
+            );
+
+            var mappedResults = _mapper.Map<IEnumerable<TResult>>(results);
+
+            int totalPages = (int)Math.Ceiling((double)totalRecords / (pageSize ?? 5));
+
+            return new ServiceResponse
+            {
+                Status = Data.Enum.SRStatus.Success,
+                Message = "Search successful!",
+                Data = new
+                {
+                    TotalRecords = totalRecords,
+                    TotalPages = totalPages,
+                    PageIndex = pageIndex ?? 1,
+                    PageSize = pageSize ?? 5,
+                    Records = mappedResults
+                }
+            };
+        }
+
     }
 }

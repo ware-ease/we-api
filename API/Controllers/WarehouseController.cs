@@ -1,11 +1,13 @@
 ﻿using API.Utils;
 using BusinessLogicLayer.IServices;
+using BusinessLogicLayer.Utils;
 using Data.Model.DTO;
 using Data.Model.Request.Area;
 using Data.Model.Request.Customer;
 using Data.Model.Request.Warehouse;
 using Data.Model.Response;
 using Microsoft.AspNetCore.Mvc;
+using Sprache;
 
 namespace API.Controllers
 {
@@ -182,6 +184,19 @@ namespace API.Controllers
             var result = await _warehouseService.Get<WarehouseDTO>();
 
             return ControllerResponse.Response(result);
+        }
+        [HttpGet("search")]
+        public async Task<IActionResult> SearchWarehouses(
+                                                            [FromQuery] int pageIndex = 1,
+                                                            [FromQuery] int pageSize = 5,
+                                                            [FromQuery] string? keyword = null,
+                                                            [FromQuery] float? minArea = null,
+                                                            [FromQuery] float? maxArea = null)
+        {
+            var response = await _warehouseService.SearchWarehouses<WarehouseDTO>(
+                pageIndex, pageSize, keyword, minArea, maxArea);
+
+            return ControllerResponse.Response(response);
         }
 
         //[Authorize]

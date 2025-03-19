@@ -1,4 +1,5 @@
 ﻿using BusinessLogicLayer.Generic;
+using Data.Enum;
 using Data.Model.Request.GoodRequest;
 using Data.Model.Response;
 using System;
@@ -15,5 +16,8 @@ namespace BusinessLogicLayer.IServices
         Task<ServiceResponse> GetById<TResult>(string id);
         Task<ServiceResponse> CreateAsync<TResult>(GoodRequestCreateDTO request);
         Task<ServiceResponse> UpdateAsync<TResult>(string id, GoodRequestUpdateDTO request);
+        Task<ServiceResponse> SearchGoodRequests<TResult>(int? pageIndex = null, int? pageSize = null,
+                                                                       string? keyword = null, string? warehouseName = null,
+                                                                       string? partnerName = null, GoodRequestEnum? requestType = null);
     }
 }
