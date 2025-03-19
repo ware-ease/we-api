@@ -42,7 +42,7 @@ namespace BusinessLogicLayer.Services
 
         public override async Task<ServiceResponse> Get<TResult>()
         {
-            var entities = await _genericRepository.Get(p => p.PartnerType == PartnerEnum.Supplier);
+            var entities = await _genericRepository.Search(p => p.PartnerType == PartnerEnum.Supplier);
 
             List<TResult> mappedResults = _mapper.Map<List<TResult>>(entities);
 

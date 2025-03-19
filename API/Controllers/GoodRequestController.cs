@@ -1,10 +1,12 @@
 ﻿using API.Utils;
 using BusinessLogicLayer.IServices;
+using Data.Enum;
 using Data.Model.Request.GoodRequest;
 using Data.Model.Response;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Sprache;
 
 namespace API.Controllers
 {
@@ -60,6 +62,19 @@ namespace API.Controllers
         {
             var result = await _goodRequestService.Delete(id);
             return ControllerResponse.Response(result);
+        }
+        [HttpGet("search")]
+        public async Task<IActionResult> Search([FromQuery] int pageIndex = 1, 
+                                                [FromQuery] int pageSize = 5,
+                                                [FromQuery] string? keyword = null,
+                                                [FromQuery] string? warehouseName = null, 
+                                                [FromQuery] string? partnerName = null,
+                                                [FromQuery] GoodRequestEnum? requestType = null)
+        {
+            var response = await _goodRequestService.SearchGoodRequests<GoodRequestDTO>(
+                pageIndex, pageSize, keyword, warehouseName, partnerName, requestType
+            );
+            return ControllerResponse.Response(response);
         }
     }
 }

@@ -2,12 +2,14 @@
 using BusinessLogicLayer.Generic;
 using BusinessLogicLayer.IServices;
 using Data.Entity;
+using Data.Model.DTO.Base;
 using Data.Model.Request.Area;
 using Data.Model.Request.Warehouse;
 using Data.Model.Response;
 using DataAccessLayer.Generic;
 using DataAccessLayer.IRepositories;
 using DataAccessLayer.UnitOfWork;
+using System.Linq.Expressions;
 
 namespace BusinessLogicLayer.Services
 {
@@ -22,6 +24,36 @@ namespace BusinessLogicLayer.Services
             _warehouseRepository = unitOfWork.WarehouseRepository;
             _mapper = mapper;
             _unitOfWork = unitOfWork;
+        }
+        public override async Task<ServiceResponse> Get<TResult>()
+        {
+            var results = await _genericRepository.Search();
+
+            IEnumerable<TResult> mappedResults = _mapper.Map<IEnumerable<TResult>>(results);
+
+            foreach (var mappedResult in mappedResults)
+            {
+                if (mappedResult.CreatedBy != null)
+                {
+                    var createdBy = await GetCreatedBy(mappedResult.CreatedBy);
+
+                    if (createdBy != null)
+                    {
+                        mappedResult.CreatedBy = createdBy!.Username;
+                    }
+                    else
+                    {
+                        mappedResult.CreatedBy = "Deleted user";
+                    }
+                }
+            }
+
+            return new ServiceResponse
+            {
+                Status = Data.Enum.SRStatus.Success,
+                Message = "Get successfully!",
+                Data = mappedResults
+            };
         }
 
         public async Task<ServiceResponse> GetFullWarehouseInfo<TResult>(string id)
@@ -109,175 +141,106 @@ namespace BusinessLogicLayer.Services
             }
         }
 
-        //public async Task<ServiceResponse> GetWarehouseAreas(string warehouseId)
-        //{
-        //    var areas = await _unitOfWork.AreaRepository.GetAllNoPaging(a => a.WarehouseId == warehouseId);
+        public override async Task<ServiceResponse> Update<TResult, TRequest>(TRequest request)
+        {
+            var updateDto = request as UpdateWarehouseDTO;
+            if (updateDto == null || string.IsNullOrEmpty(updateDto.Id))
+            {
+                return new ServiceResponse
+                {
+                    Status = Data.Enum.SRStatus.Error,
+                    Message = "Invalid request data!"
+                };
+            }
 
-        //    if (areas == null)
-        //    {
-        //        return new ServiceResponse
-        //        {
-        //            Status = Data.Enum.SRStatus.NotFound,
-        //            Message = "No areas found for this warehouse",
-        //            Data = warehouseId
-        //        };
-        //    }
+            // 🔥 Tìm warehouse hiện có trong DB
+            var existingEntity = await _genericRepository.GetByCondition(x => x.Id == updateDto.Id);
+            if (existingEntity == null)
+            {
+                return new ServiceResponse
+                {
+                    Status = Data.Enum.SRStatus.NotFound,
+                    Message = "Warehouse not found!",
+                    Data = updateDto.Id
+                };
+            }
 
-        //    var result = _mapper.Map<List<AreaDTO>>(areas);
+            // 🔥 CHỈ CẬP NHẬT CÁC TRƯỜNG CÓ GIÁ TRỊ (Không ghi đè toàn bộ)
+            if (!string.IsNullOrWhiteSpace(updateDto.Name))
+            {
+                existingEntity.Name = updateDto.Name;
+            }
 
-        //    return new ServiceResponse
-        //    {
-        //        Status = Data.Enum.SRStatus.Success,
-        //        Message = "Warehouse areas retrieved successfully",
-        //        Data = result
-        //    };
-        //}
+            if (!string.IsNullOrWhiteSpace(updateDto.Address))
+            {
+                existingEntity.Address = updateDto.Address;
+            }
 
-//        public async Task<ServiceResponse> AddWarehouseArea(CreateAREADto request)
-//        {
-//            var warehouse = await _unitOfWork.WarehouseRepository.Get(request.WarehouseId!);
+            if (updateDto.Area.HasValue)
+            {
+                existingEntity.Area = updateDto.Area.Value;
+            }
 
-//            if (warehouse == null)
-//            {
-//                return new ServiceResponse
-//                {
-//                    Status = Data.Enum.SRStatus.NotFound,
-//                    Message = "Warehouse not found",
-//                    Data = request.WarehouseId
-//                };
-//            }
+            if (updateDto.OperateFrom.HasValue)
+            {
+                existingEntity.OperateFrom = updateDto.OperateFrom.Value;
+            }
 
-//            var area = new Area
-//            {
-//                Name = request.Name,
-//                WarehouseId = request.WarehouseId
-//            };
+            try
+            {
+                _genericRepository.Update(existingEntity);
+                await _unitOfWork.SaveAsync();
 
-//            await _unitOfWork.AreaRepository.Add(area);
-//            await _unitOfWork.SaveAsync();
+                TResult result = _mapper.Map<TResult>(existingEntity);
 
-//            return new ServiceResponse
-//            {
-//                Status = Data.Enum.SRStatus.Success,
-//                Message = "Area added successfully",
-//                Data = area.Id
-//            };
-//        }
+                return new ServiceResponse
+                {
+                    Status = Data.Enum.SRStatus.Success,
+                    Message = "Update successfully!",
+                    Data = result
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ServiceResponse
+                {
+                    Status = Data.Enum.SRStatus.Error,
+                    Message = ex.Message,
+                    Data = request
+                };
+            }
+        }
 
-//        public async Task<ServiceResponse> GetShelvesByArea(string areaId)
-//        {
+        public async Task<ServiceResponse> SearchWarehouses<TResult>(int? pageIndex = null, int? pageSize = null,
+                                                                     string? keyword = null, float? minArea = null, float? maxArea = null)
+        {
+            Expression<Func<Warehouse, bool>> filter = w =>
+                (string.IsNullOrEmpty(keyword) || w.Name.Contains(keyword)) &&
+                (!minArea.HasValue || w.Area >= minArea) &&
+                (!maxArea.HasValue || w.Area <= maxArea);
 
-//            var shelves = await _unitOfWork.ShelfRepository.GetAllNoPaging(s => s.AreaId == areaId, includeProperties: "Floors.Cells"
-//);
+            var totalRecords = await _warehouseRepository.Count(filter);
 
-//            if (shelves == null || !shelves.Any())
-//            {
-//                return new ServiceResponse
-//                {
-//                    Status = Data.Enum.SRStatus.NotFound,
-//                    Message = "No shelves found for this area",
-//                    Data = areaId
-//                };
-//            }
+            var results = await _warehouseRepository.Search(
+                filter: filter, pageIndex: pageIndex, pageSize: pageSize);
 
-//            var result = _mapper.Map<List<ShelfDto>>(shelves);
+            var mappedResults = _mapper.Map<IEnumerable<TResult>>(results);
 
-//            return new ServiceResponse
-//            {
-//                Status = Data.Enum.SRStatus.Success,
-//                Message = "Shelves retrieved successfully",
-//                Data = result
-//            };
-//        }
+            int totalPages = (int)Math.Ceiling((double)totalRecords / (pageSize ?? totalRecords));
 
-//        public async Task<ServiceResponse> AddShelfWithStructure(CreateShelfDto request, string areaId)
-//        {
-//            var area = await _unitOfWork.AreaRepository.Get(areaId);
-
-//            if (area == null)
-//            {
-//                return new ServiceResponse
-//                {
-//                    Status = Data.Enum.SRStatus.NotFound,
-//                    Message = "Area not found",
-//                    Data = areaId
-//                };
-//            }
-
-//            var shelf = new Shelf
-//            {
-//                Code = request.Code,
-//                AreaId = areaId
-//            };
-
-//            await _unitOfWork.ShelfRepository.Add(shelf);
-
-//            foreach (var floorDto in request.Floors)
-//            {
-//                var floor = new Floor
-//                {
-//                    Number = floorDto.Number,
-//                    ShelfId = shelf.Id
-//                };
-
-//                await _unitOfWork.FloorRepository.Add(floor);
-
-//                foreach (var cellDto in floorDto.Cells)
-//                {
-//                    var cell = new Cell
-//                    {
-//                        Number = cellDto.Number,
-//                        Length = cellDto.Length,
-//                        Height = cellDto.Height,
-//                        MaxLoad = cellDto.MaxLoad,
-//                        FloorId = floor.Id
-//                    };
-
-//                    await _unitOfWork.CellRepository.Add(cell);
-//                }
-//            }
-
-//            await _unitOfWork.SaveAsync();
-
-//            return new ServiceResponse
-//            {
-//                Status = Data.Enum.SRStatus.Success,
-//                Message = "Shelf structure created successfully",
-//                Data = shelf.Id
-//            };
-//        }
-
-//        public async Task<ServiceResponse> GetShelfDetails(string shelfId)
-//        {
-//            var shelf = await _unitOfWork.ShelfRepository.GetByCondition(
-//                s => s.Id == shelfId,
-//                includeProperties: "Floors.Cells"
-//            );
-
-//            var area = await _unitOfWork.AreaRepository.Get(shelf.AreaId);
-//            area.Shelves.Add(shelf);
-//            var warehouse = await _unitOfWork.WarehouseRepository.Get(area.WarehouseId);
-//            warehouse.Areas.Add(area);
-
-//            if (shelf == null)
-//            {
-//                return new ServiceResponse
-//                {
-//                    Status = Data.Enum.SRStatus.NotFound,
-//                    Message = "Shelf not found",
-//                    Data = shelfId
-//                };
-//            }
-
-//            var result = _mapper.Map<WarehouseFullInfoDTO>(warehouse);
-
-//            return new ServiceResponse
-//            {
-//                Status = Data.Enum.SRStatus.Success,
-//                Message = "Shelf details retrieved successfully",
-//                Data = result
-//            };
-//        }
-
+            return new ServiceResponse
+            {
+                Status = Data.Enum.SRStatus.Success,
+                Message = "Search successful!",
+                Data = new
+                {
+                    TotalRecords = totalRecords,
+                    TotalPages = totalPages,
+                    PageIndex = pageIndex ?? 1,
+                    PageSize = pageSize ?? totalRecords,
+                    Records = mappedResults
+                }
+            };
+        }
     }
 }

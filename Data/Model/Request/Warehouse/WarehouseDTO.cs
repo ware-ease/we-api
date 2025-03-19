@@ -13,10 +13,15 @@ namespace Data.Model.Request.Warehouse
 {
     public class CreateWarehouseDTO
     {
+        [Required(ErrorMessage = "Warehouse name is required.")]
+        [MaxLength(255, ErrorMessage = "Warehouse name cannot exceed 255 characters.")]
         public string? Name { get; set; }
         public string? Address { get; set; }
-        public float Length { get; set; }
-        public float Width { get; set; }
+        [Range(1, float.MaxValue, ErrorMessage = "Area must be greater than 0.")]
+        public float Area { get; set; }
+        [Required(ErrorMessage = "OperateFrom date is required.")]
+        [DataType(DataType.Date)]
+        public DateTime OperateFrom { get; set; }
 
     }
 
@@ -26,8 +31,8 @@ namespace Data.Model.Request.Warehouse
         public string? Id { get; set; }
         public string? Name { get; set; }
         public string? Address { get; set; }
-        public float Length { get; set; }
-        public float Width { get; set; }
+        public float? Area { get; set; }
+        public DateTime? OperateFrom { get; set; }
 
     }
 
@@ -37,8 +42,8 @@ namespace Data.Model.Request.Warehouse
         public string Id { get; set; }
         public string? Name { get; set; }
         public string? Address { get; set; }
-        public float Length { get; set; }
-        public float Width { get; set; }
+        public float Area { get; set; }
+        public DateTime OperateFrom { get; set; }
 
         public List<LocationDto>? Locations { get; set; }
     }

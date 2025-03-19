@@ -16,5 +16,7 @@ namespace BusinessLogicLayer.IServices
         Task<ServiceResponse> CreateAsync<TResult>(PartnerCreateDTO request);
         Task<ServiceResponse> UpdateAsync<TResult>(string id, PartnerUpdateDTO request);
         Task<ServiceResponse> DeleteAsync(string id);
+        Task<ServiceResponse> SearchPartners<TResult>(int? pageIndex = null, int? pageSize = null,
+                                                      string? keyword = null, int? partnerType = null);
     }
 }

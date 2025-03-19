@@ -11,6 +11,7 @@ using DataAccessLayer.UnitOfWork;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace BusinessLogicLayer.Services
@@ -26,6 +27,36 @@ namespace BusinessLogicLayer.Services
             _partnerRepository = unitOfWork.PartnerRepository;
             //_mapper = mapper;
             //_unitOfWork = unitOfWork;
+        }
+        public override async Task<ServiceResponse> Get<TResult>()
+        {
+            var results = await _genericRepository.Search();
+
+            IEnumerable<TResult> mappedResults = _mapper.Map<IEnumerable<TResult>>(results);
+
+            foreach (var mappedResult in mappedResults)
+            {
+                if (mappedResult.CreatedBy != null)
+                {
+                    var createdBy = await GetCreatedBy(mappedResult.CreatedBy);
+
+                    if (createdBy != null)
+                    {
+                        mappedResult.CreatedBy = createdBy!.Username;
+                    }
+                    else
+                    {
+                        mappedResult.CreatedBy = "Deleted user";
+                    }
+                }
+            }
+
+            return new ServiceResponse
+            {
+                Status = Data.Enum.SRStatus.Success,
+                Message = "Get successfully!",
+                Data = mappedResults
+            };
         }
 
         public async Task<ServiceResponse> GetAll<TResult>()
@@ -167,6 +198,38 @@ namespace BusinessLogicLayer.Services
                     Message = $"Error deleting partner: {ex.Message}"
                 };
             }
+        }
+        public async Task<ServiceResponse> SearchPartners<TResult>(int? pageIndex = null, int? pageSize = null,
+                                                                   string? keyword = null, int? partnerType = null)
+        {
+            PartnerEnum? partnerTypeEnum = partnerType.HasValue ? (PartnerEnum?)partnerType.Value : null;
+
+            Expression<Func<Partner, bool>> filter = p =>
+                (string.IsNullOrEmpty(keyword) || p.Name.Contains(keyword)) &&
+                (!partnerTypeEnum.HasValue || p.PartnerType == partnerTypeEnum.Value);
+
+            var totalRecords = await _partnerRepository.Count(filter);
+
+            var results = await _partnerRepository.Search(
+                filter: filter, pageIndex: pageIndex, pageSize: pageSize);
+
+            var mappedResults = _mapper.Map<IEnumerable<TResult>>(results);
+
+            int totalPages = (int)Math.Ceiling((double)totalRecords / (pageSize ?? totalRecords));
+
+            return new ServiceResponse
+            {
+                Status = Data.Enum.SRStatus.Success,
+                Message = "Search successful!",
+                Data = new
+                {
+                    TotalRecords = totalRecords,
+                    TotalPages = totalPages,
+                    PageIndex = pageIndex ?? 1,
+                    PageSize = pageSize ?? totalRecords,
+                    Records = mappedResults
+                }
+            };
         }
     }
 }

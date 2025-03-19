@@ -15,7 +15,7 @@ namespace DataAccessLayer.Generic
         Task Add(TEntity entity);
         void Edit(TEntity entity);
 
-        Task<IEnumerable<TEntity>> Get(
+        Task<IEnumerable<TEntity>> Search(
             Expression<Func<TEntity, bool>> filter = null!,
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null!,
             string includeProperties = "",

@@ -90,7 +90,7 @@ namespace DataAccessLayer.Generic
             _dbSet.Update(entity);
         }
 
-        public virtual async Task<IEnumerable<TEntity>> Get(
+        public virtual async Task<IEnumerable<TEntity>> Search(
             Expression<Func<TEntity, bool>> filter = null!,
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null!,
             string includeProperties = "",
