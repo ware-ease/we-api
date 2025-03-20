@@ -12,12 +12,10 @@ namespace BusinessLogicLayer.IServices
 {
     public interface IGoodRequestService : IGenericService
     {
-        Task<ServiceResponse> GetAll<TResult>();
         Task<ServiceResponse> GetById<TResult>(string id);
         Task<ServiceResponse> CreateAsync<TResult>(GoodRequestCreateDTO request);
         Task<ServiceResponse> UpdateAsync<TResult>(string id, GoodRequestUpdateDTO request);
         Task<ServiceResponse> SearchGoodRequests<TResult>(int? pageIndex = null, int? pageSize = null,
-                                                                       string? keyword = null, string? warehouseName = null,
-                                                                       string? partnerName = null, GoodRequestEnum? requestType = null);
+                                                                       string? keyword = null, GoodRequestEnum? requestType = null);
     }
 }

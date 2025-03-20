@@ -11,9 +11,12 @@ namespace Data.Model.Request.GoodRequest
         public GoodRequestEnum RequestType { get; set; }
 
         public string? PartnerId { get; set; }
+        public string? PartnerName { get; set; }
         public string? WarehouseId { get; set; }
+        public string? WarehouseName { get; set; }
         public string? RequestedWarehouseId { get; set; }
-        public IEnumerable<GoodRequestDetailDTO>? GoodRequestDetails { get; set; }
+        public string? RequestedWarehouseName { get; set; }
+        public IEnumerable<GoodRequestDetailInfoDTO>? GoodRequestDetails { get; set; }
 
     }
 
@@ -86,5 +89,19 @@ namespace Data.Model.Request.GoodRequest
             get => _productId;
             set => _productId = string.IsNullOrEmpty(value) ? null : value;
         }
+    }
+    public class GoodRequestDetailInfoDTO : BaseCreateDTO
+    {
+        public float Quantity { get; set; }
+
+        private string? _productId;
+        public string? ProductId
+        {
+            get => _productId;
+            set => _productId = string.IsNullOrEmpty(value) ? null : value;
+        }
+        public string? ProductName { get; set; }
+        public string? UnitName { get; set; }
+        public string? BrandName { get; set; }
     }
 }
