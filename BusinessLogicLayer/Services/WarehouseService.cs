@@ -84,7 +84,7 @@ namespace BusinessLogicLayer.Services
         }
         public async Task<ServiceResponse> CreateStructureAsync(CreateWarehouseStructureRequest request)
         {
-            var warehouse = await _unitOfWork.WarehouseRepository.Get(request.Id!);
+            var warehouse = await _unitOfWork.WarehouseRepository.GetByCondition(x => x.Id == request.Id!);
 
             if (warehouse == null)
             {
