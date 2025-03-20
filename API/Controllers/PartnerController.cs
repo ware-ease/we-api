@@ -18,10 +18,15 @@ namespace API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Get()
+        public async Task<IActionResult> SearchPartners([FromQuery] int pageIndex = 1,
+                                                       [FromQuery] int pageSize = 5,
+                                                       [FromQuery] string? keyword = null,
+                                                       [FromQuery] int? partnerType = null)
         {
-            var result = await _partnerService.GetAll<PartnerDTO>();
-            return ControllerResponse.Response(result);
+            var response = await _partnerService.SearchPartners<PartnerDTO>(
+                pageIndex, pageSize, keyword, partnerType);
+
+            return ControllerResponse.Response(response);
         }
 
         [HttpGet("{id}")]
@@ -50,17 +55,6 @@ namespace API.Controllers
         {
             var result = await _partnerService.DeleteAsync(id);
             return ControllerResponse.Response(result);
-        }
-        [HttpGet("search")]
-        public async Task<IActionResult> SearchPartners([FromQuery] int pageIndex = 1,
-                                                        [FromQuery] int pageSize = 5,
-                                                        [FromQuery] string? keyword = null,
-                                                        [FromQuery] int? partnerType = null)
-        {
-            var response = await _partnerService.SearchPartners<PartnerDTO>(
-                pageIndex, pageSize, keyword, partnerType);
-
-            return ControllerResponse.Response(response);
         }
     }
 }
