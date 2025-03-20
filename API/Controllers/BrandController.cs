@@ -1,6 +1,7 @@
 ﻿using API.Utils;
 using BusinessLogicLayer.IServices;
 using BusinessLogicLayer.Models.Category;
+using BusinessLogicLayer.Services;
 using Data.Model.DTO;
 using Data.Model.Request.Brand;
 using Data.Model.Request.Category;
@@ -22,11 +23,22 @@ namespace API.Controllers
             _brandService = brandService;
         }
 
-        [HttpGet]
+        [NonAction]
         public async Task<IActionResult> Get()
         {
             var result = await _brandService.Get<BrandDTO>();
             return ControllerResponse.Response(result);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> SearchPartners([FromQuery] int pageIndex = 1,
+                                                        [FromQuery] int pageSize = 5,
+                                                        [FromQuery] string? keyword = null)
+        {
+            var response = await _brandService.Search<BrandDTO>(
+                pageIndex, pageSize, keyword);
+
+            return ControllerResponse.Response(response);
         }
 
         [HttpGet("{id}")]

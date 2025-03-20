@@ -20,6 +20,8 @@ namespace BusinessLogicLayer.IServices
         Task<ServiceResponse> GetAllProducts();
         Task<ProductDTO> AddProduct(ProductCreateDTO request);
         Task<ProductDTO> UpdateProduct(ProductUpdateDTO request);
+        Task<ServiceResponse> Search<TResult>(int? pageIndex = null, int? pageSize = null,
+                                                                   string? keyword = null);
 
         /*Task<PagedResult<Product>> GetAllAsync(int? pageNumber, int? pageSize);
         Task<PagedResult<Product>> GetAllByCategoryIdAsync(string categoryId, int? pageNumber, int? pageSize);

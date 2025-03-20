@@ -23,11 +23,22 @@ namespace API.Controllers
             _unitService = unitService;
         }
 
-        [HttpGet]
+        [NonAction]
         public async Task<IActionResult> Get()
         {
             var result = await _unitService.Get<UnitDTO>();
             return ControllerResponse.Response(result);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> SearchPartners([FromQuery] int pageIndex = 1,
+                                                        [FromQuery] int pageSize = 5,
+                                                        [FromQuery] string? keyword = null)
+        {
+            var response = await _unitService.Search<UnitDTO>(
+                pageIndex, pageSize, keyword);
+
+            return ControllerResponse.Response(response);
         }
 
         [HttpGet("{id}")]

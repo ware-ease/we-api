@@ -44,11 +44,22 @@ namespace API.Controllers
             return ControllerResponse.Response(response);
         }
 
-        [HttpGet]
+        [NonAction]
         public async Task<IActionResult> Get()
         {
             var result = await _categoryService.Get<CategoryDTO>();
             return ControllerResponse.Response(result);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> SearchPartners([FromQuery] int pageIndex = 1,
+                                                        [FromQuery] int pageSize = 5,
+                                                        [FromQuery] string? keyword = null)
+        {
+            var response = await _categoryService.Search<CategoryDTO>(
+                pageIndex, pageSize, keyword);
+
+            return ControllerResponse.Response(response);
         }
 
         [HttpGet("{id}")]

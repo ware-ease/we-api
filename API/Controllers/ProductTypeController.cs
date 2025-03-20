@@ -37,7 +37,7 @@ namespace API.Controllers
             return ControllerResponse.Response(response);
         }
 
-        [HttpGet]
+        [NonAction]
         public async Task<IActionResult> Get()
         {
             try
@@ -54,6 +54,17 @@ namespace API.Controllers
                     Data = null
                 });
             }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> SearchPartners([FromQuery] int pageIndex = 1,
+                                                        [FromQuery] int pageSize = 5,
+                                                        [FromQuery] string? keyword = null)
+        {
+            var response = await _productTypeService.Search<ProductTypeDTO>(
+                pageIndex, pageSize, keyword);
+
+            return ControllerResponse.Response(response);
         }
 
         [HttpGet("{id}")]
