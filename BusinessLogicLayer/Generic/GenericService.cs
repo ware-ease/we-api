@@ -60,7 +60,7 @@ namespace BusinessLogicLayer.Generic
 
         public virtual async Task<ServiceResponse> Delete(string id)
         {
-            TEntity? entity = await _genericRepository.Get(id);
+            TEntity? entity = await _genericRepository.GetByCondition(x => x.Id == id);
 
             if (entity != null)
             {
