@@ -29,53 +29,56 @@ namespace BusinessLogicLayer.Services
             _mapper = mapper;
             _unitOfWork = unitOfWork;
         }
-        public override async Task<ServiceResponse> Get<TResult>()
-        {
-            var results = await _genericRepository.Search();
+        //public override async Task<ServiceResponse> Get<TResult>()
+        //{
+        //    var results = await _genericRepository.Search();
 
-            IEnumerable<TResult> mappedResults = _mapper.Map<IEnumerable<TResult>>(results);
+        //    IEnumerable<TResult> mappedResults = _mapper.Map<IEnumerable<TResult>>(results);
 
-            foreach (var mappedResult in mappedResults)
-            {
-                if (mappedResult.CreatedBy != null)
-                {
-                    var createdBy = await GetCreatedBy(mappedResult.CreatedBy);
+        //    foreach (var mappedResult in mappedResults)
+        //    {
+        //        if (mappedResult.CreatedBy != null)
+        //        {
+        //            var createdBy = await GetCreatedBy(mappedResult.CreatedBy);
 
-                    if (createdBy != null)
-                    {
-                        mappedResult.CreatedBy = createdBy!.Username;
-                    }
-                    else
-                    {
-                        mappedResult.CreatedBy = "Deleted user";
-                    }
-                }
-            }
+        //            if (createdBy != null)
+        //            {
+        //                mappedResult.CreatedBy = createdBy!.Username;
+        //            }
+        //            else
+        //            {
+        //                mappedResult.CreatedBy = "Deleted user";
+        //            }
+        //        }
+        //    }
 
-            return new ServiceResponse
-            {
-                Status = Data.Enum.SRStatus.Success,
-                Message = "Get successfully!",
-                Data = mappedResults
-            };
-        }
+        //    return new ServiceResponse
+        //    {
+        //        Status = Data.Enum.SRStatus.Success,
+        //        Message = "Get successfully!",
+        //        Data = mappedResults
+        //    };
+        //}
 
-        public async Task<ServiceResponse> GetAll<TResult>()
-        {
-            var entities = await _goodRequestRepository.GetAllNoPaging();
-            var result = _mapper.Map<List<TResult>>(entities);
+        //public async Task<ServiceResponse> GetAll<TResult>()
+        //{
+        //    var entities = await _goodRequestRepository.GetAllNoPaging();
+        //    var result = _mapper.Map<List<TResult>>(entities);
 
-            return new ServiceResponse
-            {
-                Status = SRStatus.Success,
-                Message = "Get all good requests successfully!",
-                Data = result
-            };
-        }
+        //    return new ServiceResponse
+        //    {
+        //        Status = SRStatus.Success,
+        //        Message = "Get all good requests successfully!",
+        //        Data = result
+        //    };
+        //}
 
         public async Task<ServiceResponse> GetById<TResult>(string id)
         {
-            var entity = await _goodRequestRepository.GetByCondition(g => g.Id == id, includeProperties: "GoodRequestDetails");
+            var entity = await _goodRequestRepository.GetByCondition(g => g.Id == id, includeProperties: "GoodRequestDetails,Warehouse,Partner," +
+                                                                                                         "GoodRequestDetails.Product," +
+                                                                                                         "GoodRequestDetails.Product.Unit," +
+                                                                                                         "GoodRequestDetails.Product.Brand");
             if (entity == null)
             {
                 return new ServiceResponse
@@ -199,7 +202,10 @@ namespace BusinessLogicLayer.Services
         public async Task<ServiceResponse> UpdateAsync<TResult>(string id, GoodRequestUpdateDTO request)
         {
             // 1️⃣ Tìm `GoodRequest` trong DB
-            var entity = await _goodRequestRepository.GetByCondition(x => x.Id == id, includeProperties: "GoodRequestDetails");
+            var entity = await _goodRequestRepository.GetByCondition(x => x.Id == id, includeProperties: "GoodRequestDetails,Warehouse,Partner," +
+                                                                                                         "GoodRequestDetails.Product," +
+                                                                                                         "GoodRequestDetails.Product.Unit," +
+                                                                                                         "GoodRequestDetails.Product.Brand");
 
             if (entity == null)
             {
@@ -358,21 +364,22 @@ namespace BusinessLogicLayer.Services
             }
         }
         public async Task<ServiceResponse> SearchGoodRequests<TResult>(int? pageIndex = null, int? pageSize = null,
-                                                                       string? keyword = null, string? warehouseName = null,
-                                                                       string? partnerName = null, GoodRequestEnum? requestType = null)
+                                                                       string? keyword = null, GoodRequestEnum? requestType = null)
         {
             Expression<Func<GoodRequest, bool>> filter = g =>
-                (string.IsNullOrEmpty(keyword) || g.Note.Contains(keyword)) &&
-                (string.IsNullOrEmpty(warehouseName) || (g.Warehouse != null && g.Warehouse.Name.Contains(warehouseName))) &&
-                (string.IsNullOrEmpty(warehouseName) || (g.RequestedWarehouse != null && g.RequestedWarehouse.Name.Contains(warehouseName))) &&
-                (string.IsNullOrEmpty(partnerName) || (g.Partner != null && g.Partner.Name.Contains(partnerName))) &&
-                (!requestType.HasValue || g.RequestType == requestType.Value); // 🔥 Lọc theo loại yêu cầu
+                                                (string.IsNullOrEmpty(keyword) || (
+                                                (g.Note != null && g.Note.Contains(keyword)) ||
+                                                (g.Warehouse != null && g.Warehouse.Name.Contains(keyword)) ||
+                                                (g.RequestedWarehouse != null && g.RequestedWarehouse.Name.Contains(keyword)) ||
+                                                (g.Partner != null && g.Partner.Name.Contains(keyword)))) &&
+                                                (!requestType.HasValue || g.RequestType == requestType.Value); // ✅ Lọc chính xác theo loại yêu cầu
 
             var totalRecords = await _goodRequestRepository.Count(filter);
 
             var results = await _goodRequestRepository.Search(
                 filter: filter,
-                includeProperties: "Warehouse,Partner",
+                includeProperties: "GoodRequestDetails,Warehouse,Partner,GoodRequestDetails.Product," +
+                                   "GoodRequestDetails.Product.Unit,GoodRequestDetails.Product.Brand",
                 pageIndex: pageIndex,
                 pageSize: pageSize
             );

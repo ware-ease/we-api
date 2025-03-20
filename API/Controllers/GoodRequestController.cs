@@ -21,13 +21,17 @@ namespace API.Controllers
             _goodRequestService = goodRequestService;
         }
 
-        [HttpGet]
-        public async Task<IActionResult> Get()
+        [HttpGet()]
+        public async Task<IActionResult> Search([FromQuery] int pageIndex = 1,
+                                                [FromQuery] int pageSize = 5,
+                                                [FromQuery] string? keyword = null,
+                                                [FromQuery] GoodRequestEnum? requestType = null)
         {
-            var result = await _goodRequestService.GetAll<GoodRequestDTO>();
-            return ControllerResponse.Response(result);
+            var response = await _goodRequestService.SearchGoodRequests<GoodRequestDTO>(
+                pageIndex, pageSize, keyword, requestType
+            );
+            return ControllerResponse.Response(response);
         }
-
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(string id)
         {
@@ -62,19 +66,6 @@ namespace API.Controllers
         {
             var result = await _goodRequestService.Delete(id);
             return ControllerResponse.Response(result);
-        }
-        [HttpGet("search")]
-        public async Task<IActionResult> Search([FromQuery] int pageIndex = 1, 
-                                                [FromQuery] int pageSize = 5,
-                                                [FromQuery] string? keyword = null,
-                                                [FromQuery] string? warehouseName = null, 
-                                                [FromQuery] string? partnerName = null,
-                                                [FromQuery] GoodRequestEnum? requestType = null)
-        {
-            var response = await _goodRequestService.SearchGoodRequests<GoodRequestDTO>(
-                pageIndex, pageSize, keyword, warehouseName, partnerName, requestType
-            );
-            return ControllerResponse.Response(response);
         }
     }
 }
