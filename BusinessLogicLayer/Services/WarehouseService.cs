@@ -262,7 +262,6 @@ namespace BusinessLogicLayer.Services
                     Data = warehouseId
                 };
             }
-
             var result = _mapper.Map<WarehouseInventoryDTO>(warehouse);
             result.Inventories = _mapper.Map<IEnumerable<InventoryDTO>>(warehouse.Inventories);
 

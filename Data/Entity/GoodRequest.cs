@@ -8,6 +8,7 @@ namespace Data.Entity
     public class GoodRequest : BaseEntity
     {
         public string? Note { get; set; }
+        public string? Code { get; set; }
 
         public GoodRequestEnum RequestType { get; set; }
 

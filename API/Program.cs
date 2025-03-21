@@ -14,6 +14,7 @@ using DataAccessLayer.UnitOfWork;
 using DotNetEnv;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Globalization;
@@ -67,6 +68,12 @@ builder.Services.AddSwaggerGen(option =>
             new string[]{}
         }
     });
+    option.MapType<TimeOnly>(() => new Microsoft.OpenApi.Models.OpenApiSchema
+    {
+        Type = "string",
+        Format = "time",
+        Example = new Microsoft.OpenApi.Any.OpenApiString("00:00")
+    });
     option.MapType<DateOnly>(() => new Microsoft.OpenApi.Models.OpenApiSchema
     {
         Type = "string",
@@ -88,7 +95,10 @@ builder.Services.AddScoped<IGenericRepository<Group>, GenericRepository<Group>>(
 builder.Services.AddScoped<IGenericRepository<Permission>, GenericRepository<Permission>>();
 builder.Services.AddScoped<IGenericRepository<Category>, GenericRepository<Category>>();
 builder.Services.AddScoped<IGenericRepository<Product>, GenericRepository<Product>>();
+builder.Services.AddScoped<IGenericRepository<Schedule>, GenericRepository<Schedule>>();
 builder.Services.AddScoped<IGenericRepository<Batch>, GenericRepository<Batch>>();
+builder.Services.AddScoped<IGenericRepository<InventoryCount>, GenericRepository<InventoryCount>>();
+builder.Services.AddScoped<IGenericRepository<InventoryCountDetail>, GenericRepository<InventoryCountDetail>>();
 builder.Services.AddScoped<IGenericRepository<ProductType>, GenericRepository<ProductType>>();
 builder.Services.AddScoped<IGenericRepository<Brand>, GenericRepository<Brand>>();
 builder.Services.AddScoped<IGenericRepository<Unit>, GenericRepository<Unit>>();
@@ -111,7 +121,9 @@ builder.Services.AddScoped<ISupplierService, SupplierService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IBatchService, BatchService>();
 builder.Services.AddScoped<IProductTypesService, ProductTypesService>();
+builder.Services.AddScoped<IScheduleService, ScheduleService>();
 builder.Services.AddScoped<IBrandService, BrandService>();
+builder.Services.AddScoped<IInventoryCountService, InventoryCountService>();
 builder.Services.AddScoped<IUnitService, UnitService>();
 builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
 builder.Services.AddScoped<IGenericPaginationService, GenericPaginationService>();
