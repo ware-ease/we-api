@@ -98,5 +98,13 @@ namespace API.Controllers
 
             return ControllerResponse.Response(result);
         }
+        //[Authorize]
+        [HttpGet("{id}/inventory")]
+        public async Task<IActionResult> GetWarehouseInventory([FromRoute] string id)
+        {
+            var result = await _warehouseService.GetInventoryByWarehouseId(id);
+
+            return ControllerResponse.Response(result);
+        }
     }
 }

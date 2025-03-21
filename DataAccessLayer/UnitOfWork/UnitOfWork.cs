@@ -65,6 +65,10 @@ namespace DataAccessLayer.UnitOfWork
         public IGoodRequestDetailRepository GoodRequestDetailRepository => GetIRepository<IGoodRequestDetailRepository>();
         public IProductRepository ProductRepository => GetIRepository<IProductRepository>();
         public IPartnerRepository PartnerRepository => GetIRepository<IPartnerRepository>();
+        public IGoodNoteRepository GoodNoteRepository => GetIRepository<IGoodNoteRepository>();
+        public IGoodNoteDetailRepository GoodNoteDetailRepository => GetIRepository<IGoodNoteDetailRepository>();
+        public IBatchRepository BatchRepository => GetIRepository<IBatchRepository>();
+        public IInventoryRepository InventoryRepository => GetIRepository<IInventoryRepository>();
 
         public TRepository GetIRepository<TRepository>()
         {

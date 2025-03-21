@@ -1,6 +1,7 @@
 ﻿using Data.Entity;
 using Data.Entity.Base;
 using Data.Model.DTO.Base;
+using Data.Model.Request.Inventory;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -73,4 +74,14 @@ namespace Data.Model.Request.Warehouse
         public List<LocationCreateDto> Locations { get; set; }
     }
     #endregion
+
+    public class WarehouseInventoryDTO : BaseDTO
+    {
+        public string Id { get; set; }
+        public string? Name { get; set; }
+        public string? Address { get; set; }
+        public float Area { get; set; }
+        public DateTime OperateFrom { get; set; }
+        public IEnumerable<InventoryDTO>? Inventories { get; set; }
+    }
 }

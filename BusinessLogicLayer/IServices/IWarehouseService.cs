@@ -19,6 +19,6 @@ namespace BusinessLogicLayer.IServices
                                                         string? keyword = null,
                                                         float? minArea = null,
                                                         float? maxArea = null);
-
+        Task<ServiceResponse> GetInventoryByWarehouseId(string warehouseId);
     }
 }
