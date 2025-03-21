@@ -16,9 +16,11 @@ using Data.Model.Request.Brand;
 using Data.Model.Request.Category;
 using Data.Model.Request.Customer;
 using Data.Model.Request.GoodRequest;
+using Data.Model.Request.InventoryCount;
 using Data.Model.Request.Partner;
 using Data.Model.Request.Product;
 using Data.Model.Request.ProductType;
+using Data.Model.Request.Schedule;
 using Data.Model.Request.Suppiler;
 using Data.Model.Request.Supplier;
 using Data.Model.Request.Unit;
@@ -111,6 +113,34 @@ namespace BusinessLogicLayer.Mappings
 
             CreateMap<ProductCreateDTO, Product>().ReverseMap();
             CreateMap<ProductUpdateDTO, Product>().ReverseMap();
+            #endregion
+
+            #region InventoryCount
+            CreateMap<InventoryCount, InventoryCountDTO>()
+                .ForMember(dest => dest.LocationName, opt => opt.MapFrom(src => $"{src.Location.Name}".Trim()))
+                .ForMember(dest => dest.ScheduleDate, opt => opt.MapFrom(src => src.Schedule.Date))
+                .ForMember(dest => dest.InventoryCountDetailDTO, opt => opt.MapFrom(src => src.InventoryCheckDetails))
+                .ReverseMap();
+
+            CreateMap<InventoryCount, InventoryCountCreateDTO>().ReverseMap();
+            CreateMap<InventoryCount, InventoryCountUpdateDTO>().ReverseMap();
+            #endregion
+
+            #region InventoryCountDetail
+            CreateMap<InventoryCountDetail, InventoryCountDetailDTO>()
+                .ReverseMap();
+
+            CreateMap<InventoryCountDetail, InventoryCountDetailCreateDTO>().ReverseMap();
+            CreateMap<InventoryCountDetail, InventoryCountDetailUpdateDTO>().ReverseMap();
+            #endregion
+
+            #region Schedule
+            CreateMap<Schedule, ScheduleDTO>()
+                .ForMember(dest => dest.LocationName, opt => opt.MapFrom(src => $"{src.Location.Name}".Trim()))
+                .ReverseMap();
+
+            CreateMap<Schedule, ScheduleCreateDTO>().ReverseMap();
+            CreateMap<Schedule, ScheduleUpdateDTO>().ReverseMap();
             #endregion
 
             #region Batch
