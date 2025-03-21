@@ -29,50 +29,6 @@ namespace BusinessLogicLayer.Services
             _mapper = mapper;
             _unitOfWork = unitOfWork;
         }
-        //public override async Task<ServiceResponse> Get<TResult>()
-        //{
-        //    var results = await _genericRepository.Search();
-
-        //    IEnumerable<TResult> mappedResults = _mapper.Map<IEnumerable<TResult>>(results);
-
-        //    foreach (var mappedResult in mappedResults)
-        //    {
-        //        if (mappedResult.CreatedBy != null)
-        //        {
-        //            var createdBy = await GetCreatedBy(mappedResult.CreatedBy);
-
-        //            if (createdBy != null)
-        //            {
-        //                mappedResult.CreatedBy = createdBy!.Username;
-        //            }
-        //            else
-        //            {
-        //                mappedResult.CreatedBy = "Deleted user";
-        //            }
-        //        }
-        //    }
-
-        //    return new ServiceResponse
-        //    {
-        //        Status = Data.Enum.SRStatus.Success,
-        //        Message = "Get successfully!",
-        //        Data = mappedResults
-        //    };
-        //}
-
-        //public async Task<ServiceResponse> GetAll<TResult>()
-        //{
-        //    var entities = await _goodRequestRepository.GetAllNoPaging();
-        //    var result = _mapper.Map<List<TResult>>(entities);
-
-        //    return new ServiceResponse
-        //    {
-        //        Status = SRStatus.Success,
-        //        Message = "Get all good requests successfully!",
-        //        Data = result
-        //    };
-        //}
-
         public async Task<ServiceResponse> GetById<TResult>(string id)
         {
             var entity = await _goodRequestRepository.GetByCondition(g => g.Id == id, includeProperties: "GoodRequestDetails,Warehouse,Partner," +
@@ -100,10 +56,22 @@ namespace BusinessLogicLayer.Services
 
         public async Task<ServiceResponse> CreateAsync<TResult>(GoodRequestCreateDTO request)
         {
+            // Kiểm tra Code có bị trùng không
+            var existingCode = await _goodRequestRepository.GetByCondition(g => g.Code == request.Code);
+            if (existingCode != null)
+            {
+                return new ServiceResponse
+                {
+                    Status = SRStatus.Error,
+                    Message = "Good request code already exists.",
+                    Data = request.Code
+                };
+            }
+
             // 2️⃣ Kiểm tra PartnerId có tồn tại trong DB không (nếu có giá trị)
             if (!string.IsNullOrEmpty(request.PartnerId))
             {
-                var partnerExists = await _unitOfWork.PartnerRepository.Get(request.PartnerId);
+                var partnerExists = await _unitOfWork.PartnerRepository.GetByCondition(x => x.Id == request.PartnerId);
                 if (partnerExists == null)
                 {
                     return new ServiceResponse
@@ -133,7 +101,7 @@ namespace BusinessLogicLayer.Services
             // 4️⃣ Kiểm tra RequestedWarehouseId có tồn tại không
             if (!string.IsNullOrEmpty(request.RequestedWarehouseId))
             {
-                var requestedWarehouseExists = await _unitOfWork.WarehouseRepository.Get(request.RequestedWarehouseId);
+                var requestedWarehouseExists = await _unitOfWork.WarehouseRepository.GetByCondition(x => x.Id == request.RequestedWarehouseId);
                 if (requestedWarehouseExists == null)
                 {
                     return new ServiceResponse
@@ -159,7 +127,7 @@ namespace BusinessLogicLayer.Services
                         };
                     }
 
-                    var productExists = await _unitOfWork.ProductRepository.Get(detail.ProductId);
+                    var productExists = await _unitOfWork.ProductRepository.GetByCondition(x => x.Id == detail.ProductId);
                     if (productExists == null)
                     {
                         return new ServiceResponse
@@ -216,8 +184,24 @@ namespace BusinessLogicLayer.Services
                     Data = id
                 };
             }
+
+            if (!string.IsNullOrEmpty(request.Code) && request.Code != entity.Code)
+            {
+                var existingCode = await _goodRequestRepository.GetByCondition(g => g.Code == request.Code);
+                if (existingCode != null)
+                {
+                    return new ServiceResponse
+                    {
+                        Status = SRStatus.Error,
+                        Message = "Good request code already exists.",
+                        Data = request.Code
+                    };
+                }
+            }
+
             // 2️⃣ Kiểm tra và gán dữ liệu (nếu request null thì giữ nguyên giá trị cũ)
             request.Note = request.Note ?? entity.Note;
+            request.Code = request.Code ?? entity.Code;
             request.PartnerId = request.PartnerId ?? entity.PartnerId;
             request.WarehouseId = request.WarehouseId ?? entity.WarehouseId;
             request.RequestedWarehouseId = request.RequestedWarehouseId ?? entity.RequestedWarehouseId;
@@ -368,6 +352,7 @@ namespace BusinessLogicLayer.Services
         {
             Expression<Func<GoodRequest, bool>> filter = g =>
                                                 (string.IsNullOrEmpty(keyword) || (
+                                                (g.Code != null && g.Code.Contains(keyword)) ||  // ✅ Tìm theo Code
                                                 (g.Note != null && g.Note.Contains(keyword)) ||
                                                 (g.Warehouse != null && g.Warehouse.Name.Contains(keyword)) ||
                                                 (g.RequestedWarehouse != null && g.RequestedWarehouse.Name.Contains(keyword)) ||

@@ -7,7 +7,7 @@ namespace Data.Model.Request.GoodRequest
     public class GoodRequestDTO : BaseDTO
     {
         public string? Note { get; set; }
-
+        public string? Code { get; set; }
         public GoodRequestEnum RequestType { get; set; }
 
         public string? PartnerId { get; set; }
@@ -23,6 +23,7 @@ namespace Data.Model.Request.GoodRequest
     public class GoodRequestCreateDTO : BaseCreateDTO
     {
         public string? Note { get; set; }
+        public string? Code { get; set; }
         public GoodRequestEnum RequestType { get; set; }
 
         private string? _partnerId;
@@ -54,6 +55,7 @@ namespace Data.Model.Request.GoodRequest
         [JsonIgnore]
         public string? Id { get; set; }
         public string? Note { get; set; }
+        public string? Code { get; set; }
 
         private string? _partnerId;
         public string? PartnerId

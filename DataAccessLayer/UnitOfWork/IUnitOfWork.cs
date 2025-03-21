@@ -25,5 +25,9 @@ namespace DataAccessLayer.UnitOfWork
         IGoodRequestDetailRepository GoodRequestDetailRepository { get; }
         IProductRepository ProductRepository { get; }
         IPartnerRepository PartnerRepository { get; }
+        IGoodNoteRepository GoodNoteRepository { get; }
+        IGoodNoteDetailRepository GoodNoteDetailRepository { get; }
+        IBatchRepository BatchRepository { get; }
+        IInventoryRepository InventoryRepository { get; }
     }
 }

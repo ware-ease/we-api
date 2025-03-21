@@ -15,8 +15,10 @@ using Data.Model.Request.Batch;
 using Data.Model.Request.Brand;
 using Data.Model.Request.Category;
 using Data.Model.Request.Customer;
+using Data.Model.Request.GoodNote;
 using Data.Model.Request.GoodRequest;
 using Data.Model.Request.InventoryCount;
+using Data.Model.Request.Inventory;
 using Data.Model.Request.Partner;
 using Data.Model.Request.Product;
 using Data.Model.Request.ProductType;
@@ -196,6 +198,10 @@ namespace BusinessLogicLayer.Mappings
             CreateMap<Warehouse, WarehouseFullInfoDTO>().ReverseMap();
             CreateMap<Location, LocationDto>().ReverseMap();
             CreateMap<Location, LocationCreateDto>().ReverseMap();
+            CreateMap<Warehouse, WarehouseInventoryDTO>().ReverseMap();
+            #region Inventory
+            CreateMap<Inventory, InventoryDTO>().ReverseMap();
+            #endregion
             #endregion
 
             #region GoodRequest
@@ -215,6 +221,33 @@ namespace BusinessLogicLayer.Mappings
                             .ReverseMap();
             #endregion
 
+            #region GoodNote
+            CreateMap<GoodNote, GoodNoteDTO>()
+                //.ForMember(dest => dest.GoodNoteDetails, opt => opt.MapFrom(src => src.GoodNoteDetails))
+                .ReverseMap();
+
+            CreateMap<GoodNoteCreateDTO, GoodNote>().ReverseMap();
+            CreateMap<GoodNoteDetail, GoodNoteDetailCreateDTO>().ReverseMap();
+            CreateMap<GoodNoteDetail, GoodNoteDTO>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.GoodNote.Id))
+                .ForMember(dest => dest.ReceiverName, opt => opt.MapFrom(src => src.GoodNote.ReceiverName))
+                .ForMember(dest => dest.ShipperName, opt => opt.MapFrom(src => src.GoodNote.ShipperName))
+                .ForMember(dest => dest.NoteType, opt => opt.MapFrom(src => src.GoodNote.NoteType))
+                .ForMember(dest => dest.GoodRequestId, opt => opt.MapFrom(src => src.GoodNote.GoodRequestId))
+                .ForMember(dest => dest.Code, opt => opt.MapFrom(src => src.GoodNote.Code))
+                .ForMember(dest => dest.Date, opt => opt.MapFrom(src => src.GoodNote.Date))
+                .ForMember(dest => dest.CreatedTime, opt => opt.MapFrom(src => src.GoodNote.CreatedTime))
+                .ForMember(dest => dest.CreatedBy, opt => opt.MapFrom(src => src.GoodNote.CreatedBy))
+                .ReverseMap();
+
+            CreateMap<GoodNoteDetail, GoodNoteDetailDTO>()
+                .ForMember(dest => dest.Batch, opt => opt.MapFrom(src => src.Batch))
+                //.ForMember(dest => dest.Batch.Product, opt => opt.MapFrom(src => src.Batch.Product))
+                .ReverseMap();
+            CreateMap<Batch, BatchNoteDTO>().ReverseMap();
+            CreateMap<Product, ProductNoteDTO>().ReverseMap();
+            #endregion
+
             #region Partner
             // Map từ Entity -> DTO
             CreateMap<Partner, PartnerDTO>();
@@ -226,6 +259,7 @@ namespace BusinessLogicLayer.Mappings
             CreateMap<PartnerUpdateDTO, Partner>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore());
             #endregion
+
         }
     }
 }

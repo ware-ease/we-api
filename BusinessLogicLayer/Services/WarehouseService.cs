@@ -2,8 +2,10 @@
 using BusinessLogicLayer.Generic;
 using BusinessLogicLayer.IServices;
 using Data.Entity;
+using Data.Enum;
 using Data.Model.DTO.Base;
 using Data.Model.Request.Area;
+using Data.Model.Request.Inventory;
 using Data.Model.Request.Warehouse;
 using Data.Model.Response;
 using DataAccessLayer.Generic;
@@ -240,6 +242,34 @@ namespace BusinessLogicLayer.Services
                     PageSize = pageSize ?? totalRecords,
                     Records = mappedResults
                 }
+            };
+        }
+
+        public async Task<ServiceResponse> GetInventoryByWarehouseId(string warehouseId)
+        {
+            var warehouse = await _unitOfWork.WarehouseRepository.GetByCondition(i => i.Id == warehouseId,
+                includeProperties: "Inventories,Inventories.Batch," +
+                                    "Inventories.Batch.Product," +
+                                    "Inventories.Batch.Product.Unit," +
+                                    "Inventories.Batch.Product.Brand");
+
+            if (warehouse == null)
+            {
+                return new ServiceResponse
+                {
+                    Status = SRStatus.NotFound,
+                    Message = "Warehouse not found.",
+                    Data = warehouseId
+                };
+            }
+            var result = _mapper.Map<WarehouseInventoryDTO>(warehouse);
+            result.Inventories = _mapper.Map<IEnumerable<InventoryDTO>>(warehouse.Inventories);
+
+            return new ServiceResponse
+            {
+                Status = SRStatus.Success,
+                Message = "Inventory retrieved successfully.",
+                Data = result
             };
         }
     }
