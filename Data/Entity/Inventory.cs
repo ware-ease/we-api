@@ -13,8 +13,8 @@ namespace Data.Entity
     {
         public float CurrentQuantity { get; set; }
 
-        public ICollection<LocationLog> LocationLogs { get; set; } = [];
-        public ICollection<InventoryAdjustmentDetail> InventoryAdjustmentDetails { get; set; } = [];
+        public ICollection<InventoryLocation> InventoryLocations { get; set; } = [];
+        //public ICollection<InventoryAdjustmentDetail> InventoryAdjustmentDetails { get; set; } = [];
 
         [ForeignKey("Warehouse")]
         public string WarehouseId { get; set; }

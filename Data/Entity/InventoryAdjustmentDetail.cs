@@ -15,12 +15,12 @@ namespace Data.Entity
         public float ChangeInQuantity { get; set; }
         public string? Note { get; set; }
 
-        [ForeignKey("Inventory")]
-        public string InventoryId { get; set; }
-        public Inventory Inventory { get; set; }
-
         [ForeignKey("InventoryAdjustment")]
         public string InventoryAdjustmentId { get; set; }
         public InventoryAdjustment InventoryAdjustment { get; set; }
+
+        [ForeignKey("LocationLog")]
+        public string LocationLogId { get; set; }
+        public LocationLog LocationLog { get; set; }
     }
 }

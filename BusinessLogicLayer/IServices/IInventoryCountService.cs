@@ -1,5 +1,5 @@
 ﻿using BusinessLogicLayer.Generic;
-using Data.Entity;
+using Data.Model.DTO;
 using Data.Model.Request.InventoryCount;
 using Data.Model.Response;
 using System;

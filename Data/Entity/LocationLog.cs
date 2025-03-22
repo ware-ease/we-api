@@ -14,12 +14,8 @@ namespace Data.Entity
         public float NewQuantity { get; set; }
         public float ChangeInQuantity { get; set; }
 
-        [ForeignKey("Location")]
-        public string LocationId { get; set; }
-        public Location Location { get; set; }
-
-        [ForeignKey("Inventory")]
-        public string InventoryId { get; set; }
-        public Inventory Inventory { get; set; }
+        [ForeignKey("InventoryLocation")]
+        public string InventoryLocationId { get; set; }
+        public InventoryLocation InventoryLocation { get; set; }
     }
 }
