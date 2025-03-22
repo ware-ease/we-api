@@ -14,7 +14,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/inventory-counts")]
     [ApiController]
     public class InventoryCountController : ControllerBase
     {
