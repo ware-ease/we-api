@@ -33,7 +33,7 @@ namespace DataAccessLayer
         public virtual DbSet<Permission> Permissions { get; set; }
         public virtual DbSet<Category> Categories { get; set; }
         //public virtual DbSet<Cell> Cells { get; set; }
-        public virtual DbSet<Customer> Customers { get; set; }
+        //public virtual DbSet<Customer> Customers { get; set; }
         //public virtual DbSet<Floor> Floors { get; set; }
         public virtual DbSet<Group> Groups { get; set; }
         public virtual DbSet<GroupPermission> GroupPermissions { get; set; }
@@ -46,7 +46,7 @@ namespace DataAccessLayer
         public virtual DbSet<ReceivingDetail> ReceivingDetails { get; set; }
         public virtual DbSet<ReceivingNote> ReceivingNotes { get; set; }
         //public virtual DbSet<Shelf> Shelves { get; set; }
-        public virtual DbSet<Supplier> Suppliers { get; set; }
+        //public virtual DbSet<Supplier> Suppliers { get; set; }
         public virtual DbSet<Warehouse> Warehouses { get; set; }
         //public virtual DbSet<Area> Areas { get; set; }
         public virtual DbSet<Batch> Batches { get; set; }

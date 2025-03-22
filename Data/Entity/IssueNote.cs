@@ -24,8 +24,5 @@ namespace Data.Entity
         public string? WarehouseId { get; set; }
         public Warehouse? Warehouse { get; set; }
 
-        [ForeignKey("Customer")]
-        public string? CustomerId { get; set; }
-        public Customer? Customer { get; set; }
     }
 }

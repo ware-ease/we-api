@@ -52,7 +52,7 @@ namespace DataAccessLayer.UnitOfWork
             GC.SuppressFinalize(this);
         }
 
-        public ICustomerRepository CustomerRepository => GetIRepository<ICustomerRepository>();
+        //public ICustomerRepository CustomerRepository => GetIRepository<ICustomerRepository>();
         public IRefreshTokenRepository RefreshTokenRepository => GetIRepository<IRefreshTokenRepository>();
         public IAccountRepository AccountRepository => GetIRepository<IAccountRepository>();
         public IGroupRepository GroupRepository => GetIRepository<IGroupRepository>();

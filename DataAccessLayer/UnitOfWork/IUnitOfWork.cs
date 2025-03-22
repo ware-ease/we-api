@@ -19,7 +19,7 @@ namespace DataAccessLayer.UnitOfWork
         IPermissionRepository PermissionRepository { get; }
         IWarehouseRepository WarehouseRepository { get; }
         IRefreshTokenRepository RefreshTokenRepository { get; }
-        ICustomerRepository CustomerRepository { get; }
+        //ICustomerRepository CustomerRepository { get; }
         ILocationRepository LocationRepository { get; }
         IGoodRequestRepository GoodRequestRepository { get; }
         IGoodRequestDetailRepository GoodRequestDetailRepository { get; }
