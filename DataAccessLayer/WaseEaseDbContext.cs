@@ -70,6 +70,7 @@ namespace DataAccessLayer
         public virtual DbSet<InventoryAdjustmentDetail> InventoryAdjustmentDetails { get; set; }
         public virtual DbSet<InventoryCount> InventoryCounts { get; set; }
         public virtual DbSet<InventoryCountDetail> InventoryCountDetails { get; set; }
+        public virtual DbSet<InventoryLocation> InventoryLocations { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

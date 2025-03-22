@@ -2,6 +2,7 @@
 using BusinessLogicLayer.Generic;
 using BusinessLogicLayer.IServices;
 using Data.Entity;
+using Data.Model.DTO;
 using Data.Model.Request.InventoryCount;
 using Data.Model.Response;
 using DataAccessLayer.Generic;
