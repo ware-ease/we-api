@@ -125,6 +125,7 @@ builder.Services.AddScoped<IScheduleService, ScheduleService>();
 builder.Services.AddScoped<IBrandService, BrandService>();
 builder.Services.AddScoped<IInventoryCountService, InventoryCountService>();
 builder.Services.AddScoped<IUnitService, UnitService>();
+builder.Services.AddScoped<IInventoryService, InventoryService>();
 builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
 builder.Services.AddScoped<IGenericPaginationService, GenericPaginationService>();
 builder.Services.AddScoped<IGroupService, GroupService>();
