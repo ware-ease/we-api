@@ -13,4 +13,12 @@ namespace Data.Enum
         Transfer,
         Return,
     }
+    public enum GoodRequestStatusEnum
+    {
+        Pending,
+        Approved,
+        Rejected,
+        Completed,
+        Canceled,
+    }
 }

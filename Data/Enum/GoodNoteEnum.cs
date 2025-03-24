@@ -13,4 +13,11 @@ namespace Data.Enum
         Transfer,
         Return,
     }
+    public enum GoodNoteStatusEnum
+    {
+        Pending,      // 🟡 Chờ xử lý
+        Completed,    // ✅ Hoàn thành
+        Canceled,     // ❌ Đã hủy
+        Failed        // ⚠️ Thất bại (nếu có lỗi trong quá trình thực hiện)
+    }
 }
