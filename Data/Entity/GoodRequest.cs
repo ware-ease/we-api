@@ -11,7 +11,7 @@ namespace Data.Entity
         public string? Code { get; set; }
 
         public GoodRequestEnum RequestType { get; set; }
-        public GoodRequestEnum Status { get; set; }
+        public GoodRequestStatusEnum Status { get; set; } = GoodRequestStatusEnum.Pending;
 
         public ICollection<GoodRequestDetail> GoodRequestDetails { get; set; } = [];
 

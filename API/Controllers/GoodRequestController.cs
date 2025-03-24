@@ -5,6 +5,7 @@ using Data.Model.Request.GoodRequest;
 using Data.Model.Response;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Sprache;
 
@@ -66,6 +67,12 @@ namespace API.Controllers
         {
             var result = await _goodRequestService.Delete(id);
             return ControllerResponse.Response(result);
+        }
+        [HttpPut("{id}/status")]
+        public async Task<IActionResult> UpdateStatus(string id, [FromQuery] GoodRequestStatusEnum requestStatus)
+        {
+            var response = await _goodRequestService.UpdateStatusAsync(id, requestStatus);
+            return ControllerResponse.Response(response);
         }
     }
 }

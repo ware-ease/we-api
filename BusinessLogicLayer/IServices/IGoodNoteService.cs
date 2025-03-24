@@ -17,5 +17,7 @@ namespace BusinessLogicLayer.IServices
         Task<ServiceResponse> GetById<TResult>(string id);
         Task<ServiceResponse> CreateAsync<TResult>(GoodNoteCreateDTO request);
         Task<ServiceResponse> DeleteAsync(string id);
+        Task<ServiceResponse> UpdateStatusAsync(string id, GoodNoteStatusEnum newStatus);
+        Task<ServiceResponse> UpdateAsync(string id, GoodNoteUpdateDTO request);
     }
 }

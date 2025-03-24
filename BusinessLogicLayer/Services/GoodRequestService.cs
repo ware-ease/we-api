@@ -187,7 +187,7 @@ namespace BusinessLogicLayer.Services
 
             if (!string.IsNullOrEmpty(request.Code) && request.Code != entity.Code)
             {
-                var existingCode = await _goodRequestRepository.GetByCondition(g => g.Code == request.Code);
+                var existingCode = await _goodRequestRepository.GetByCondition(g => g.Code == request.Code && g.Id == request.Id);
                 if (existingCode != null)
                 {
                     return new ServiceResponse
@@ -387,6 +387,53 @@ namespace BusinessLogicLayer.Services
                 }
             };
         }
+        public async Task<ServiceResponse> UpdateStatusAsync(string id, GoodRequestStatusEnum newStatus)
+        {
+            var goodRequest = await _goodRequestRepository.GetByCondition(x => x.Id == id);
+            if (goodRequest == null)
+            {
+                return new ServiceResponse
+                {
+                    Status = SRStatus.NotFound,
+                    Message = "GoodRequest không tồn tại.",
+                    Data = id
+                };
+            }
 
+            // Kiểm tra quy tắc cập nhật trạng thái
+            if (!CanUpdateStatus(goodRequest.Status, newStatus))
+            {
+                return new ServiceResponse
+                {
+                    Status = SRStatus.Error,
+                    Message = $"Không thể chuyển từ trạng thái {goodRequest.Status.ToString()} sang {newStatus.ToString()}.",
+                    Data = id
+                };
+            }
+
+            goodRequest.Status = newStatus;
+            _goodRequestRepository.Update(goodRequest);
+            await _unitOfWork.SaveAsync();
+
+            return new ServiceResponse
+            {
+                Status = SRStatus.Success,
+                Message = "Cập nhật trạng thái thành công.",
+                Data = new { goodRequestId = id, newStatus = goodRequest.Status }
+            };
+        }
+        private bool CanUpdateStatus(GoodRequestStatusEnum currentStatus, GoodRequestStatusEnum newStatus)
+        {
+            var validTransitions = new Dictionary<GoodRequestStatusEnum, List<GoodRequestStatusEnum>>()
+            {
+                { GoodRequestStatusEnum.Pending, new List<GoodRequestStatusEnum> { GoodRequestStatusEnum.Approved, GoodRequestStatusEnum.Canceled, GoodRequestStatusEnum.Rejected } },
+                { GoodRequestStatusEnum.Approved, new List<GoodRequestStatusEnum> { GoodRequestStatusEnum.Completed, GoodRequestStatusEnum.Canceled } },
+                { GoodRequestStatusEnum.Canceled, new List<GoodRequestStatusEnum>() }, // Không thể đổi từ Canceled                
+                { GoodRequestStatusEnum.Completed, new List<GoodRequestStatusEnum>() }, // Không thể đổi từ Completed
+                { GoodRequestStatusEnum.Rejected, new List<GoodRequestStatusEnum>() } // Không thể đổi từ Rejected
+            };
+
+            return validTransitions.ContainsKey(currentStatus) && validTransitions[currentStatus].Contains(newStatus);
+        }
     }
 }

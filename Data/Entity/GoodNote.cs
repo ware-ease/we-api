@@ -13,7 +13,7 @@ namespace Data.Entity
     public class GoodNote : BaseEntity
     {
         public GoodNoteEnum NoteType { get; set; }
-        public GoodNoteEnum Status { get; set; }
+        public GoodNoteStatusEnum Status { get; set; } = GoodNoteStatusEnum.Pending;
         public string? ShipperName { get; set; }
         public string? ReceiverName { get; set; }
         public string? Code { get; set; }

@@ -1,5 +1,6 @@
 ﻿using Data.Enum;
 using Data.Model.DTO.Base;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
@@ -7,7 +8,8 @@ namespace Data.Model.Request.GoodNote
 {
     public class GoodNoteDTO : BaseDTO
     {
-        public GoodNoteEnum NoteType { get; set; }
+        public string NoteType { get; set; }
+        public string Status { get; set; }
         public string? ShipperName { get; set; }
         public string? ReceiverName { get; set; }
         public string? Code { get; set; }
@@ -46,11 +48,18 @@ namespace Data.Model.Request.GoodNote
     }
     public class GoodNoteCreateDTO : BaseCreateDTO
     {
+        [Required(ErrorMessage = "Loại phiếu không được để trống.")]
         public GoodNoteEnum NoteType { get; set; }
+        [MaxLength(100, ErrorMessage = "Tên người giao hàng không được vượt quá 100 ký tự.")]
         public string? ShipperName { get; set; }
+        [MaxLength(100, ErrorMessage = "Tên người nhận hàng không được vượt quá 100 ký tự.")]
         public string? ReceiverName { get; set; }
+        [Required(ErrorMessage = "Mã phiếu không được để trống.")]
+        [MaxLength(50, ErrorMessage = "Mã phiếu không được vượt quá 50 ký tự.")]
         public string? Code { get; set; }
+        [Required(ErrorMessage = "Ngày không được để trống.")]
         public DateTime? Date { get; set; }
+        [Required(ErrorMessage = "GoodRequestId không được để trống.")]
         public string GoodRequestId { get; set; }
         public IEnumerable<GoodNoteDetailCreateDTO>? GoodNoteDetails { get; set; }
     }
@@ -69,12 +78,11 @@ namespace Data.Model.Request.GoodNote
     {
         [JsonIgnore]
         public string? Id { get; set; }
-        public GoodNoteEnum NoteType { get; set; }
+        public GoodNoteEnum? NoteType { get; set; }
         public string? ShipperName { get; set; }
         public string? ReceiverName { get; set; }
         public string? Code { get; set; }
         public DateTime? Date { get; set; }
-        //public string GoodRequestId { get; set; }
         public IEnumerable<GoodNoteDetailCreateDTO>? GoodNoteDetails { get; set; }
     }
 }

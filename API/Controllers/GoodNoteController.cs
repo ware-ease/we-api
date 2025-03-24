@@ -1,4 +1,5 @@
 ﻿using BusinessLogicLayer.IServices;
+using BusinessLogicLayer.Services;
 using Data.Enum;
 using Data.Model.Request.GoodNote;
 using Data.Model.Request.GoodRequest;
@@ -51,20 +52,19 @@ namespace API.Controllers
             return ControllerResponse.Response(result);
         }
 
-        //[HttpPatch("{id}")]
-        //public async Task<IActionResult> Update([FromRoute] string id, [FromBody] GoodRequestUpdateDTO request)
-        //{
-        //    request.Id = id;
-        //    var result = await _goodRequestService.UpdateAsync<GoodRequestDTO>(id, request);
-        //    return ControllerResponse.Response(result);
-        //}
-
-        //[HttpDelete("{id}")]
-        //public async Task<IActionResult> Delete(string id)
-        //{
-        //    var result = await _goodNoteService.Delete(id);
-        //    return ControllerResponse.Response(result);
-        //}
+        [HttpPut("{id}/status")]
+        public async Task<IActionResult> UpdateStatus(string id, [FromQuery] GoodNoteStatusEnum noteStatus)
+        {
+            var response = await _goodNoteService.UpdateStatusAsync(id, noteStatus);
+            return ControllerResponse.Response(response);
+        }
+        [HttpPatch("{id}")]
+        public async Task<IActionResult> Update([FromRoute] string id, [FromBody] GoodNoteUpdateDTO request)
+        {
+            request.Id = id;
+            var result = await _goodNoteService.UpdateAsync(id, request);
+            return ControllerResponse.Response(result);
+        }
     }
 }
 
