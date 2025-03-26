@@ -24,10 +24,11 @@ namespace API.Controllers
         public async Task<IActionResult> Search([FromQuery] int pageIndex = 1,
                                                 [FromQuery] int pageSize = 5,
                                                 [FromQuery] string? keyword = null,
-                                                [FromQuery] GoodNoteEnum? noteType = null)
+                                                [FromQuery] GoodNoteEnum? noteType = null,
+                                                [FromQuery] GoodNoteStatusEnum? status = null)
         {
             var response = await _goodNoteService.SearchGoodNotes<GoodNoteDTO>(
-                pageIndex, pageSize, keyword, noteType
+                pageIndex, pageSize, keyword, noteType, status
             );
             return ControllerResponse.Response(response);
         }

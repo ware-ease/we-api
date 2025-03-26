@@ -29,19 +29,28 @@ namespace BusinessLogicLayer.Services
         }
 
         public async Task<ServiceResponse> SearchGoodNotes<TResult>(int? pageIndex = null, int? pageSize = null,
-                                                                      string? keyword = null, GoodNoteEnum? goodNoteType = null)
+                                                                      string? keyword = null, GoodNoteEnum? goodNoteType = null,
+                                                                                              GoodNoteStatusEnum? status = null)
         {
-            Expression<Func<GoodNoteDetail, bool>> filter = g =>(string.IsNullOrEmpty(keyword) || 
+            try
+            {
+                Expression<Func<GoodNoteDetail, bool>> filter = g =>(string.IsNullOrEmpty(keyword) || 
                                                                 ((g.GoodNote.ShipperName != null && g.GoodNote.ShipperName.Contains(keyword)) ||
                                                                 (g.GoodNote.ReceiverName != null && g.GoodNote.ReceiverName.Contains(keyword)) ||
                                                                 (g.GoodNote.Code != null && g.GoodNote.Code.Contains(keyword)) ||
+                                                                (g.GoodNote.GoodRequest.RequestedWarehouse.Name != null && g.GoodNote.GoodRequest.RequestedWarehouse.Name.Contains(keyword)) ||
+                                                                (g.GoodNote.GoodRequest.Warehouse.Name != null && g.GoodNote.GoodRequest.Warehouse.Name.Contains(keyword)) ||
                                                                 (g.Batch.Product.Name != null && g.Batch.Product.Name.Contains(keyword))
                                                                 )) &&
-                                                                (!goodNoteType.HasValue || g.GoodNote.NoteType == goodNoteType.Value);
+                                                                (!goodNoteType.HasValue || g.GoodNote.NoteType == goodNoteType.Value) &&
+                                                                (!status.HasValue || g.GoodNote.Status == status.Value); // Thêm điều kiện lọc theo Status
+
 
             var results = await _unitOfWork.GoodNoteDetailRepository.Search(
                 filter: filter,
-                includeProperties: "GoodNote,Batch," +
+                includeProperties: "GoodNote,GoodNote.GoodRequest,GoodNote.GoodRequest.Warehouse," +
+                                    "GoodNote.GoodRequest.RequestedWarehouse," +
+                                    "Batch," +
                                     "Batch.Product," +
                                     "Batch.Product.Unit," +
                                     "Batch.Product.Brand",
@@ -51,7 +60,7 @@ namespace BusinessLogicLayer.Services
 
             var totalRecords = results.GroupBy(g => g.GoodNoteId).Count();
 
-            var mappedResults = _mapper.Map<IEnumerable<TResult>>(results);
+            //var mappedResults = _mapper.Map<IEnumerable<TResult>>(results);
             var groupedResults = results.GroupBy(g => g.GoodNote.Id)
                                         .Select(group => new GoodNoteDTO
                                         {
@@ -61,6 +70,7 @@ namespace BusinessLogicLayer.Services
                                             NoteType = group.First().GoodNote.NoteType.ToString(),
                                             Status = group.First().GoodNote.Status.ToString(),
                                             GoodRequestId = group.First().GoodNote.GoodRequestId,
+                                            RequestedWarehouseName = group.First().GoodNote.GoodRequest.RequestedWarehouse?.Name,
                                             Code = group.First().GoodNote.Code,
                                             Date = group.First().GoodNote.Date,
                                             CreatedTime = group.First().GoodNote.CreatedTime.ToString(),
@@ -84,6 +94,16 @@ namespace BusinessLogicLayer.Services
                     Records = groupedResults
                 }
             };
+            }
+            catch (Exception ex)
+            {
+                return new ServiceResponse
+                {
+                    Status = Data.Enum.SRStatus.Error,
+                    Message = "An error occurred while searching GoodNotes. Please try again later.",
+                    Data = null
+                };
+            }
         }
         public async Task<ServiceResponse> GetById<TResult>(string id)
         {
@@ -231,96 +251,121 @@ namespace BusinessLogicLayer.Services
 
         private async Task UpdateInventories(GoodNote goodNote, List<GoodNoteDetail> details)
         {
-            var batchIds = details.Select(d => d.BatchId).Distinct().ToList();
-            var goodRequest = await _unitOfWork.GoodRequestRepository.GetByCondition(g => g.Id == goodNote.GoodRequestId);
-            var warehouseId = goodRequest.WarehouseId;  // 🔥 Chỉ dùng khi Transfer
-            var requestedWarehouseId = goodRequest.RequestedWarehouseId; // 🔥 Dùng cho tất cả các loại phiếu
-
-            // Lấy danh sách Inventory cho tất cả Batch liên quan
-            var inventories = await _unitOfWork.InventoryRepository.Search(i => batchIds.Contains(i.BatchId));
-
-            foreach (var detail in details)
+            try
             {
-                Inventory? sourceInventory = null;
-                Inventory? targetInventory = null;
-
-                switch (goodNote.NoteType)
+                if (goodNote == null)
                 {
-                    case GoodNoteEnum.Receive:
-                        // 🟢 Hàng nhập vào requestedWarehouseId
-                        targetInventory = inventories.FirstOrDefault(i => i.BatchId == detail.BatchId && i.WarehouseId == requestedWarehouseId);
-                        if (targetInventory == null)
-                        {
-                            targetInventory = new Inventory
-                            {
-                                WarehouseId = requestedWarehouseId,
-                                BatchId = detail.BatchId,
-                                CurrentQuantity = detail.Quantity
-                            };
-                            await _unitOfWork.InventoryRepository.Add(targetInventory);
-                            break;
-                        }
-                        targetInventory.CurrentQuantity += detail.Quantity;
-                        _unitOfWork.InventoryRepository.Update(targetInventory);
-                        break;
-                    case GoodNoteEnum.Return:
-                        // 🟢 Hàng nhập vào requestedWarehouseId
-                        targetInventory = inventories.FirstOrDefault(i => i.BatchId == detail.BatchId && i.WarehouseId == requestedWarehouseId);
-                        if (targetInventory == null)
-                        {
-                            targetInventory = new Inventory
-                            {
-                                WarehouseId = requestedWarehouseId,
-                                BatchId = detail.BatchId,
-                                CurrentQuantity = detail.Quantity
-                            };
-                            await _unitOfWork.InventoryRepository.Add(targetInventory);
-                            break;
-                        }
-                        targetInventory.CurrentQuantity += detail.Quantity;
-                        _unitOfWork.InventoryRepository.Update(targetInventory);
-                        break;
-
-                    case GoodNoteEnum.Issue:
-                        // 🔴 Xuất hàng từ requestedWarehouseId
-                        sourceInventory = inventories.FirstOrDefault(i => i.BatchId == detail.BatchId && i.WarehouseId == requestedWarehouseId);
-                        if (sourceInventory == null || sourceInventory.CurrentQuantity < detail.Quantity)
-                        {
-                            throw new Exception($"Not enough inventory in warehouse {requestedWarehouseId} for batch {detail.BatchId}.");
-                        }
-                        sourceInventory.CurrentQuantity -= detail.Quantity;
-                        _unitOfWork.InventoryRepository.Update(sourceInventory);
-                        break;
-
-                    case GoodNoteEnum.Transfer:
-                        // 🔁 Điều chuyển hàng từ warehouseId -> requestedWarehouseId
-                        sourceInventory = inventories.FirstOrDefault(i => i.BatchId == detail.BatchId && i.WarehouseId == warehouseId);
-                        targetInventory = inventories.FirstOrDefault(i => i.BatchId == detail.BatchId && i.WarehouseId == requestedWarehouseId);
-
-                        if (sourceInventory == null || sourceInventory.CurrentQuantity < detail.Quantity)
-                        {
-                            throw new Exception($"Not enough inventory in warehouse {warehouseId} for batch {detail.BatchId}.");
-                        }
-
-                        sourceInventory.CurrentQuantity -= detail.Quantity;
-                        _unitOfWork.InventoryRepository.Update(sourceInventory);
-
-                        if (targetInventory == null)
-                        {
-                            targetInventory = new Inventory
-                            {
-                                WarehouseId = requestedWarehouseId,
-                                BatchId = detail.BatchId,
-                                CurrentQuantity = detail.Quantity
-                            };
-                            await _unitOfWork.InventoryRepository.Add(targetInventory);
-                            break;
-                        }
-
-                        targetInventory.CurrentQuantity += detail.Quantity;
-                        _unitOfWork.InventoryRepository.Update(targetInventory);
-                        break;
+                    throw new Exception("GoodNote cannot be null.");
                 }
+
+                if (details == null || !details.Any())
+                {
+                    throw new Exception("GoodNoteDetails cannot be null or empty.");
+                }
+                var batchIds = details.Select(d => d.BatchId).Distinct().ToList();
+                if (!batchIds.Any())
+                {
+                    throw new Exception("No batch IDs found in GoodNoteDetails.");
+                }
+                var goodRequest = await _unitOfWork.GoodRequestRepository.GetByCondition(g => g.Id == goodNote.GoodRequestId);
+                if (goodRequest == null)
+                {
+                    throw new Exception($"Good request {goodNote.GoodRequestId} not found.");
+                }
+
+                var warehouseId = goodRequest.WarehouseId ?? throw new Exception("Warehouse ID is missing."); // 🔥 Chỉ dùng khi Transfer
+                var requestedWarehouseId = goodRequest.RequestedWarehouseId ?? throw new Exception("Requested warehouse ID is missing."); // 🔥 Dùng cho tất cả các loại phiếu
+
+                // Lấy danh sách Inventory cho tất cả Batch liên quan
+                var inventories = await _unitOfWork.InventoryRepository.Search(i => batchIds.Contains(i.BatchId));
+
+                foreach (var detail in details)
+                {
+                    Inventory? sourceInventory = null;
+                    Inventory? targetInventory = null;
+
+                    switch (goodNote.NoteType)
+                    {
+                        case GoodNoteEnum.Receive:
+                            // 🟢 Hàng nhập vào requestedWarehouseId
+                            targetInventory = inventories.FirstOrDefault(i => i.BatchId == detail.BatchId && i.WarehouseId == requestedWarehouseId);
+                            if (targetInventory == null)
+                            {
+                                targetInventory = new Inventory
+                                {
+                                    WarehouseId = requestedWarehouseId,
+                                    BatchId = detail.BatchId,
+                                    CurrentQuantity = detail.Quantity
+                                };
+                                await _unitOfWork.InventoryRepository.Add(targetInventory);
+                                break;
+                            }
+                            targetInventory.CurrentQuantity += detail.Quantity;
+                            _unitOfWork.InventoryRepository.Update(targetInventory);
+                            break;
+                        case GoodNoteEnum.Return:
+                            // 🟢 Hàng nhập vào requestedWarehouseId
+                            targetInventory = inventories.FirstOrDefault(i => i.BatchId == detail.BatchId && i.WarehouseId == requestedWarehouseId);
+                            if (targetInventory == null)
+                            {
+                                targetInventory = new Inventory
+                                {
+                                    WarehouseId = requestedWarehouseId,
+                                    BatchId = detail.BatchId,
+                                    CurrentQuantity = detail.Quantity
+                                };
+                                await _unitOfWork.InventoryRepository.Add(targetInventory);
+                                break;
+                            }
+                            targetInventory.CurrentQuantity += detail.Quantity;
+                            _unitOfWork.InventoryRepository.Update(targetInventory);
+                            break;
+
+                        case GoodNoteEnum.Issue:
+                            // 🔴 Xuất hàng từ requestedWarehouseId
+                            sourceInventory = inventories.FirstOrDefault(i => i.BatchId == detail.BatchId && i.WarehouseId == requestedWarehouseId);
+                            if (sourceInventory == null || sourceInventory.CurrentQuantity < detail.Quantity)
+                            {
+                                throw new Exception($"Not enough inventory in warehouse {requestedWarehouseId} for batch {detail.BatchId}.");
+                            }
+                            sourceInventory.CurrentQuantity -= detail.Quantity;
+                            _unitOfWork.InventoryRepository.Update(sourceInventory);
+                            break;
+
+                        case GoodNoteEnum.Transfer:
+                            // 🔁 Điều chuyển hàng từ warehouseId -> requestedWarehouseId
+                            sourceInventory = inventories.FirstOrDefault(i => i.BatchId == detail.BatchId && i.WarehouseId == warehouseId);
+                            targetInventory = inventories.FirstOrDefault(i => i.BatchId == detail.BatchId && i.WarehouseId == requestedWarehouseId);
+
+                            if (sourceInventory == null || sourceInventory.CurrentQuantity < detail.Quantity)
+                            {
+                                throw new Exception($"Not enough inventory in warehouse {warehouseId} for batch {detail.BatchId}.");
+                            }
+
+                            sourceInventory.CurrentQuantity -= detail.Quantity;
+                            _unitOfWork.InventoryRepository.Update(sourceInventory);
+
+                            if (targetInventory == null)
+                            {
+                                targetInventory = new Inventory
+                                {
+                                    WarehouseId = requestedWarehouseId,
+                                    BatchId = detail.BatchId,
+                                    CurrentQuantity = detail.Quantity
+                                };
+                                await _unitOfWork.InventoryRepository.Add(targetInventory);
+                                break;
+                            }
+
+                            targetInventory.CurrentQuantity += detail.Quantity;
+                            _unitOfWork.InventoryRepository.Update(targetInventory);
+                            break;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error creating inventory: {ex.Message}");
             }
         }
 

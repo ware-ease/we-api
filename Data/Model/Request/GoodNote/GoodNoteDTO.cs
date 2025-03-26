@@ -15,6 +15,7 @@ namespace Data.Model.Request.GoodNote
         public string? Code { get; set; }
         public DateTime? Date { get; set; }
         public string GoodRequestId { get; set; }
+        public string? RequestedWarehouseName { get; set; }
         public IEnumerable<GoodNoteDetailDTO>? GoodNoteDetails { get; set; }
 
     }

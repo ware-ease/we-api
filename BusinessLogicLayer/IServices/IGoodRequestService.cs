@@ -16,7 +16,8 @@ namespace BusinessLogicLayer.IServices
         Task<ServiceResponse> CreateAsync<TResult>(GoodRequestCreateDTO request);
         Task<ServiceResponse> UpdateAsync<TResult>(string id, GoodRequestUpdateDTO request);
         Task<ServiceResponse> SearchGoodRequests<TResult>(int? pageIndex = null, int? pageSize = null,
-                                                                       string? keyword = null, GoodRequestEnum? requestType = null);
+                                                                       string? keyword = null, GoodRequestEnum? requestType = null,
+                                                                                               GoodRequestStatusEnum? status = null);
         Task<ServiceResponse> UpdateStatusAsync(string id, GoodRequestStatusEnum newStatus);
     }
 }
