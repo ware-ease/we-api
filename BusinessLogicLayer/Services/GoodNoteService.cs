@@ -222,8 +222,16 @@ namespace BusinessLogicLayer.Services
                 }
 
                 await _unitOfWork.SaveAsync();
+                //var goodNoteDetails = await _unitOfWork.GoodNoteDetailRepository.Search(x => x.GoodNoteId == entity.Id, includeProperties: "GoodNote,GoodNote.GoodRequest," +
+                //                                                                                                                            "GoodNote.GoodRequest.RequestedWarehouse" +
+                //                                                                                                                            "Batch," +
+                //                                                                                                                            "Batch.Product," +
+                //                                                                                                                            "Batch.Product.Unit," +
+                //                                                                                                                            "Batch.Product.Brand");
+                var result = _mapper.Map<GoodNoteDTO>(entity);
+                //result.GoodNoteDetails = _mapper.Map<List<GoodNoteDetailDTO>>(goodNoteDetails);
+                //result.RequestedWarehouseName = goodNoteDetails.First().GoodNote.GoodRequest.RequestedWarehouse?.Name;
 
-                var result = _mapper.Map<TResult>(entity);
                 return new ServiceResponse
                 {
                     Status = SRStatus.Success,
@@ -273,7 +281,7 @@ namespace BusinessLogicLayer.Services
                     throw new Exception($"Good request {goodNote.GoodRequestId} not found.");
                 }
 
-                var warehouseId = goodRequest.WarehouseId ?? throw new Exception("Warehouse ID is missing."); // 🔥 Chỉ dùng khi Transfer
+                var warehouseId = goodRequest.WarehouseId; // 🔥 Chỉ dùng khi Transfer
                 var requestedWarehouseId = goodRequest.RequestedWarehouseId ?? throw new Exception("Requested warehouse ID is missing."); // 🔥 Dùng cho tất cả các loại phiếu
 
                 // Lấy danh sách Inventory cho tất cả Batch liên quan

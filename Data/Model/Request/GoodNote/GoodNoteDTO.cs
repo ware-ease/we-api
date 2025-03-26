@@ -36,7 +36,7 @@ namespace Data.Model.Request.GoodNote
         public string? Name { get; set; }
         public DateOnly MfgDate { get; set; }
         public DateOnly ExpDate { get; set; }
-        public string? InventoryId { get; set; }
+        //public string? InventoryId { get; set; }
         public string ProductId { get; set; }
         public ProductNoteDTO? Product { get; set; }
     }
