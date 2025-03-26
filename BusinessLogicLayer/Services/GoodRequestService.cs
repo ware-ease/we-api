@@ -149,7 +149,11 @@ namespace BusinessLogicLayer.Services
                 await _goodRequestRepository.Add(entity);
                 await _unitOfWork.SaveAsync();
 
-                var result = _mapper.Map<TResult>(entity);
+                var goodRequest = await _goodRequestRepository.GetByCondition(x => x.Id == entity.Id, includeProperties: "GoodRequestDetails,Warehouse,Partner," +
+                                                                                                                         "GoodRequestDetails.Product," +
+                                                                                                                         "GoodRequestDetails.Product.Unit," +
+                                                                                                                         "GoodRequestDetails.Product.Brand");
+                var result = _mapper.Map<TResult>(goodRequest);
                 return new ServiceResponse
                 {
                     Status = SRStatus.Success,

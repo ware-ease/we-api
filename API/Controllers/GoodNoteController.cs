@@ -49,7 +49,7 @@ namespace API.Controllers
             //    request.CreatedBy = authUser.id;
             //}
 
-            var result = await _goodNoteService.CreateAsync<GoodNoteCreateDTO>(request);
+            var result = await _goodNoteService.CreateAsync<GoodNoteDTO>(request);
             return ControllerResponse.Response(result);
         }
 
