@@ -26,10 +26,11 @@ namespace API.Controllers
         public async Task<IActionResult> Search([FromQuery] int pageIndex = 1,
                                                 [FromQuery] int pageSize = 5,
                                                 [FromQuery] string? keyword = null,
-                                                [FromQuery] GoodRequestEnum? requestType = null)
+                                                [FromQuery] GoodRequestEnum? requestType = null,
+                                                [FromQuery] GoodRequestStatusEnum? status = null)
         {
             var response = await _goodRequestService.SearchGoodRequests<GoodRequestDTO>(
-                pageIndex, pageSize, keyword, requestType
+                pageIndex, pageSize, keyword, requestType, status
             );
             return ControllerResponse.Response(response);
         }

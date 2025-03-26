@@ -13,7 +13,8 @@ namespace BusinessLogicLayer.IServices
     public interface IGoodNoteService : IGenericService
     {
         Task<ServiceResponse> SearchGoodNotes<TResult>(int? pageIndex = null, int? pageSize = null,
-                                                                      string? keyword = null, GoodNoteEnum? goodNoteType = null);
+                                                                      string? keyword = null, GoodNoteEnum? goodNoteType = null,
+                                                                                              GoodNoteStatusEnum? status = null);
         Task<ServiceResponse> GetById<TResult>(string id);
         Task<ServiceResponse> CreateAsync<TResult>(GoodNoteCreateDTO request);
         Task<ServiceResponse> DeleteAsync(string id);

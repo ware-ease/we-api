@@ -348,44 +348,57 @@ namespace BusinessLogicLayer.Services
             }
         }
         public async Task<ServiceResponse> SearchGoodRequests<TResult>(int? pageIndex = null, int? pageSize = null,
-                                                                       string? keyword = null, GoodRequestEnum? requestType = null)
+                                                                       string? keyword = null, GoodRequestEnum? requestType = null,
+                                                                                               GoodRequestStatusEnum? status = null)
         {
-            Expression<Func<GoodRequest, bool>> filter = g =>
-                                                (string.IsNullOrEmpty(keyword) || (
-                                                (g.Code != null && g.Code.Contains(keyword)) ||  // ✅ Tìm theo Code
-                                                (g.Note != null && g.Note.Contains(keyword)) ||
-                                                (g.Warehouse != null && g.Warehouse.Name.Contains(keyword)) ||
-                                                (g.RequestedWarehouse != null && g.RequestedWarehouse.Name.Contains(keyword)) ||
-                                                (g.Partner != null && g.Partner.Name.Contains(keyword)))) &&
-                                                (!requestType.HasValue || g.RequestType == requestType.Value); // ✅ Lọc chính xác theo loại yêu cầu
-
-            var totalRecords = await _goodRequestRepository.Count(filter);
-
-            var results = await _goodRequestRepository.Search(
-                filter: filter,
-                includeProperties: "GoodRequestDetails,Warehouse,Partner,GoodRequestDetails.Product," +
-                                   "GoodRequestDetails.Product.Unit,GoodRequestDetails.Product.Brand",
-                pageIndex: pageIndex,
-                pageSize: pageSize
-            );
-
-            var mappedResults = _mapper.Map<IEnumerable<TResult>>(results);
-
-            int totalPages = (int)Math.Ceiling((double)totalRecords / (pageSize ?? 5));
-
-            return new ServiceResponse
+            try
             {
-                Status = Data.Enum.SRStatus.Success,
-                Message = "Search successful!",
-                Data = new
+                Expression<Func<GoodRequest, bool>> filter = g =>
+                                                    (string.IsNullOrEmpty(keyword) || (
+                                                    (g.Code != null && g.Code.Contains(keyword)) ||  // ✅ Tìm theo Code
+                                                    (g.Note != null && g.Note.Contains(keyword)) ||
+                                                    (g.Warehouse != null && g.Warehouse.Name.Contains(keyword)) ||
+                                                    (g.RequestedWarehouse != null && g.RequestedWarehouse.Name.Contains(keyword)) ||
+                                                    (g.Partner != null && g.Partner.Name.Contains(keyword)))) &&
+                                                    (!requestType.HasValue || g.RequestType == requestType.Value) &&  // ✅ Lọc theo loại yêu cầu
+                                                    (!status.HasValue || g.Status == status.Value);                   // ✅ Lọc theo trạng thái yêu cầu
+                var totalRecords = await _goodRequestRepository.Count(filter);
+
+                var results = await _goodRequestRepository.Search(
+                    filter: filter,
+                    includeProperties: "GoodRequestDetails,Warehouse,Partner,GoodRequestDetails.Product," +
+                                       "GoodRequestDetails.Product.Unit,GoodRequestDetails.Product.Brand",
+                    pageIndex: pageIndex,
+                    pageSize: pageSize
+                );
+
+                var mappedResults = _mapper.Map<IEnumerable<TResult>>(results);
+
+                int totalPages = (int)Math.Ceiling((double)totalRecords / (pageSize ?? 5));
+
+                return new ServiceResponse
                 {
-                    TotalRecords = totalRecords,
-                    TotalPages = totalPages,
-                    PageIndex = pageIndex ?? 1,
-                    PageSize = pageSize ?? 5,
-                    Records = mappedResults
-                }
-            };
+                    Status = Data.Enum.SRStatus.Success,
+                    Message = "Search successful!",
+                    Data = new
+                    {
+                        TotalRecords = totalRecords,
+                        TotalPages = totalPages,
+                        PageIndex = pageIndex ?? 1,
+                        PageSize = pageSize ?? 5,
+                        Records = mappedResults
+                    }
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ServiceResponse
+                {
+                    Status = Data.Enum.SRStatus.Error,
+                    Message = "An error occurred while searching GoodRequests. Please try again later.",
+                    Data = null
+                };
+            }
         }
         public async Task<ServiceResponse> UpdateStatusAsync(string id, GoodRequestStatusEnum newStatus)
         {
