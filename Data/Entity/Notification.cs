@@ -16,8 +16,10 @@ namespace Data.Entity
         public string? Content { get; set; }
         public bool Status { get; set; }
 
-        [ForeignKey("Account")]
+        public ICollection<AccountNotification> AccountNotifications { get; set; } = [];
+
+        /*[ForeignKey("Account")]
         public string AccountId { get; set; }
-        public Account Account { get; set; }
+        public Account Account { get; set; }*/
     }
 }
