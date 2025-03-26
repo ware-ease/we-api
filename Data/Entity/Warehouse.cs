@@ -15,10 +15,10 @@ namespace Data.Entity
         public string? Name { get; set; }
         public string? Address { get; set; }
         public float Area { get; set; }
-        [Column(TypeName = "decimal(10,8)")]
-        public decimal Latitude { get; set; }
-        [Column(TypeName = "decimal(10,8)")]
-        public decimal Longitude { get; set; }
+        [Column(TypeName = "decimal(11,8)")]
+        public decimal? Latitude { get; set; }
+        [Column(TypeName = "decimal(11,8)")]
+        public decimal? Longitude { get; set; }
         public DateTime OperateFrom { get; set; }
 
         public ICollection<AccountWarehouse> AccountWarehouses { get; set; } = [];
