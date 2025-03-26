@@ -5,6 +5,7 @@ using Data.Model.Request.Inventory;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
@@ -18,6 +19,10 @@ namespace Data.Model.Request.Warehouse
         [MaxLength(255, ErrorMessage = "Warehouse name cannot exceed 255 characters.")]
         public string? Name { get; set; }
         public string? Address { get; set; }
+        [Required(ErrorMessage = "Warehouse Latitude is required.")]
+        public decimal? Latitude { get; set; }
+        [Required(ErrorMessage = "Warehouse Longtitude is required.")]
+        public decimal? Longitude { get; set; }
         [Range(1, float.MaxValue, ErrorMessage = "Area must be greater than 0.")]
         public float Area { get; set; }
         [Required(ErrorMessage = "OperateFrom date is required.")]
@@ -32,6 +37,8 @@ namespace Data.Model.Request.Warehouse
         public string? Id { get; set; }
         public string? Name { get; set; }
         public string? Address { get; set; }
+        public decimal? Latitude { get; set; }
+        public decimal? Longitude { get; set; }
         public float? Area { get; set; }
         public DateTime? OperateFrom { get; set; }
 
@@ -43,6 +50,8 @@ namespace Data.Model.Request.Warehouse
         public string Id { get; set; }
         public string? Name { get; set; }
         public string? Address { get; set; }
+        public decimal Latitude { get; set; }
+        public decimal Longitude { get; set; }
         public float Area { get; set; }
         public DateTime OperateFrom { get; set; }
 

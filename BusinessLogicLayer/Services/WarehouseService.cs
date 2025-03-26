@@ -122,7 +122,7 @@ namespace BusinessLogicLayer.Services
                     // 🔥 Kiểm tra ParentId: nếu là "" thì chuyển thành null
                     location.ParentId = string.IsNullOrWhiteSpace(locationDto.ParentId) ? null : locationDto.ParentId;
                     await _unitOfWork.LocationRepository.Add(location);
-                                                             
+
                 }
 
                 await _unitOfWork.SaveAsync();
@@ -177,7 +177,14 @@ namespace BusinessLogicLayer.Services
             {
                 existingEntity.Address = updateDto.Address;
             }
-
+            if (updateDto.Longitude.HasValue && updateDto.Longitude != 0)
+            {
+                existingEntity.Longitude = updateDto.Longitude.Value;
+            }
+            if (updateDto.Latitude.HasValue && updateDto.Latitude != 0)
+            {
+                existingEntity.Latitude = updateDto.Latitude.Value;
+            }
             if (updateDto.Area.HasValue)
             {
                 existingEntity.Area = updateDto.Area.Value;
