@@ -12,6 +12,8 @@ namespace Data.Model.DTO
     {
         public string? Name { get; set; }
         public string? Address { get; set; }
+        public decimal Latitude { get; set; }
+        public decimal Longitude { get; set; }
         public float? Area { get; set; }
         public DateTime? OperateFrom { get; set; }
     }
