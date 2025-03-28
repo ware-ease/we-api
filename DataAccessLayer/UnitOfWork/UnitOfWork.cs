@@ -2,6 +2,7 @@
 using DataAccessLayer.Generic;
 using DataAccessLayer.IRepositories;
 using DataAccessLayer.Repositories;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -14,6 +15,7 @@ namespace DataAccessLayer.UnitOfWork
         private readonly IServiceProvider _serviceProvider;
         private WaseEaseDbContext _context;
         private readonly Dictionary<Type, object> _repositories = new();
+        private IDbContextTransaction _transaction;
 
         public UnitOfWork(WaseEaseDbContext context, IConfiguration configuration, IServiceProvider serviceProvider)
         {
@@ -21,6 +23,25 @@ namespace DataAccessLayer.UnitOfWork
             _configuration = configuration;
             _serviceProvider = serviceProvider;
         }
+
+        #region Transaction
+        public async Task BeginTransactionAsync()
+        {
+            _transaction = await _context.Database.BeginTransactionAsync();
+        }
+
+        public async Task CommitTransactionAsync()
+        {
+            await _context.SaveChangesAsync();
+            await _transaction.CommitAsync();
+        }
+
+        public async Task RollbackTransactionAsync()
+        {
+            await _transaction.RollbackAsync();
+        }
+        #endregion Transaction
+
 
         public void Save()
         {

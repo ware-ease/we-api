@@ -102,6 +102,10 @@ builder.Services.AddScoped<IGenericRepository<InventoryCountDetail>, GenericRepo
 builder.Services.AddScoped<IGenericRepository<ProductType>, GenericRepository<ProductType>>();
 builder.Services.AddScoped<IGenericRepository<Brand>, GenericRepository<Brand>>();
 builder.Services.AddScoped<IGenericRepository<Unit>, GenericRepository<Unit>>();
+builder.Services.AddScoped<IGenericRepository<InventoryAdjustment>, GenericRepository<InventoryAdjustment>>();
+builder.Services.AddScoped<IGenericRepository<InventoryAdjustmentDetail>, GenericRepository<InventoryAdjustmentDetail>>();
+builder.Services.AddScoped<IGenericRepository<LocationLog>, GenericRepository<LocationLog>>();
+builder.Services.AddScoped<IGenericRepository<InventoryLocation>, GenericRepository<InventoryLocation>>();
 //builder.Services.AddScoped<IGenericRepository<Supplier>, GenericRepository<Supplier>>();
 builder.Services.AddScoped<IGenericRepository<Data.Entity.Route>, GenericRepository<Data.Entity.Route>>();
 builder.Services.AddScoped<IGenericRepository<Location>, GenericRepository<Location>>();
@@ -124,6 +128,7 @@ builder.Services.AddScoped<IProductTypesService, ProductTypesService>();
 builder.Services.AddScoped<IScheduleService, ScheduleService>();
 builder.Services.AddScoped<IBrandService, BrandService>();
 builder.Services.AddScoped<IInventoryCountService, InventoryCountService>();
+builder.Services.AddScoped<IInventoryAdjustmentService, InventoryAdjustmentService>();
 builder.Services.AddScoped<IUnitService, UnitService>();
 builder.Services.AddScoped<IInventoryService, InventoryService>();
 builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
