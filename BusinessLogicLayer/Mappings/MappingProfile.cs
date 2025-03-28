@@ -29,6 +29,7 @@ using Data.Model.Request.Unit;
 using Data.Model.Request.Warehouse;
 using static Data.Model.Request.Warehouse.WarehouseFullInfoDTO;
 using Profile = Data.Entity.Profile;
+using Data.Model.Request.InventoryAdjustment;
 
 namespace BusinessLogicLayer.Mappings
 {
@@ -134,6 +135,24 @@ namespace BusinessLogicLayer.Mappings
 
             CreateMap<InventoryCount, InventoryCountCreateDTO>().ReverseMap();
             CreateMap<InventoryCount, InventoryCountUpdateDTO>().ReverseMap();
+            #endregion
+
+            #region InventoryAdjustment
+            CreateMap<InventoryAdjustment, InventoryAdjustmentDTO>()
+                .ForMember(dest => dest.WarehouseName, opt => opt.MapFrom(src => $"{src.Warehouse.Name}".Trim()))
+                .ForMember(dest => dest.inventoryAdjustmentDetailDTOs, opt => opt.MapFrom(src => src.InventoryAdjustmentDetails))
+                .ReverseMap();
+
+            CreateMap<InventoryAdjustment, InventoryAdjustmentCreateDTO>().ReverseMap();
+            CreateMap<InventoryAdjustment, InventoryAdjustmentUpdateDTO>().ReverseMap();
+            #endregion
+
+            #region InventoryAdjustmentDetail
+            CreateMap<InventoryAdjustmentDetail, InventoryAdjustmentDetailDTO>()
+                .ReverseMap();
+
+            CreateMap<InventoryAdjustmentDetail, InventoryAdjustmentDetailCreateDTO>().ReverseMap();
+            CreateMap<InventoryAdjustmentDetail, InventoryAdjustmentDetailUpdateDTO>().ReverseMap();
             #endregion
 
             #region InventoryCountDetail
