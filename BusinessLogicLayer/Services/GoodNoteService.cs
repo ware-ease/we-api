@@ -70,6 +70,7 @@ namespace BusinessLogicLayer.Services
                                             NoteType = group.First().GoodNote.NoteType.ToString(),
                                             Status = group.First().GoodNote.Status.ToString(),
                                             GoodRequestId = group.First().GoodNote.GoodRequestId,
+                                            GoodRequestCode = group.First().GoodNote.GoodRequest.Code,
                                             RequestedWarehouseName = group.First().GoodNote.GoodRequest.RequestedWarehouse?.Name,
                                             Code = group.First().GoodNote.Code,
                                             Date = group.First().GoodNote.Date,
@@ -108,6 +109,9 @@ namespace BusinessLogicLayer.Services
         public async Task<ServiceResponse> GetById<TResult>(string id)
         {
             var entities = await _unitOfWork.GoodNoteDetailRepository.Search(g => g.GoodNoteId == id, includeProperties: "GoodNote," +
+                                                                                                                         "GoodNote.GoodRequest," +
+                                                                                                                         "GoodNote.GoodRequest.Warehouse," +
+                                                                                                                         "GoodNote.GoodRequest.RequestedWarehouse," +
                                                                                                                          "Batch," +
                                                                                                                          "Batch.Product," +
                                                                                                                          "Batch.Product.Unit," +
@@ -130,6 +134,8 @@ namespace BusinessLogicLayer.Services
                 NoteType = entities.First().GoodNote.NoteType.ToString(),
                 Status = entities.First().GoodNote.Status.ToString(),
                 GoodRequestId = entities.First().GoodNote.GoodRequestId,
+                GoodRequestCode = entities.First().GoodNote.GoodRequest.Code,
+                RequestedWarehouseName = entities.First().GoodNote.GoodRequest.RequestedWarehouse?.Name,
                 Code = entities.First().GoodNote.Code,
                 Date = entities.First().GoodNote.Date,
                 CreatedTime = entities.First().GoodNote.CreatedTime.ToString(),
