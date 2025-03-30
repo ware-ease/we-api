@@ -28,73 +28,162 @@ namespace BusinessLogicLayer.Services
             _unitOfWork = unitOfWork;
         }
 
+        //public async Task<ServiceResponse> SearchGoodNotes<TResult>(int? pageIndex = null, int? pageSize = null,
+        //                                                              string? keyword = null, GoodNoteEnum? goodNoteType = null,
+        //                                                                                      GoodNoteStatusEnum? status = null,
+        //                                                                                      string? requestedWarehouseId = null)
+        //{
+        //    try
+        //    {
+        //        Expression<Func<GoodNoteDetail, bool>> filter = g =>(string.IsNullOrEmpty(keyword) || 
+        //                                                        ((g.GoodNote.ShipperName != null && g.GoodNote.ShipperName.Contains(keyword)) ||
+        //                                                        (g.GoodNote.ReceiverName != null && g.GoodNote.ReceiverName.Contains(keyword)) ||
+        //                                                        (g.GoodNote.Code != null && g.GoodNote.Code.Contains(keyword)) ||
+        //                                                        (g.GoodNote.GoodRequest.RequestedWarehouse!.Name != null && g.GoodNote.GoodRequest.RequestedWarehouse.Name.Contains(keyword)) ||
+        //                                                        (g.GoodNote.GoodRequest.Warehouse!.Name != null && g.GoodNote.GoodRequest.Warehouse.Name.Contains(keyword)) ||
+        //                                                        (g.Batch.Product.Name != null && g.Batch.Product.Name.Contains(keyword))
+        //                                                        )) &&
+        //                                                        (!goodNoteType.HasValue || g.GoodNote.NoteType == goodNoteType.Value) &&
+        //                                                        (!status.HasValue || g.GoodNote.Status == status.Value) && // Thêm điều kiện lọc theo Status
+        //                                                        (string.IsNullOrEmpty(requestedWarehouseId) || g.GoodNote.GoodRequest.RequestedWarehouseId != null && g.GoodNote.GoodRequest.RequestedWarehouseId == requestedWarehouseId);
+
+
+        //    var results = await _unitOfWork.GoodNoteDetailRepository.Search(
+        //        filter: filter,
+        //        includeProperties: "GoodNote,GoodNote.GoodRequest,GoodNote.GoodRequest.Warehouse," +
+        //                            "GoodNote.GoodRequest.RequestedWarehouse," +
+        //                            "Batch," +
+        //                            "Batch.Product," +
+        //                            "Batch.Product.Unit," +
+        //                            "Batch.Product.Brand",
+        //        pageIndex: pageIndex,
+        //        pageSize: pageSize
+        //    );
+
+        //    //var totalRecords = results.GroupBy(g => g.GoodNoteId).Count();
+
+        //    //var mappedResults = _mapper.Map<IEnumerable<TResult>>(results);
+        //    var groupedResults = results.GroupBy(g => g.GoodNote.Id)
+        //                                .Select(group => new GoodNoteDTO
+        //                                {
+        //                                    Id = group.Key,
+        //                                    ReceiverName = group.First().GoodNote.ReceiverName,
+        //                                    ShipperName = group.First().GoodNote.ShipperName,
+        //                                    NoteType = group.First().GoodNote.NoteType,
+        //                                    Status = group.First().GoodNote.Status,
+        //                                    GoodRequestId = group.First().GoodNote.GoodRequestId,
+        //                                    GoodRequestCode = group.First().GoodNote.GoodRequest.Code,
+        //                                    RequestedWarehouseName = group.First().GoodNote.GoodRequest.RequestedWarehouse?.Name,
+        //                                    Code = group.First().GoodNote.Code,
+        //                                    Date = group.First().GoodNote.Date,
+        //                                    CreatedTime = group.First().GoodNote.CreatedTime.ToString(),
+        //                                    CreatedBy = group.First().GoodNote.CreatedBy,
+        //                                    GoodNoteDetails = _mapper.Map<List<GoodNoteDetailDTO>>(group.ToList())
+        //                                }).ToList();
+
+        //    var totalRecords = groupedResults.Count();
+        //    int totalPages = (int)Math.Ceiling((double)totalRecords / (pageSize ?? 5));
+
+        //    return new ServiceResponse
+        //    {
+        //        Status = Data.Enum.SRStatus.Success,
+        //        Message = "Search successful!",
+        //        Data = new
+        //        {
+        //            TotalRecords = totalRecords,
+        //            TotalPages = totalPages,
+        //            PageIndex = pageIndex ?? 1,
+        //            PageSize = pageSize ?? 5,
+        //            Records = groupedResults
+        //        }
+        //    };
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return new ServiceResponse
+        //        {
+        //            Status = Data.Enum.SRStatus.Error,
+        //            Message = "An error occurred while searching GoodNotes. Please try again later.",
+        //            Data = null
+        //        };
+        //    }
+        //}
+
         public async Task<ServiceResponse> SearchGoodNotes<TResult>(int? pageIndex = null, int? pageSize = null,
-                                                                      string? keyword = null, GoodNoteEnum? goodNoteType = null,
-                                                                                              GoodNoteStatusEnum? status = null)
+                                                                    string? keyword = null, GoodNoteEnum? goodNoteType = null,
+                                                                    GoodNoteStatusEnum? status = null, string? requestedWarehouseId = null)
         {
             try
             {
-                Expression<Func<GoodNoteDetail, bool>> filter = g =>(string.IsNullOrEmpty(keyword) || 
-                                                                ((g.GoodNote.ShipperName != null && g.GoodNote.ShipperName.Contains(keyword)) ||
-                                                                (g.GoodNote.ReceiverName != null && g.GoodNote.ReceiverName.Contains(keyword)) ||
-                                                                (g.GoodNote.Code != null && g.GoodNote.Code.Contains(keyword)) ||
-                                                                (g.GoodNote.GoodRequest.RequestedWarehouse.Name != null && g.GoodNote.GoodRequest.RequestedWarehouse.Name.Contains(keyword)) ||
-                                                                (g.GoodNote.GoodRequest.Warehouse.Name != null && g.GoodNote.GoodRequest.Warehouse.Name.Contains(keyword)) ||
-                                                                (g.Batch.Product.Name != null && g.Batch.Product.Name.Contains(keyword))
-                                                                )) &&
-                                                                (!goodNoteType.HasValue || g.GoodNote.NoteType == goodNoteType.Value) &&
-                                                                (!status.HasValue || g.GoodNote.Status == status.Value); // Thêm điều kiện lọc theo Status
+                // Bước 1: Lọc danh sách GoodNote trước
+                Expression<Func<GoodNote, bool>> goodNoteFilter = g =>
+                    (string.IsNullOrEmpty(keyword) ||
+                        (g.ShipperName != null && g.ShipperName.Contains(keyword)) ||
+                        (g.ReceiverName != null && g.ReceiverName.Contains(keyword)) ||
+                        (g.Code != null && g.Code.Contains(keyword)) ||
+                        (g.GoodRequest.RequestedWarehouse != null && g.GoodRequest.RequestedWarehouse.Name.Contains(keyword)) ||
+                        (g.GoodRequest.Warehouse != null && g.GoodRequest.Warehouse.Name.Contains(keyword))) &&
+                    (!goodNoteType.HasValue || g.NoteType == goodNoteType.Value) &&
+                    (!status.HasValue || g.Status == status.Value) &&
+                    (string.IsNullOrEmpty(requestedWarehouseId) || g.GoodRequest.RequestedWarehouseId == requestedWarehouseId);
 
+                // Dùng Search
+                var pagedGoodNotes = await _unitOfWork.GoodNoteRepository.Search(
+                    filter: goodNoteFilter,
+                    includeProperties: "GoodRequest,GoodRequest.Warehouse,GoodRequest.RequestedWarehouse",
+                    orderBy: q => q.OrderByDescending(g => g.CreatedTime),
+                    pageIndex: pageIndex,
+                    pageSize: pageSize
+                );
 
-            var results = await _unitOfWork.GoodNoteDetailRepository.Search(
-                filter: filter,
-                includeProperties: "GoodNote,GoodNote.GoodRequest,GoodNote.GoodRequest.Warehouse," +
-                                    "GoodNote.GoodRequest.RequestedWarehouse," +
-                                    "Batch," +
-                                    "Batch.Product," +
-                                    "Batch.Product.Unit," +
-                                    "Batch.Product.Brand",
-                pageIndex: pageIndex,
-                pageSize: pageSize
-            );
+                // Lấy tổng số bản ghi (đếm theo GoodNote)
+                int totalRecords = await _unitOfWork.GoodNoteRepository.Count(goodNoteFilter);
+                int totalPages = (int)Math.Ceiling((double)totalRecords / (pageSize ?? 5));
 
-            var totalRecords = results.GroupBy(g => g.GoodNoteId).Count();
+                // Lấy danh sách GoodNoteId để truy vấn chi tiết
+                var goodNoteIds = pagedGoodNotes.Select(g => g.Id).ToList();
 
-            //var mappedResults = _mapper.Map<IEnumerable<TResult>>(results);
-            var groupedResults = results.GroupBy(g => g.GoodNote.Id)
-                                        .Select(group => new GoodNoteDTO
-                                        {
-                                            Id = group.Key,
-                                            ReceiverName = group.First().GoodNote.ReceiverName,
-                                            ShipperName = group.First().GoodNote.ShipperName,
-                                            NoteType = group.First().GoodNote.NoteType,
-                                            Status = group.First().GoodNote.Status,
-                                            GoodRequestId = group.First().GoodNote.GoodRequestId,
-                                            GoodRequestCode = group.First().GoodNote.GoodRequest.Code,
-                                            RequestedWarehouseName = group.First().GoodNote.GoodRequest.RequestedWarehouse?.Name,
-                                            Code = group.First().GoodNote.Code,
-                                            Date = group.First().GoodNote.Date,
-                                            CreatedTime = group.First().GoodNote.CreatedTime.ToString(),
-                                            CreatedBy = group.First().GoodNote.CreatedBy,
-                                            GoodNoteDetails = _mapper.Map<List<GoodNoteDetailDTO>>(group.ToList())
-                                        }).ToList();
+                // Bước 2: Lấy danh sách GoodNoteDetail theo danh sách GoodNoteId
+                Expression<Func<GoodNoteDetail, bool>> detailFilter = d => goodNoteIds.Contains(d.GoodNoteId);
 
+                var details = await _unitOfWork.GoodNoteDetailRepository.Search(
+                    filter: detailFilter,
+                    includeProperties: "GoodNote,GoodNote.GoodRequest,GoodNote.GoodRequest.Warehouse," +
+                                       "GoodNote.GoodRequest.RequestedWarehouse," +
+                                       "Batch,Batch.Product,Batch.Product.Unit,Batch.Product.Brand"
+                );
 
-            int totalPages = (int)Math.Ceiling((double)totalRecords / (pageSize ?? 5));
-
-            return new ServiceResponse
-            {
-                Status = Data.Enum.SRStatus.Success,
-                Message = "Search successful!",
-                Data = new
+                // Bước 3: Nhóm dữ liệu theo GoodNote
+                var groupedResults = pagedGoodNotes.Select(g => new GoodNoteDTO
                 {
-                    TotalRecords = totalRecords,
-                    TotalPages = totalPages,
-                    PageIndex = pageIndex ?? 1,
-                    PageSize = pageSize ?? 5,
-                    Records = groupedResults
-                }
-            };
+                    Id = g.Id,
+                    ReceiverName = g.ReceiverName,
+                    ShipperName = g.ShipperName,
+                    NoteType = g.NoteType,
+                    Status = g.Status,
+                    GoodRequestId = g.GoodRequestId,
+                    GoodRequestCode = g.GoodRequest?.Code,
+                    RequestedWarehouseName = g.GoodRequest?.RequestedWarehouse?.Name,
+                    Code = g.Code,
+                    Date = g.Date,
+                    CreatedTime = g.CreatedTime.ToString(),
+                    CreatedBy = g.CreatedBy,
+                    GoodNoteDetails = _mapper.Map<List<GoodNoteDetailDTO>>(details.Where(d => d.GoodNoteId == g.Id).ToList())
+                }).ToList();
+
+                return new ServiceResponse
+                {
+                    Status = Data.Enum.SRStatus.Success,
+                    Message = "Search successful!",
+                    Data = new
+                    {
+                        TotalRecords = totalRecords,
+                        TotalPages = totalPages,
+                        PageIndex = pageIndex ?? 1,
+                        PageSize = pageSize ?? 5,
+                        Records = groupedResults
+                    }
+                };
             }
             catch (Exception ex)
             {
@@ -106,6 +195,8 @@ namespace BusinessLogicLayer.Services
                 };
             }
         }
+
+
         public async Task<ServiceResponse> GetById<TResult>(string id)
         {
             var entities = await _unitOfWork.GoodNoteDetailRepository.Search(g => g.GoodNoteId == id, includeProperties: "GoodNote," +
