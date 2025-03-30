@@ -207,7 +207,7 @@ namespace BusinessLogicLayer.Services
                                                                                                                          "Batch.Product," +
                                                                                                                          "Batch.Product.Unit," +
                                                                                                                          "Batch.Product.Brand");
-            if (entities == null)
+            if (entities.Count() == 0)  // Chỉ đếm một lần, không gọi truy vấn lại
             {
                 return new ServiceResponse
                 {
