@@ -4,6 +4,7 @@ using BusinessLogicLayer.IServices;
 using BusinessLogicLayer.Utils;
 using Data.Entity;
 using Data.Model.DTO;
+using Data.Model.DTO.Base;
 using Data.Model.Request.Account;
 using Data.Model.Response;
 using DataAccessLayer.Generic;
@@ -24,6 +25,63 @@ namespace BusinessLogicLayer.Services
     {
         public AccountService(IGenericRepository<Data.Entity.Account> genericRepository, IMapper mapper, IUnitOfWork unitOfWork) : base(genericRepository, mapper, unitOfWork)
         {
+        }
+
+        public override async Task<ServiceResponse> Get<AccountDTO>()
+        {
+            var results = _unitOfWork.AccountRepository.GetWithFullInfo();
+
+            List<Data.Model.DTO.AccountDTO> mappedResults = _mapper.Map<List<Data.Model.DTO.AccountDTO>>(results);
+
+            foreach (var mappedResult in mappedResults)
+            {
+                if (mappedResult.CreatedBy != null)
+                {
+                    var createdBy = await GetCreatedBy(mappedResult.CreatedBy);
+
+                    if (createdBy != null)
+                    {
+                        mappedResult.CreatedBy = createdBy!.Username;
+                    }
+                    else
+                    {
+                        mappedResult.CreatedBy = "Deleted user";
+                    }
+                }
+            }
+
+            return new ServiceResponse
+            {
+                Status = Data.Enum.SRStatus.Success,
+                Message = "Get successfully!",
+                Data = mappedResults
+            };
+        }
+
+        public override async Task<ServiceResponse> Get<AccountDTO>(string id)
+        {
+            Data.Entity.Account? entity = await _unitOfWork.AccountRepository.GetWithFullInfo(id);
+
+            Data.Model.DTO.AccountDTO result = _mapper.Map<Data.Model.DTO.AccountDTO>(entity);
+
+            var groups = result.Groups;
+
+            if (entity != null)
+            {
+                return new ServiceResponse
+                {
+                    Status = Data.Enum.SRStatus.Success,
+                    Message = "Get successfully!",
+                    Data = result
+                };
+            }
+
+            return new ServiceResponse
+            {
+                Status = Data.Enum.SRStatus.NotFound,
+                Message = "Not found!",
+                Data = id
+            };
         }
 
         public async Task<ServiceResponse> Add(AccountCreateDTO request)
