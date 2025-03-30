@@ -14,7 +14,8 @@ namespace BusinessLogicLayer.IServices
     {
         Task<ServiceResponse> SearchGoodNotes<TResult>(int? pageIndex = null, int? pageSize = null,
                                                                       string? keyword = null, GoodNoteEnum? goodNoteType = null,
-                                                                                              GoodNoteStatusEnum? status = null);
+                                                                                              GoodNoteStatusEnum? status = null,
+                                                                                              string? requestedWarehouseId = null);
         Task<ServiceResponse> GetById<TResult>(string id);
         Task<ServiceResponse> CreateAsync<TResult>(GoodNoteCreateDTO request);
         Task<ServiceResponse> DeleteAsync(string id);

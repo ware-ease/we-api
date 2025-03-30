@@ -25,10 +25,11 @@ namespace API.Controllers
                                                 [FromQuery] int pageSize = 5,
                                                 [FromQuery] string? keyword = null,
                                                 [FromQuery] GoodNoteEnum? noteType = null,
-                                                [FromQuery] GoodNoteStatusEnum? status = null)
+                                                [FromQuery] GoodNoteStatusEnum? status = null,
+                                                [FromQuery] string? requestedWarehouseId = null)
         {
             var response = await _goodNoteService.SearchGoodNotes<GoodNoteDTO>(
-                pageIndex, pageSize, keyword, noteType, status
+                pageIndex, pageSize, keyword, noteType, status, requestedWarehouseId
             );
             return ControllerResponse.Response(response);
         }
