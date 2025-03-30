@@ -9,8 +9,8 @@ namespace Data.Model.Request.GoodRequest
     {
         public string? Note { get; set; }
         public string? Code { get; set; }
-        public string RequestType { get; set; }
-        public string Status { get; set; }
+        public GoodRequestEnum RequestType { get; set; }
+        public GoodRequestStatusEnum Status { get; set; }
         public string? PartnerId { get; set; }
         public string? PartnerName { get; set; }
         public string? WarehouseId { get; set; }
