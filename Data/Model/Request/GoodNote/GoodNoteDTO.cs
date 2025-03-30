@@ -8,8 +8,8 @@ namespace Data.Model.Request.GoodNote
 {
     public class GoodNoteDTO : BaseDTO
     {
-        public string NoteType { get; set; }
-        public string Status { get; set; }
+        public GoodNoteEnum NoteType { get; set; }
+        public GoodNoteStatusEnum Status { get; set; }
         public string? ShipperName { get; set; }
         public string? ReceiverName { get; set; }
         public string? Code { get; set; }
