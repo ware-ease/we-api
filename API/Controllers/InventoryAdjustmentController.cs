@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/inventory-adjustments")]
     [ApiController]
     public class InventoryAdjustmentController : ControllerBase
     {
