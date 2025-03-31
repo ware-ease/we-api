@@ -49,10 +49,11 @@ namespace API.Controllers
         [HttpGet]
         public async Task<IActionResult> SearchPartners([FromQuery] int pageIndex = 1,
                                                         [FromQuery] int pageSize = 5,
-                                                        [FromQuery] string? keyword = null)
+                                                        [FromQuery] string? keyword = null,
+                                                        [FromQuery] string? productId = null)
         {
             var response = await _batchService.Search<BatchDTO>(
-                pageIndex, pageSize, keyword);
+                pageIndex, pageSize, keyword, productId);
 
             return ControllerResponse.Response(response);
         }
