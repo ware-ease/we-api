@@ -166,6 +166,7 @@ namespace BusinessLogicLayer.Services
             Expression<Func<Batch, bool>> filter = p =>
                 (string.IsNullOrEmpty(keyword) 
                 || p.Name.Contains(keyword) 
+                || p.ProductId.Contains(keyword) 
                 || p.Product.Name.Contains(keyword)
                 || p.Code.Contains(keyword));
 
