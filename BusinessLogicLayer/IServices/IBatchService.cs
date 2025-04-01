@@ -16,6 +16,6 @@ namespace BusinessLogicLayer.IServices
         Task<BatchDTO> AddBatch(BatchCreateDTO request);
         Task<BatchDTO> UpdateBatch(BatchUpdateDTO request);
         Task<ServiceResponse> Search<TResult>(int? pageIndex = null, int? pageSize = null,
-                                                                   string? keyword = null);
+                                                                   string? keyword = null, string? productId = null);
     }
 }

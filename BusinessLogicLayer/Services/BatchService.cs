@@ -160,14 +160,16 @@ namespace BusinessLogicLayer.Services
         }
 
         public async Task<ServiceResponse> Search<TResult>(int? pageIndex = null, int? pageSize = null,
-                                                                   string? keyword = null)
+                                                                   string? keyword = null, string? productId = null)
         {
 
             Expression<Func<Batch, bool>> filter = p =>
-                (string.IsNullOrEmpty(keyword) 
-                || p.Name.Contains(keyword) 
+            (string.IsNullOrEmpty(keyword)
+                || p.Name.Contains(keyword)
                 || p.Product.Name.Contains(keyword)
-                || p.Code.Contains(keyword));
+                || p.Code.Contains(keyword))
+                &&
+    (string.IsNullOrEmpty(productId) || p.ProductId == productId);
 
             var totalRecords = await _batchRepository.Count(filter);
 

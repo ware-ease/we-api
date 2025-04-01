@@ -52,7 +52,8 @@ namespace BusinessLogicLayer.Mappings
             CreateMap<Account, AccountUpdateDTO>().ReverseMap();
             CreateMap<Account, AccountCreateDTO>().ReverseMap();
             CreateMap<Profile, AccountDTOProfile>().ReverseMap();
-            CreateMap<Group, AccountDTOGroup>().ReverseMap();
+            CreateMap<Group, AccountDTOGroup>()
+                .ForMember(dest => dest.Permissions, opt => opt.MapFrom(src => src.GroupPermissions.Select(gp => gp.Permission))).ReverseMap();
             CreateMap<Warehouse, AccountDTOWarehouse>().ReverseMap();
             #endregion
 
