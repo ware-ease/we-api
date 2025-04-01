@@ -109,7 +109,7 @@ namespace BusinessLogicLayer.Services
         //    }
         //}
 
-        public async Task<ServiceResponse> SearchGoodNotes<TResult>(int? pageIndex = null, int? pageSize = null,
+        public async Task<ServiceResponse> SearchGoodNotes(int? pageIndex = null, int? pageSize = null,
                                                                     string? keyword = null, GoodNoteEnum? goodNoteType = null,
                                                                     GoodNoteStatusEnum? status = null, string? requestedWarehouseId = null)
         {
@@ -130,7 +130,7 @@ namespace BusinessLogicLayer.Services
                 // Dùng Search
                 var pagedGoodNotes = await _unitOfWork.GoodNoteRepository.Search(
                     filter: goodNoteFilter,
-                    includeProperties: "GoodRequest,GoodRequest.Warehouse,GoodRequest.RequestedWarehouse",
+                    includeProperties: "GoodRequest,GoodRequest.Warehouse,GoodRequest.RequestedWarehouse,GoodRequest.Partner",
                     orderBy: q => q.OrderByDescending(g => g.CreatedTime),
                     pageIndex: pageIndex,
                     pageSize: pageSize
@@ -161,9 +161,10 @@ namespace BusinessLogicLayer.Services
                     ShipperName = g.ShipperName,
                     NoteType = g.NoteType,
                     Status = g.Status,
-                    GoodRequestId = g.GoodRequestId,
-                    GoodRequestCode = g.GoodRequest?.Code,
-                    RequestedWarehouseName = g.GoodRequest?.RequestedWarehouse?.Name,
+                    //GoodRequestId = g.GoodRequestId,
+                    //GoodRequestCode = g.GoodRequest?.Code,
+                    //RequestedWarehouseName = g.GoodRequest?.RequestedWarehouse?.Name,
+                    GoodRequest = _mapper.Map<GoodRequestOfGoodNoteDTO>(g.GoodRequest),
                     Code = g.Code,
                     Date = g.Date,
                     CreatedTime = g.CreatedTime.ToString(),
@@ -197,12 +198,13 @@ namespace BusinessLogicLayer.Services
         }
 
 
-        public async Task<ServiceResponse> GetById<TResult>(string id)
+        public async Task<ServiceResponse> GetById(string id)
         {
             var entities = await _unitOfWork.GoodNoteDetailRepository.Search(g => g.GoodNoteId == id, includeProperties: "GoodNote," +
                                                                                                                          "GoodNote.GoodRequest," +
                                                                                                                          "GoodNote.GoodRequest.Warehouse," +
                                                                                                                          "GoodNote.GoodRequest.RequestedWarehouse," +
+                                                                                                                         "GoodNote.GoodRequest.Partner," +
                                                                                                                          "Batch," +
                                                                                                                          "Batch.Product," +
                                                                                                                          "Batch.Product.Unit," +
@@ -224,9 +226,10 @@ namespace BusinessLogicLayer.Services
                 ShipperName = entities.First().GoodNote.ShipperName,
                 NoteType = entities.First().GoodNote.NoteType,
                 Status = entities.First().GoodNote.Status,
-                GoodRequestId = entities.First().GoodNote.GoodRequestId,
-                GoodRequestCode = entities.First().GoodNote.GoodRequest.Code,
-                RequestedWarehouseName = entities.First().GoodNote.GoodRequest.RequestedWarehouse?.Name,
+                //GoodRequestId = entities.First().GoodNote.GoodRequestId,
+                //GoodRequestCode = entities.First().GoodNote.GoodRequest.Code,
+                //RequestedWarehouseName = entities.First().GoodNote.GoodRequest.RequestedWarehouse?.Name,
+                GoodRequest = _mapper.Map<GoodRequestOfGoodNoteDTO>(entities.First().GoodNote.GoodRequest),
                 Code = entities.First().GoodNote.Code,
                 Date = entities.First().GoodNote.Date,
                 CreatedTime = entities.First().GoodNote.CreatedTime.ToString(),
@@ -244,7 +247,7 @@ namespace BusinessLogicLayer.Services
 
         }
 
-        public async Task<ServiceResponse> CreateAsync<TResult>(GoodNoteCreateDTO request)
+        public async Task<ServiceResponse> CreateAsync(GoodNoteCreateDTO request)
         {
             if (!string.IsNullOrEmpty(request.GoodRequestId))
             {
@@ -325,7 +328,7 @@ namespace BusinessLogicLayer.Services
                 //                                                                                                                            "Batch.Product," +
                 //                                                                                                                            "Batch.Product.Unit," +
                 //                                                                                                                            "Batch.Product.Brand");
-                var result = _mapper.Map<GoodNoteDTO>(entity);
+                //var result = _mapper.Map<GoodNoteDTO>(entity);
                 //result.GoodNoteDetails = _mapper.Map<List<GoodNoteDetailDTO>>(goodNoteDetails);
                 //result.RequestedWarehouseName = goodNoteDetails.First().GoodNote.GoodRequest.RequestedWarehouse?.Name;
 
@@ -333,7 +336,7 @@ namespace BusinessLogicLayer.Services
                 {
                     Status = SRStatus.Success,
                     Message = "Good note created successfully!",
-                    Data = result
+                    Data = "GoodNoteId: " +entity.Id
                 };
             }
             catch (DbUpdateException dbEx)

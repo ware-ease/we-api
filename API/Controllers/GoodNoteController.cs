@@ -28,7 +28,7 @@ namespace API.Controllers
                                                 [FromQuery] GoodNoteStatusEnum? status = null,
                                                 [FromQuery] string? requestedWarehouseId = null)
         {
-            var response = await _goodNoteService.SearchGoodNotes<GoodNoteDTO>(
+            var response = await _goodNoteService.SearchGoodNotes(
                 pageIndex, pageSize, keyword, noteType, status, requestedWarehouseId
             );
             return ControllerResponse.Response(response);
@@ -36,7 +36,7 @@ namespace API.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(string id)
         {
-            var result = await _goodNoteService.GetById<GoodNoteDTO>(id);
+            var result = await _goodNoteService.GetById(id);
             return ControllerResponse.Response(result);
         }
 
@@ -50,7 +50,7 @@ namespace API.Controllers
             //    request.CreatedBy = authUser.id;
             //}
 
-            var result = await _goodNoteService.CreateAsync<GoodNoteDTO>(request);
+            var result = await _goodNoteService.CreateAsync(request);
             return ControllerResponse.Response(result);
         }
 
