@@ -12,12 +12,12 @@ namespace BusinessLogicLayer.IServices
 {
     public interface IGoodNoteService : IGenericService
     {
-        Task<ServiceResponse> SearchGoodNotes<TResult>(int? pageIndex = null, int? pageSize = null,
+        Task<ServiceResponse> SearchGoodNotes(int? pageIndex = null, int? pageSize = null,
                                                                       string? keyword = null, GoodNoteEnum? goodNoteType = null,
                                                                                               GoodNoteStatusEnum? status = null,
                                                                                               string? requestedWarehouseId = null);
-        Task<ServiceResponse> GetById<TResult>(string id);
-        Task<ServiceResponse> CreateAsync<TResult>(GoodNoteCreateDTO request);
+        Task<ServiceResponse> GetById(string id);
+        Task<ServiceResponse> CreateAsync(GoodNoteCreateDTO request);
         Task<ServiceResponse> DeleteAsync(string id);
         Task<ServiceResponse> UpdateStatusAsync(string id, GoodNoteStatusEnum newStatus);
         Task<ServiceResponse> UpdateAsync(string id, GoodNoteUpdateDTO request);

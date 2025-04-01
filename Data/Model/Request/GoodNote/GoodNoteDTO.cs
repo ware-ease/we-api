@@ -1,5 +1,9 @@
-﻿using Data.Enum;
+﻿using Data.Entity;
+using Data.Enum;
+using Data.Model.DTO;
 using Data.Model.DTO.Base;
+using Data.Model.Request.GoodRequest;
+using Data.Model.Request.Partner;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
@@ -14,10 +18,11 @@ namespace Data.Model.Request.GoodNote
         public string? ReceiverName { get; set; }
         public string? Code { get; set; }
         public DateTime? Date { get; set; }
-        public string GoodRequestId { get; set; }
+        //public string GoodRequestId { get; set; }
 
-        public string? GoodRequestCode { get; set; }
-        public string? RequestedWarehouseName { get; set; }
+        //public string? GoodRequestCode { get; set; }
+        public GoodRequestOfGoodNoteDTO? GoodRequest { get; set; }
+        //public string? RequestedWarehouseName { get; set; }
         public IEnumerable<GoodNoteDetailDTO>? GoodNoteDetails { get; set; }
 
     }
@@ -88,5 +93,18 @@ namespace Data.Model.Request.GoodNote
         public string? Code { get; set; }
         public DateTime? Date { get; set; }
         public IEnumerable<GoodNoteDetailCreateDTO>? GoodNoteDetails { get; set; }
+    }
+    public class GoodRequestOfGoodNoteDTO : BaseDTO
+    {
+        public string? Note { get; set; }
+        public string? Code { get; set; }
+
+        public GoodRequestEnum RequestType { get; set; }
+        public GoodRequestStatusEnum Status { get; set; } = GoodRequestStatusEnum.Pending;
+
+        //public ICollection<GoodRequestDetail> GoodRequestDetails { get; set; } = [];
+        public PartnerDTO? Partner { get; set; }
+        public WarehouseDTO? Warehouse { get; set; }
+        public WarehouseDTO? RequestedWarehouse { get; set; }
     }
 }
