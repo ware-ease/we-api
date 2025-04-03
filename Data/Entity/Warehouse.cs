@@ -14,6 +14,7 @@ namespace Data.Entity
     {
         public string? Name { get; set; }
         public string? Address { get; set; }
+        public string? Phone { get; set; }
         public float Area { get; set; }
         [Column(TypeName = "decimal(11,8)")]
         public decimal? Latitude { get; set; }
