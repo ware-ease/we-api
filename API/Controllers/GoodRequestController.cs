@@ -29,7 +29,7 @@ namespace API.Controllers
                                                 [FromQuery] GoodRequestEnum? requestType = null,
                                                 [FromQuery] GoodRequestStatusEnum? status = null)
         {
-            var response = await _goodRequestService.SearchGoodRequests<GoodRequestDTO>(
+            var response = await _goodRequestService.SearchGoodRequests(
                 pageIndex, pageSize, keyword, requestType, status
             );
             return ControllerResponse.Response(response);
@@ -37,7 +37,7 @@ namespace API.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(string id)
         {
-            var result = await _goodRequestService.GetById<GoodRequestDTO>(id);
+            var result = await _goodRequestService.GetById(id);
             return ControllerResponse.Response(result);
         }
 
@@ -59,7 +59,7 @@ namespace API.Controllers
         public async Task<IActionResult> Update([FromRoute] string id, [FromBody] GoodRequestUpdateDTO request)
         {
             request.Id = id;
-            var result = await _goodRequestService.UpdateAsync<GoodRequestDTO>(id, request);
+            var result = await _goodRequestService.UpdateAsync(id, request);
             return ControllerResponse.Response(result);
         }
 
