@@ -171,6 +171,9 @@ namespace BusinessLogicLayer.Services
             if (!string.IsNullOrWhiteSpace(updateDto.Name))
             {
                 existingEntity.Name = updateDto.Name;
+            } if (!string.IsNullOrWhiteSpace(updateDto.Phone))
+            {
+                existingEntity.Phone = updateDto.Phone;
             }
 
             if (!string.IsNullOrWhiteSpace(updateDto.Address))

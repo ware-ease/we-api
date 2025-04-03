@@ -18,6 +18,7 @@ namespace Data.Model.Request.Warehouse
         [Required(ErrorMessage = "Warehouse name is required.")]
         [MaxLength(255, ErrorMessage = "Warehouse name cannot exceed 255 characters.")]
         public string? Name { get; set; }
+        public string? Phone { get; set; }
         public string? Address { get; set; }
         [Required(ErrorMessage = "Warehouse Latitude is required.")]
         public decimal? Latitude { get; set; }
@@ -36,6 +37,7 @@ namespace Data.Model.Request.Warehouse
         [JsonIgnore]
         public string? Id { get; set; }
         public string? Name { get; set; }
+        public string? Phone { get; set; }
         public string? Address { get; set; }
         public decimal? Latitude { get; set; }
         public decimal? Longitude { get; set; }
@@ -49,6 +51,7 @@ namespace Data.Model.Request.Warehouse
     {
         public string Id { get; set; }
         public string? Name { get; set; }
+        public string? Phone { get; set; }
         public string? Address { get; set; }
         public decimal Latitude { get; set; }
         public decimal Longitude { get; set; }
@@ -88,6 +91,7 @@ namespace Data.Model.Request.Warehouse
     {
         public string Id { get; set; }
         public string? Name { get; set; }
+        public string? Phone { get; set; }
         public string? Address { get; set; }
         public float Area { get; set; }
         public DateTime OperateFrom { get; set; }
