@@ -29,7 +29,7 @@ namespace BusinessLogicLayer.Services
             _mapper = mapper;
             _unitOfWork = unitOfWork;
         }
-        public async Task<ServiceResponse> GetById<TResult>(string id)
+        public async Task<ServiceResponse> GetById(string id)
         {
             var entity = await _goodRequestRepository.GetByCondition(g => g.Id == id, includeProperties: "GoodRequestDetails,Warehouse,Partner," +
                                                                                                          "GoodRequestDetails.Product," +
@@ -45,7 +45,12 @@ namespace BusinessLogicLayer.Services
                 };
             }
 
-            var result = _mapper.Map<TResult>(entity);
+            var goodNote = await _unitOfWork.GoodNoteRepository.GetByCondition(g => g.GoodRequestId == id);
+            var result = _mapper.Map<GoodRequestDTO>(entity);
+            if (goodNote != null)
+            {
+                result.GoodNote = _mapper.Map<GoodNoteOfGoodRequestDTO>(goodNote);
+            }
             return new ServiceResponse
             {
                 Status = SRStatus.Success,
@@ -171,7 +176,7 @@ namespace BusinessLogicLayer.Services
             }
         }
 
-        public async Task<ServiceResponse> UpdateAsync<TResult>(string id, GoodRequestUpdateDTO request)
+        public async Task<ServiceResponse> UpdateAsync(string id, GoodRequestUpdateDTO request)
         {
             // 1️⃣ Tìm `GoodRequest` trong DB
             var entity = await _goodRequestRepository.GetByCondition(x => x.Id == id, includeProperties: "GoodRequestDetails,Warehouse,Partner," +
@@ -186,6 +191,17 @@ namespace BusinessLogicLayer.Services
                     Status = SRStatus.NotFound,
                     Message = "Good request not found!",
                     Data = id
+                };
+            }
+
+            // 🔴 Kiểm tra nếu trạng thái không phải PENDING thì không cho chỉnh sửa
+            if (entity.Status != GoodRequestStatusEnum.Pending)
+            {
+                return new ServiceResponse
+                {
+                    Status = SRStatus.Error,
+                    Message = "Only requests with status 'Pending' can be updated.",
+                    Data = entity.Status
                 };
             }
 
@@ -297,8 +313,14 @@ namespace BusinessLogicLayer.Services
                 _mapper.Map(request, entity);
                 _unitOfWork.GoodRequestRepository.Update(entity);
                 await _unitOfWork.SaveAsync();
-                var result = _mapper.Map<TResult>(entity);
 
+                var goodnote = await _unitOfWork.GoodNoteRepository.GetByCondition(g => g.GoodRequestId == id);
+
+                var result = _mapper.Map<GoodRequestDTO>(entity);
+                if (goodnote != null)
+                {
+                    result.GoodNote = _mapper.Map<GoodNoteOfGoodRequestDTO>(goodnote);
+                }
                 return new ServiceResponse
                 {
                     Status = SRStatus.Success,
@@ -351,7 +373,7 @@ namespace BusinessLogicLayer.Services
                 };
             }
         }
-        public async Task<ServiceResponse> SearchGoodRequests<TResult>(int? pageIndex = null, int? pageSize = null,
+        public async Task<ServiceResponse> SearchGoodRequests(int? pageIndex = null, int? pageSize = null,
                                                                        string? keyword = null, GoodRequestEnum? requestType = null,
                                                                                                GoodRequestStatusEnum? status = null)
         {
@@ -376,7 +398,16 @@ namespace BusinessLogicLayer.Services
                     pageSize: pageSize
                 );
 
-                var mappedResults = _mapper.Map<IEnumerable<TResult>>(results);
+                var mappedResults = _mapper.Map<IEnumerable<GoodRequestDTO>>(results);
+
+                foreach (var goodRequest in mappedResults)
+                {
+                    var goodNote = await _unitOfWork.GoodNoteRepository.GetByCondition(g => g.GoodRequestId == goodRequest.Id);
+                    if (goodNote != null)
+                    {
+                        goodRequest.GoodNote = _mapper.Map<GoodNoteOfGoodRequestDTO>(goodNote);
+                    }
+                }
 
                 int totalPages = (int)Math.Ceiling((double)totalRecords / (pageSize ?? 5));
 

@@ -1,5 +1,6 @@
 ﻿using Data.Enum;
 using Data.Model.DTO.Base;
+using Data.Model.Request.GoodNote;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
@@ -18,6 +19,7 @@ namespace Data.Model.Request.GoodRequest
         public string? RequestedWarehouseId { get; set; }
         public string? RequestedWarehouseName { get; set; }
         public IEnumerable<GoodRequestDetailInfoDTO>? GoodRequestDetails { get; set; }
+        public GoodNoteOfGoodRequestDTO? GoodNote { get; set; }
 
     }
 
@@ -97,7 +99,7 @@ namespace Data.Model.Request.GoodRequest
             set => _productId = string.IsNullOrEmpty(value) ? null : value;
         }
     }
-    public class GoodRequestDetailInfoDTO : BaseCreateDTO
+    public class GoodRequestDetailInfoDTO /*: BaseCreateDTO*/
     {
         public float Quantity { get; set; }
 
@@ -110,5 +112,14 @@ namespace Data.Model.Request.GoodRequest
         public string? ProductName { get; set; }
         public string? UnitName { get; set; }
         public string? BrandName { get; set; }
+    }
+    public class GoodNoteOfGoodRequestDTO : BaseDTO
+    {
+        public GoodNoteEnum NoteType { get; set; }
+        public GoodNoteStatusEnum Status { get; set; } = GoodNoteStatusEnum.Pending;
+        public string? ShipperName { get; set; }
+        public string? ReceiverName { get; set; }
+        public string? Code { get; set; }
+        public DateTime? Date { get; set; }
     }
 }

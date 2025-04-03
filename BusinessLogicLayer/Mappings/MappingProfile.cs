@@ -255,6 +255,7 @@ namespace BusinessLogicLayer.Mappings
                             .ForMember(dest => dest.BrandName, opt => opt.MapFrom(src => src.Product.Brand.Name))
                             .ForMember(dest => dest.UnitName, opt => opt.MapFrom(src => src.Product.Unit.Name))
                             .ReverseMap();
+            CreateMap<GoodNoteOfGoodRequestDTO, GoodNote>().ReverseMap();
             #endregion
 
             #region GoodNote
