@@ -30,6 +30,8 @@ using Data.Model.Request.Warehouse;
 using static Data.Model.Request.Warehouse.WarehouseFullInfoDTO;
 using Profile = Data.Entity.Profile;
 using Data.Model.Request.InventoryAdjustment;
+using Data.Model.Request.InventoryLocation;
+using Data.Model.Request.LocationLog;
 
 namespace BusinessLogicLayer.Mappings
 {
@@ -298,6 +300,18 @@ namespace BusinessLogicLayer.Mappings
                 .ForMember(dest => dest.Id, opt => opt.Ignore());
             #endregion
 
+            #region InventoryLocation
+            CreateMap<InventoryLocation, InventoryInLocationDTO>().ReverseMap();
+            CreateMap<Location, LocationInventoryDTO>()
+                .ForMember(dest => dest.InventoryItems, opt => opt.MapFrom(src => src.InventoryLocations))
+                .ReverseMap();
+            #endregion 
+
+            #region LocationLog
+            CreateMap<LocationLog, LocationLogDTO>()
+                .ForMember(dest => dest.LocationId, opt => opt.MapFrom(src => src.InventoryLocation.LocationId))
+                .ReverseMap();
+            #endregion
         }
     }
 }

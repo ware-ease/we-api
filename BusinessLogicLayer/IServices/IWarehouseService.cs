@@ -1,4 +1,5 @@
 ﻿using BusinessLogicLayer.Generic;
+using Data.Model.Request.InventoryLocation;
 using Data.Model.Request.Warehouse;
 using Data.Model.Response;
 using System;
@@ -20,5 +21,8 @@ namespace BusinessLogicLayer.IServices
                                                         float? minArea = null,
                                                         float? maxArea = null);
         Task<ServiceResponse> GetInventoryByWarehouseId(string warehouseId);
+        Task<ServiceResponse> InventoryLocationInOutAsync(CreateInventoryLocationDTO request);
+        Task<ServiceResponse> GetInventoriesInLocation(string locationId);
+        Task<ServiceResponse> GetLocationLogsAsync(string warehouseId, string? locationId, int pageIndex, int pageSize);
     }
 }

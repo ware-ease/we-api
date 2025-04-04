@@ -1,9 +1,11 @@
 ﻿using API.Utils;
 using BusinessLogicLayer.IServices;
 using BusinessLogicLayer.Utils;
+using Data.Enum;
 using Data.Model.DTO;
 using Data.Model.Request.Area;
 using Data.Model.Request.Customer;
+using Data.Model.Request.InventoryLocation;
 using Data.Model.Request.Warehouse;
 using Data.Model.Response;
 using Microsoft.AspNetCore.Mvc;
@@ -103,6 +105,32 @@ namespace API.Controllers
         public async Task<IActionResult> GetWarehouseInventory([FromRoute] string id)
         {
             var result = await _warehouseService.GetInventoryByWarehouseId(id);
+
+            return ControllerResponse.Response(result);
+        }
+
+        //[Authorize]
+        [HttpPost("{id}/inventory-location")]
+        public async Task<IActionResult> PutAwayInventory([FromRoute] string id, [FromBody] CreateInventoryLocationDTO request)
+        {
+            var result = await _warehouseService.InventoryLocationInOutAsync(request);
+            return ControllerResponse.Response(result);
+        }
+        [HttpGet("locations/{locationId}")]
+        public async Task<IActionResult> GetInventoriesInLocation([FromRoute] string locationId)
+        {
+            var result = await _warehouseService.GetInventoriesInLocation(locationId);
+            return ControllerResponse.Response(result);
+        }
+        [HttpGet("{id}/location-logs")]
+        public async Task<IActionResult> GetLocationLogs(
+            [FromRoute] string id,
+            [FromQuery] string? locationId = null,  // locationId là tùy chọn
+            [FromQuery] int pageIndex = 1,
+            [FromQuery] int pageSize = 10)
+        {
+            // Gọi service để lấy log
+            var result = await _warehouseService.GetLocationLogsAsync(id, locationId, pageIndex, pageSize);
 
             return ControllerResponse.Response(result);
         }

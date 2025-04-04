@@ -60,9 +60,9 @@ namespace Data.Model.Request.Warehouse
 
         public List<LocationDto>? Locations { get; set; }
     }
-    public class LocationDto
+    public class LocationDto : BaseDTO
     {
-        public string Id { get; set; }
+        //public string Id { get; set; }
         public int Level { get; set; }
         public string? Name { get; set; }
         public string? Code { get; set; }
