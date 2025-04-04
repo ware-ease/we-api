@@ -32,5 +32,7 @@ namespace DataAccessLayer.UnitOfWork
         IGoodNoteDetailRepository GoodNoteDetailRepository { get; }
         IBatchRepository BatchRepository { get; }
         IInventoryRepository InventoryRepository { get; }
+        IInventoryLocationRepository InventoryLocationRepository { get; }
+        ILocationLogRepository LocationLogRepository { get; }
     }
 }

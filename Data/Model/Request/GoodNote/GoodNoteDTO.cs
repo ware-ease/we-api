@@ -32,11 +32,11 @@ namespace Data.Model.Request.GoodNote
         public float Quantity { get; set; }
         public string? Note { get; set; }
         //public string GoodNoteId { get; set; }
-        public string BatchId { get; set; }
+        //public string BatchId { get; set; }
         public BatchNoteDTO? Batch { get; set; }
     }
 
-    public class BatchNoteDTO 
+    public class BatchNoteDTO : BaseDTO
     {
         public string? SupplierId { get; set; }
         public string? Code { get; set; }
