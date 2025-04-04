@@ -72,7 +72,8 @@ namespace Data.Model.Request.Warehouse
 
     public class LocationCreateDto
     {
-        public int Level { get; set; }
+        [JsonIgnore]
+        public int Level { get; set; } = 0; // Default level is 0
         public string? Name { get; set; }
         public string? Code { get; set; }
 

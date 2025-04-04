@@ -115,6 +115,16 @@ namespace BusinessLogicLayer.Services
                                 Data = locationDto.ParentId
                             };
                         }
+                        if(parentExists.Level == 4)
+                        {
+                            return new ServiceResponse
+                            {
+                                Status = Data.Enum.SRStatus.Error,
+                                Message = $"The maximum level of a Location is 4. The parent location with ID '{locationDto.ParentId}' has already reached this limit.",
+                                Data = locationDto.ParentId
+                            };
+                        }
+                        locationDto.Level = parentExists.Level + 1; // Cấp độ của location mới là cấp độ của parent + 1
                     }
                     var location = _mapper.Map<Location>(locationDto);
                     location.WarehouseId = request.Id!;
