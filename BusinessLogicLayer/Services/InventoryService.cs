@@ -4,6 +4,7 @@ using BusinessLogicLayer.IServices;
 using Data.Entity;
 using Data.Enum;
 using Data.Model.DTO;
+using Data.Model.Request.InventoryLocation;
 using Data.Model.Request.Warehouse;
 using Data.Model.Response;
 using DataAccessLayer.Generic;
@@ -96,7 +97,8 @@ namespace BusinessLogicLayer.Services
         {
             var inventory = await _unitOfWork.InventoryRepository.GetByCondition(
                 i => i.Id == inventoryId,
-                includeProperties: "InventoryLocations.Location"
+                includeProperties: "InventoryLocations.Location,InventoryLocations," +
+                "Batch,Batch.Product,Batch.Product.Unit,Batch.Product.Brand"
             );
 
             if (inventory == null)
@@ -109,18 +111,21 @@ namespace BusinessLogicLayer.Services
                 };
             }
 
-            var locations = inventory.InventoryLocations
-                .Select(il => il.Location)
-            .Distinct()
-            .ToList();
+            //var locations = inventory.InventoryLocations
+            //    .Select(il => il.Location)
+            //.Distinct()
+            //.ToList();
 
-            var locationDtos = _mapper.Map<List<LocationDTO>>(locations);
+            //var locationDtos = _mapper.Map<List<InventoryLocationDTO>>(inventory.InventoryLocations);
+
+            var locationsByInventoryDtos = _mapper.Map<InventoryDTOv2>(inventory); 
+            locationsByInventoryDtos.InventoryLocations = _mapper.Map<List<InventoryLocationDTO>>(inventory.InventoryLocations);
 
             return new ServiceResponse
             {
                 Status = SRStatus.Success,
                 Message = "Locations retrieved successfully.",
-                Data = locationDtos
+                Data = locationsByInventoryDtos
             };
         }
 

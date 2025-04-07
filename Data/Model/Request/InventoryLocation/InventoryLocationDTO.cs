@@ -1,4 +1,6 @@
-﻿using Data.Model.DTO.Base;
+﻿using Data.Model.DTO;
+using Data.Model.DTO.Base;
+using Data.Model.Request.GoodNote;
 using Data.Model.Request.Inventory;
 using Data.Model.Request.Warehouse;
 using System;
@@ -7,13 +9,14 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using InventoryDTO = Data.Model.DTO.InventoryDTO;
 
 namespace Data.Model.Request.InventoryLocation
 {
     public class InventoryInLocationDTO : BaseDTO
     {
         public int Quantity { get; set; } = 0;
-        public InventoryDTO Inventory { get; set; }
+        public InventoryDTOv2 Inventory { get; set; }
     }
 
     public class CreateInventoryLocationDTO : BaseCreateDTO
@@ -36,5 +39,22 @@ namespace Data.Model.Request.InventoryLocation
         public string WarehouseId { get; set; }
         public ICollection<InventoryInLocationDTO>? InventoryItems { get; set; } 
     }
-
+    public class LocationOfInventoryDTO : BaseDTO
+    {
+        public int Quantity { get; set; } = 0;
+        public InventoryDTOv2 Inventory { get; set; }
+        public LocationDTO Location { get; set; }
+    }
+    public class InventoryDTOv2 : BaseDTO
+    {
+        public float CurrentQuantity { get; set; }
+        public string BatchId { get; set; }
+        public BatchNoteDTO Batch { get; set; }
+        public List<InventoryLocationDTO> InventoryLocations { get; set; } = [];
+    }
+    public class InventoryLocationDTO : BaseDTO
+    {
+        public int Quantity { get; set; } 
+        public LocationDTO Location { get; set; }
+    }
 }
