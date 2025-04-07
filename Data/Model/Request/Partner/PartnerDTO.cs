@@ -22,7 +22,8 @@ namespace Data.Model.Request.Partner
         public PartnerEnum PartnerType { get; set; }
         public string? Name { get; set; }
         public string? Phone { get; set; }
-        public bool Status { get; set; }
+        [JsonIgnore]
+        public bool Status { get; set; } = true;
     }
 
     public class PartnerUpdateDTO
