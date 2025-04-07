@@ -24,5 +24,7 @@ namespace BusinessLogicLayer.IServices
         Task<ServiceResponse> InventoryLocationInOutAsync(CreateInventoryLocationDTO request);
         Task<ServiceResponse> GetInventoriesInLocation(string locationId);
         Task<ServiceResponse> GetLocationLogsAsync(string warehouseId, string? locationId, int pageIndex, int pageSize);
+        Task<ServiceResponse> GetWarehouseStatisticsAsync(string? warehouseId);
+        Task<ServiceResponse> GetGoodsFlowHistogramAsync(string? warehouseId);
     }
 }

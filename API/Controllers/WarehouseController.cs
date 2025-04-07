@@ -109,19 +109,19 @@ namespace API.Controllers
             return ControllerResponse.Response(result);
         }
 
-        //[Authorize]
-        [HttpPost("{id}/inventory-location")]
-        public async Task<IActionResult> PutAwayInventory([FromRoute] string id, [FromBody] CreateInventoryLocationDTO request)
-        {
-            var result = await _warehouseService.InventoryLocationInOutAsync(request);
-            return ControllerResponse.Response(result);
-        }
-        [HttpGet("locations/{locationId}")]
-        public async Task<IActionResult> GetInventoriesInLocation([FromRoute] string locationId)
-        {
-            var result = await _warehouseService.GetInventoriesInLocation(locationId);
-            return ControllerResponse.Response(result);
-        }
+        ////[Authorize]
+        //[HttpPost("{id}/inventory-location")]
+        //public async Task<IActionResult> PutAwayInventory([FromRoute] string id, [FromBody] CreateInventoryLocationDTO request)
+        //{
+        //    var result = await _warehouseService.InventoryLocationInOutAsync(request);
+        //    return ControllerResponse.Response(result);
+        //}
+        //[HttpGet("locations/{locationId}")]
+        //public async Task<IActionResult> GetInventoriesInLocation([FromRoute] string locationId)
+        //{
+        //    var result = await _warehouseService.GetInventoriesInLocation(locationId);
+        //    return ControllerResponse.Response(result);
+        //}
         [HttpGet("{id}/location-logs")]
         public async Task<IActionResult> GetLocationLogs(
             [FromRoute] string id,

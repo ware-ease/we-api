@@ -2,9 +2,11 @@
 using BusinessLogicLayer.Services;
 using Data.Enum;
 using Data.Model.DTO;
+using Data.Model.Request.InventoryLocation;
 using Data.Model.Response;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Sprache;
 
 namespace API.Controllers
 {
@@ -13,10 +15,12 @@ namespace API.Controllers
     public class InventoryController : ControllerBase
     {
         private readonly IInventoryService _inventoryService;
+        private readonly IWarehouseService _warehouseService;
 
-        public InventoryController(IInventoryService inventoryService)
+        public InventoryController(IInventoryService inventoryService, IWarehouseService warehouseService)
         {
             _inventoryService = inventoryService;
+            _warehouseService = warehouseService;
         }
 
         [HttpGet]
@@ -48,5 +52,33 @@ namespace API.Controllers
                 });
             }
         }
+        //[Authorize]
+        [HttpPost("/inventory-location")]
+        public async Task<IActionResult> PutAwayInvento([FromBody] CreateInventoryLocationDTO request)
+        {
+            var result = await _warehouseService.InventoryLocationInOutAsync(request);
+            return ControllerResponse.Response(result);
+        }
+        [HttpGet("locations/{locationId}")]
+        public async Task<IActionResult> GetInventoriesInLocation([FromRoute] string locationId)
+        {
+            var result = await _warehouseService.GetInventoriesInLocation(locationId);
+            return ControllerResponse.Response(result);
+        }
+        [HttpGet("{inventoryId}/locations")]
+        public async Task<IActionResult> GetLocationsByInventoryId(string inventoryId)
+        {
+            var response = await _inventoryService.GetLocationsByInventoryId(inventoryId);
+
+            return ControllerResponse.Response(response);
+        }
+        [HttpGet("batch/{batchId}/locations")]
+        public async Task<IActionResult> GetLocationsByBatchId(string batchId)
+        {
+            var response = await _inventoryService.GetLocationsByBatchId(batchId);
+
+            return ControllerResponse.Response(response);
+        }
+
     }
 }

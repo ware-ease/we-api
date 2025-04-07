@@ -15,6 +15,9 @@ using DataAccessLayer.Generic;
 using DataAccessLayer.IRepositories;
 using DataAccessLayer.UnitOfWork;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualBasic;
+using Org.BouncyCastle.Tls;
+using System;
 using System.Linq.Expressions;
 
 namespace BusinessLogicLayer.Services
@@ -298,78 +301,6 @@ namespace BusinessLogicLayer.Services
             };
         }
 
-        //public async Task<ServiceResponse> PutAwayInventoryAsync(CreateInventoryLocationDTO request)
-        //{
-        //    // Lấy thông tin inventory và location từ request
-        //    var inventory = await _unitOfWork.InventoryRepository.GetByCondition(x => x.Id == request.InventoryId);
-        //    var location = await _unitOfWork.LocationRepository.GetByCondition(x => x.Id == request.LocationId);
-
-        //    // Kiểm tra nếu inventory hoặc location không tồn tại
-        //    if (inventory == null || location == null)
-        //    {
-        //        return new ServiceResponse
-        //        {
-        //            Status = SRStatus.NotFound,
-        //            Message = "Inventory or Location not found.",
-        //            Data = request
-        //        };
-        //    }
-
-        //    // Kiểm tra nếu đã tồn tại bản ghi trong InventoryLocation
-        //    var existing = await _unitOfWork.InventoryLocationRepository.GetByCondition(
-        //        x => x.InventoryId == request.InventoryId && x.LocationId == request.LocationId);
-
-        //    if (existing != null)
-        //    {
-        //        // Lưu số lượng cũ để tính toán sự thay đổi
-        //        var oldQuantity = existing.Quantity;
-
-        //        // Cập nhật số lượng mới cho InventoryLocation
-        //        existing.Quantity += request.Quantity;
-        //        _unitOfWork.InventoryLocationRepository.Update(existing);
-
-        //        // Thêm bản ghi vào bảng LocationLog để ghi nhận sự thay đổi
-        //        var locationLog = new LocationLog
-        //        {
-        //            InventoryLocationId = existing.Id,  // Lưu ID của InventoryLocation vào LocationLog
-        //            NewQuantity = existing.Quantity,    // Số lượng mới sau khi thay đổi
-        //            ChangeInQuantity = existing.Quantity - oldQuantity // Sự thay đổi trong số lượng
-        //        };
-        //        await _unitOfWork.LocationLogRepository.Add(locationLog);
-        //    }
-        //    else
-        //    {
-        //        // Nếu chưa có bản ghi InventoryLocation, tạo mới
-        //        var newEntry = new InventoryLocation
-        //        {
-        //            InventoryId = request.InventoryId,
-        //            LocationId = request.LocationId,
-        //            Quantity = request.Quantity,
-        //        };
-
-        //        // Lưu bản ghi mới vào InventoryLocation
-        //        await _unitOfWork.InventoryLocationRepository.Add(newEntry);
-
-        //        // Thêm bản ghi vào LocationLog cho trường hợp mới
-        //        var locationLog = new LocationLog
-        //        {
-        //            InventoryLocationId = newEntry.Id,  // ID của InventoryLocation mới
-        //            NewQuantity = newEntry.Quantity,    // Số lượng sau khi thêm vào
-        //            ChangeInQuantity = newEntry.Quantity // Sự thay đổi là số lượng ban đầu
-        //        };
-        //        await _unitOfWork.LocationLogRepository.Add(locationLog);
-        //    }
-
-        //    // Lưu tất cả thay đổi vào database
-        //    await _unitOfWork.SaveAsync();
-
-        //    return new ServiceResponse
-        //    {
-        //        Status = SRStatus.Success,
-        //        Message = "Put-away operation completed successfully."
-        //    };
-        //}
-
         public async Task<ServiceResponse> InventoryLocationInOutAsync(CreateInventoryLocationDTO request)
         {
             // Lấy thông tin inventory và location từ request
@@ -507,7 +438,7 @@ namespace BusinessLogicLayer.Services
 
         public async Task<ServiceResponse> GetInventoriesInLocation(string locationId)
         {
-            var location = await _unitOfWork.LocationRepository.GetByCondition(
+            var location = await _unitOfWork.LocationRepository.Search(
                 l => l.Id == locationId,
                 includeProperties: "InventoryLocations," +
                                    "InventoryLocations.Inventory," +
@@ -586,5 +517,119 @@ namespace BusinessLogicLayer.Services
             };
         }
 
+        public async Task<ServiceResponse> GetWarehouseStatisticsAsync(string? warehouseId)
+        {
+            // Tính ngày bắt đầu và kết thúc của tháng hiện tại và tháng trước
+            var startOfMonth = new DateTime(year: DateTime.Now.Year, month: DateTime.Now.Month, 1);
+            var endOfMonth = startOfMonth.AddMonths(1).AddTicks(-1);
+            var startOfLastMonth = startOfMonth.AddMonths(-1);
+            var endOfLastMonth = startOfMonth.AddTicks(-1);
+
+            // Lấy tất cả các GoodNoteDetail có liên kết tới kho và nằm trong 2 khoảng thời gian
+            var allDetails = await _unitOfWork.GoodNoteDetailRepository.Search(
+                filter: d => /*d.GoodNote.GoodRequest.RequestedWarehouseId == warehouseId &&*/
+                             d.GoodNote.CreatedTime >= startOfLastMonth &&
+                             d.GoodNote.CreatedTime <= endOfMonth,
+                includeProperties: "GoodNote"
+            );
+
+            // Phân loại theo tháng
+            var currentMonthDetails = allDetails.Where(d =>
+                d.GoodNote.CreatedTime >= startOfMonth &&
+                d.GoodNote.CreatedTime <= endOfMonth);
+
+            var lastMonthDetails = allDetails.Where(d =>
+                d.GoodNote.CreatedTime >= startOfLastMonth &&
+                d.GoodNote.CreatedTime <= endOfLastMonth);
+
+            // Hàm tính tổng số lượng theo loại phiếu
+            int SumByType(IEnumerable<GoodNoteDetail> details, GoodNoteEnum type) =>
+                (int)details.Where(d => d.GoodNote.NoteType == type).Sum(d => d.Quantity);
+
+            // Tính tổng từng loại trong tháng hiện tại
+            int totalPutIn = SumByType(currentMonthDetails, GoodNoteEnum.Receive) + SumByType(currentMonthDetails, GoodNoteEnum.Return);
+            int totalTakeOut = SumByType(currentMonthDetails, GoodNoteEnum.Issue);
+            int totalTransfer = SumByType(currentMonthDetails, GoodNoteEnum.Transfer);
+            int currentStockChange = totalPutIn - totalTakeOut;
+
+            // Tháng trước
+            int lastPutIn = SumByType(lastMonthDetails, GoodNoteEnum.Receive) + SumByType(lastMonthDetails, GoodNoteEnum.Return);
+            int lastTakeOut = SumByType(lastMonthDetails, GoodNoteEnum.Issue);
+            int lastTransfer = SumByType(lastMonthDetails, GoodNoteEnum.Transfer);
+            int lastStockChange = lastPutIn - lastTakeOut;
+
+            // Hàm tính phần trăm thay đổi
+            double CalcChangePercent(int current, int previous)
+            {
+                if (previous == 0) return current == 0 ? 0 : 100;
+                return Math.Round(((double)(current - previous) / previous) * 100, 2);
+            }
+
+            return new ServiceResponse
+            {
+                Status = SRStatus.Success,
+                Message = "4 Cards statistics generated successfully.",
+                Data = new
+                {
+                    TotalPutIn = totalPutIn,
+                    ChangePutIn = CalcChangePercent(totalPutIn, lastPutIn),
+
+                    TotalTakeOut = totalTakeOut,
+                    ChangeTakeOut = CalcChangePercent(totalTakeOut, lastTakeOut),
+
+                    CurrentStockChange = currentStockChange,
+                    ChangeStock = CalcChangePercent(currentStockChange, lastStockChange),
+
+                    TotalTransfer = totalTransfer,
+                    ChangeTransfer = CalcChangePercent(totalTransfer, lastTransfer)
+                }
+            };
+        }
+        public async Task<ServiceResponse> GetGoodsFlowHistogramAsync(string? warehouseId)
+        {
+            // Mặc định khoảng thời gian là từ đầu đến cuối tháng hiện tại
+            DateTime now = DateTime.Now;
+            DateTime fromDate = new DateTime(now.Year, now.Month, 1);
+            DateTime toDate = fromDate.AddMonths(1).AddDays(-1);
+
+            var details = await _unitOfWork.GoodNoteDetailRepository.Search(
+                gnd =>
+                    gnd.GoodNote.CreatedTime.HasValue &&
+                    gnd.GoodNote.CreatedTime.Value.Date >= fromDate.Date &&
+                    gnd.GoodNote.CreatedTime.Value.Date <= toDate.Date &&
+                    (string.IsNullOrEmpty(warehouseId) || gnd.GoodNote.GoodRequest.RequestedWarehouseId == warehouseId),
+                includeProperties: "GoodNote,GoodNote.GoodRequest"
+            );
+
+            var groupedData = details
+                .GroupBy(d => d.GoodNote.CreatedTime.Value.Date)
+                .Select(g => new
+                {
+                    Date = g.Key,
+                    PutIn = g.Where(x => x.GoodNote.NoteType == GoodNoteEnum.Receive || x.GoodNote.NoteType == GoodNoteEnum.Return).Sum(x => x.Quantity),
+                    TakeOut = g.Where(x => x.GoodNote.NoteType == GoodNoteEnum.Issue /*|| x.GoodNote.NoteType == GoodNoteEnum.Transfer*/).Sum(x => x.Quantity)
+                })
+                .OrderBy(x => x.Date)
+                .ToList();
+            // Tính tổng nhập và tổng xuất cả tháng
+            int totalPutIn = (int)groupedData.Sum(x => x.PutIn);
+            int totalTakeOut = (int)groupedData.Sum(x => x.TakeOut);
+            return new ServiceResponse
+            {
+                Status = SRStatus.Success,
+                Message = "Histogram data retrieved successfully.",
+                Data = new
+                {
+                    TotalPutIn = totalPutIn,
+                    TotalTakeOut = totalTakeOut,
+                    Records = groupedData.Select(d => new
+                    {
+                        Date = d.Date.ToString("dd/MM/yyyy"),
+                        PutIn = d.PutIn,
+                        TakeOut = d.TakeOut
+                    })
+                }
+            };
+        }
     }
 }

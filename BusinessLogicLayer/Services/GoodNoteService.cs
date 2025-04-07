@@ -313,7 +313,7 @@ namespace BusinessLogicLayer.Services
                 var entity = _mapper.Map<GoodNote>(request);
                 entity.CreatedTime = DateTime.Now;
                 entity.Status = GoodNoteStatusEnum.Completed;
-                await _goodNoteRepository.Add(entity);
+                await _unitOfWork.GoodNoteRepository.Add(entity);
                 //cập nhật goodrequest là thành công
                 var goodRequest = await _unitOfWork.GoodRequestRepository.GetByCondition(x => x.Id == request.GoodRequestId);
                 goodRequest.Status = GoodRequestStatusEnum.Completed;

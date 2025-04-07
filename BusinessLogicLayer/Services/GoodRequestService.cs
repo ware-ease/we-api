@@ -179,7 +179,7 @@ namespace BusinessLogicLayer.Services
         public async Task<ServiceResponse> UpdateAsync(string id, GoodRequestUpdateDTO request)
         {
             // 1️⃣ Tìm `GoodRequest` trong DB
-            var entity = await _goodRequestRepository.GetByCondition(x => x.Id == id, includeProperties: "GoodRequestDetails,Warehouse,Partner," +
+            var entity = await _goodRequestRepository.GetByCondition(x => x.Id == id, includeProperties: "GoodRequestDetails,Warehouse,RequestedWarehouse,Partner," +
                                                                                                          "GoodRequestDetails.Product," +
                                                                                                          "GoodRequestDetails.Product.Unit," +
                                                                                                          "GoodRequestDetails.Product.Brand");
