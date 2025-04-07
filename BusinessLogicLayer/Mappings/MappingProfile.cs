@@ -127,6 +127,10 @@ namespace BusinessLogicLayer.Mappings
                 .ForMember(d => d.BatchCode, opt => opt.MapFrom(src => $"{src.Batch.Code}".Trim()))
                 .ForMember(d => d.WarehouseName, opt => opt.MapFrom(src => $"{src.Warehouse.Name}".Trim()))
                 .ReverseMap();
+
+            CreateMap<Inventory, InventoryDTOv2>().ForMember(d => d.InventoryLocations, opt => opt.MapFrom(src => src.InventoryLocations))
+                .ReverseMap();
+            CreateMap<InventoryLocation, InventoryLocationDTO>().ReverseMap();
             #endregion
 
             #region InventoryCount

@@ -38,7 +38,7 @@ namespace Data.Model.Request.GoodNote
 
     public class BatchNoteDTO : BaseDTO
     {
-        public string? SupplierId { get; set; }
+        //public string? SupplierId { get; set; }
         public string? Code { get; set; }
         public string? Name { get; set; }
         public DateOnly MfgDate { get; set; }

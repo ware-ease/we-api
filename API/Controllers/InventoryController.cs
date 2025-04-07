@@ -34,24 +34,24 @@ namespace API.Controllers
             return ControllerResponse.Response(response);
         }
 
-        [HttpGet("{id}")]
-        public async Task<IActionResult> Get(string id)
-        {
-            try
-            {
-                var inventory = await _inventoryService.Get<Data.Model.DTO.InventoryDTO>(id);
-                return ControllerResponse.Response(inventory);
-            }
-            catch (Exception ex)
-            {
-                return ControllerResponse.Response(new ServiceResponse
-                {
-                    Status = SRStatus.Error,
-                    Message = ex.Message,
-                    Data = null
-                });
-            }
-        }
+        //[HttpGet("{id}")]
+        //public async Task<IActionResult> Get(string id)
+        //{
+        //    try
+        //    {
+        //        var inventory = await _inventoryService.Get<Data.Model.DTO.InventoryDTO>(id);
+        //        return ControllerResponse.Response(inventory);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return ControllerResponse.Response(new ServiceResponse
+        //        {
+        //            Status = SRStatus.Error,
+        //            Message = ex.Message,
+        //            Data = null
+        //        });
+        //    }
+        //}
         //[Authorize]
         [HttpPost("/inventory-location")]
         public async Task<IActionResult> PutAwayInvento([FromBody] CreateInventoryLocationDTO request)
@@ -65,7 +65,7 @@ namespace API.Controllers
             var result = await _warehouseService.GetInventoriesInLocation(locationId);
             return ControllerResponse.Response(result);
         }
-        [HttpGet("{inventoryId}/locations")]
+        [HttpGet("{inventoryId}")]
         public async Task<IActionResult> GetLocationsByInventoryId(string inventoryId)
         {
             var response = await _inventoryService.GetLocationsByInventoryId(inventoryId);
