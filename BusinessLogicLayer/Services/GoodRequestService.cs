@@ -392,7 +392,7 @@ namespace BusinessLogicLayer.Services
 
                 var results = await _goodRequestRepository.Search(
                     filter: filter,
-                    includeProperties: "GoodRequestDetails,Warehouse,Partner,GoodRequestDetails.Product," +
+                    includeProperties: "GoodRequestDetails,Warehouse,RequestedWarehouse,Partner,GoodRequestDetails.Product," +
                                        "GoodRequestDetails.Product.Unit,GoodRequestDetails.Product.Brand",
                     pageIndex: pageIndex,
                     pageSize: pageSize
