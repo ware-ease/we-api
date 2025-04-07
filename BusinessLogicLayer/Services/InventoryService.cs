@@ -2,6 +2,9 @@
 using BusinessLogicLayer.Generic;
 using BusinessLogicLayer.IServices;
 using Data.Entity;
+using Data.Enum;
+using Data.Model.DTO;
+using Data.Model.Request.Warehouse;
 using Data.Model.Response;
 using DataAccessLayer.Generic;
 using DataAccessLayer.UnitOfWork;
@@ -88,5 +91,71 @@ namespace BusinessLogicLayer.Services
                 }
             };
         }
+
+        public async Task<ServiceResponse> GetLocationsByInventoryId(string inventoryId)
+        {
+            var inventory = await _unitOfWork.InventoryRepository.GetByCondition(
+                i => i.Id == inventoryId,
+                includeProperties: "InventoryLocations.Location"
+            );
+
+            if (inventory == null)
+            {
+                return new ServiceResponse
+                {
+                    Status = SRStatus.NotFound,
+                    Message = "Inventory not found.",
+                    Data = inventoryId
+                };
+            }
+
+            var locations = inventory.InventoryLocations
+                .Select(il => il.Location)
+            .Distinct()
+            .ToList();
+
+            var locationDtos = _mapper.Map<List<LocationDTO>>(locations);
+
+            return new ServiceResponse
+            {
+                Status = SRStatus.Success,
+                Message = "Locations retrieved successfully.",
+                Data = locationDtos
+            };
+        }
+
+        public async Task<ServiceResponse> GetLocationsByBatchId(string batchId)
+        {
+            var inventories = await _unitOfWork.InventoryRepository.Search(
+                i => i.BatchId == batchId,
+                includeProperties: "InventoryLocations.Location"
+            );
+
+            if (inventories == null || !inventories.Any())
+            {
+                return new ServiceResponse
+                {
+                    Status = SRStatus.NotFound,
+                    Message = "No inventories found for the given batch.",
+                    Data = batchId
+                };
+            }
+
+            var locations = inventories
+                .SelectMany(i => i.InventoryLocations)
+                .Select(il => il.Location)
+                .Distinct()
+                .ToList();
+
+            var locationDtos = _mapper.Map<List<LocationDTO>>(locations);
+
+            return new ServiceResponse
+            {
+                Status = SRStatus.Success,
+                Message = "Locations retrieved successfully.",
+                Data = locationDtos
+            };
+        }
+
     }
 }

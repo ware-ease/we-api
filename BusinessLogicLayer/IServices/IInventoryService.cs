@@ -12,5 +12,7 @@ namespace BusinessLogicLayer.IServices
     {
         Task<ServiceResponse> Search<TResult>(int? pageIndex = null, int? pageSize = null,
                                                                    string? keyword = null);
+        Task<ServiceResponse> GetLocationsByInventoryId(string inventoryId);
+        Task<ServiceResponse> GetLocationsByBatchId(string batchId);
     }
 }

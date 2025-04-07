@@ -311,6 +311,9 @@ namespace BusinessLogicLayer.Mappings
             CreateMap<LocationLog, LocationLogDTO>()
                 .ForMember(dest => dest.LocationId, opt => opt.MapFrom(src => src.InventoryLocation.LocationId))
                 .ReverseMap();
+            #endregion 
+            #region Location
+            CreateMap<Location, LocationDTO>().ReverseMap();
             #endregion
         }
     }
