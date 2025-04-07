@@ -70,7 +70,8 @@ namespace Data.Model.Request.GoodNote
         public DateTime? Date { get; set; }
         [Required(ErrorMessage = "GoodRequestId không được để trống.")]
         public string GoodRequestId { get; set; }
-        public IEnumerable<GoodNoteDetailCreateDTO>? GoodNoteDetails { get; set; }
+        [Required(ErrorMessage = "GoodNoteDetails không được để trống.")]
+        public List<GoodNoteDetailCreateDTO> GoodNoteDetails { get; set; }
     }
 
     public class GoodNoteDetailCreateDTO : BaseCreateDTO

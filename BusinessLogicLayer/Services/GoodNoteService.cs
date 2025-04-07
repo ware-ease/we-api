@@ -251,8 +251,8 @@ namespace BusinessLogicLayer.Services
         {
             if (!string.IsNullOrEmpty(request.GoodRequestId))
             {
-                var warehouseExists = await _unitOfWork.GoodRequestRepository.GetByCondition(x => x.Id == request.GoodRequestId);
-                if (warehouseExists == null)
+                var goodRequest = await _unitOfWork.GoodRequestRepository.GetByCondition(x => x.Id == request.GoodRequestId);
+                if (goodRequest == null)
                 {
                     return new ServiceResponse
                     {
@@ -309,29 +309,30 @@ namespace BusinessLogicLayer.Services
             }
             try
             {
+                //Tạo goodnote
                 var entity = _mapper.Map<GoodNote>(request);
                 entity.CreatedTime = DateTime.Now;
+                entity.Status = GoodNoteStatusEnum.Completed;
                 await _goodNoteRepository.Add(entity);
-                await _unitOfWork.SaveAsync();
-                foreach (var detail in request.GoodNoteDetails)
+                //cập nhật goodrequest là thành công
+                var goodRequest = await _unitOfWork.GoodRequestRepository.GetByCondition(x => x.Id == request.GoodRequestId);
+                goodRequest.Status = GoodRequestStatusEnum.Completed;
+                _unitOfWork.GoodRequestRepository.Update(goodRequest);
+                //await _unitOfWork.SaveAsync();
+
+                //Tạo goodnoteDetail
+                var goodNoteDetails = _mapper.Map<List<GoodNoteDetail>>(request.GoodNoteDetails);
+                foreach (var detail in request.GoodNoteDetails!)
                 {
                     detail.GoodNoteId = entity.Id;
                     detail.CreatedTime = DateTime.Now;
                     var goodNoteDetail = _mapper.Map<GoodNoteDetail>(detail);
                     await _unitOfWork.GoodNoteDetailRepository.Add(goodNoteDetail);
                 }
-
+                //await _unitOfWork.SaveAsync();
+                //Cập nhật tồn kho
+                await UpdateInventories(entity, goodNoteDetails);
                 await _unitOfWork.SaveAsync();
-                //var goodNoteDetails = await _unitOfWork.GoodNoteDetailRepository.Search(x => x.GoodNoteId == entity.Id, includeProperties: "GoodNote,GoodNote.GoodRequest," +
-                //                                                                                                                            "GoodNote.GoodRequest.RequestedWarehouse" +
-                //                                                                                                                            "Batch," +
-                //                                                                                                                            "Batch.Product," +
-                //                                                                                                                            "Batch.Product.Unit," +
-                //                                                                                                                            "Batch.Product.Brand");
-                //var result = _mapper.Map<GoodNoteDTO>(entity);
-                //result.GoodNoteDetails = _mapper.Map<List<GoodNoteDetailDTO>>(goodNoteDetails);
-                //result.RequestedWarehouseName = goodNoteDetails.First().GoodNote.GoodRequest.RequestedWarehouse?.Name;
-
                 return new ServiceResponse
                 {
                     Status = SRStatus.Success,
@@ -672,6 +673,5 @@ namespace BusinessLogicLayer.Services
                 Data = new { goodNoteId = id }
             };
         }
-
     }
 }
