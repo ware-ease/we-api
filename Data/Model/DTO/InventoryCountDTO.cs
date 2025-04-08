@@ -18,6 +18,9 @@ namespace Data.Model.DTO
         public TimeOnly? EndTime { get; set; }
         public DateOnly? ScheduleDate { get; set; }
         public string LocationName { get; set; }
+        public string LocationId { get; set; }
+        public string WarehouseName { get; set; }
+        public string WarehouseId { get; set; }
         public List<InventoryCountDetailDTO> InventoryCountDetailDTO { get; set; }
     }
 
