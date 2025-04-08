@@ -32,6 +32,7 @@ using Profile = Data.Entity.Profile;
 using Data.Model.Request.InventoryAdjustment;
 using Data.Model.Request.InventoryLocation;
 using Data.Model.Request.LocationLog;
+using Data.Model.Request.ErrorTicket;
 
 namespace BusinessLogicLayer.Mappings
 {
@@ -181,10 +182,11 @@ namespace BusinessLogicLayer.Mappings
 
             #region ErrorTicket
             CreateMap<ErrorTicket, ErrorTicketDTO>()
+                .ForMember(dest => dest.InventoryCountDetailNote, opt => opt.MapFrom(src => src.InventoryCountDetail.Note))
                 .ReverseMap();
 
-            //CreateMap<Schedule, ScheduleCreateDTO>().ReverseMap();
-            //CreateMap<Schedule, ScheduleUpdateDTO>().ReverseMap();
+            CreateMap<ErrorTicket, ErrorTicketCreateDTO>().ReverseMap();
+            CreateMap<ErrorTicket, ErrorTicketUpdateDTO>().ReverseMap();
             #endregion
 
             #region Batch

@@ -94,6 +94,7 @@ builder.Services.AddScoped<IGenericRepository<Account>, GenericRepository<Accoun
 builder.Services.AddScoped<IGenericRepository<Group>, GenericRepository<Group>>();
 builder.Services.AddScoped<IGenericRepository<Permission>, GenericRepository<Permission>>();
 builder.Services.AddScoped<IGenericRepository<Category>, GenericRepository<Category>>();
+builder.Services.AddScoped<IGenericRepository<ErrorTicket>, GenericRepository<ErrorTicket>>();
 builder.Services.AddScoped<IGenericRepository<Product>, GenericRepository<Product>>();
 builder.Services.AddScoped<IGenericRepository<Schedule>, GenericRepository<Schedule>>();
 builder.Services.AddScoped<IGenericRepository<Batch>, GenericRepository<Batch>>();
@@ -128,6 +129,7 @@ builder.Services.AddScoped<IBatchService, BatchService>();
 builder.Services.AddScoped<IProductTypesService, ProductTypesService>();
 builder.Services.AddScoped<IScheduleService, ScheduleService>();
 builder.Services.AddScoped<IBrandService, BrandService>();
+builder.Services.AddScoped<IErrorTicketService, ErrorTicketService>();
 builder.Services.AddScoped<IInventoryCountService, InventoryCountService>();
 builder.Services.AddScoped<IInventoryAdjustmentService, InventoryAdjustmentService>();
 builder.Services.AddScoped<IUnitService, UnitService>();
