@@ -14,5 +14,6 @@ namespace BusinessLogicLayer.IServices
                                                                    string? keyword = null);
         Task<ServiceResponse> GetLocationsByInventoryId(string inventoryId);
         Task<ServiceResponse> GetLocationsByBatchId(string batchId);
+        Task<ServiceResponse> GetLocationLogsByInventoryIdAsync(string inventoryId, int pageIndex, int pageSize);
     }
 }

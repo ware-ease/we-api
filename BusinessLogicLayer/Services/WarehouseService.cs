@@ -633,5 +633,73 @@ namespace BusinessLogicLayer.Services
                 }
             };
         }
+        public async Task<ServiceResponse> GetStockCard(string productId, string warehouseId, DateTime? from = null, DateTime? to = null)
+        {
+            try
+            {
+                var goodNoteDetails = await _unitOfWork.GoodNoteDetailRepository
+                    .Search(d => d.Batch.ProductId == productId &&
+                                      d.GoodNote.GoodRequest.RequestedWarehouseId == warehouseId &&
+                                      (!from.HasValue || d.GoodNote.CreatedTime.Value >= from.Value) &&
+                                      (!to.HasValue || d.GoodNote.CreatedTime.Value < to.Value.Date.AddDays(1)),
+                                 includeProperties: "GoodNote,Batch,Batch.Product,Batch.Product.Unit,GoodNote.GoodRequest.RequestedWarehouse");
+
+                var sortedDetails = goodNoteDetails.OrderBy(d => d.GoodNote.Date).ToList();
+
+                var product = sortedDetails.FirstOrDefault()?.Batch.Product;
+                var warehouse = sortedDetails.FirstOrDefault()?.GoodNote?.GoodRequest.RequestedWarehouse;
+
+                float stock = 0;
+                var result = new List<StockCardDetailDTO>();
+
+                foreach (var detail in sortedDetails)
+                {
+                    var type = detail.GoodNote.NoteType;
+                    float importQty = 0, exportQty = 0;
+
+                    if (type == GoodNoteEnum.Receive || type == GoodNoteEnum.Return)
+                        importQty = detail.Quantity;
+                    else if (type == GoodNoteEnum.Issue || type == GoodNoteEnum.Transfer)
+                        exportQty = detail.Quantity;
+
+                    stock += importQty - exportQty;
+
+                    result.Add(new StockCardDetailDTO
+                    {
+                        Date = detail.GoodNote.CreatedTime,
+                        Code = detail.GoodNote.Code,
+                        Description = detail.Note,
+                        Import = importQty,
+                        Export = exportQty,
+                        Stock = stock,
+                        Note = detail.Batch.Code
+                    });
+                }
+
+                return new ServiceResponse
+                {
+                    Status = SRStatus.Success,
+                    Message = "Thẻ kho được truy xuất thành công.",
+                    Data = new StockCardDTO
+                    {
+                        ProductCode = product?.Sku,
+                        ProductName = product?.Name,
+                        UnitName = product?.Unit?.Name,
+                        WarehouseName = warehouse?.Name,
+                        Details = result
+                    }
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ServiceResponse
+                {
+                    Status = SRStatus.Error,
+                    Message = "Lỗi khi lấy dữ liệu thẻ kho.",
+                    Data = null
+                };
+            }
+        }
+
     }
 }

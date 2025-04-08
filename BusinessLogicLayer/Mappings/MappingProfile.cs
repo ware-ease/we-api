@@ -258,10 +258,13 @@ namespace BusinessLogicLayer.Mappings
             CreateMap<GoodRequestDetail, GoodRequestDetailDTO>().ReverseMap();
             CreateMap<GoodRequestDetail, GoodRequestDetailInfoDTO>()
                             .ForMember(dest => dest.ProductName, opt => opt.MapFrom(src => src.Product.Name))
+                            .ForMember(dest => dest.Sku, opt => opt.MapFrom(src => src.Product.Sku))
+                            .ForMember(dest => dest.imageUrl, opt => opt.MapFrom(src => src.Product.imageUrl))
                             .ForMember(dest => dest.BrandName, opt => opt.MapFrom(src => src.Product.Brand.Name))
                             .ForMember(dest => dest.UnitName, opt => opt.MapFrom(src => src.Product.Unit.Name))
                             .ReverseMap();
             CreateMap<GoodNoteOfGoodRequestDTO, GoodNote>().ReverseMap();
+            CreateMap<GoodNoteDTOv2, GoodNote>().ReverseMap();
             #endregion
 
             #region GoodNote

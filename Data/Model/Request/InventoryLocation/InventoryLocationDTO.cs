@@ -26,8 +26,6 @@ namespace Data.Model.Request.InventoryLocation
 
         [Required(ErrorMessage = "LocationId is required.")]
         public string LocationId { get; set; }
-
-        [Range(1, int.MaxValue, ErrorMessage = "Quantity must be greater than 0.")]
         public int Quantity { get; set; } = 0;
     }
     public class LocationInventoryDTO : BaseDTO

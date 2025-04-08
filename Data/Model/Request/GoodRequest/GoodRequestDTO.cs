@@ -19,7 +19,7 @@ namespace Data.Model.Request.GoodRequest
         public string? RequestedWarehouseId { get; set; }
         public string? RequestedWarehouseName { get; set; }
         public IEnumerable<GoodRequestDetailInfoDTO>? GoodRequestDetails { get; set; }
-        public GoodNoteOfGoodRequestDTO? GoodNote { get; set; }
+        public GoodNoteDTOv2? GoodNote { get; set; }
 
     }
 
@@ -110,6 +110,8 @@ namespace Data.Model.Request.GoodRequest
             set => _productId = string.IsNullOrEmpty(value) ? null : value;
         }
         public string? ProductName { get; set; }
+        public string? Sku { get; set; }
+        public string? imageUrl { get; set; }
         public string? UnitName { get; set; }
         public string? BrandName { get; set; }
     }
@@ -121,5 +123,22 @@ namespace Data.Model.Request.GoodRequest
         public string? ReceiverName { get; set; }
         public string? Code { get; set; }
         public DateTime? Date { get; set; }
+    }
+
+    public class GoodNoteDTOv2 : BaseDTO
+    {
+        public GoodNoteEnum NoteType { get; set; }
+        public GoodNoteStatusEnum Status { get; set; }
+        public string? ShipperName { get; set; }
+        public string? ReceiverName { get; set; }
+        public string? Code { get; set; }
+        public DateTime? Date { get; set; }
+        //public string GoodRequestId { get; set; }
+
+        //public string? GoodRequestCode { get; set; }
+        //public GoodRequestOfGoodNoteDTO? GoodRequest { get; set; }
+        //public string? RequestedWarehouseName { get; set; }
+        public IEnumerable<GoodNoteDetailDTO>? GoodNoteDetails { get; set; }
+
     }
 }
