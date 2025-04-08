@@ -15,6 +15,7 @@ namespace Data.Model.Request.InventoryAdjustment
         public DateTime? Date { get; set; }
         public string? Reason { get; set; }
         public string? Note { get; set; }
+        public string? RelatedDocument { get; set; }
         public string? WarehouseId { get; set; }
         public List<InventoryAdjustmentDetailUpdateDTO>? InventoryAdjustmentDetails { get; set; }
     }

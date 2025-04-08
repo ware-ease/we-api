@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Data.Enum;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -11,9 +12,9 @@ namespace Data.Model.Request.InventoryCount
 {
     public class InventoryCountCreateDTO : BaseCreateDTO
     {
-        //[Required(ErrorMessage = "Status không được để trống")]
-        [JsonIgnore]
-        public bool Status { get; set; } = true;
+        [Required(ErrorMessage = "Status không được để trống")]
+        //[JsonIgnore]
+        public InventoryCountStatus Status { get; set; }
         [Required(ErrorMessage = "Code không được để trống")]
         public string? Code { get; set; }
         public string? Note { get; set; }
@@ -27,14 +28,15 @@ namespace Data.Model.Request.InventoryCount
         public TimeOnly? EndTime { get; set; }
         [Required(ErrorMessage = "ScheduleId không được để trống")]
         public string ScheduleId { get; set; }
-        //[Required(ErrorMessage = "LocationId không được để trống")]
-        //public string LocationId { get; set; }
+        [Required(ErrorMessage = "LocationId không được để trống")]
+        public string LocationId { get; set; }
         public List<InventoryCountDetailCreateDTO> InventoryCountDetails { get; set; } = new();
     }
 
     public class InventoryCountDetailCreateDTO : BaseCreateDTO
     {
-        [Required(ErrorMessage = "ExpectedQuantity không được để trống")]
+        //[Required(ErrorMessage = "ExpectedQuantity không được để trống")]
+        [JsonIgnore]
         public float ExpectedQuantity { get; set; }
         [Required(ErrorMessage = "CountedQuantity không được để trống")]
         public float CountedQuantity { get; set; }

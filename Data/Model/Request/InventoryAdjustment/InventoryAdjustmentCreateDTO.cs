@@ -15,6 +15,7 @@ namespace Data.Model.Request.InventoryAdjustment
         public string? Reason { get; set; }
         [Required(ErrorMessage = "Note không được để trống")]
         public string? Note { get; set; }
+        public string? RelatedDocument { get; set; }
         [Required(ErrorMessage = "WarehouseId không được để trống")]
         public string WarehouseId { get; set; }
         public List<InventoryAdjustmentDetailCreateDTO> InventoryAdjustmentDetailCreateDTOs { get; set; }
