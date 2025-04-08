@@ -19,9 +19,9 @@ namespace Data.Entity
         public string InventoryCountId { get; set; }
         public InventoryCount InventoryCount { get; set; }
 
-        [ForeignKey("Product")]
-        public string ProductId { get; set; }
-        public Product Product { get; set; }
+        [ForeignKey("Inventory")]
+        public string InventoryId { get; set; }
+        public Inventory Inventory { get; set; }
 
         public string? ErrorTicketId { get; set; }
     }
