@@ -116,6 +116,8 @@ namespace BusinessLogicLayer.Services
                     var inventoryAdjustment = _mapper.Map<InventoryAdjustment>(request);
                     inventoryAdjustment.WarehouseId = request.WarehouseId;
 
+                    if (request.DocumentType.HasValue && (request.DocumentType != Data.Enum.DocumentType.GoodNote || request.DocumentType != Data.Enum.DocumentType.InventoryCount))
+                        throw new Exception("DocumentType không hợp lệ");
                     if (!string.IsNullOrEmpty(request.RelatedDocument))
                     {
                         var inventoryCount = await _inventoryCountRepository.GetByCondition(p => p.Id == request.RelatedDocument);
@@ -239,6 +241,12 @@ namespace BusinessLogicLayer.Services
                         inventoryAdjustment.Reason = request.Reason;
                     if (!string.IsNullOrEmpty(request.Note))
                         inventoryAdjustment.Note = request.Note;
+                    if (request.DocumentType.HasValue && (request.DocumentType != Data.Enum.DocumentType.GoodNote || request.DocumentType != Data.Enum.DocumentType.InventoryCount))
+                    {
+                        throw new Exception("DocumentType không hợp lệ");
+                    }
+                    else inventoryAdjustment.DocumentType = request.DocumentType;
+
 
                     if (!string.IsNullOrEmpty(request.RelatedDocument))
                     {

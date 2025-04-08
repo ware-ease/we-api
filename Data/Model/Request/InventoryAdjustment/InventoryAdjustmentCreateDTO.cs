@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Data.Enum;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -15,6 +16,7 @@ namespace Data.Model.Request.InventoryAdjustment
         public string? Reason { get; set; }
         [Required(ErrorMessage = "Note không được để trống")]
         public string? Note { get; set; }
+        public DocumentType? DocumentType { get; set; }
         public string? RelatedDocument { get; set; }
         [Required(ErrorMessage = "WarehouseId không được để trống")]
         public string WarehouseId { get; set; }
