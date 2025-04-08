@@ -33,6 +33,7 @@ namespace Data.Model.Request.Account
         [Phone]
         public string? Phone { get; set; }
         public string? Address { get; set; }
+        [Required]
         public bool Sex { get; set; }
         public string? Nationality { get; set; }
         public string? AvatarUrl { get; set; }
