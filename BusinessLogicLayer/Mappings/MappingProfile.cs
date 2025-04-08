@@ -146,6 +146,17 @@ namespace BusinessLogicLayer.Mappings
 
             CreateMap<InventoryCount, InventoryCountCreateDTO>().ReverseMap();
             CreateMap<InventoryCount, InventoryCountUpdateDTO>().ReverseMap();
+
+
+            CreateMap<InventoryLocation, CustomInventoryLocationDTO>().ReverseMap();
+
+            CreateMap<Inventory, InventoryWithProductDTO>()
+                .ForMember(dest => dest.ProductId, opt => opt.MapFrom(src => src.Batch.ProductId)).ReverseMap();
+
+            CreateMap<Location, InventoryByLocationDTO>()
+                .ForMember(dest => dest.LocationId, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.LocationName, opt => opt.MapFrom(src => src.Name))
+                .ForMember(dest => dest.LocationCode, opt => opt.MapFrom(src => src.Code)).ReverseMap();
             #endregion
 
             #region InventoryAdjustment

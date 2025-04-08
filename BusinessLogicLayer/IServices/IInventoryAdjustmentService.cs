@@ -13,7 +13,7 @@ namespace BusinessLogicLayer.IServices
     public interface IInventoryAdjustmentService : IGenericService
     {
         Task<ServiceResponse> Search<TResult>(int? pageIndex = null, int? pageSize = null,
-                                                                   string? keyword = null);
+                                                                   string? keyword = null, string? warehouseId = null);
         Task<InventoryAdjustmentDTO> AddInventoryAdjustment(InventoryAdjustmentCreateDTO request);
         Task<InventoryAdjustmentDTO> UpdateInventoryAdjustment(InventoryAdjustmentUpdateDTO request);
     }

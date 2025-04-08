@@ -1,5 +1,6 @@
 ﻿using Data.Enum;
 using Data.Model.DTO.Base;
+using Data.Model.Request.InventoryLocation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,5 +33,33 @@ namespace Data.Model.DTO
         public float CountedQuantity { get; set; }
         public string? Note { get; set; }
         public string ProductName { get; set; }
+    }
+
+    public class InventoryByLocationDTO : BaseDTO
+    {
+        public string LocationId { get; set; }
+        public string? LocationName { get; set; }
+        public string? LocationCode { get; set; }
+
+        public List<CustomInventoryLocationDTO> InventoryLocations { get; set; } = [];
+        public List<InventoryWithProductDTO> Inventories { get; set; } = [];
+    }
+
+    public class CustomInventoryLocationDTO : BaseDTO
+    {
+        public string Id { get; set; }
+        public string InventoryId { get; set; }
+        public string LocationId { get; set; }
+        public int Quantity { get; set; }
+    }
+
+    public class InventoryWithProductDTO : BaseDTO
+    {
+        public string Id { get; set; }
+        public float CurrentQuantity { get; set; }
+        public float? ArrangedQuantity { get; set; }
+        public float? NotArrgangedQuantity { get; set; }
+
+        public string ProductId { get; set; }
     }
 }

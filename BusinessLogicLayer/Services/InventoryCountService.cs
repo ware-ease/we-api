@@ -89,15 +89,15 @@ namespace BusinessLogicLayer.Services
                 throw new Exception("Schedule này đã có phiếu kiểm kê");
 
             var location = await _locationRepository.GetByCondition(p => p.Id == request.LocationId);
-            /*if (location != null)
+            if (location != null)
             {
                 if (location.Level != 0)
                     throw new Exception("Level phải bằng 0");
             }
             else
-                throw new Exception("Location không tồn tại");*/
-            if (location == null)
                 throw new Exception("Location không tồn tại");
+            /*if (location == null)
+                throw new Exception("Location không tồn tại");*/
 
             /*var product = await _productRepository.GetByCondition(p => p.Id == request.InventoryCountDetailCreateDTO.ProductId);
             if (location == null)
@@ -120,7 +120,7 @@ namespace BusinessLogicLayer.Services
                     if (product == null)
                         throw new Exception($"Sản phẩm với ID {detail.ProductId} không tồn tại");
 
-                    var expectedQuantity = await CalculateExpectedQuantity(inventoryCount.LocationId, detail.ProductId);
+                    var expectedQuantity = await SumInventoryLocationQuantityByLocationLevel0AndProduct(inventoryCount.LocationId, detail.ProductId);
 
                     var inventoryCountDetail = _mapper.Map<InventoryCountDetail>(detail);
                     inventoryCountDetail.InventoryCountId = inventoryCount.Id;
@@ -210,7 +210,7 @@ namespace BusinessLogicLayer.Services
                             if (product == null)
                                 throw new Exception($"Product with ID {detailDto.ProductId} not found");
                             existingDetail.ProductId = detailDto.ProductId;
-                            var expectedQuantity = await CalculateExpectedQuantity(existingInventoryCount.LocationId, existingDetail.ProductId);
+                            var expectedQuantity = await SumInventoryLocationQuantityByLocationLevel0AndProduct(existingInventoryCount.LocationId, existingDetail.ProductId);
                         }
                         if (!string.IsNullOrEmpty(detailDto.ErrorTicketId))
                             existingDetail.ErrorTicketId = detailDto.ErrorTicketId;
@@ -300,6 +300,62 @@ namespace BusinessLogicLayer.Services
 
             float expectedQuantity = matchedInventories.Sum(inv => inv.CurrentQuantity);
             return expectedQuantity;
+        }
+
+
+        public async Task<InventoryByLocationDTO> GetInventoriesByLocationLevel0Async(string locationLevel0Id)
+        {
+            var locationLevel0 = await _locationRepository.GetByCondition(p => p.Id == locationLevel0Id);
+            if (locationLevel0 != null)
+            {
+                if (locationLevel0.Level != 0)
+                    throw new Exception("Location không phải là cấp độ 0");
+            }
+            else
+                throw new Exception("Location không tồn tại");
+
+            var level2LocationIds = await _locationRepository.GetAllNoPaging(
+            x => x.Level == 2 && x.Parent!.ParentId == locationLevel0Id);
+
+            var level2Ids = level2LocationIds.Select(x => x.Id).ToList();
+
+            var inventoryLocations = await _inventoryLocationRepository.GetAllNoPaging(
+            x => level2Ids.Contains(x.LocationId),
+            includeProperties: "Inventory,Inventory.Batch");
+
+            var inventories = inventoryLocations.Select(x => x.Inventory).Distinct().ToList();
+
+            var dto = _mapper.Map<InventoryByLocationDTO>(locationLevel0);
+            dto.InventoryLocations = _mapper.Map<List<CustomInventoryLocationDTO>>(inventoryLocations);
+            dto.Inventories = _mapper.Map<List<InventoryWithProductDTO>>(inventories);
+
+            return dto;
+
+        }
+
+
+        public async Task<float> SumInventoryLocationQuantityByLocationLevel0AndProduct(string locationLevel0Id, string productId)
+        {
+            var level2Locations = await _locationRepository.GetAllNoPaging(
+                x => x.Level == 2 && x.Parent!.ParentId == locationLevel0Id
+            );
+
+            var level2LocationIds = level2Locations.Select(x => x.Id).ToList();
+
+            // Lấy tất cả InventoryLocation thuộc các Location level 2 đó
+            var inventoryLocations = await _inventoryLocationRepository.GetAllNoPaging(
+                x => level2LocationIds.Contains(x.LocationId),
+                includeProperties: "Inventory,Inventory.Batch"
+            );
+
+            // Lọc các InventoryLocation có cùng ProductId và cùng WarehouseId (giả sử cùng với Location cấp 0)
+            var matchedInventoryLocations = inventoryLocations
+                .Where(il => il.Inventory?.Batch?.ProductId == productId)
+                .GroupBy(il => il.Inventory.WarehouseId) // Group theo WarehouseId
+                .Where(g => g.Count() > 0) // Có ít nhất 1 bản ghi hợp lệ
+                .SelectMany(g => g); // Mở rộng trở lại danh sách
+
+            return matchedInventoryLocations.Sum(il => (float)il.Quantity);
         }
 
     }

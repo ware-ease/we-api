@@ -57,6 +57,30 @@ namespace API.Controllers
             }
         }
 
+        [HttpGet("location-level0")]
+        public async Task<IActionResult> GetByLocation(string id)
+        {
+            try
+            {
+                var response = await _inventoryCountService.GetInventoriesByLocationLevel0Async(id);
+                return ControllerResponse.Response(new ServiceResponse
+                {
+                    Status = SRStatus.Success,
+                    Message = " successfully",
+                    Data = response
+                });
+            }
+            catch (Exception ex)
+            {
+                return ControllerResponse.Response(new ServiceResponse
+                {
+                    Status = SRStatus.Error,
+                    Message = ex.Message,
+                    Data = null
+                });
+            }
+        }
+
         [Authorize]
         [HttpPost]
         public async Task<IActionResult> Add([FromBody] InventoryCountCreateDTO request)

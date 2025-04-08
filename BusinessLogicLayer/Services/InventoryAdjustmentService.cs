@@ -63,7 +63,7 @@ namespace BusinessLogicLayer.Services
         }
 
         public async Task<ServiceResponse> Search<TResult>(int? pageIndex = null, int? pageSize = null,
-                                                                   string? keyword = null)
+                                                                   string? keyword = null, string? warehouseId = null)
         {
 
             Expression<Func<InventoryAdjustment, bool>> filter = p =>
@@ -71,7 +71,8 @@ namespace BusinessLogicLayer.Services
                 || p.Note.Contains(keyword)
                 || p.Warehouse.Name.Contains(keyword)
                 || p.InventoryAdjustmentDetails.Any(d => d.Note != null && d.Note.Contains(keyword))
-                );
+                &&
+                (string.IsNullOrEmpty(warehouseId) || p.WarehouseId == warehouseId));
 
             var totalRecords = await _genericRepository.Count(filter);
 
@@ -133,7 +134,7 @@ namespace BusinessLogicLayer.Services
                     //==================================================================================================//
 
 
-                    foreach (var detailDto in request.InventoryAdjustmentDetailCreateDTOs)
+                    foreach (var detailDto in request.InventoryAdjustmentDetails)
                     {
                         var inventoryAdjustmentDetail = _mapper.Map<InventoryAdjustmentDetail>(detailDto);
                         inventoryAdjustmentDetail.InventoryAdjustmentId = inventoryAdjustment.Id;

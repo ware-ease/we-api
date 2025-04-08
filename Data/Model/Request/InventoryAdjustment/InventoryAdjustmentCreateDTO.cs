@@ -18,7 +18,7 @@ namespace Data.Model.Request.InventoryAdjustment
         public string? RelatedDocument { get; set; }
         [Required(ErrorMessage = "WarehouseId không được để trống")]
         public string WarehouseId { get; set; }
-        public List<InventoryAdjustmentDetailCreateDTO> InventoryAdjustmentDetailCreateDTOs { get; set; }
+        public List<InventoryAdjustmentDetailCreateDTO> InventoryAdjustmentDetails { get; set; }
 
     }
 
