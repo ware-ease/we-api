@@ -17,5 +17,6 @@ namespace BusinessLogicLayer.IServices
                                                                    string? keyword = null, InventoryCountStatus? status = null, string? warehouseId = null);
         Task<InventoryCountDTO> AddInventoryCount(InventoryCountCreateDTO request);
         Task<InventoryCountDTO> UpdateInventoryCount(InventoryCountUpdateDTO request);
+        Task<InventoryByLocationDTO> GetInventoriesByLocationLevel0Async(string locationLevel0Id);
     }
 }

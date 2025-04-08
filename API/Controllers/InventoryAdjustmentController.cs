@@ -26,10 +26,10 @@ namespace API.Controllers
         [HttpGet]
         public async Task<IActionResult> SearchPartners([FromQuery] int pageIndex = 1,
                                                         [FromQuery] int pageSize = 5,
-                                                        [FromQuery] string? keyword = null)
+                                                        [FromQuery] string? keyword = null, string? warehouseId = null)
         {
             var response = await _inventoryAdjustmentService.Search<InventoryAdjustmentDTO>(
-                pageIndex, pageSize, keyword);
+                pageIndex, pageSize, keyword, warehouseId);
 
             return ControllerResponse.Response(response);
         }
@@ -64,7 +64,7 @@ namespace API.Controllers
                 if (authUser != null)
                 {
                     request.CreatedBy = authUser.id;
-                    request.InventoryAdjustmentDetailCreateDTOs.ForEach(x => x.CreatedBy = authUser.id);
+                    request.InventoryAdjustmentDetails.ForEach(x => x.CreatedBy = authUser.id);
                 }
 
                 var respones = await _inventoryAdjustmentService.AddInventoryAdjustment(request);
