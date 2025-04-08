@@ -432,16 +432,18 @@ namespace BusinessLogicLayer.Services
             return new ServiceResponse
             {
                 Status = SRStatus.Success,
-                Message = "Inventory Location operation completed successfully."
+                Message = "Inventory Location operation completed successfully.",
+                Data = request.InventoryId
             };
         }
 
         public async Task<ServiceResponse> GetInventoriesInLocation(string locationId)
         {
-            var location = await _unitOfWork.LocationRepository.Search(
+            var location = await _unitOfWork.LocationRepository.GetByCondition(
                 l => l.Id == locationId,
                 includeProperties: "InventoryLocations," +
                                    "InventoryLocations.Inventory," +
+                                   "InventoryLocations.Inventory.Warehouse," +
                                    "InventoryLocations.Inventory.Batch," +
                                    "InventoryLocations.Inventory.Batch.Product," +
                                    "InventoryLocations.Inventory.Batch.Product.Unit," +
