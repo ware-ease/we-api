@@ -21,6 +21,9 @@ namespace Data.Model.Request.Account
         public string? CreatedBy { get; set; }
 
         public ProfileCreateDTO Profile { get; set; }
+
+        public string GroupId { get; set; }
+        public List<string>? WarehouseIds { get; set; }
     }
 
     public class ProfileCreateDTO

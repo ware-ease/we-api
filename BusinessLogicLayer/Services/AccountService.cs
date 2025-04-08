@@ -123,6 +123,31 @@ namespace BusinessLogicLayer.Services
                 account.Profile.CreatedBy = request.CreatedBy;
                 account.CreatedBy = request.CreatedBy;
 
+                account.AccountGroups.Add(new AccountGroup
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    CreatedTime = DateTime.Now,
+                    CreatedBy = request.CreatedBy,
+                    GroupId = request.GroupId,
+                    IsDeleted = false,
+                });
+
+                if (request.GroupId.Equals("2") && request.WarehouseIds != null)
+                {
+                    foreach (var warehouseId in request.WarehouseIds)
+                    {
+                        account.AccountWarehouses.Add(new AccountWarehouse
+                        {
+                            Id = Guid.NewGuid().ToString(),
+                            CreatedTime = DateTime.Now,
+                            CreatedBy = request.CreatedBy,
+                            WarehouseId = warehouseId,
+                            IsDeleted = false,
+                            Status = true,
+                        });
+                    }
+                }
+
                 await _unitOfWork.AccountRepository.Add(account);
 
                 await _unitOfWork.SaveAsync();
