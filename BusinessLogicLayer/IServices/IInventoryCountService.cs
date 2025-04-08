@@ -13,7 +13,7 @@ namespace BusinessLogicLayer.IServices
     public interface IInventoryCountService : IGenericService
     {
         Task<ServiceResponse> Search<TResult>(int? pageIndex = null, int? pageSize = null,
-                                                                   string? keyword = null, bool? status = null);
+                                                                   string? keyword = null, bool? status = null, string? warehouseId = null);
         Task<InventoryCountDTO> AddInventoryCount(InventoryCountCreateDTO request);
         Task<InventoryCountDTO> UpdateInventoryCount(InventoryCountUpdateDTO request);
     }
