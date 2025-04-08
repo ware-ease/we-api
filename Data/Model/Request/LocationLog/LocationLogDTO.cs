@@ -14,6 +14,7 @@ namespace Data.Model.Request.LocationLog
         public float NewQuantity { get; set; }
         public float ChangeInQuantity { get; set; }
         public string InventoryLocationId { get; set; }
+        public string? Note { get; set; }
         public string LocationId { get; set; }
         //public InventoryInLocationDTO InventoryLocation { get; set; }
     }

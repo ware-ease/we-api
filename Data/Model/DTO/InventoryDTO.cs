@@ -10,6 +10,8 @@ namespace Data.Model.DTO
     public class InventoryDTO : BaseDTO
     {
         public float CurrentQuantity { get; set; }
+        public float? ArrangedQuantity { get; set; }
+        public float? NotArrgangedQuantity { get; set; }
         public string WarehouseName { get; set; }
         public string BatchName { get; set; }
         public string BatchCode { get; set; }

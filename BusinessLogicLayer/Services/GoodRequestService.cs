@@ -159,7 +159,7 @@ namespace BusinessLogicLayer.Services
                 await _goodRequestRepository.Add(entity);
                 await _unitOfWork.SaveAsync();
 
-                var goodRequest = await _goodRequestRepository.GetByCondition(x => x.Id == entity.Id, includeProperties: "GoodRequestDetails,Warehouse,Partner," +
+                var goodRequest = await _goodRequestRepository.GetByCondition(x => x.Id == entity.Id, includeProperties: "GoodRequestDetails,Warehouse,RequestedWarehouse,Partner," +
                                                                                                                          "GoodRequestDetails.Product," +
                                                                                                                          "GoodRequestDetails.Product.Unit," +
                                                                                                                          "GoodRequestDetails.Product.Brand");
