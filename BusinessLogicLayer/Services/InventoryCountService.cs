@@ -40,7 +40,7 @@ namespace BusinessLogicLayer.Services
         {
             var inventoryCount = await _genericRepository.GetByCondition(
                 p => p.Id == id,
-                includeProperties: "Schedule,Location,InventoryCheckDetails,InventoryCheckDetails.Product"
+                includeProperties: "Schedule,Location,Location.Warehouse,InventoryCheckDetails,InventoryCheckDetails.Product"
             );
 
             if (inventoryCount == null)
@@ -227,7 +227,7 @@ namespace BusinessLogicLayer.Services
 
             var results = await _genericRepository.Search(
                 filter: filter, pageIndex: pageIndex, pageSize: pageSize,
-                includeProperties: "Schedule,Location,InventoryCheckDetails.Product,InventoryCheckDetails");
+                includeProperties: "Schedule,Location,Location.Warehouse,InventoryCheckDetails.Product,InventoryCheckDetails");
 
             var mappedResults = _mapper.Map<IEnumerable<TResult>>(results);
 
