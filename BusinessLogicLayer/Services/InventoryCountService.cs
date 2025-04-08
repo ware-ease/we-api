@@ -116,11 +116,11 @@ namespace BusinessLogicLayer.Services
 
                 foreach (var detail in request.InventoryCountDetails)
                 {
-                    var product = await _productRepository.GetByCondition(p => p.Id == detail.ProductId);
-                    if (product == null)
-                        throw new Exception($"Sản phẩm với ID {detail.ProductId} không tồn tại");
+                    var inventory = await _inventoryRepository.GetByCondition(p => p.Id == detail.InventoryId);
+                    if (inventory == null)
+                        throw new Exception($"Inventory với ID {detail.InventoryId} không tồn tại");
 
-                    var expectedQuantity = await SumInventoryLocationQuantityByLocationLevel0AndProduct(inventoryCount.LocationId, detail.ProductId);
+                    var expectedQuantity = await SumInventoryLocationQuantityByLocationLevel0AndInventory(inventoryCount.LocationId, detail.InventoryId);
 
                     var inventoryCountDetail = _mapper.Map<InventoryCountDetail>(detail);
                     inventoryCountDetail.InventoryCountId = inventoryCount.Id;
@@ -204,22 +204,22 @@ namespace BusinessLogicLayer.Services
                         }
                         if (!string.IsNullOrEmpty(detailDto.Note))
                             existingDetail.Note = detailDto.Note;
-                        if (!string.IsNullOrEmpty(detailDto.ProductId))
+                        if (!string.IsNullOrEmpty(detailDto.InventoryId))
                         {
-                            var product = await _productRepository.GetByCondition(p => p.Id == detailDto.ProductId);
-                            if (product == null)
-                                throw new Exception($"Product with ID {detailDto.ProductId} not found");
-                            /*existingDetail.ProductId = detailDto.ProductId;
-                            var expectedQuantity = await SumInventoryLocationQuantityByLocationLevel0AndProduct(existingInventoryCount.LocationId, existingDetail.ProductId);*/
+                            var inventory = await _inventoryRepository.GetByCondition(p => p.Id == detailDto.InventoryId);
+                            if (inventory == null)
+                                throw new Exception($"Inventory with ID {detailDto.InventoryId} not found");
+                            existingDetail.InventoryId = detailDto.InventoryId;
+                            var expectedQuantity = await SumInventoryLocationQuantityByLocationLevel0AndInventory(existingInventoryCount.LocationId, existingDetail.InventoryId);
                         }
                         if (!string.IsNullOrEmpty(detailDto.ErrorTicketId))
                             existingDetail.ErrorTicketId = detailDto.ErrorTicketId;
                     }
                     else
                     {
-                        var product = await _productRepository.GetByCondition(p => p.Id == detailDto.ProductId);
-                        if (product == null)
-                            throw new Exception($"Product with ID {detailDto.ProductId} not found");
+                        var inventory = await _inventoryRepository.GetByCondition(p => p.Id == detailDto.InventoryId);
+                        if (inventory == null)
+                            throw new Exception($"Inventory with ID {detailDto.InventoryId} not found");
 
                         var newDetail = _mapper.Map<InventoryCountDetail>(detailDto);
                         newDetail.InventoryCountId = existingInventoryCount.Id;
@@ -334,8 +334,9 @@ namespace BusinessLogicLayer.Services
         }
 
 
-        public async Task<float> SumInventoryLocationQuantityByLocationLevel0AndProduct(string locationLevel0Id, string productId)
+        public async Task<float> SumInventoryLocationQuantityByLocationLevel0AndInventory(string locationLevel0Id, string inventoryId)
         {
+            // Lấy tất cả Location level 2 thuộc location level 0
             var level2Locations = await _locationRepository.GetAllNoPaging(
                 x => x.Level == 2 && x.Parent!.ParentId == locationLevel0Id
             );
@@ -344,16 +345,16 @@ namespace BusinessLogicLayer.Services
 
             // Lấy tất cả InventoryLocation thuộc các Location level 2 đó
             var inventoryLocations = await _inventoryLocationRepository.GetAllNoPaging(
-                x => level2LocationIds.Contains(x.LocationId),
-                includeProperties: "Inventory,Inventory.Batch"
+                x => level2LocationIds.Contains(x.LocationId) && x.InventoryId == inventoryId,
+                includeProperties: "Inventory"
             );
 
-            // Lọc các InventoryLocation có cùng ProductId và cùng WarehouseId (giả sử cùng với Location cấp 0)
+            // Lấy WarehouseId của Inventory truyền vào (chỉ để đảm bảo đúng warehouse)
+            var inventory = await _inventoryRepository.GetByCondition(x => x.Id == inventoryId);
+            if (inventory == null) return 0;
+
             var matchedInventoryLocations = inventoryLocations
-                .Where(il => il.Inventory?.Batch?.ProductId == productId)
-                .GroupBy(il => il.Inventory.WarehouseId) // Group theo WarehouseId
-                .Where(g => g.Count() > 0) // Có ít nhất 1 bản ghi hợp lệ
-                .SelectMany(g => g); // Mở rộng trở lại danh sách
+                .Where(il => il.Inventory.WarehouseId == inventory.WarehouseId);
 
             return matchedInventoryLocations.Sum(il => (float)il.Quantity);
         }

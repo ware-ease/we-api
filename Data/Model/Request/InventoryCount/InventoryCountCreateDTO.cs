@@ -42,7 +42,7 @@ namespace Data.Model.Request.InventoryCount
         public float CountedQuantity { get; set; }
         public string? Note { get; set; }
         [Required(ErrorMessage = "ProductId không được để trống")]
-        public string ProductId { get; set; }
+        public string InventoryId { get; set; }
         public string? ErrorTicketId { get; set; }
     }
 }
