@@ -209,8 +209,8 @@ namespace BusinessLogicLayer.Services
                             var product = await _productRepository.GetByCondition(p => p.Id == detailDto.ProductId);
                             if (product == null)
                                 throw new Exception($"Product with ID {detailDto.ProductId} not found");
-                            existingDetail.ProductId = detailDto.ProductId;
-                            var expectedQuantity = await SumInventoryLocationQuantityByLocationLevel0AndProduct(existingInventoryCount.LocationId, existingDetail.ProductId);
+                            /*existingDetail.ProductId = detailDto.ProductId;
+                            var expectedQuantity = await SumInventoryLocationQuantityByLocationLevel0AndProduct(existingInventoryCount.LocationId, existingDetail.ProductId);*/
                         }
                         if (!string.IsNullOrEmpty(detailDto.ErrorTicketId))
                             existingDetail.ErrorTicketId = detailDto.ErrorTicketId;
@@ -254,8 +254,8 @@ namespace BusinessLogicLayer.Services
                 || p.Location.Name.Contains(keyword)
                 || p.Location.Code.Contains(keyword)
                 || p.Location.Warehouse.Name.Contains(keyword)
-                || p.InventoryCheckDetails.Any(d => d.Note != null && d.Note.Contains(keyword))
-                || p.InventoryCheckDetails.Any(d => d.Product != null && d.Product.Name.Contains(keyword)))
+                || p.InventoryCheckDetails.Any(d => d.Note != null && d.Note.Contains(keyword)))
+                //|| p.InventoryCheckDetails.Any(d => d.Product != null && d.Product.Name.Contains(keyword)))
                 ) &&
                 (string.IsNullOrEmpty(warehouseId) || p.Location.Warehouse.Id == warehouseId);
 

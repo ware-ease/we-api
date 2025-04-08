@@ -25,5 +25,7 @@ namespace Data.Entity
         [ForeignKey("Batch")]
         public string BatchId { get; set; }
         public Batch Batch { get; set; }
+
+        public ICollection<InventoryCountDetail> InventoryCountDetails { get; set; } = [];
     }
 }
