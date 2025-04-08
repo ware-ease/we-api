@@ -1,6 +1,8 @@
 ﻿using Data.Enum;
+using Data.Model.DTO;
 using Data.Model.DTO.Base;
 using Data.Model.Request.GoodNote;
+using Data.Model.Request.Partner;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
@@ -13,11 +15,14 @@ namespace Data.Model.Request.GoodRequest
         public GoodRequestEnum RequestType { get; set; }
         public GoodRequestStatusEnum Status { get; set; }
         public string? PartnerId { get; set; }
-        public string? PartnerName { get; set; }
+        //public string? PartnerName { get; set; }
+        public PartnerDTO? Partner { get; set; }
         public string? WarehouseId { get; set; }
-        public string? WarehouseName { get; set; }
+        //public string? WarehouseName { get; set; }
+        public WarehouseDTO? Warehouse { get; set; }
         public string? RequestedWarehouseId { get; set; }
-        public string? RequestedWarehouseName { get; set; }
+        //public string? RequestedWarehouseName { get; set; }
+        public WarehouseDTO? RequestedWarehouse { get; set; }
         public IEnumerable<GoodRequestDetailInfoDTO>? GoodRequestDetails { get; set; }
         public GoodNoteDTOv2? GoodNote { get; set; }
 

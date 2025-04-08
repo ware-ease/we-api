@@ -13,7 +13,8 @@ namespace Data.Model.Request.Inventory
     public class InventoryDTO : BaseDTO
     {
         public float CurrentQuantity { get; set; }
-
+        public float? ArrangedQuantity { get; set; }
+        public float? NotArrgangedQuantity { get; set; }
         public string BatchId { get; set; }
         public BatchNoteDTO? Batch { get; set; }
     }

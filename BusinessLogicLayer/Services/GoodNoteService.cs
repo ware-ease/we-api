@@ -404,12 +404,15 @@ namespace BusinessLogicLayer.Services
                                 {
                                     WarehouseId = requestedWarehouseId,
                                     BatchId = detail.BatchId,
-                                    CurrentQuantity = detail.Quantity
+                                    CurrentQuantity = detail.Quantity,
+                                    ArrangedQuantity = 0,
+                                    NotArrgangedQuantity = detail.Quantity,
                                 };
                                 await _unitOfWork.InventoryRepository.Add(targetInventory);
                                 break;
                             }
                             targetInventory.CurrentQuantity += detail.Quantity;
+                            targetInventory.NotArrgangedQuantity += detail.Quantity;
                             _unitOfWork.InventoryRepository.Update(targetInventory);
                             break;
                         case GoodNoteEnum.Return:
@@ -421,23 +424,27 @@ namespace BusinessLogicLayer.Services
                                 {
                                     WarehouseId = requestedWarehouseId,
                                     BatchId = detail.BatchId,
-                                    CurrentQuantity = detail.Quantity
+                                    CurrentQuantity = detail.Quantity,
+                                    ArrangedQuantity = 0,
+                                    NotArrgangedQuantity = detail.Quantity,
                                 };
                                 await _unitOfWork.InventoryRepository.Add(targetInventory);
                                 break;
                             }
                             targetInventory.CurrentQuantity += detail.Quantity;
+                            targetInventory.NotArrgangedQuantity += detail.Quantity;
                             _unitOfWork.InventoryRepository.Update(targetInventory);
                             break;
 
                         case GoodNoteEnum.Issue:
                             // 🔴 Xuất hàng từ requestedWarehouseId
                             sourceInventory = inventories.FirstOrDefault(i => i.BatchId == detail.BatchId && i.WarehouseId == requestedWarehouseId);
-                            if (sourceInventory == null || sourceInventory.CurrentQuantity < detail.Quantity)
+                            if (sourceInventory == null || sourceInventory.NotArrgangedQuantity < detail.Quantity)
                             {
-                                throw new Exception($"Not enough inventory in warehouse {requestedWarehouseId} for batch {detail.BatchId}.");
+                                throw new Exception($"Not enough 'Inventory not in location' in warehouse {requestedWarehouseId} for batch {detail.BatchId}.");
                             }
                             sourceInventory.CurrentQuantity -= detail.Quantity;
+                            sourceInventory.NotArrgangedQuantity -= detail.Quantity;
                             _unitOfWork.InventoryRepository.Update(sourceInventory);
                             break;
 
@@ -446,12 +453,13 @@ namespace BusinessLogicLayer.Services
                             sourceInventory = inventories.FirstOrDefault(i => i.BatchId == detail.BatchId && i.WarehouseId == warehouseId);
                             targetInventory = inventories.FirstOrDefault(i => i.BatchId == detail.BatchId && i.WarehouseId == requestedWarehouseId);
 
-                            if (sourceInventory == null || sourceInventory.CurrentQuantity < detail.Quantity)
+                            if (sourceInventory == null || sourceInventory.NotArrgangedQuantity < detail.Quantity)
                             {
-                                throw new Exception($"Not enough inventory in warehouse {warehouseId} for batch {detail.BatchId}.");
+                                throw new Exception($"Not enough 'Inventory not in location' in warehouse {warehouseId} for batch {detail.BatchId}.");
                             }
 
                             sourceInventory.CurrentQuantity -= detail.Quantity;
+                            sourceInventory.NotArrgangedQuantity -= detail.Quantity;
                             _unitOfWork.InventoryRepository.Update(sourceInventory);
 
                             if (targetInventory == null)
@@ -460,13 +468,16 @@ namespace BusinessLogicLayer.Services
                                 {
                                     WarehouseId = requestedWarehouseId,
                                     BatchId = detail.BatchId,
-                                    CurrentQuantity = detail.Quantity
+                                    CurrentQuantity = detail.Quantity,
+                                    ArrangedQuantity = 0,
+                                    NotArrgangedQuantity = detail.Quantity,
                                 };
                                 await _unitOfWork.InventoryRepository.Add(targetInventory);
                                 break;
                             }
 
                             targetInventory.CurrentQuantity += detail.Quantity;
+                            targetInventory.NotArrgangedQuantity += detail.Quantity;
                             _unitOfWork.InventoryRepository.Update(targetInventory);
                             break;
                     }

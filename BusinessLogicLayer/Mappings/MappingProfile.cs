@@ -251,9 +251,9 @@ namespace BusinessLogicLayer.Mappings
             #region GoodRequest
             CreateMap<GoodRequest, GoodRequestDTO>()
                            .ForMember(dest => dest.GoodRequestDetails, opt => opt.MapFrom(src => src.GoodRequestDetails))
-                           .ForMember(dest => dest.PartnerName, opt => opt.MapFrom(src => src.Partner.Name))
-                           .ForMember(dest => dest.WarehouseName, opt => opt.MapFrom(src => src.Warehouse.Name))
-                           .ForMember(dest => dest.RequestedWarehouseName, opt => opt.MapFrom(src => src.RequestedWarehouse.Name))
+                           //.ForMember(dest => dest.PartnerName, opt => opt.MapFrom(src => src.Partner.Name))
+                           //.ForMember(dest => dest.WarehouseName, opt => opt.MapFrom(src => src.Warehouse.Name))
+                           //.ForMember(dest => dest.RequestedWarehouseName, opt => opt.MapFrom(src => src.RequestedWarehouse.Name))
                            .ReverseMap();
             CreateMap<GoodRequestCreateDTO, GoodRequest>().ReverseMap();
             CreateMap<GoodRequestUpdateDTO, GoodRequest>().ReverseMap();

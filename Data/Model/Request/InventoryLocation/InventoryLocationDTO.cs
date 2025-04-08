@@ -27,6 +27,8 @@ namespace Data.Model.Request.InventoryLocation
         [Required(ErrorMessage = "LocationId is required.")]
         public string LocationId { get; set; }
         public int Quantity { get; set; } = 0;
+        public string? Note { get; set; }
+
     }
     public class LocationInventoryDTO : BaseDTO
     {
@@ -46,6 +48,8 @@ namespace Data.Model.Request.InventoryLocation
     public class InventoryDTOv2 : BaseDTO
     {
         public float CurrentQuantity { get; set; }
+        public float? ArrangedQuantity { get; set; }
+        public float? NotArrgangedQuantity { get; set; }
         public string BatchId { get; set; }
         public BatchNoteDTO Batch { get; set; }
         public List<InventoryLocationDTO> InventoryLocations { get; set; } = [];

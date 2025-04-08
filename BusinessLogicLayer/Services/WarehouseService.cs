@@ -368,9 +368,13 @@ namespace BusinessLogicLayer.Services
                     {
                         InventoryLocationId = existing.Id,  // Lưu ID của InventoryLocation vào LocationLog
                         NewQuantity = existing.Quantity,    // Số lượng mới sau khi thay đổi
-                        ChangeInQuantity = request.Quantity // Sự thay đổi trong số lượng
+                        ChangeInQuantity = request.Quantity, // Sự thay đổi trong số lượng
+                        Note = request.Note // Ghi chú từ request
                     };
                     await _unitOfWork.LocationLogRepository.Add(locationLog);
+                    inventory.ArrangedQuantity += request.Quantity;
+                    inventory.NotArrgangedQuantity -= request.Quantity;
+                    _unitOfWork.InventoryRepository.Update(inventory);
                 }
                 else
                 {
@@ -390,9 +394,13 @@ namespace BusinessLogicLayer.Services
                     {
                         InventoryLocationId = newEntry.Id,  // ID của InventoryLocation mới
                         NewQuantity = newEntry.Quantity,    // Số lượng sau khi thêm vào
-                        ChangeInQuantity = newEntry.Quantity // Sự thay đổi là số lượng ban đầu
+                        ChangeInQuantity = newEntry.Quantity, // Sự thay đổi là số lượng ban đầu                      
+                        Note = request.Note // Ghi chú từ request
                     };
                     await _unitOfWork.LocationLogRepository.Add(locationLog);
+                    inventory.ArrangedQuantity += request.Quantity;
+                    inventory.NotArrgangedQuantity -= request.Quantity;
+                    _unitOfWork.InventoryRepository.Update(inventory);
                 }
             }
             else
@@ -421,9 +429,13 @@ namespace BusinessLogicLayer.Services
                 {
                     InventoryLocationId = existingLocation.Id,
                     NewQuantity = existingLocation.Quantity,
-                    ChangeInQuantity = request.Quantity // Sự thay đổi trong số lượng
+                    ChangeInQuantity = request.Quantity, // Sự thay đổi trong số lượng
+                    Note = request.Note // Ghi chú từ request
                 };
                 await _unitOfWork.LocationLogRepository.Add(locationLog);
+                inventory.ArrangedQuantity += request.Quantity;
+                inventory.NotArrgangedQuantity -= request.Quantity;
+                _unitOfWork.InventoryRepository.Update(inventory);
             }
 
             // Lưu tất cả thay đổi vào database
