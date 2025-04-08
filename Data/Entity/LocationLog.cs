@@ -13,6 +13,7 @@ namespace Data.Entity
     {
         public float NewQuantity { get; set; }
         public float ChangeInQuantity { get; set; }
+        public string? Note { get; set; }
 
         [ForeignKey("InventoryLocation")]
         public string InventoryLocationId { get; set; }
