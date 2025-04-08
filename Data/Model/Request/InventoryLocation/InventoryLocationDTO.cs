@@ -16,7 +16,7 @@ namespace Data.Model.Request.InventoryLocation
     public class InventoryInLocationDTO : BaseDTO
     {
         public int Quantity { get; set; } = 0;
-        public InventoryDTOv2 Inventory { get; set; }
+        public InventoryDTO Inventory { get; set; }
     }
 
     public class CreateInventoryLocationDTO : BaseCreateDTO

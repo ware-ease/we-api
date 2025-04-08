@@ -53,7 +53,7 @@ namespace API.Controllers
         //    }
         //}
         //[Authorize]
-        [HttpPost("/inventory-location")]
+        [HttpPost("inventory-location")]
         public async Task<IActionResult> PutAwayInvento([FromBody] CreateInventoryLocationDTO request)
         {
             var result = await _warehouseService.InventoryLocationInOutAsync(request);
