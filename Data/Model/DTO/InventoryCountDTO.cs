@@ -32,7 +32,7 @@ namespace Data.Model.DTO
         public float ExpectedQuantity { get; set; }
         public float CountedQuantity { get; set; }
         public string? Note { get; set; }
-        public string ProductName { get; set; }
+        public string Inventory { get; set; }
     }
 
     public class InventoryByLocationDTO : BaseDTO
