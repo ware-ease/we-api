@@ -1,4 +1,5 @@
 ﻿using Data.Entity.Base;
+using Data.Enum;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -11,7 +12,7 @@ namespace Data.Entity
     [Table ("InventoryCount")]
     public class InventoryCount : BaseEntity
     {
-        public bool Status { get; set; }
+        public InventoryCountStatus Status { get; set; }
         public string? Code { get; set; }
         public string? Note { get; set; }
         public DateOnly? Date {  get; set; }
