@@ -193,16 +193,19 @@ namespace BusinessLogicLayer.Services
 
                 if (!string.IsNullOrEmpty(request.Email))
                 {
-                    var existingEmail = await _unitOfWork.AccountRepository
-                        .GetByCondition(a => a.Email.ToLower() == request.Email!.ToLower());
-                    if (existingEmail != null)
+                    if (existingAccount.Email != request.Email)
                     {
-                        return new ServiceResponse
+                        var existingEmail = await _unitOfWork.AccountRepository
+                            .GetByCondition(a => a.Email.ToLower() == request.Email!.ToLower());
+                        if (existingEmail != null)
                         {
-                            Status = Data.Enum.SRStatus.Duplicated,
-                            Message = "Email is existed!",
-                            Data = id
-                        };
+                            return new ServiceResponse
+                            {
+                                Status = Data.Enum.SRStatus.Duplicated,
+                                Message = "Email is existed!",
+                                Data = id
+                            };
+                        }
                     }
                 }
 
