@@ -134,5 +134,18 @@ namespace API.Controllers
 
             return ControllerResponse.Response(result);
         }
+        /// <summary>
+        /// Lấy dữ liệu thẻ kho theo sản phẩm và kho
+        /// </summary>
+        /// <param name="productId">ID sản phẩm</param>
+        /// <param name="warehouseId">ID kho</param>
+        /// <returns>Thông tin thẻ kho</returns>
+        [HttpGet("stock-card")]
+        public async Task<IActionResult> GetStockCard([FromQuery] string productId, [FromQuery] string warehouseId, 
+                                                      [FromQuery] DateTime? from = null, [FromQuery] DateTime? to = null)
+        {
+            var response = await _warehouseService.GetStockCard(productId, warehouseId, from, to);
+            return ControllerResponse.Response(response);
+        }
     }
 }

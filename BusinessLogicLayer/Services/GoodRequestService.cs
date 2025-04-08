@@ -3,6 +3,7 @@ using BusinessLogicLayer.Generic;
 using BusinessLogicLayer.IServices;
 using Data.Entity;
 using Data.Enum;
+using Data.Model.Request.GoodNote;
 using Data.Model.Request.GoodRequest;
 using Data.Model.Response;
 using DataAccessLayer.Generic;
@@ -31,7 +32,8 @@ namespace BusinessLogicLayer.Services
         }
         public async Task<ServiceResponse> GetById(string id)
         {
-            var entity = await _goodRequestRepository.GetByCondition(g => g.Id == id, includeProperties: "GoodRequestDetails,Warehouse,Partner," +
+            var entity = await _goodRequestRepository.GetByCondition(g => g.Id == id, includeProperties: "GoodRequestDetails,Warehouse,RequestedWarehouse,Partner," +
+                                                                                                         "GoodNote," +
                                                                                                          "GoodRequestDetails.Product," +
                                                                                                          "GoodRequestDetails.Product.Unit," +
                                                                                                          "GoodRequestDetails.Product.Brand");
@@ -47,9 +49,12 @@ namespace BusinessLogicLayer.Services
 
             var goodNote = await _unitOfWork.GoodNoteRepository.GetByCondition(g => g.GoodRequestId == id);
             var result = _mapper.Map<GoodRequestDTO>(entity);
+
+            await AttachGoodNoteToGoodRequest(result); // Với 1 đối tượng
+
             if (goodNote != null)
             {
-                result.GoodNote = _mapper.Map<GoodNoteOfGoodRequestDTO>(goodNote);
+                //result.GoodNote = _mapper.Map<GoodNoteOfGoodRequestDTO>(goodNote);
             }
             return new ServiceResponse
             {
@@ -317,9 +322,12 @@ namespace BusinessLogicLayer.Services
                 var goodnote = await _unitOfWork.GoodNoteRepository.GetByCondition(g => g.GoodRequestId == id);
 
                 var result = _mapper.Map<GoodRequestDTO>(entity);
+
+                await AttachGoodNoteToGoodRequest(result); // Với 1 đối tượng
+
                 if (goodnote != null)
                 {
-                    result.GoodNote = _mapper.Map<GoodNoteOfGoodRequestDTO>(goodnote);
+                    //result.GoodNote = _mapper.Map<GoodNoteOfGoodRequestDTO>(goodnote);
                 }
                 return new ServiceResponse
                 {
@@ -402,11 +410,13 @@ namespace BusinessLogicLayer.Services
 
                 foreach (var goodRequest in mappedResults)
                 {
-                    var goodNote = await _unitOfWork.GoodNoteRepository.GetByCondition(g => g.GoodRequestId == goodRequest.Id);
-                    if (goodNote != null)
-                    {
-                        goodRequest.GoodNote = _mapper.Map<GoodNoteOfGoodRequestDTO>(goodNote);
-                    }
+                    //var goodNote = await _unitOfWork.GoodNoteRepository.GetByCondition(g => g.GoodRequestId == goodRequest.Id);
+                    //if (goodNote != null)
+                    //{
+                    //    //goodRequest.GoodNote = _mapper.Map<GoodNoteOfGoodRequestDTO>(goodNote);
+                    //}
+                    await AttachGoodNoteToGoodRequest(goodRequest);
+
                 }
 
                 int totalPages = (int)Math.Ceiling((double)totalRecords / (pageSize ?? 5));
@@ -483,5 +493,41 @@ namespace BusinessLogicLayer.Services
 
             return validTransitions.ContainsKey(currentStatus) && validTransitions[currentStatus].Contains(newStatus);
         }
+        private async Task AttachGoodNoteToGoodRequest(GoodRequestDTO goodRequest)
+        {
+            var goodNote = await _unitOfWork.GoodNoteRepository.GetByCondition(g => g.GoodRequestId == goodRequest.Id);
+            if (goodNote == null) return;
+
+            var entities = await _unitOfWork.GoodNoteDetailRepository.Search(
+                g => g.GoodNoteId == goodNote.Id,
+                includeProperties: "GoodNote," +
+                                   "GoodNote.GoodRequest," +
+                                   "GoodNote.GoodRequest.Warehouse," +
+                                   "GoodNote.GoodRequest.RequestedWarehouse," +
+                                   "GoodNote.GoodRequest.Partner," +
+                                   "Batch," +
+                                   "Batch.Product," +
+                                   "Batch.Product.Unit," +
+                                   "Batch.Product.Brand");
+
+            if (entities.Count() > 0)
+            {
+                var groupedResult = new GoodNoteDTOv2
+                {
+                    Id = goodNote.Id,
+                    ReceiverName = goodNote.ReceiverName,
+                    ShipperName = goodNote.ShipperName,
+                    NoteType = goodNote.NoteType,
+                    Status = goodNote.Status,
+                    Code = goodNote.Code,
+                    Date = goodNote.Date,
+                    CreatedTime = goodNote.CreatedTime.ToString(),
+                    CreatedBy = goodNote.CreatedBy,
+                    GoodNoteDetails = _mapper.Map<List<GoodNoteDetailDTO>>(entities)
+                };
+                goodRequest.GoodNote = groupedResult;
+            }
+        }
+
     }
 }

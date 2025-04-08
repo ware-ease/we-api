@@ -51,6 +51,7 @@ namespace Data.Model.Request.GoodNote
     public class ProductNoteDTO 
     {
         public string? sku { get; set; }
+        public string? imageUrl { get; set; }
         public string? Name { get; set; }
         public string UnitName { get; set; }
         public string BrandName { get; set; }

@@ -79,6 +79,12 @@ namespace API.Controllers
 
             return ControllerResponse.Response(response);
         }
+        [HttpGet("{inventoryId}/location-logs")]
+        public async Task<IActionResult> GetLogsByInventory(string inventoryId, int pageIndex = 1, int pageSize = 5)
+        {
+            var result = await _inventoryService.GetLocationLogsByInventoryIdAsync(inventoryId, pageIndex, pageSize);
+            return StatusCode((int)result.Status, result);
+        }
 
     }
 }
