@@ -132,7 +132,7 @@ namespace BusinessLogicLayer.Services
                     IsDeleted = false,
                 });
 
-                if (request.GroupId.Equals("2") && request.WarehouseIds != null)
+                if ((request.GroupId.Equals("2") || request.GroupId.Equals("3")) && request.WarehouseIds != null)
                 {
                     foreach (var warehouseId in request.WarehouseIds)
                     {
