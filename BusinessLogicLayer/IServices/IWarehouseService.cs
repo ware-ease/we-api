@@ -26,5 +26,6 @@ namespace BusinessLogicLayer.IServices
         Task<ServiceResponse> GetLocationLogsAsync(string warehouseId, string? locationId, int pageIndex, int pageSize);
         Task<ServiceResponse> GetWarehouseStatisticsAsync(string? warehouseId);
         Task<ServiceResponse> GetGoodsFlowHistogramAsync(string? warehouseId);
+        Task<ServiceResponse> GetStockCard(string productId, string warehouseId, DateTime? from = null, DateTime? to = null);
     }
 }

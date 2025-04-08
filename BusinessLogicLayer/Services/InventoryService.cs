@@ -5,6 +5,7 @@ using Data.Entity;
 using Data.Enum;
 using Data.Model.DTO;
 using Data.Model.Request.InventoryLocation;
+using Data.Model.Request.LocationLog;
 using Data.Model.Request.Warehouse;
 using Data.Model.Response;
 using DataAccessLayer.Generic;
@@ -161,6 +162,57 @@ namespace BusinessLogicLayer.Services
                 Data = locationDtos
             };
         }
+
+        public async Task<ServiceResponse> GetLocationLogsByInventoryIdAsync(string inventoryId, int pageIndex, int pageSize)
+        {
+            // Tạo filter để lấy các LocationLog liên quan đến InventoryId
+            Expression<Func<LocationLog, bool>> filter = log =>
+                log.InventoryLocation.InventoryId == inventoryId;
+
+            // Đếm tổng số bản ghi
+            var totalRecords = await _unitOfWork.LocationLogRepository.Count(filter);
+
+            // Truy vấn dữ liệu có phân trang + bao gồm các bảng liên quan
+            var logs = await _unitOfWork.LocationLogRepository.Search(
+                filter: filter,
+                orderBy: l => l.OrderByDescending(x => x.CreatedTime),
+                pageIndex: pageIndex,
+                pageSize: pageSize,
+                includeProperties: "InventoryLocation,InventoryLocation.Location,InventoryLocation.Inventory"
+            );
+
+            // Nếu không có bản ghi nào
+            if (logs == null || !logs.Any())
+            {
+                return new ServiceResponse
+                {
+                    Status = SRStatus.NotFound,
+                    Message = "No location logs found for the given InventoryId.",
+                    Data = null
+                };
+            }
+
+            // Map sang DTO
+            var logsDto = _mapper.Map<IEnumerable<LocationLogDTO>>(logs);
+
+            // Tính tổng số trang
+            int totalPages = (int)Math.Ceiling((double)totalRecords / pageSize);
+
+            return new ServiceResponse
+            {
+                Status = SRStatus.Success,
+                Message = "Location logs retrieved successfully.",
+                Data = new
+                {
+                    TotalRecords = totalRecords,
+                    TotalPages = totalPages,
+                    PageIndex = pageIndex,
+                    PageSize = pageSize,
+                    Records = logsDto
+                }
+            };
+        }
+
 
     }
 }
