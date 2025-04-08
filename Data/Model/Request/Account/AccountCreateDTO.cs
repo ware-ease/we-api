@@ -21,6 +21,9 @@ namespace Data.Model.Request.Account
         public string? CreatedBy { get; set; }
 
         public ProfileCreateDTO Profile { get; set; }
+
+        public string GroupId { get; set; }
+        public List<string>? WarehouseIds { get; set; }
     }
 
     public class ProfileCreateDTO
@@ -30,6 +33,7 @@ namespace Data.Model.Request.Account
         [Phone]
         public string? Phone { get; set; }
         public string? Address { get; set; }
+        [Required]
         public bool Sex { get; set; }
         public string? Nationality { get; set; }
         public string? AvatarUrl { get; set; }

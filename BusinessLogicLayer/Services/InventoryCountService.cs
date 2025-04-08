@@ -40,7 +40,7 @@ namespace BusinessLogicLayer.Services
         {
             var inventoryCount = await _genericRepository.GetByCondition(
                 p => p.Id == id,
-                includeProperties: "Schedule,Location,InventoryCheckDetails,InventoryCheckDetails.Product"
+                includeProperties: "Schedule,Location,Location.Warehouse,InventoryCheckDetails,InventoryCheckDetails.Product"
             );
 
             if (inventoryCount == null)
@@ -211,7 +211,7 @@ namespace BusinessLogicLayer.Services
         }
 
         public async Task<ServiceResponse> Search<TResult>(int? pageIndex = null, int? pageSize = null,
-                                                                   string? keyword = null, bool? status = null)
+                                                                   string? keyword = null, bool? status = null, string? warehouseId = null)
         {
 
             Expression<Func<InventoryCount, bool>> filter = p =>
@@ -220,14 +220,17 @@ namespace BusinessLogicLayer.Services
                 || p.Note.Contains(keyword)
                 || p.Location.Name.Contains(keyword)
                 || p.Location.Code.Contains(keyword)
+                || p.Location.Warehouse.Name.Contains(keyword)
                 || p.InventoryCheckDetails.Any(d => d.Note != null && d.Note.Contains(keyword))
-                || p.InventoryCheckDetails.Any(d => d.Product != null && d.Product.Name.Contains(keyword))));
+                || p.InventoryCheckDetails.Any(d => d.Product != null && d.Product.Name.Contains(keyword)))
+                ) &&
+                (string.IsNullOrEmpty(warehouseId) || p.Location.Warehouse.Id == warehouseId);
 
             var totalRecords = await _genericRepository.Count(filter);
 
             var results = await _genericRepository.Search(
                 filter: filter, pageIndex: pageIndex, pageSize: pageSize,
-                includeProperties: "Schedule,Location,InventoryCheckDetails.Product,InventoryCheckDetails");
+                includeProperties: "Schedule,Location,Location.Warehouse,InventoryCheckDetails.Product,InventoryCheckDetails");
 
             var mappedResults = _mapper.Map<IEnumerable<TResult>>(results);
 

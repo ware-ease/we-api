@@ -123,6 +123,31 @@ namespace BusinessLogicLayer.Services
                 account.Profile.CreatedBy = request.CreatedBy;
                 account.CreatedBy = request.CreatedBy;
 
+                account.AccountGroups.Add(new AccountGroup
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    CreatedTime = DateTime.Now,
+                    CreatedBy = request.CreatedBy,
+                    GroupId = request.GroupId,
+                    IsDeleted = false,
+                });
+
+                if (request.GroupId.Equals("2") && request.WarehouseIds != null)
+                {
+                    foreach (var warehouseId in request.WarehouseIds)
+                    {
+                        account.AccountWarehouses.Add(new AccountWarehouse
+                        {
+                            Id = Guid.NewGuid().ToString(),
+                            CreatedTime = DateTime.Now,
+                            CreatedBy = request.CreatedBy,
+                            WarehouseId = warehouseId,
+                            IsDeleted = false,
+                            Status = true,
+                        });
+                    }
+                }
+
                 await _unitOfWork.AccountRepository.Add(account);
 
                 await _unitOfWork.SaveAsync();
@@ -152,6 +177,82 @@ namespace BusinessLogicLayer.Services
                     Status = Data.Enum.SRStatus.Error,
                     Message = ex.Message,
                     Data = _mapper.Map<AccountDTO>(request)
+                };
+            }
+        }
+
+        public async Task<ServiceResponse> Update(string id, AccountUpdateDTO request)
+        {
+            try
+            {
+                var existingAccount = await _unitOfWork.AccountRepository
+                    .GetByCondition(a => a.Id == id, "Profile");
+
+                if (existingAccount == null)
+                    throw new Exception("Account not found!");
+
+                if (!string.IsNullOrEmpty(request.Email))
+                {
+                    var existingEmail = await _unitOfWork.AccountRepository
+                        .GetByCondition(a => a.Email.ToLower() == request.Email!.ToLower());
+                    if (existingEmail != null)
+                    {
+                        return new ServiceResponse
+                        {
+                            Status = Data.Enum.SRStatus.Duplicated,
+                            Message = "Email is existed!",
+                            Data = id
+                        };
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(request.Profile.FirstName))
+                {
+                    existingAccount.Profile!.FirstName = request.Profile.FirstName;
+                }
+                if (!string.IsNullOrEmpty(request.Profile.LastName))
+                {
+                    existingAccount.Profile!.LastName = request.Profile.LastName;
+                }
+                if (!string.IsNullOrEmpty(request.Profile.Address))
+                {
+                    existingAccount.Profile!.Address = request.Profile.Address;
+                }
+                if (!string.IsNullOrEmpty(request.Profile.AvatarUrl))
+                {
+                    existingAccount.Profile!.AvatarUrl = request.Profile.AvatarUrl;
+                }
+                if (!string.IsNullOrEmpty(request.Profile.Nationality))
+                {
+                    existingAccount.Profile!.Nationality = request.Profile.Nationality;
+                }
+                if (!string.IsNullOrEmpty(request.Profile.Phone))
+                {
+                    existingAccount.Profile!.Phone = request.Profile.Phone;
+                }
+                if (request.Profile.Sex != existingAccount.Profile!.Sex)
+                {
+                    existingAccount.Profile!.Sex = request.Profile.Sex;
+                }
+
+                _unitOfWork.AccountRepository.Update(existingAccount);
+
+                await _unitOfWork.SaveAsync();
+
+                return new ServiceResponse
+                {
+                    Status = Data.Enum.SRStatus.Success,
+                    Message = "Update successfully!",
+                    Data = _mapper.Map<AccountDTO>(existingAccount)
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ServiceResponse
+                {
+                    Status = Data.Enum.SRStatus.Error,
+                    Message = ex.Message,
+                    Data = id
                 };
             }
         }

@@ -66,10 +66,10 @@ namespace API.Controllers
             return ControllerResponse.Response(result);
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Add([FromRoute] string id, [FromBody] AccountUpdateDTO request)
+        [HttpPatch("{id}")]
+        public async Task<IActionResult> Update([FromRoute] string id, [FromBody] AccountUpdateDTO request)
         {
-            var result = await _accountService.Update<AccountDTO, AccountUpdateDTO>(request);
+            var result = await _accountService.Update(id, request);
 
             return ControllerResponse.Response(result);
         }
