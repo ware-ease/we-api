@@ -1,4 +1,5 @@
-﻿using Data.Model.DTO.Base;
+﻿using Data.Enum;
+using Data.Model.DTO.Base;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +11,7 @@ namespace Data.Model.DTO
     public class InventoryCountDTO : BaseDTO
     {
         public string Id { get; set; }
-        public bool Status { get; set; }
+        public InventoryCountStatus Status { get; set; }
         public string? Code { get; set; }
         public string? Note { get; set; }
         public DateOnly? Date { get; set; }

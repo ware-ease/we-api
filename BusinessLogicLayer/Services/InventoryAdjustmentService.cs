@@ -25,6 +25,7 @@ namespace BusinessLogicLayer.Services
         IGenericRepository<LocationLog> _locationLogRepository;
         IGenericRepository<Location> _locationRepository;
         IGenericRepository<Inventory> _inventoryRepository;
+        IGenericRepository<InventoryCount> _inventoryCountRepository;
         IGenericRepository<InventoryLocation> _inventoryLocationRepository;
         public InventoryAdjustmentService(IGenericRepository<InventoryAdjustment> genericRepository,
             IGenericRepository<InventoryAdjustmentDetail> inventoryAdjustmentDetailRepository,
@@ -32,6 +33,7 @@ namespace BusinessLogicLayer.Services
             IGenericRepository<LocationLog> locationLogRepository,
             IGenericRepository<Location> locationRepository,
             IGenericRepository<Inventory> inventoryRepository,
+            IGenericRepository<InventoryCount> inventoryCountRepository,
             IGenericRepository<InventoryLocation> inventoryLocationRepository,
             IMapper mapper, IUnitOfWork unitOfWork) : base(genericRepository, mapper, unitOfWork)
         {
@@ -40,12 +42,13 @@ namespace BusinessLogicLayer.Services
             _locationLogRepository = locationLogRepository;
             _locationRepository = locationRepository;
             _inventoryRepository = inventoryRepository;
+            _inventoryCountRepository = inventoryCountRepository;
             _inventoryLocationRepository = inventoryLocationRepository;
         }
 
         public override async Task<ServiceResponse> Get<TResult>()
         {
-            var inventoryAdjustments= await _genericRepository.GetAllNoPaging(
+            var inventoryAdjustments = await _genericRepository.GetAllNoPaging(
                 includeProperties: "InventoryAdjustmentDetails,Warehouse,InventoryAdjustmentDetails.LocationLog"
             );
 
@@ -111,6 +114,16 @@ namespace BusinessLogicLayer.Services
 
                     var inventoryAdjustment = _mapper.Map<InventoryAdjustment>(request);
                     inventoryAdjustment.WarehouseId = request.WarehouseId;
+
+                    if (!string.IsNullOrEmpty(request.RelatedDocument))
+                    {
+                        var inventoryCount = await _inventoryCountRepository.GetByCondition(p => p.Id == request.RelatedDocument);
+                        if (inventoryCount != null)
+                        {
+                            inventoryCount.Status = Data.Enum.InventoryCountStatus.Balanced;
+                            _inventoryCountRepository.Update(inventoryCount);
+                        }
+                    }
 
                     await _genericRepository.Insert(inventoryAdjustment);
                     await _unitOfWork.SaveAsync();
@@ -225,6 +238,16 @@ namespace BusinessLogicLayer.Services
                         inventoryAdjustment.Reason = request.Reason;
                     if (!string.IsNullOrEmpty(request.Note))
                         inventoryAdjustment.Note = request.Note;
+
+                    if (!string.IsNullOrEmpty(request.RelatedDocument))
+                    {
+                        var inventoryCount = await _inventoryCountRepository.GetByCondition(p => p.Id == request.RelatedDocument);
+                        if (inventoryCount != null)
+                        {
+                            inventoryCount.Status = Data.Enum.InventoryCountStatus.Balanced;
+                            _inventoryCountRepository.Update(inventoryCount);
+                        }
+                    }
 
                     if (!string.IsNullOrEmpty(request.WarehouseId))
                     {

@@ -12,6 +12,7 @@ namespace Data.Model.DTO
         public DateTime? Date { get; set; }
         public string? Reason { get; set; }
         public string? Note { get; set; }
+        public string? RelatedDocument { get; set; }
         public string WarehouseName { get; set; }
         public List<InventoryAdjustmentDetailDTO> inventoryAdjustmentDetailDTOs { get; set; }
     }

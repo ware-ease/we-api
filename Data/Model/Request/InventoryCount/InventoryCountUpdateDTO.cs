@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Data.Enum;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -14,7 +15,8 @@ namespace Data.Model.Request.InventoryCount
         [JsonIgnore]
         public string? Id { get; set; }
         //[Required(ErrorMessage = "Status không được để trống")]
-        public bool? Status { get; set; }
+        [JsonIgnore]
+        public InventoryCountStatus? Status { get; set; }
         //[Required(ErrorMessage = "Code không được để trống")]
         public string? Code { get; set; }
         public string? Note { get; set; }
@@ -29,7 +31,7 @@ namespace Data.Model.Request.InventoryCount
         //[Required(ErrorMessage = "ScheduleId không được để trống")]
         public string? ScheduleId { get; set; }
         //[Required(ErrorMessage = "LocationId không được để trống")]
-        //public string LocationId { get; set; }
+        public string? LocationId { get; set; }
         public List<InventoryCountDetailUpdateDTO>? InventoryCountDetails { get; set; } = new();
     }
 
@@ -38,6 +40,7 @@ namespace Data.Model.Request.InventoryCount
         //[JsonIgnore]
         public string? Id { get; set; }
         //[Required(ErrorMessage = "ExpectedQuantity không được để trống")]
+        [JsonIgnore]
         public float? ExpectedQuantity { get; set; }
         //[Required(ErrorMessage = "CountedQuantity không được để trống")]
         public float? CountedQuantity { get; set; }

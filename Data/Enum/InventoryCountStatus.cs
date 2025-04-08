@@ -8,5 +8,10 @@ namespace Data.Enum
 {
     public enum InventoryCountStatus
     {
+        Uncounted,
+        Counting,
+        Balanced,
+        Understock,
+        Overstock
     }
 }
