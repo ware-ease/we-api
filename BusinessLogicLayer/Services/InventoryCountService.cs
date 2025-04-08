@@ -125,8 +125,8 @@ namespace BusinessLogicLayer.Services
             if (existingInventoryCount == null)
                 throw new Exception("InventoryCount not found");
 
-            if (request.Status.HasValue)
-                existingInventoryCount.Status = request.Status.Value;
+            /*if (request.Status.HasValue)
+                existingInventoryCount.Status = request.Status.Value;*/
 
             if (!string.IsNullOrEmpty(request.Code))
                 existingInventoryCount.Code = request.Code;
@@ -215,7 +215,7 @@ namespace BusinessLogicLayer.Services
         {
 
             Expression<Func<InventoryCount, bool>> filter = p =>
-            (p.Status == status &&
+            (//p.Status == status &&
             (string.IsNullOrEmpty(keyword) || p.Code.Contains(keyword)
                 || p.Note.Contains(keyword)
                 || p.Location.Name.Contains(keyword)
