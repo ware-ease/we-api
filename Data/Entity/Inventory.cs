@@ -12,6 +12,8 @@ namespace Data.Entity
     public class Inventory : BaseEntity
     {
         public float CurrentQuantity { get; set; }
+        public float? ArrangedQuantity { get; set; }
+        public float? NotArrgangedQuantity { get; set; }
 
         public ICollection<InventoryLocation> InventoryLocations { get; set; } = [];
         //public ICollection<InventoryAdjustmentDetail> InventoryAdjustmentDetails { get; set; } = [];
