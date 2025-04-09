@@ -27,7 +27,8 @@ namespace Data.Model.DTO
 
     public class AccountDTOWarehouse
     {
-
+        public string Id { get; set; }
+        public string Name { get; set; }
     }
 
     public class AccountDTOProfile
