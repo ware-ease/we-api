@@ -119,6 +119,7 @@ builder.Services.AddScoped<IGenericRepository<LocationLog>, GenericRepository<Lo
 #endregion Generic
 
 #region Services
+builder.Services.AddScoped<IFirebaseService, FirebaseService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
