@@ -13,13 +13,12 @@ namespace Data.Entity
         public GoodRequestEnum RequestType { get; set; }
         public GoodRequestStatusEnum Status { get; set; } = GoodRequestStatusEnum.Pending;
 
+        public ICollection<GoodNote> GoodNotes { get; set; } = [];
         public ICollection<GoodRequestDetail> GoodRequestDetails { get; set; } = [];
 
         [ForeignKey("Partner")]
         public string? PartnerId { get; set; }
         public Partner? Partner { get; set; }
-
-        public GoodNote? GoodNote { get; set; }
 
         [ForeignKey("Warehouse")]
         public string? WarehouseId { get; set; }
