@@ -15,10 +15,10 @@ namespace Data.Enum
     }
     public enum GoodRequestStatusEnum
     {
-        Pending,
-        Approved,
-        Rejected,
-        Completed,
-        Canceled,
+        Pending, // chờ xử lí, good request mới tạo
+        Approved, // cứ tạo good note thì thành approved
+        Rejected, // từ chối yêu cầu
+        Completed, // thủ kho xác nhận
+        Canceled, // bỏ
     }
 }

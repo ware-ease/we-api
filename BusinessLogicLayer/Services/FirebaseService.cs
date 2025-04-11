@@ -46,7 +46,7 @@ namespace BusinessLogicLayer.Services
     public enum NotificationType
     {
         GOOD_REQUEST_CREATED,
-        GOOD_REQUEST_UPDATED,
+        GOOD_REQUEST_APPROVED,
         GOOD_REQUEST_REJECTED,
         GOOD_REQUEST_CONFIRMED,
     }

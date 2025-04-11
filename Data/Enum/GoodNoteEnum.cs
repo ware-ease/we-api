@@ -10,8 +10,8 @@ namespace Data.Enum
     {
         Receive,
         Issue,
-        Transfer,
-        Return,
+        Transfer, // ko can
+        Return, // ko can
     }
     public enum GoodNoteStatusEnum
     {
