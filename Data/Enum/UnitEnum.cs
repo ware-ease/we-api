@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 
 namespace Data.Enum
 {
-    public enum GoodNoteStatus
+    public enum UnitEnum
     {
+        Int,
+        Float
     }
 }
