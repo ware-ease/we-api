@@ -7,5 +7,6 @@ namespace DataAccessLayer.IRepositories
     {
         Task<Account> GetWithFullInfo(string id);
         IQueryable<Account> GetWithFullInfo();
+        Task<List<string>> GetUserIdsByRequestedWarehouseAndGroups(string requestedWarehouseId, List<string> groupNames);
     }
 }

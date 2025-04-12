@@ -23,12 +23,14 @@ namespace BusinessLogicLayer.Services
         private readonly IGoodRequestRepository _goodRequestRepository;
         private readonly IMapper _mapper;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IFirebaseService _firebaseService;
 
-        public GoodRequestService(IGenericRepository<GoodRequest> genericRepository, IUnitOfWork unitOfWork, IMapper mapper) : base(genericRepository, mapper, unitOfWork)
+        public GoodRequestService(IGenericRepository<GoodRequest> genericRepository, IUnitOfWork unitOfWork, IMapper mapper, IFirebaseService firebaseService) : base(genericRepository, mapper, unitOfWork)
         {
             _goodRequestRepository = unitOfWork.GoodRequestRepository;
             _mapper = mapper;
             _unitOfWork = unitOfWork;
+            _firebaseService = firebaseService;
         }
         public async Task<ServiceResponse> GetById(string id)
         {
@@ -109,8 +111,8 @@ namespace BusinessLogicLayer.Services
             }
 
             // 4️⃣ Kiểm tra RequestedWarehouseId có tồn tại không
-            if (!string.IsNullOrEmpty(request.RequestedWarehouseId))
-            {
+            //if (!string.IsNullOrEmpty(request.RequestedWarehouseId))
+            //{
                 var requestedWarehouseExists = await _unitOfWork.WarehouseRepository.GetByCondition(x => x.Id == request.RequestedWarehouseId);
                 if (requestedWarehouseExists == null)
                 {
@@ -121,7 +123,7 @@ namespace BusinessLogicLayer.Services
                         Data = request.RequestedWarehouseId
                     };
                 }
-            }
+            //}
 
             // 5️⃣ Kiểm tra danh sách GoodRequestDetails nếu có
             if (request.GoodRequestDetails != null && request.GoodRequestDetails.Any())
@@ -158,6 +160,9 @@ namespace BusinessLogicLayer.Services
             {
                 await _goodRequestRepository.Add(entity);
                 await _unitOfWork.SaveAsync();
+                // Gửi thông báo đến người dùng
+                var userIds = await _unitOfWork.AccountRepository.GetUserIdsByRequestedWarehouseAndGroups(request.RequestedWarehouseId, new List<string> { "Thủ kho" });
+                await _firebaseService.SendNotificationToUsersAsync(userIds, "Yêu cầu mới vừa được tạo.", $"Một yêu càu kho vừa được tạo với mã yêu cầu: {entity.Code}", NotificationType.GOOD_REQUEST_CREATED, request.RequestedWarehouseId);
 
                 var goodRequest = await _goodRequestRepository.GetByCondition(x => x.Id == entity.Id, includeProperties: "GoodRequestDetails,Warehouse,RequestedWarehouse,Partner," +
                                                                                                                          "GoodRequestDetails.Product," +

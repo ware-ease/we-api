@@ -27,88 +27,6 @@ namespace BusinessLogicLayer.Services
             _mapper = mapper;
             _unitOfWork = unitOfWork;
         }
-
-        //public async Task<ServiceResponse> SearchGoodNotes<TResult>(int? pageIndex = null, int? pageSize = null,
-        //                                                              string? keyword = null, GoodNoteEnum? goodNoteType = null,
-        //                                                                                      GoodNoteStatusEnum? status = null,
-        //                                                                                      string? requestedWarehouseId = null)
-        //{
-        //    try
-        //    {
-        //        Expression<Func<GoodNoteDetail, bool>> filter = g =>(string.IsNullOrEmpty(keyword) || 
-        //                                                        ((g.GoodNote.ShipperName != null && g.GoodNote.ShipperName.Contains(keyword)) ||
-        //                                                        (g.GoodNote.ReceiverName != null && g.GoodNote.ReceiverName.Contains(keyword)) ||
-        //                                                        (g.GoodNote.Code != null && g.GoodNote.Code.Contains(keyword)) ||
-        //                                                        (g.GoodNote.GoodRequest.RequestedWarehouse!.Name != null && g.GoodNote.GoodRequest.RequestedWarehouse.Name.Contains(keyword)) ||
-        //                                                        (g.GoodNote.GoodRequest.Warehouse!.Name != null && g.GoodNote.GoodRequest.Warehouse.Name.Contains(keyword)) ||
-        //                                                        (g.Batch.Product.Name != null && g.Batch.Product.Name.Contains(keyword))
-        //                                                        )) &&
-        //                                                        (!goodNoteType.HasValue || g.GoodNote.NoteType == goodNoteType.Value) &&
-        //                                                        (!status.HasValue || g.GoodNote.Status == status.Value) && // Thêm điều kiện lọc theo Status
-        //                                                        (string.IsNullOrEmpty(requestedWarehouseId) || g.GoodNote.GoodRequest.RequestedWarehouseId != null && g.GoodNote.GoodRequest.RequestedWarehouseId == requestedWarehouseId);
-
-
-        //    var results = await _unitOfWork.GoodNoteDetailRepository.Search(
-        //        filter: filter,
-        //        includeProperties: "GoodNote,GoodNote.GoodRequest,GoodNote.GoodRequest.Warehouse," +
-        //                            "GoodNote.GoodRequest.RequestedWarehouse," +
-        //                            "Batch," +
-        //                            "Batch.Product," +
-        //                            "Batch.Product.Unit," +
-        //                            "Batch.Product.Brand",
-        //        pageIndex: pageIndex,
-        //        pageSize: pageSize
-        //    );
-
-        //    //var totalRecords = results.GroupBy(g => g.GoodNoteId).Count();
-
-        //    //var mappedResults = _mapper.Map<IEnumerable<TResult>>(results);
-        //    var groupedResults = results.GroupBy(g => g.GoodNote.Id)
-        //                                .Select(group => new GoodNoteDTO
-        //                                {
-        //                                    Id = group.Key,
-        //                                    ReceiverName = group.First().GoodNote.ReceiverName,
-        //                                    ShipperName = group.First().GoodNote.ShipperName,
-        //                                    NoteType = group.First().GoodNote.NoteType,
-        //                                    Status = group.First().GoodNote.Status,
-        //                                    GoodRequestId = group.First().GoodNote.GoodRequestId,
-        //                                    GoodRequestCode = group.First().GoodNote.GoodRequest.Code,
-        //                                    RequestedWarehouseName = group.First().GoodNote.GoodRequest.RequestedWarehouse?.Name,
-        //                                    Code = group.First().GoodNote.Code,
-        //                                    Date = group.First().GoodNote.Date,
-        //                                    CreatedTime = group.First().GoodNote.CreatedTime.ToString(),
-        //                                    CreatedBy = group.First().GoodNote.CreatedBy,
-        //                                    GoodNoteDetails = _mapper.Map<List<GoodNoteDetailDTO>>(group.ToList())
-        //                                }).ToList();
-
-        //    var totalRecords = groupedResults.Count();
-        //    int totalPages = (int)Math.Ceiling((double)totalRecords / (pageSize ?? 5));
-
-        //    return new ServiceResponse
-        //    {
-        //        Status = Data.Enum.SRStatus.Success,
-        //        Message = "Search successful!",
-        //        Data = new
-        //        {
-        //            TotalRecords = totalRecords,
-        //            TotalPages = totalPages,
-        //            PageIndex = pageIndex ?? 1,
-        //            PageSize = pageSize ?? 5,
-        //            Records = groupedResults
-        //        }
-        //    };
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return new ServiceResponse
-        //        {
-        //            Status = Data.Enum.SRStatus.Error,
-        //            Message = "An error occurred while searching GoodNotes. Please try again later.",
-        //            Data = null
-        //        };
-        //    }
-        //}
-
         public async Task<ServiceResponse> SearchGoodNotes(int? pageIndex = null, int? pageSize = null,
                                                                     string? keyword = null, GoodNoteEnum? goodNoteType = null,
                                                                     GoodNoteStatusEnum? status = null, string? requestedWarehouseId = null)
@@ -316,9 +234,10 @@ namespace BusinessLogicLayer.Services
                 await _unitOfWork.GoodNoteRepository.Add(entity);
                 //cập nhật goodrequest là thành công
                 var goodRequest = await _unitOfWork.GoodRequestRepository.GetByCondition(x => x.Id == request.GoodRequestId);
-                goodRequest.Status = GoodRequestStatusEnum.Completed;
+                goodRequest.Status = GoodRequestStatusEnum.Approved;
                 _unitOfWork.GoodRequestRepository.Update(goodRequest);
-                //await _unitOfWork.SaveAsync();
+                // thông báo cho người tạo yêu cầu
+                // ++++
 
                 //Tạo goodnoteDetail
                 var goodNoteDetails = _mapper.Map<List<GoodNoteDetail>>(request.GoodNoteDetails);
@@ -405,81 +324,81 @@ namespace BusinessLogicLayer.Services
                                     WarehouseId = requestedWarehouseId,
                                     BatchId = detail.BatchId,
                                     CurrentQuantity = detail.Quantity,
-                                    ArrangedQuantity = 0,
-                                    NotArrgangedQuantity = detail.Quantity,
+                                    //ArrangedQuantity = 0,
+                                    //NotArrgangedQuantity = detail.Quantity,
                                 };
                                 await _unitOfWork.InventoryRepository.Add(targetInventory);
                                 break;
                             }
                             targetInventory.CurrentQuantity += detail.Quantity;
-                            targetInventory.NotArrgangedQuantity += detail.Quantity;
+                            //targetInventory.NotArrgangedQuantity += detail.Quantity;
                             _unitOfWork.InventoryRepository.Update(targetInventory);
                             break;
-                        case GoodNoteEnum.Return:
-                            // 🟢 Hàng nhập vào requestedWarehouseId
-                            targetInventory = inventories.FirstOrDefault(i => i.BatchId == detail.BatchId && i.WarehouseId == requestedWarehouseId);
-                            if (targetInventory == null)
-                            {
-                                targetInventory = new Inventory
-                                {
-                                    WarehouseId = requestedWarehouseId,
-                                    BatchId = detail.BatchId,
-                                    CurrentQuantity = detail.Quantity,
-                                    ArrangedQuantity = 0,
-                                    NotArrgangedQuantity = detail.Quantity,
-                                };
-                                await _unitOfWork.InventoryRepository.Add(targetInventory);
-                                break;
-                            }
-                            targetInventory.CurrentQuantity += detail.Quantity;
-                            targetInventory.NotArrgangedQuantity += detail.Quantity;
-                            _unitOfWork.InventoryRepository.Update(targetInventory);
-                            break;
+                        //case GoodNoteEnum.Return:
+                        //    // 🟢 Hàng nhập vào requestedWarehouseId
+                        //    targetInventory = inventories.FirstOrDefault(i => i.BatchId == detail.BatchId && i.WarehouseId == requestedWarehouseId);
+                        //    if (targetInventory == null)
+                        //    {
+                        //        targetInventory = new Inventory
+                        //        {
+                        //            WarehouseId = requestedWarehouseId,
+                        //            BatchId = detail.BatchId,
+                        //            CurrentQuantity = detail.Quantity,
+                        //            ArrangedQuantity = 0,
+                        //            NotArrgangedQuantity = detail.Quantity,
+                        //        };
+                        //        await _unitOfWork.InventoryRepository.Add(targetInventory);
+                        //        break;
+                        //    }
+                        //    targetInventory.CurrentQuantity += detail.Quantity;
+                        //    targetInventory.NotArrgangedQuantity += detail.Quantity;
+                        //    _unitOfWork.InventoryRepository.Update(targetInventory);
+                        //    break;
 
                         case GoodNoteEnum.Issue:
                             // 🔴 Xuất hàng từ requestedWarehouseId
                             sourceInventory = inventories.FirstOrDefault(i => i.BatchId == detail.BatchId && i.WarehouseId == requestedWarehouseId);
-                            if (sourceInventory == null || sourceInventory.NotArrgangedQuantity < detail.Quantity)
+                            if (sourceInventory == null || sourceInventory.CurrentQuantity < detail.Quantity)
                             {
                                 throw new Exception($"Not enough 'Inventory not in location' in warehouse {requestedWarehouseId} for batch {detail.BatchId}.");
                             }
                             sourceInventory.CurrentQuantity -= detail.Quantity;
-                            sourceInventory.NotArrgangedQuantity -= detail.Quantity;
+                            //sourceInventory.NotArrgangedQuantity -= detail.Quantity;
                             _unitOfWork.InventoryRepository.Update(sourceInventory);
                             break;
 
-                        case GoodNoteEnum.Transfer:
-                            // 🔁 Điều chuyển hàng từ warehouseId -> requestedWarehouseId
-                            sourceInventory = inventories.FirstOrDefault(i => i.BatchId == detail.BatchId && i.WarehouseId == warehouseId);
-                            targetInventory = inventories.FirstOrDefault(i => i.BatchId == detail.BatchId && i.WarehouseId == requestedWarehouseId);
+                        //case GoodNoteEnum.Transfer:
+                        //    // 🔁 Điều chuyển hàng từ warehouseId -> requestedWarehouseId
+                        //    sourceInventory = inventories.FirstOrDefault(i => i.BatchId == detail.BatchId && i.WarehouseId == warehouseId);
+                        //    targetInventory = inventories.FirstOrDefault(i => i.BatchId == detail.BatchId && i.WarehouseId == requestedWarehouseId);
 
-                            if (sourceInventory == null || sourceInventory.NotArrgangedQuantity < detail.Quantity)
-                            {
-                                throw new Exception($"Not enough 'Inventory not in location' in warehouse {warehouseId} for batch {detail.BatchId}.");
-                            }
+                        //    if (sourceInventory == null || sourceInventory.NotArrgangedQuantity < detail.Quantity)
+                        //    {
+                        //        throw new Exception($"Not enough 'Inventory not in location' in warehouse {warehouseId} for batch {detail.BatchId}.");
+                        //    }
 
-                            sourceInventory.CurrentQuantity -= detail.Quantity;
-                            sourceInventory.NotArrgangedQuantity -= detail.Quantity;
-                            _unitOfWork.InventoryRepository.Update(sourceInventory);
+                        //    sourceInventory.CurrentQuantity -= detail.Quantity;
+                        //    sourceInventory.NotArrgangedQuantity -= detail.Quantity;
+                        //    _unitOfWork.InventoryRepository.Update(sourceInventory);
 
-                            if (targetInventory == null)
-                            {
-                                targetInventory = new Inventory
-                                {
-                                    WarehouseId = requestedWarehouseId,
-                                    BatchId = detail.BatchId,
-                                    CurrentQuantity = detail.Quantity,
-                                    ArrangedQuantity = 0,
-                                    NotArrgangedQuantity = detail.Quantity,
-                                };
-                                await _unitOfWork.InventoryRepository.Add(targetInventory);
-                                break;
-                            }
+                        //    if (targetInventory == null)
+                        //    {
+                        //        targetInventory = new Inventory
+                        //        {
+                        //            WarehouseId = requestedWarehouseId,
+                        //            BatchId = detail.BatchId,
+                        //            CurrentQuantity = detail.Quantity,
+                        //            ArrangedQuantity = 0,
+                        //            NotArrgangedQuantity = detail.Quantity,
+                        //        };
+                        //        await _unitOfWork.InventoryRepository.Add(targetInventory);
+                        //        break;
+                        //    }
 
-                            targetInventory.CurrentQuantity += detail.Quantity;
-                            targetInventory.NotArrgangedQuantity += detail.Quantity;
-                            _unitOfWork.InventoryRepository.Update(targetInventory);
-                            break;
+                        //    targetInventory.CurrentQuantity += detail.Quantity;
+                        //    targetInventory.NotArrgangedQuantity += detail.Quantity;
+                        //    _unitOfWork.InventoryRepository.Update(targetInventory);
+                        //    break;
                     }
                 }
             }
