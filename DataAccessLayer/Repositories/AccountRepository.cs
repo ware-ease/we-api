@@ -37,5 +37,25 @@ namespace DataAccessLayer.Repositories
 
             return query;
         }
+
+        public async Task<List<string>> GetUserIdsByRequestedWarehouseAndGroups(string requestedWarehouseId, List<string> groupNames)
+        {
+            var userIds = await _context.AccountWarehouses
+                .Where(aw => aw.WarehouseId == requestedWarehouseId && aw.IsDeleted == false)
+                .SelectMany(aw => _context.AccountGroups
+                    .Where(ag => ag.AccountId == aw.AccountId && ag.IsDeleted == false)
+                    .Join(_context.Groups,
+                          ag => ag.GroupId,
+                          g => g.Id,
+                          (ag, g) => new { ag.AccountId, g.Name }))
+                .Where(x => groupNames.Contains(x.Name))
+                .Select(x => x.AccountId)
+                .Distinct()
+                .ToListAsync();
+
+            return userIds;
+        }
+
+
     }
 }
