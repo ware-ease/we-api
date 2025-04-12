@@ -22,19 +22,31 @@ namespace BusinessLogicLayer.Services
         private readonly IGenericRepository<Batch> _batchRepository;
         private readonly IGenericRepository<Partner> _partnerRepository;
         private readonly IGenericRepository<Product> _productRepository;
+        private readonly IGenericRepository<Account> _accountRepository;
+        private readonly IGenericRepository<AccountGroup> _accountGroupRepository;
+        private readonly IGenericRepository<Group> _groupRepository;
         private readonly IMapper _mapper;
         public readonly IUnitOfWork _unitOfWork;
+        private readonly IFirebaseService _firebaseService;
         public BatchService(IGenericRepository<Batch> genericService,
             IGenericRepository<Partner> partnerRepository,
             IGenericRepository<Product> productRepository,
+            IGenericRepository<Account> accountRepository,
+            IGenericRepository<AccountGroup> accountGroupRepository,
+            IGenericRepository<Group> groupRepository,
             IMapper mapper,
-            IUnitOfWork unitOfWork) : base(genericService, mapper, unitOfWork)
+            IUnitOfWork unitOfWork,
+            IFirebaseService firebaseService) : base(genericService, mapper, unitOfWork)
         {
             _batchRepository = genericService;
             _partnerRepository = partnerRepository;
             _productRepository = productRepository;
+            _accountRepository = accountRepository;
+            _accountGroupRepository = accountGroupRepository;
+            _groupRepository = groupRepository;
             _mapper = mapper;
             _unitOfWork = unitOfWork;
+            _firebaseService = firebaseService;
         }
 
         public async Task<int> CountBatch()
@@ -105,6 +117,17 @@ namespace BusinessLogicLayer.Services
             await _genericRepository.Insert(batch);
             await _unitOfWork.SaveAsync();
 
+            try
+            {
+                var userIds = (await _accountGroupRepository.GetAllNoPaging(x => x.GroupId == "4")).Select(x => x.AccountId).Distinct().ToList();
+                await _firebaseService.SendNotificationToUsersAsync(userIds, "Batch mới vừa được tạo.", $"Batch Code: {batch.Code}", NotificationType.BATCH_CREATED, null);
+            }
+            catch
+            {
+                throw new Exception("Lỗi khi gửi thông báo batch");
+            }
+
+
             return _mapper.Map<BatchDTO>(batch);
         }
 
@@ -157,6 +180,21 @@ namespace BusinessLogicLayer.Services
             var updatedBatch = await _batchRepository.GetByCondition(p => p.Id == existingBatch.Id);
             if (updatedBatch == null)
                 throw new Exception("Update failed, batch not found after update");
+
+            try
+            {
+                var groupIds = new List<string> { "4", "2" };
+
+                var userIds = (await _accountGroupRepository.GetAllNoPaging(x => groupIds.Contains(x.GroupId)))
+                .Select(x => x.AccountId)
+                .Distinct()
+                .ToList();
+                await _firebaseService.SendNotificationToUsersAsync(userIds, "Batch mới được chỉnh sửa.", $"Batch Code: {updatedBatch.Code}", NotificationType.BATCH_CREATED, null);
+            }
+            catch
+            {
+                throw new Exception("Lỗi khi gửi thông báo batch");
+            }
 
             return _mapper.Map<BatchDTO>(updatedBatch);
         }
