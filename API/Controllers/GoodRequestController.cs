@@ -41,16 +41,15 @@ namespace API.Controllers
             return ControllerResponse.Response(result);
         }
 
-        //[Authorize]
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> Add([FromBody] GoodRequestCreateDTO request)
         {
-            //var authUser = AuthHelper.GetCurrentUser(HttpContext.Request);
-            //if (authUser != null)
-            //{
-            //    request.CreatedBy = authUser.id;
-            //}
-
+            var authUser = AuthHelper.GetCurrentUser(HttpContext.Request);
+            if (authUser != null)
+            {
+                request.CreatedBy = authUser.id;
+            }
             var result = await _goodRequestService.CreateAsync<GoodRequestDTO>(request);
             return ControllerResponse.Response(result);
         }

@@ -51,5 +51,7 @@ namespace BusinessLogicLayer.Services
         GOOD_REQUEST_CONFIRMED,
         BATCH_CREATED,
         BATCH_UPDATED,
+        RECEIVE_NOTE_CREATED,
+        ISSUE_NOTE_CREATED,
     }
 }

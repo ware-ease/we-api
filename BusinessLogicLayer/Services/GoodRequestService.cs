@@ -35,7 +35,7 @@ namespace BusinessLogicLayer.Services
         public async Task<ServiceResponse> GetById(string id)
         {
             var entity = await _goodRequestRepository.GetByCondition(g => g.Id == id, includeProperties: "GoodRequestDetails,Warehouse,RequestedWarehouse,Partner," +
-                                                                                                         "GoodNote," +
+                                                                                                         "GoodNotes," +
                                                                                                          "GoodRequestDetails.Product," +
                                                                                                          "GoodRequestDetails.Product.Unit," +
                                                                                                          "GoodRequestDetails.Product.Brand");
@@ -405,6 +405,7 @@ namespace BusinessLogicLayer.Services
 
                 var results = await _goodRequestRepository.Search(
                     filter: filter,
+                    orderBy: g => g.OrderByDescending(x => x.CreatedTime),
                     includeProperties: "GoodRequestDetails,Warehouse,RequestedWarehouse,Partner,GoodRequestDetails.Product," +
                                        "GoodRequestDetails.Product.Unit,GoodRequestDetails.Product.Brand",
                     pageIndex: pageIndex,
@@ -445,7 +446,7 @@ namespace BusinessLogicLayer.Services
                 return new ServiceResponse
                 {
                     Status = Data.Enum.SRStatus.Error,
-                    Message = "An error occurred while searching GoodRequests. Please try again later.",
+                    Message = "An error occurred while searching GoodRequests. Please try again later." + ex,
                     Data = null
                 };
             }
@@ -489,35 +490,38 @@ namespace BusinessLogicLayer.Services
         {
             var validTransitions = new Dictionary<GoodRequestStatusEnum, List<GoodRequestStatusEnum>>()
             {
-                { GoodRequestStatusEnum.Pending, new List<GoodRequestStatusEnum> { GoodRequestStatusEnum.Approved, GoodRequestStatusEnum.Canceled, GoodRequestStatusEnum.Rejected } },
-                { GoodRequestStatusEnum.Approved, new List<GoodRequestStatusEnum> { GoodRequestStatusEnum.Completed, GoodRequestStatusEnum.Canceled } },
-                { GoodRequestStatusEnum.Canceled, new List<GoodRequestStatusEnum>() }, // Không thể đổi từ Canceled                
+                { GoodRequestStatusEnum.Pending, new List<GoodRequestStatusEnum> { GoodRequestStatusEnum.Approved,/* GoodRequestStatusEnum.Canceled,*/ GoodRequestStatusEnum.Rejected } },
+                { GoodRequestStatusEnum.Approved, new List<GoodRequestStatusEnum> { GoodRequestStatusEnum.Completed, /*GoodRequestStatusEnum.Canceled*/ } },
+                //{ GoodRequestStatusEnum.Canceled, new List<GoodRequestStatusEnum>() }, // Không thể đổi từ Canceled                
                 { GoodRequestStatusEnum.Completed, new List<GoodRequestStatusEnum>() }, // Không thể đổi từ Completed
                 { GoodRequestStatusEnum.Rejected, new List<GoodRequestStatusEnum>() } // Không thể đổi từ Rejected
             };
 
             return validTransitions.ContainsKey(currentStatus) && validTransitions[currentStatus].Contains(newStatus);
         }
+
         private async Task AttachGoodNoteToGoodRequest(GoodRequestDTO goodRequest)
         {
-            var goodNote = await _unitOfWork.GoodNoteRepository.GetByCondition(g => g.GoodRequestId == goodRequest.Id);
-            if (goodNote == null) return;
+            var goodNotes = await _unitOfWork.GoodNoteRepository.Search(g => g.GoodRequestId == goodRequest.Id);
+            if (!goodNotes.Any()) return;
 
-            var entities = await _unitOfWork.GoodNoteDetailRepository.Search(
-                g => g.GoodNoteId == goodNote.Id,
-                includeProperties: "GoodNote," +
-                                   "GoodNote.GoodRequest," +
-                                   "GoodNote.GoodRequest.Warehouse," +
-                                   "GoodNote.GoodRequest.RequestedWarehouse," +
-                                   "GoodNote.GoodRequest.Partner," +
-                                   "Batch," +
-                                   "Batch.Product," +
-                                   "Batch.Product.Unit," +
-                                   "Batch.Product.Brand");
+            var goodNoteDTOs = new List<GoodNoteDTOv2>();
 
-            if (entities.Count() > 0)
+            foreach (var goodNote in goodNotes)
             {
-                var groupedResult = new GoodNoteDTOv2
+                var entities = await _unitOfWork.GoodNoteDetailRepository.Search(
+                    g => g.GoodNoteId == goodNote.Id,
+                    includeProperties: "GoodNote," +
+                                       "GoodNote.GoodRequest," +
+                                       "GoodNote.GoodRequest.Warehouse," +
+                                       "GoodNote.GoodRequest.RequestedWarehouse," +
+                                       "GoodNote.GoodRequest.Partner," +
+                                       "Batch," +
+                                       "Batch.Product," +
+                                       "Batch.Product.Unit," +
+                                       "Batch.Product.Brand");
+
+                var goodNoteDTO = new GoodNoteDTOv2
                 {
                     Id = goodNote.Id,
                     ReceiverName = goodNote.ReceiverName,
@@ -530,9 +534,11 @@ namespace BusinessLogicLayer.Services
                     CreatedBy = goodNote.CreatedBy,
                     GoodNoteDetails = _mapper.Map<List<GoodNoteDetailDTO>>(entities)
                 };
-                goodRequest.GoodNote = groupedResult;
-            }
-        }
 
+                goodNoteDTOs.Add(goodNoteDTO);
+            }
+
+            goodRequest.GoodNotes = goodNoteDTOs;
+        }
     }
 }

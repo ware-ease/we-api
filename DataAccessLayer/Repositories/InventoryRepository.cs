@@ -1,6 +1,7 @@
 ﻿using Data.Entity;
 using DataAccessLayer.Generic;
 using DataAccessLayer.IRepositories;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +14,20 @@ namespace DataAccessLayer.Repositories
     {
         public InventoryRepository(WaseEaseDbContext context) : base(context)
         {
+        }
+        //public async Task<List<Inventory>> GetInventoriesByProductIdAsync(string productId)
+        //{
+        //    return await _context.Inventories
+        //        .Where(x => x.Batch.ProductId == productId && x.CurrentQuantity > 0)
+        //        .ToListAsync();
+        //}
+
+        public async Task<List<Inventory>> GetAvailableInventoriesAsync(string productId)
+        {
+            return await _context.Inventories
+                .Where(x => x.Batch.ProductId == productId && x.CurrentQuantity > 0)
+                .OrderBy(x => x.Batch.InboundDate)  // Sắp xếp theo ngày nhập kho
+                .ToListAsync();
         }
     }
 }

@@ -17,8 +17,8 @@ namespace Data.Entity
         public DateOnly InboundDate { get; set; }
         //public DateOnly MfgDate { get; set; }
         //public DateOnly ExpDate { get; set; }
-        public ICollection<IssueDetail> IssueDetails { get; set; } = [];
-        public ICollection<ReceivingDetail> ReceivingDetails { get; set; } = [];
+        //public ICollection<IssueDetail> IssueDetails { get; set; } = [];
+        //public ICollection<ReceivingDetail> ReceivingDetails { get; set; } = [];
         public ICollection<GoodNoteDetail> GoodNoteDetails { get; set; } = [];
 
         public string? InventoryId { get; set; }

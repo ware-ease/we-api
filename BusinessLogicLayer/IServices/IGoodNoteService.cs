@@ -17,9 +17,11 @@ namespace BusinessLogicLayer.IServices
                                                                                               GoodNoteStatusEnum? status = null,
                                                                                               string? requestedWarehouseId = null);
         Task<ServiceResponse> GetById(string id);
-        Task<ServiceResponse> CreateAsync(GoodNoteCreateDTO request);
-        Task<ServiceResponse> DeleteAsync(string id);
-        Task<ServiceResponse> UpdateStatusAsync(string id, GoodNoteStatusEnum newStatus);
-        Task<ServiceResponse> UpdateAsync(string id, GoodNoteUpdateDTO request);
+        Task<ServiceResponse> CreateReceiveNoteAsync(GoodNoteCreateDTO request);
+        Task<ServiceResponse> CreateIssueNoteAsync(GoodNoteIssueCreateDTO dto);
+
+        //Task<ServiceResponse> DeleteAsync(string id);
+        //Task<ServiceResponse> UpdateStatusAsync(string id, GoodNoteStatusEnum newStatus);
+        //Task<ServiceResponse> UpdateAsync(string id, GoodNoteUpdateDTO request);
     }
 }
