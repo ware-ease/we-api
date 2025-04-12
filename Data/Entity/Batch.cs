@@ -14,8 +14,9 @@ namespace Data.Entity
         public string? SupplierId { get; set; }
         public string? Code { get; set; }
         public string? Name { get; set; }
-        public DateOnly MfgDate { get; set; }
-        public DateOnly ExpDate { get; set; }
+        public DateOnly InboundDate { get; set; }
+        //public DateOnly MfgDate { get; set; }
+        //public DateOnly ExpDate { get; set; }
         public ICollection<IssueDetail> IssueDetails { get; set; } = [];
         public ICollection<ReceivingDetail> ReceivingDetails { get; set; } = [];
         public ICollection<GoodNoteDetail> GoodNoteDetails { get; set; } = [];

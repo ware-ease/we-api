@@ -126,6 +126,9 @@ namespace BusinessLogicLayer.Services
             if (existingProduct != null)
                 throw new Exception("SKU đã tồn tại trong hệ thống!");
 
+            if ((request.QuantityType != ProductQuantityTypeEnum.Countable) || (request.QuantityType != ProductQuantityTypeEnum.Uncountable))
+                throw new Exception("QuantityType không hợp lệ");
+
             var productType = await _productTypeRepository.GetByCondition(p => p.Id == request.ProductTypeId);
             if (productType == null)
                 throw new Exception("ProductType không tồn tại");
@@ -181,6 +184,15 @@ namespace BusinessLogicLayer.Services
 
                 existingProduct.Sku = request.Sku;
             }
+            if (request.QuantityType.HasValue)
+            {
+                if ((request.QuantityType != ProductQuantityTypeEnum.Countable) || (request.QuantityType != ProductQuantityTypeEnum.Uncountable))
+                {
+                    throw new Exception("QuantityType không hợp lệ");
+                }
+                else
+                    existingProduct.QuantityType = request.QuantityType.Value;
+            }
             if (!string.IsNullOrEmpty(request.imageUrl))
             {
                 existingProduct.imageUrl = request.imageUrl;
@@ -230,8 +242,8 @@ namespace BusinessLogicLayer.Services
         {
 
             Expression<Func<Product, bool>> filter = p =>
-                (string.IsNullOrEmpty(keyword) || p.Name.Contains(keyword) 
-                || p.Sku.Contains(keyword) 
+                (string.IsNullOrEmpty(keyword) || p.Name.Contains(keyword)
+                || p.Sku.Contains(keyword)
                 || p.ProductType.Name.Contains(keyword)
                 || p.Brand.Name.Contains(keyword)
                 || (p.ProductType.Category.Name + " " + p.ProductType.Category.Note).Contains(keyword));

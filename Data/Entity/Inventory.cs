@@ -27,5 +27,6 @@ namespace Data.Entity
         public Batch Batch { get; set; }
 
         public ICollection<InventoryCountDetail> InventoryCountDetails { get; set; } = [];
+        public ICollection<InventoryAdjustmentDetail> InventoryAdjustmentDetails { get; set; } = [];
     }
 }

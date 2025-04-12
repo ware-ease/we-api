@@ -46,7 +46,7 @@ namespace BusinessLogicLayer.Services
             _inventoryLocationRepository = inventoryLocationRepository;
         }
 
-        public override async Task<ServiceResponse> Get<TResult>()
+        /*public override async Task<ServiceResponse> Get<TResult>()
         {
             var inventoryAdjustments = await _genericRepository.GetAllNoPaging(
                 includeProperties: "InventoryAdjustmentDetails,Warehouse,InventoryAdjustmentDetails.LocationLog"
@@ -360,7 +360,7 @@ namespace BusinessLogicLayer.Services
                     throw new Exception($"Lỗi khi cập nhật InventoryAdjustment: {ex.Message}");
                 }
             }
-        }
+        }*/
 
     }
 }

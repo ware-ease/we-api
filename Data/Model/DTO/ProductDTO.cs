@@ -1,4 +1,5 @@
 ﻿using Data.Entity;
+using Data.Enum;
 using Data.Model.DTO.Base;
 using System;
 using System.Collections.Generic;
@@ -15,6 +16,7 @@ namespace Data.Model.DTO
         public string? imageUrl { get; set; }
         //public string Barcode { get; set; }
         public string Sku { get; set; }
+        public ProductQuantityTypeEnum QuantityType { get; set; }
         public string ProductType { get; set; }
         public string Category { get; set; }
         public string Brand { get; set; }
