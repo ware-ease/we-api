@@ -94,9 +94,11 @@ namespace BusinessLogicLayer.Services
             if (product == null)
                 throw new Exception("Product không tồn tại");
 
-            if (request.MfgDate >= request.ExpDate)
-                throw new Exception("MfgDate phải nhỏ hơn ExpDate");
+            /*if (request.MfgDate >= request.ExpDate)
+                throw new Exception("MfgDate phải nhỏ hơn ExpDate");*/
 
+            if (request.InboundDate >= DateOnly.FromDateTime(DateTime.Now))
+                throw new Exception("InboundDate không được đặt ở tương lai");
 
             var batch = _mapper.Map<Batch>(request);
 
@@ -135,14 +137,14 @@ namespace BusinessLogicLayer.Services
             {
                 existingBatch.Name = request.Name;
             }
-            if (request.MfgDate.HasValue)
+            if (request.InboundDate.HasValue)
             {
-                existingBatch.MfgDate = request.MfgDate.Value;
+                existingBatch.InboundDate = request.InboundDate.Value;
             }
-            if (request.ExpDate.HasValue)
+            /*if (request.ExpDate.HasValue)
             {
                 existingBatch.ExpDate = request.ExpDate.Value;
-            }
+            }*/
 
             if (!string.IsNullOrEmpty(request.InventoryId))
             {

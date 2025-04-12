@@ -18,12 +18,14 @@ namespace Data.Model.Request.Batch
         public string? Code { get; set; }
         [Required(ErrorMessage = "Name không được để trống")]
         public string? Name { get; set; }
-        [Required(ErrorMessage = "MfgDate không được để trống")]
+        [Required(ErrorMessage = "InboundDate không được để trống")]
+        public DateOnly? InboundDate { get; set; }
+        //[Required(ErrorMessage = "MfgDate không được để trống")]
         //[DataType(DataType.Date)]
-        public DateOnly MfgDate { get; set; }
-        [Required(ErrorMessage = "ExpDate không được để trống")]
+        //public DateOnly MfgDate { get; set; }
+        //[Required(ErrorMessage = "ExpDate không được để trống")]
         //[DataType(DataType.Date)]
-        public DateOnly ExpDate { get; set; }
+        //public DateOnly ExpDate { get; set; }
         //public string? InventoryId { get; set; }
     }
 }

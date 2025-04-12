@@ -23,7 +23,7 @@ namespace API.Controllers
             _inventoryAdjustmentService = inventoryAdjustmentService;
         }
 
-        [HttpGet]
+        /*[HttpGet]
         public async Task<IActionResult> SearchPartners([FromQuery] int pageIndex = 1,
                                                         [FromQuery] int pageSize = 5,
                                                         [FromQuery] string? keyword = null, string? warehouseId = null)
@@ -116,6 +116,6 @@ namespace API.Controllers
         {
             var result = await _inventoryAdjustmentService.Delete(id);
             return ControllerResponse.Response(result);
-        }
+        }*/
     }
 }

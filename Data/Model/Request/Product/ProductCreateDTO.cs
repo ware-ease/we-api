@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Data.Enum;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -13,6 +14,8 @@ namespace Data.Model.Request.Product
         public string? Name { get; set; }
         [Required(ErrorMessage = "Sku không được để trống")]
         public string? Sku { get; set; }
+        [Required(ErrorMessage = "QuantityType không được để trống")]
+        public ProductQuantityTypeEnum QuantityType { get; set; }
         public string? imageUrl { get; set; }
         [Required(ErrorMessage = "ProductTypeId không được để trống")]
         public string ProductTypeId { get; set; }

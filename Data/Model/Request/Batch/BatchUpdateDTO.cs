@@ -16,12 +16,14 @@ namespace Data.Model.Request.Batch
         public string? ProductId { get; set; }
         public string? Code { get; set; }
         public string? Name { get; set; }
+        [DataType(DataType.Date)]
+        public DateOnly? InboundDate { get; set; }
         //[Required(ErrorMessage = "MfgDate không được để trống")]
-        [DataType(DataType.Date)]
-        public DateOnly? MfgDate { get; set; }
+        //[DataType(DataType.Date)]
+        //public DateOnly? MfgDate { get; set; }
         //[Required(ErrorMessage = "ExpDate không được để trống")]
-        [DataType(DataType.Date)]
-        public DateOnly? ExpDate { get; set; }
+        //[DataType(DataType.Date)]
+        //public DateOnly? ExpDate { get; set; }
         public string? InventoryId { get; set; }
     }
 }

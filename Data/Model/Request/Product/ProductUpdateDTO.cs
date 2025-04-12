@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Data.Enum;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -14,6 +15,7 @@ namespace Data.Model.Request.Product
         public string? Id { get; set; }
         public string? Name { get; set; }
         public string? Sku { get; set; }
+        public ProductQuantityTypeEnum? QuantityType { get; set; }
         public string? imageUrl { get; set; }
         //[Required(ErrorMessage = "CategoryId không được để trống")]
         public string? ProductTypeId { get; set; }
