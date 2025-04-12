@@ -49,5 +49,7 @@ namespace BusinessLogicLayer.Services
         GOOD_REQUEST_APPROVED,
         GOOD_REQUEST_REJECTED,
         GOOD_REQUEST_CONFIRMED,
+        RECEIVE_NOTE_CREATED,
+        ISSUE_NOTE_CREATED,
     }
 }

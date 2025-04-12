@@ -2,6 +2,7 @@
 using Data.Enum;
 using Data.Model.DTO;
 using Data.Model.DTO.Base;
+using Data.Model.Request.Batch;
 using Data.Model.Request.GoodRequest;
 using Data.Model.Request.Partner;
 using System.ComponentModel.DataAnnotations;
@@ -58,8 +59,9 @@ namespace Data.Model.Request.GoodNote
     }
     public class GoodNoteCreateDTO : BaseCreateDTO
     {
-        [Required(ErrorMessage = "Loại phiếu không được để trống.")]
-        public GoodNoteEnum NoteType { get; set; }
+        [JsonIgnore]
+        //[Required(ErrorMessage = "Loại phiếu không được để trống.")]
+        public GoodNoteEnum NoteType { get; set; } = GoodNoteEnum.Receive;
         [MaxLength(100, ErrorMessage = "Tên người giao hàng không được vượt quá 100 ký tự.")]
         public string? ShipperName { get; set; }
         [MaxLength(100, ErrorMessage = "Tên người nhận hàng không được vượt quá 100 ký tự.")]
@@ -81,7 +83,9 @@ namespace Data.Model.Request.GoodNote
         public string? Note { get; set; }
         [JsonIgnore]
         public string? GoodNoteId { get; set; }
-        public string BatchId { get; set; }
+        [Required(ErrorMessage = "Thông tin lô nhập không được để trống.")]
+        public BatchCreateDTO? NewBatch { get; set; }
+
         [JsonIgnore]
         public DateTime? CreatedTime { get; set; }
     }
@@ -109,4 +113,39 @@ namespace Data.Model.Request.GoodNote
         public WarehouseDTO? Warehouse { get; set; }
         public WarehouseDTO? RequestedWarehouse { get; set; }
     }
+
+    public class GoodNoteIssueCreateDTO : BaseCreateDTO
+    {
+        [MaxLength(100, ErrorMessage = "Tên người giao hàng không được vượt quá 100 ký tự.")]
+        public string? ShipperName { get; set; }
+
+        [MaxLength(100, ErrorMessage = "Tên người nhận hàng không được vượt quá 100 ký tự.")]
+        public string? ReceiverName { get; set; }
+
+        [Required(ErrorMessage = "Mã phiếu không được để trống.")]
+        [MaxLength(50, ErrorMessage = "Mã phiếu không được vượt quá 50 ký tự.")]
+        public string? Code { get; set; }
+
+        [Required(ErrorMessage = "Ngày không được để trống.")]
+        public DateTime? Date { get; set; }
+
+        [Required(ErrorMessage = "GoodRequestId không được để trống.")]
+        public string GoodRequestId { get; set; }
+
+        [Required(ErrorMessage = "Danh sách hàng hóa xuất không được để trống.")]
+        public List<GoodNoteIssueDetailCreateDTO> GoodNoteDetails { get; set; }
+    }
+
+    public class GoodNoteIssueDetailCreateDTO : BaseCreateDTO
+    {
+        [Required(ErrorMessage = "ProductId không được để trống.")]
+        public string ProductId { get; set; }
+
+        [Required(ErrorMessage = "Số lượng không được để trống.")]
+        [Range(0.1, double.MaxValue, ErrorMessage = "Số lượng phải lớn hơn 0.")]
+        public float Quantity { get; set; }
+
+        public string? Note { get; set; }
+    }
+
 }

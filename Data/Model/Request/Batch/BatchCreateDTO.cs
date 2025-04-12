@@ -12,11 +12,11 @@ namespace Data.Model.Request.Batch
     {
         //[Required(ErrorMessage = "SupplierId không được để trống")]
         //public string? SupplierId { get; set; }
-        [Required(ErrorMessage = "ProductId không được để trống")]
+        [Required(ErrorMessage = "Id sản phẩm không được để trống")]
         public string ProductId { get; set; }
-        [Required(ErrorMessage = "Code không được để trống")]
+        [Required(ErrorMessage = "Mã lô không được để trống")]
         public string? Code { get; set; }
-        [Required(ErrorMessage = "Name không được để trống")]
+        [Required(ErrorMessage = "Tên lô không được để trống")]
         public string? Name { get; set; }
         [Required(ErrorMessage = "InboundDate không được để trống")]
         public DateOnly? InboundDate { get; set; }

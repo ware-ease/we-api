@@ -561,15 +561,15 @@ namespace BusinessLogicLayer.Services
                 (int)details.Where(d => d.GoodNote.NoteType == type).Sum(d => d.Quantity);
 
             // Tính tổng từng loại trong tháng hiện tại
-            int totalPutIn = SumByType(currentMonthDetails, GoodNoteEnum.Receive) + SumByType(currentMonthDetails, GoodNoteEnum.Return);
+            int totalPutIn = SumByType(currentMonthDetails, GoodNoteEnum.Receive) /*+ SumByType(currentMonthDetails, GoodNoteEnum.Return)*/;
             int totalTakeOut = SumByType(currentMonthDetails, GoodNoteEnum.Issue);
-            int totalTransfer = SumByType(currentMonthDetails, GoodNoteEnum.Transfer);
+            //int totalTransfer = SumByType(currentMonthDetails, GoodNoteEnum.Transfer);
             int currentStockChange = totalPutIn - totalTakeOut;
 
             // Tháng trước
-            int lastPutIn = SumByType(lastMonthDetails, GoodNoteEnum.Receive) + SumByType(lastMonthDetails, GoodNoteEnum.Return);
+            int lastPutIn = SumByType(lastMonthDetails, GoodNoteEnum.Receive) /*+ SumByType(lastMonthDetails, GoodNoteEnum.Return)*/;
             int lastTakeOut = SumByType(lastMonthDetails, GoodNoteEnum.Issue);
-            int lastTransfer = SumByType(lastMonthDetails, GoodNoteEnum.Transfer);
+            //int lastTransfer = SumByType(lastMonthDetails, GoodNoteEnum.Transfer);
             int lastStockChange = lastPutIn - lastTakeOut;
 
             // Hàm tính phần trăm thay đổi
@@ -594,8 +594,8 @@ namespace BusinessLogicLayer.Services
                     CurrentStockChange = currentStockChange,
                     ChangeStock = CalcChangePercent(currentStockChange, lastStockChange),
 
-                    TotalTransfer = totalTransfer,
-                    ChangeTransfer = CalcChangePercent(totalTransfer, lastTransfer)
+                    //TotalTransfer = totalTransfer,
+                    //ChangeTransfer = CalcChangePercent(totalTransfer, lastTransfer)
                 }
             };
         }
@@ -620,7 +620,7 @@ namespace BusinessLogicLayer.Services
                 .Select(g => new
                 {
                     Date = g.Key,
-                    PutIn = g.Where(x => x.GoodNote.NoteType == GoodNoteEnum.Receive || x.GoodNote.NoteType == GoodNoteEnum.Return).Sum(x => x.Quantity),
+                    PutIn = g.Where(x => x.GoodNote.NoteType == GoodNoteEnum.Receive /*|| x.GoodNote.NoteType == GoodNoteEnum.Return*/).Sum(x => x.Quantity),
                     TakeOut = g.Where(x => x.GoodNote.NoteType == GoodNoteEnum.Issue /*|| x.GoodNote.NoteType == GoodNoteEnum.Transfer*/).Sum(x => x.Quantity)
                 })
                 .OrderBy(x => x.Date)
@@ -669,9 +669,9 @@ namespace BusinessLogicLayer.Services
                     var type = detail.GoodNote.NoteType;
                     float importQty = 0, exportQty = 0;
 
-                    if (type == GoodNoteEnum.Receive || type == GoodNoteEnum.Return)
+                    if (type == GoodNoteEnum.Receive /*|| type == GoodNoteEnum.Return*/)
                         importQty = detail.Quantity;
-                    else if (type == GoodNoteEnum.Issue || type == GoodNoteEnum.Transfer)
+                    else if (type == GoodNoteEnum.Issue/* || type == GoodNoteEnum.Transfer*/)
                         exportQty = detail.Quantity;
 
                     stock += importQty - exportQty;

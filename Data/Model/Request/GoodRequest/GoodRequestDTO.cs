@@ -24,7 +24,7 @@ namespace Data.Model.Request.GoodRequest
         //public string? RequestedWarehouseName { get; set; }
         public WarehouseDTO? RequestedWarehouse { get; set; }
         public IEnumerable<GoodRequestDetailInfoDTO>? GoodRequestDetails { get; set; }
-        public GoodNoteDTOv2? GoodNote { get; set; }
+        public IEnumerable<GoodNoteDTOv2>? GoodNotes { get; set; }
 
     }
 

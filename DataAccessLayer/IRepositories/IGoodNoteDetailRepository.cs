@@ -10,5 +10,7 @@ namespace DataAccessLayer.IRepositories
 {
     public interface IGoodNoteDetailRepository : IGenericRepository<GoodNoteDetail>
     {
+        Task<List<GoodNoteDetail>> GetDetailsByGoodNoteIdAsync(string goodNoteId);
+        
     }
 }
