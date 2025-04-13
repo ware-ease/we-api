@@ -19,10 +19,10 @@ namespace Data.Model.DTO
         public TimeOnly? StartTime { get; set; }
         public TimeOnly? EndTime { get; set; }
         public DateOnly? ScheduleDate { get; set; }
-        public string LocationName { get; set; }
+        /*public string LocationName { get; set; }
         public string LocationId { get; set; }
         public string WarehouseName { get; set; }
-        public string WarehouseId { get; set; }
+        public string WarehouseId { get; set; }*/
         public List<InventoryCountDetailDTO> InventoryCountDetailDTO { get; set; }
     }
 
@@ -32,7 +32,9 @@ namespace Data.Model.DTO
         public float ExpectedQuantity { get; set; }
         public float CountedQuantity { get; set; }
         public string? Note { get; set; }
-        public string Inventory { get; set; }
+        public string InventoryId { get; set; }
+        public string BatchId { get; set; }
+        public string BatchCode { get; set; }
     }
 
     public class InventoryByLocationDTO : BaseDTO

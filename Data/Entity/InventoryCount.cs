@@ -22,8 +22,8 @@ namespace Data.Entity
         public ICollection<InventoryCountDetail> InventoryCheckDetails { get; set; } = [];
 
         [ForeignKey("Schedule")]
-        public string ScheduleId { get; set; }
-        public Schedule Schedule { get; set; }
+        public string? ScheduleId { get; set; }
+        public Schedule? Schedule { get; set; }
 
         /*[ForeignKey("Location")]
         public string LocationId { get; set; }
