@@ -25,8 +25,8 @@ namespace Data.Entity
         public string ScheduleId { get; set; }
         public Schedule Schedule { get; set; }
 
-        [ForeignKey("Location")]
+        /*[ForeignKey("Location")]
         public string LocationId { get; set; }
-        public Location Location { get; set; } //level 0 only
+        public Location Location { get; set; } //level 0 only*/
     }
 }
