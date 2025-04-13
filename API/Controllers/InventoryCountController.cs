@@ -29,11 +29,10 @@ namespace API.Controllers
         public async Task<IActionResult> SearchPartners([FromQuery] int pageIndex = 1,
                                                         [FromQuery] int pageSize = 5,
                                                         [FromQuery] string? keyword = null,
-                                                        [FromQuery] InventoryCountStatus? status = 0,
-                                                        [FromQuery] string? warehouseId = null)
+                                                        [FromQuery] InventoryCountStatus? status = 0)
         {
             var response = await _inventoryCountService.Search<InventoryCountDTO>(
-                pageIndex, pageSize, keyword, status, warehouseId);
+                pageIndex, pageSize, keyword, status);
 
             return ControllerResponse.Response(response);
         }
