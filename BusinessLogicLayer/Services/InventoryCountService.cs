@@ -105,7 +105,7 @@ namespace BusinessLogicLayer.Services
 
             var inventoryCount = _mapper.Map<InventoryCount>(request);
             //inventoryCount.LocationId = schedule.LocationId;
-            inventoryCount.LocationId = request.LocationId;
+            //inventoryCount.LocationId = request.LocationId;
 
             await _genericRepository.Insert(inventoryCount);
             await _unitOfWork.SaveAsync();
@@ -120,11 +120,11 @@ namespace BusinessLogicLayer.Services
                     if (inventory == null)
                         throw new Exception($"Inventory với ID {detail.InventoryId} không tồn tại");
 
-                    var expectedQuantity = await SumInventoryLocationQuantityByLocationLevel0AndInventory(inventoryCount.LocationId, detail.InventoryId);
+                    //var expectedQuantity = await SumInventoryLocationQuantityByLocationLevel0AndInventory(inventoryCount.LocationId, detail.InventoryId);
 
                     var inventoryCountDetail = _mapper.Map<InventoryCountDetail>(detail);
                     inventoryCountDetail.InventoryCountId = inventoryCount.Id;
-                    inventoryCountDetail.ExpectedQuantity = expectedQuantity;
+                    //inventoryCountDetail.ExpectedQuantity = expectedQuantity;
                     inventoryCountDetail.CreatedBy = inventoryCount.CreatedBy;
 
                     await _inventoryCountDetailRepository.Insert(inventoryCountDetail);
@@ -210,7 +210,7 @@ namespace BusinessLogicLayer.Services
                             if (inventory == null)
                                 throw new Exception($"Inventory with ID {detailDto.InventoryId} not found");
                             existingDetail.InventoryId = detailDto.InventoryId;
-                            var expectedQuantity = await SumInventoryLocationQuantityByLocationLevel0AndInventory(existingInventoryCount.LocationId, existingDetail.InventoryId);
+                            //var expectedQuantity = await SumInventoryLocationQuantityByLocationLevel0AndInventory(existingInventoryCount.LocationId, existingDetail.InventoryId);
                         }
                         if (!string.IsNullOrEmpty(detailDto.ErrorTicketId))
                             existingDetail.ErrorTicketId = detailDto.ErrorTicketId;
@@ -251,13 +251,10 @@ namespace BusinessLogicLayer.Services
             (p.Status == status &&
             (string.IsNullOrEmpty(keyword) || p.Code.Contains(keyword)
                 || p.Note.Contains(keyword)
-                || p.Location.Name.Contains(keyword)
-                || p.Location.Code.Contains(keyword)
-                || p.Location.Warehouse.Name.Contains(keyword)
                 || p.InventoryCheckDetails.Any(d => d.Note != null && d.Note.Contains(keyword)))
                 //|| p.InventoryCheckDetails.Any(d => d.Product != null && d.Product.Name.Contains(keyword)))
-                ) &&
-                (string.IsNullOrEmpty(warehouseId) || p.Location.Warehouse.Id == warehouseId);
+                );/* &&
+                (string.IsNullOrEmpty(warehouseId) || p.Location.Warehouse.Id == warehouseId);*/
 
             var totalRecords = await _genericRepository.Count(filter);
 

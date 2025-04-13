@@ -18,7 +18,7 @@ namespace Data.Entity
         public ICollection<ScheduleSetting> ScheduleSettings { get; set; } = [];
         public ICollection<Schedule> Schedules { get; set; } = [];
         public ICollection<InventoryLocation> InventoryLocations { get; set; } = [];
-        public ICollection<InventoryCount> InventoryCounts { get; set; } = [];
+        //public ICollection<InventoryCount> InventoryCounts { get; set; } = [];
 
         [ForeignKey("Warehouse")]
         public string WarehouseId { get; set; }
