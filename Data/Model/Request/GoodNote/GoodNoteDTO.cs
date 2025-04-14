@@ -84,6 +84,7 @@ namespace Data.Model.Request.GoodNote
         [JsonIgnore]
         public string? GoodNoteId { get; set; }
         [Required(ErrorMessage = "Thông tin lô nhập không được để trống.")]
+        public string? BatchId { get; set; }
         public BatchCreateDTO? NewBatch { get; set; }
 
         [JsonIgnore]
@@ -148,4 +149,18 @@ namespace Data.Model.Request.GoodNote
         public string? Note { get; set; }
     }
 
+    public class GoodNoteAndGoodRequestDTOv2 : BaseDTO
+    {
+        public string? Note { get; set; }
+        public string? Code { get; set; }
+
+        public GoodRequestEnum RequestType { get; set; }
+        public GoodRequestStatusEnum Status { get; set; } = GoodRequestStatusEnum.Pending;
+
+        //public ICollection<GoodRequestDetail> GoodRequestDetails { get; set; } = [];
+        public PartnerDTO? Partner { get; set; }
+        public WarehouseDTO? Warehouse { get; set; }
+        public WarehouseDTO? RequestedWarehouse { get; set; }
+        public List<GoodNoteDTOv2>? GoodRequestDetails { get; set; }
+    }
 }

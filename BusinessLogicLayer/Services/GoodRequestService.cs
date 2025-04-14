@@ -155,6 +155,8 @@ namespace BusinessLogicLayer.Services
             // 6️⃣ Mapping và thêm vào DB
             var entity = _mapper.Map<GoodRequest>(request);
             entity.CreatedTime = DateTime.Now;
+            // Bắt đầu transaction
+            await _unitOfWork.BeginTransactionAsync();
 
             try
             {
@@ -162,13 +164,16 @@ namespace BusinessLogicLayer.Services
                 await _unitOfWork.SaveAsync();
                 // Gửi thông báo đến người dùng
                 var userIds = await _unitOfWork.AccountRepository.GetUserIdsByRequestedWarehouseAndGroups(request.RequestedWarehouseId, new List<string> { "Thủ kho" });
-                await _firebaseService.SendNotificationToUsersAsync(userIds, "Yêu cầu mới vừa được tạo.", $"Một yêu càu kho vừa được tạo với mã yêu cầu: {entity.Code}", NotificationType.GOOD_REQUEST_CREATED, request.RequestedWarehouseId);
+                await _firebaseService.SendNotificationToUsersAsync(userIds, "Yêu cầu mới vừa được tạo.", $"Một yêu cầu kho vừa được tạo với mã yêu cầu: {entity.Code}", NotificationType.GOOD_REQUEST_CREATED, request.RequestedWarehouseId);
 
                 var goodRequest = await _goodRequestRepository.GetByCondition(x => x.Id == entity.Id, includeProperties: "GoodRequestDetails,Warehouse,RequestedWarehouse,Partner," +
                                                                                                                          "GoodRequestDetails.Product," +
                                                                                                                          "GoodRequestDetails.Product.Unit," +
                                                                                                                          "GoodRequestDetails.Product.Brand");
                 var result = _mapper.Map<TResult>(goodRequest);
+                // Commit transaction
+                await _unitOfWork.CommitTransactionAsync();
+
                 return new ServiceResponse
                 {
                     Status = SRStatus.Success,
@@ -178,6 +183,8 @@ namespace BusinessLogicLayer.Services
             }
             catch (Exception ex)
             {
+                // Nếu có lỗi, rollback transaction
+                await _unitOfWork.RollbackTransactionAsync();
                 return new ServiceResponse
                 {
                     Status = SRStatus.Error,
@@ -478,7 +485,24 @@ namespace BusinessLogicLayer.Services
             goodRequest.Status = newStatus;
             _goodRequestRepository.Update(goodRequest);
             await _unitOfWork.SaveAsync();
-
+            // Gửi thông báo đến người dùng
+            //var userIds = await _unitOfWork.AccountRepository.GetUserIdsByRequestedWarehouseAndGroups(goodRequest.RequestedWarehouseId, new List<string> { "Nhân viên bán hàng" });
+            switch (newStatus)
+            {
+                case GoodRequestStatusEnum.Approved:
+                    await _firebaseService.SendNotificationToUsersAsync( new List<string> { goodRequest.CreatedBy }, "Yêu cầu kho đã được phê duyệt.", $"Yêu cầu kho với mã yêu cầu: {goodRequest.Code} đã được phê duyệt.", NotificationType.GOOD_REQUEST_APPROVED, goodRequest.RequestedWarehouseId);
+                    break;
+                case GoodRequestStatusEnum.Rejected:
+                    await _firebaseService.SendNotificationToUsersAsync(new List<string> { goodRequest.CreatedBy }, "Yêu cầu kho đã bị từ chối.", $"Yêu cầu kho với mã yêu cầu: {goodRequest.Code} đã bị từ chối.", NotificationType.GOOD_REQUEST_REJECTED, goodRequest.RequestedWarehouseId);
+                    break;
+                case GoodRequestStatusEnum.Completed:
+                    await _firebaseService.SendNotificationToUsersAsync(new List<string> { goodRequest.CreatedBy }, "Yêu cầu kho đã hoàn thành.", $"Yêu cầu kho với mã yêu cầu: {goodRequest.Code} đã hoàn thành.", NotificationType.GOOD_REQUEST_CONFIRMED, goodRequest.RequestedWarehouseId);
+                    break;
+                case GoodRequestStatusEnum.Pending:
+                    break;
+                default:
+                    break;
+            }
             return new ServiceResponse
             {
                 Status = SRStatus.Success,

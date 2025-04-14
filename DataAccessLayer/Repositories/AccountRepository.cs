@@ -55,7 +55,21 @@ namespace DataAccessLayer.Repositories
 
             return userIds;
         }
+        public async Task<List<string>> GetAdminUserIdsAsync()
+        {
+            var userIds = await _context.AccountGroups
+                .Where(ag => ag.IsDeleted == false)
+                .Join(_context.Groups,
+                      ag => ag.GroupId,
+                      g => g.Id,
+                      (ag, g) => new { ag.AccountId, g.Name })
+                .Where(x => x.Name == "Admin")
+                .Select(x => x.AccountId)
+                .Distinct()
+                .ToListAsync();
 
+            return userIds;
+        }
 
     }
 }
