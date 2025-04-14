@@ -4,6 +4,7 @@ using DataAccessLayer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccessLayer.Migrations
 {
     [DbContext(typeof(WaseEaseDbContext))]
-    partial class WaseEaseDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250414101330_UpdateBatch")]
+    partial class UpdateBatch
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -899,10 +902,15 @@ namespace DataAccessLayer.Migrations
                     b.Property<DateTime?>("LastUpdatedTime")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("LocationId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<string>("Note")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ScheduleId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<TimeOnly?>("StartTime")
@@ -913,9 +921,10 @@ namespace DataAccessLayer.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("LocationId");
+
                     b.HasIndex("ScheduleId")
-                        .IsUnique()
-                        .HasFilter("[ScheduleId] IS NOT NULL");
+                        .IsUnique();
 
                     b.ToTable("InventoryCount");
                 });
@@ -2156,10 +2165,19 @@ namespace DataAccessLayer.Migrations
 
             modelBuilder.Entity("Data.Entity.InventoryCount", b =>
                 {
+                    b.HasOne("Data.Entity.Location", "Location")
+                        .WithMany("InventoryCounts")
+                        .HasForeignKey("LocationId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
                     b.HasOne("Data.Entity.Schedule", "Schedule")
                         .WithOne("InventoryCount")
                         .HasForeignKey("Data.Entity.InventoryCount", "ScheduleId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Location");
 
                     b.Navigation("Schedule");
                 });
@@ -2470,6 +2488,8 @@ namespace DataAccessLayer.Migrations
 
             modelBuilder.Entity("Data.Entity.Location", b =>
                 {
+                    b.Navigation("InventoryCounts");
+
                     b.Navigation("InventoryLocations");
 
                     b.Navigation("ScheduleSettings");

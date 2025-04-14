@@ -1,4 +1,5 @@
 ﻿using BusinessLogicLayer.IServices;
+using DataAccessLayer.UnitOfWork;
 using Firebase.Database;
 using Firebase.Database.Query;
 using Microsoft.Extensions.Configuration;
@@ -13,17 +14,41 @@ namespace BusinessLogicLayer.Services
     public class FirebaseService : IFirebaseService
     {
         private readonly FirebaseClient _firebaseClient;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public FirebaseService()
+        public FirebaseService(IUnitOfWork unitOfWork)
         {
             _firebaseClient = new FirebaseClient(Environment.GetEnvironmentVariable("FIREBASE_DATABASE_URL"));
+            _unitOfWork = unitOfWork;
         }
 
         public async Task SendNotificationToUsersAsync(List<string> userIds, string title, string message, NotificationType type, string? warehouseId)
         {
             var timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 
-            var tasks = userIds.Select(userId =>
+            //var tasks = userIds.Select(userId =>
+            //    _firebaseClient
+            //        .Child("notifications")
+            //        .Child(userId)
+            //        .PostAsync(new
+            //        {
+            //            id = Guid.NewGuid().ToString(),
+            //            title,
+            //            message,
+            //            warehouseId,
+            //            type,
+            //            timestamp,
+            //            read = false
+            //        })
+            //);
+            // Lấy thêm toàn bộ admin userIds
+            var adminUserIds = await _unitOfWork.AccountRepository.GetAdminUserIdsAsync();
+
+            // Gộp userIds lại và loại trùng
+            var allUserIds = userIds.Concat(adminUserIds).Distinct().ToList();
+
+            // Gửi thông báo
+            var tasks = allUserIds.Select(userId =>
                 _firebaseClient
                     .Child("notifications")
                     .Child(userId)
@@ -38,6 +63,7 @@ namespace BusinessLogicLayer.Services
                         read = false
                     })
             );
+
 
             await Task.WhenAll(tasks);
         }

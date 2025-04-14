@@ -183,6 +183,10 @@ namespace BusinessLogicLayer.Services
                     goodRequest = await _unitOfWork.GoodRequestRepository.GetByCondition(x => x.Id == request.GoodRequestId);
                     if (goodRequest == null)
                         return Fail("Không tìm thấy yêu cầu kho.", request.GoodRequestId);
+                    if (goodRequest.Status == GoodRequestStatusEnum.Pending)
+                    {
+                        return Fail("Không thể tạo phiếu cho yêu cầu chưa được chấp thuận.", request.GoodRequestId);
+                    }
                     if (goodRequest.Status == GoodRequestStatusEnum.Completed)
                     {
                         return Fail("Không thể tạo phiếu cho yêu cầu đã hoàn thành.", request.GoodRequestId);
@@ -208,8 +212,13 @@ namespace BusinessLogicLayer.Services
 
                 foreach (var detail in request.GoodNoteDetails)
                 {
-                    if (detail.NewBatch == null)
-                        return Fail("Thiếu thông tin lô cho sản phẩm.", null);
+                    var hasNewBatch = detail.NewBatch != null;
+                    var hasBatchId = !string.IsNullOrEmpty(detail.BatchId);
+
+                    if (hasNewBatch == hasBatchId) // hoặc cả 2 null hoặc cả 2 có
+                    {
+                        return Fail("Mỗi chi tiết phải có đúng một trong thông tin lô hoặc lô Id.", null);
+                    }
                 }
 
                 // Tạo phiếu nhập kho
@@ -224,16 +233,35 @@ namespace BusinessLogicLayer.Services
 
                 foreach (var detailDto in request.GoodNoteDetails)
                 {
-                    // Tạo batch
-                    var batch = _mapper.Map<Batch>(detailDto.NewBatch);
-                    await _unitOfWork.BatchRepository.Add(batch);
+                    // Kiểm tra điều kiện: chỉ được có 1 trong 2
+                    var hasNewBatch = detailDto.NewBatch != null;
+                    var hasBatchId = !string.IsNullOrEmpty(detailDto.BatchId);
+                    // Nếu cả 2 đều có hoặc cả 2 đều không có thì báo lỗi
+                    if (hasNewBatch == hasBatchId) // tức là hoặc cả 2 true hoặc cả 2 false
+                    {
+                        return Fail("Mỗi chi tiết phải có đúng một trong thông tin lô hoặc lô Id.", null);
+                    }
 
                     // Tạo chi tiết
                     var detail = _mapper.Map<GoodNoteDetail>(detailDto);
                     detail.GoodNoteId = goodNote.Id;
                     detail.CreatedTime = DateTime.Now;
-                    detail.BatchId = batch.Id;
+                    if (hasNewBatch)
+                    {
+                        // Tạo batch mới
+                        var batch = _mapper.Map<Batch>(detailDto.NewBatch);
+                        await _unitOfWork.BatchRepository.Add(batch);
+                        detail.BatchId = batch.Id;
+                    }
+                    else if (hasBatchId)
+                    {
+                        // Kiểm tra lô cũ có tồn tại không
+                        var oldBatch = await _unitOfWork.BatchRepository.GetByCondition(x => x.Id == detailDto.BatchId);
+                        if (oldBatch == null)
+                            return Fail("Không tìm thấy lô hàng.", detailDto.BatchId);
 
+                        detail.BatchId = oldBatch.Id;
+                    }
                     await _unitOfWork.GoodNoteDetailRepository.Add(detail);
 
                     goodNoteDetails.Add(detail);
@@ -262,6 +290,8 @@ namespace BusinessLogicLayer.Services
                 }
 
                 await _unitOfWork.SaveAsync();
+                // Thông báo cho thủ kho
+                //++++
                 await _unitOfWork.CommitTransactionAsync();
 
                 serviceResponse.Status = SRStatus.Success;
@@ -850,7 +880,7 @@ namespace BusinessLogicLayer.Services
 
 
                 var keeperIds = await _unitOfWork.AccountRepository.GetUserIdsByRequestedWarehouseAndGroups(goodRequest.RequestedWarehouseId, new List<string> { "Thủ kho" });
-               
+
                 await SendIssueNoteNotificationAsync(
                     keeperIds,
                     goodRequest.CreatedBy,
