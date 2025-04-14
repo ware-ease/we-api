@@ -18,7 +18,10 @@ namespace BusinessLogicLayer.Services
 
         public FirebaseService(IUnitOfWork unitOfWork)
         {
-            _firebaseClient = new FirebaseClient(Environment.GetEnvironmentVariable("FIREBASE_DATABASE_URL"));
+            _firebaseClient = new FirebaseClient(Environment.GetEnvironmentVariable("FIREBASE_DATABASE_URL"), new FirebaseOptions
+            {
+                AuthTokenAsyncFactory = () => Task.FromResult(Environment.GetEnvironmentVariable("FIREBASE_APP_SECRET"))
+            });
             _unitOfWork = unitOfWork;
         }
 

@@ -171,7 +171,7 @@ namespace BusinessLogicLayer.Generic
 
         protected async Task<Account?> GetCreatedBy(string id)
         {
-            return await _unitOfWork.AccountRepository.Get(id);
+            return await _unitOfWork.AccountRepository.GetWithFullInfo(id);
         }
     }
 }
