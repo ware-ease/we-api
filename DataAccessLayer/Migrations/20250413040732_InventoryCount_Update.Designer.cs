@@ -4,6 +4,7 @@ using DataAccessLayer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccessLayer.Migrations
 {
     [DbContext(typeof(WaseEaseDbContext))]
-    partial class WaseEaseDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250413040732_InventoryCount_Update")]
+    partial class InventoryCount_Update
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -266,9 +269,6 @@ namespace DataAccessLayer.Migrations
                     b.Property<DateTime?>("DeletedTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateOnly?>("ExpDate")
-                        .HasColumnType("date");
-
                     b.Property<DateOnly>("InboundDate")
                         .HasColumnType("date");
 
@@ -283,9 +283,6 @@ namespace DataAccessLayer.Migrations
 
                     b.Property<DateTime?>("LastUpdatedTime")
                         .HasColumnType("datetime2");
-
-                    b.Property<DateOnly?>("MfgDate")
-                        .HasColumnType("date");
 
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
@@ -903,6 +900,7 @@ namespace DataAccessLayer.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ScheduleId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<TimeOnly?>("StartTime")
@@ -914,8 +912,7 @@ namespace DataAccessLayer.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ScheduleId")
-                        .IsUnique()
-                        .HasFilter("[ScheduleId] IS NOT NULL");
+                        .IsUnique();
 
                     b.ToTable("InventoryCount");
                 });
@@ -2159,7 +2156,8 @@ namespace DataAccessLayer.Migrations
                     b.HasOne("Data.Entity.Schedule", "Schedule")
                         .WithOne("InventoryCount")
                         .HasForeignKey("Data.Entity.InventoryCount", "ScheduleId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
 
                     b.Navigation("Schedule");
                 });

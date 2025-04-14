@@ -22,11 +22,11 @@ namespace Data.Entity
         public ICollection<InventoryCountDetail> InventoryCheckDetails { get; set; } = [];
 
         [ForeignKey("Schedule")]
-        public string ScheduleId { get; set; }
-        public Schedule Schedule { get; set; }
+        public string? ScheduleId { get; set; }
+        public Schedule? Schedule { get; set; }
 
-        [ForeignKey("Location")]
+        /*[ForeignKey("Location")]
         public string LocationId { get; set; }
-        public Location Location { get; set; } //level 0 only
+        public Location Location { get; set; } //level 0 only*/
     }
 }

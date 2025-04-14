@@ -4,6 +4,7 @@ using DataAccessLayer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccessLayer.Migrations
 {
     [DbContext(typeof(WaseEaseDbContext))]
-    partial class WaseEaseDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250413042702_InventoryCount_Update2")]
+    partial class InventoryCount_Update2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -266,9 +269,6 @@ namespace DataAccessLayer.Migrations
                     b.Property<DateTime?>("DeletedTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateOnly?>("ExpDate")
-                        .HasColumnType("date");
-
                     b.Property<DateOnly>("InboundDate")
                         .HasColumnType("date");
 
@@ -283,9 +283,6 @@ namespace DataAccessLayer.Migrations
 
                     b.Property<DateTime?>("LastUpdatedTime")
                         .HasColumnType("datetime2");
-
-                    b.Property<DateOnly?>("MfgDate")
-                        .HasColumnType("date");
 
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
