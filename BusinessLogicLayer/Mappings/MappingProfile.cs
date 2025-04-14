@@ -211,6 +211,7 @@ namespace BusinessLogicLayer.Mappings
                 .ForMember(dest => dest.ProductName, opt => opt.MapFrom(src => src.Product.Name))
                 .ReverseMap();
             CreateMap<Batch, BatchCreateDTO>().ReverseMap();
+            CreateMap<Batch, BatchCreateDTOv2>().ReverseMap();
             CreateMap<Batch, BatchUpdateDTO>().ReverseMap();
             #endregion
 

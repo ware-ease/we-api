@@ -21,15 +21,16 @@ namespace BusinessLogicLayer.Services
         private readonly IMapper _mapper;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IFirebaseService _firebaseService;
+        private readonly ICodeGeneratorService _codeGeneratorService;
 
-
-        public GoodNoteService(IGenericRepository<GoodNote> genericRepository, IUnitOfWork unitOfWork, IMapper mapper, IFirebaseService firebaseService)
+        public GoodNoteService(IGenericRepository<GoodNote> genericRepository, IUnitOfWork unitOfWork, IMapper mapper, IFirebaseService firebaseService, ICodeGeneratorService codeGeneratorService)
             : base(genericRepository, mapper, unitOfWork)
         {
             _goodNoteRepository = unitOfWork.GoodNoteRepository;
             _mapper = mapper;
             _unitOfWork = unitOfWork;
             _firebaseService = firebaseService;
+            _codeGeneratorService = codeGeneratorService;
         }
         public async Task<ServiceResponse> SearchGoodNotes(int? pageIndex = null, int? pageSize = null,
                                                                     string? keyword = null, GoodNoteEnum? goodNoteType = null,
@@ -201,10 +202,10 @@ namespace BusinessLogicLayer.Services
                     }
                 }
 
-                // Kiểm tra mã phiếu trùng
-                var existingNote = await _unitOfWork.GoodNoteRepository.GetByCondition(x => x.Code == request.Code);
-                if (existingNote != null)
-                    return Fail("Mã phiếu đã tồn tại.", request.Code);
+                //// Kiểm tra mã phiếu trùng
+                //var existingNote = await _unitOfWork.GoodNoteRepository.GetByCondition(x => x.Code == request.Code);
+                //if (existingNote != null)
+                //    return Fail("Mã phiếu đã tồn tại.", request.Code);
 
                 // Kiểm tra chi tiết có lô
                 if (request.GoodNoteDetails == null || !request.GoodNoteDetails.Any())
@@ -212,12 +213,9 @@ namespace BusinessLogicLayer.Services
 
                 foreach (var detail in request.GoodNoteDetails)
                 {
-                    var hasNewBatch = detail.NewBatch != null;
-                    var hasBatchId = !string.IsNullOrEmpty(detail.BatchId);
-
-                    if (hasNewBatch == hasBatchId) // hoặc cả 2 null hoặc cả 2 có
+                    if (detail.NewBatch == null)
                     {
-                        return Fail("Mỗi chi tiết phải có đúng một trong thông tin lô hoặc lô Id.", null);
+                        return Fail("Thiếu thông tin lô trong chi tiết phiếu kho.", null);
                     }
                 }
 
@@ -225,7 +223,8 @@ namespace BusinessLogicLayer.Services
                 var goodNote = _mapper.Map<GoodNote>(request);
                 goodNote.CreatedTime = DateTime.Now;
                 goodNote.Status = GoodNoteStatusEnum.Completed;
-
+                // Sinh mã cho phiếu nhập kho
+                goodNote.Code = await _codeGeneratorService.GenerateCodeAsync(CodeType.PN);
                 await _unitOfWork.GoodNoteRepository.Add(goodNote);
 
                 // Tạo batch và chi tiết
@@ -235,12 +234,12 @@ namespace BusinessLogicLayer.Services
                 {
                     // Kiểm tra điều kiện: chỉ được có 1 trong 2
                     var hasNewBatch = detailDto.NewBatch != null;
-                    var hasBatchId = !string.IsNullOrEmpty(detailDto.BatchId);
+                    //var hasBatchId = !string.IsNullOrEmpty(detailDto.BatchId);
                     // Nếu cả 2 đều có hoặc cả 2 đều không có thì báo lỗi
-                    if (hasNewBatch == hasBatchId) // tức là hoặc cả 2 true hoặc cả 2 false
-                    {
-                        return Fail("Mỗi chi tiết phải có đúng một trong thông tin lô hoặc lô Id.", null);
-                    }
+                    //if (hasNewBatch == hasBatchId) // tức là hoặc cả 2 true hoặc cả 2 false
+                    //{
+                    //    return Fail("Mỗi chi tiết phải có đúng một trong thông tin lô hoặc lô Id.", null);
+                    //}
 
                     // Tạo chi tiết
                     var detail = _mapper.Map<GoodNoteDetail>(detailDto);
@@ -250,18 +249,29 @@ namespace BusinessLogicLayer.Services
                     {
                         // Tạo batch mới
                         var batch = _mapper.Map<Batch>(detailDto.NewBatch);
+                        // Sinh mã cho batch
+                        batch.Code = await _codeGeneratorService.GenerateCodeAsync(CodeType.LO);
+                        if (request.Date.HasValue)
+                        {
+                            batch.InboundDate = DateOnly.FromDateTime(request.Date.Value);
+                        }
+                        else
+                        {
+                            // gán giá trị mặc định
+                            batch.InboundDate = DateOnly.FromDateTime(DateTime.Now);
+                        }
                         await _unitOfWork.BatchRepository.Add(batch);
                         detail.BatchId = batch.Id;
                     }
-                    else if (hasBatchId)
-                    {
-                        // Kiểm tra lô cũ có tồn tại không
-                        var oldBatch = await _unitOfWork.BatchRepository.GetByCondition(x => x.Id == detailDto.BatchId);
-                        if (oldBatch == null)
-                            return Fail("Không tìm thấy lô hàng.", detailDto.BatchId);
+                    //else if (hasBatchId)
+                    //{
+                    //    // Kiểm tra lô cũ có tồn tại không
+                    //    var oldBatch = await _unitOfWork.BatchRepository.GetByCondition(x => x.Id == detailDto.BatchId);
+                    //    if (oldBatch == null)
+                    //        return Fail("Không tìm thấy lô hàng.", detailDto.BatchId);
 
-                        detail.BatchId = oldBatch.Id;
-                    }
+                    //    detail.BatchId = oldBatch.Id;
+                    //}
                     await _unitOfWork.GoodNoteDetailRepository.Add(detail);
 
                     goodNoteDetails.Add(detail);
@@ -838,7 +848,7 @@ namespace BusinessLogicLayer.Services
 
                 // Tạo phiếu xuất kho
                 var goodNote = await CreateGoodNoteIssueAsync(dto);
-
+               
                 // Trừ tồn kho và tạo chi tiết phiếu xuất
                 var deductResult = await DeductInventoryAndCreateDetailsAsync(dto, goodNote.Id);
                 if (!deductResult)
@@ -931,12 +941,12 @@ namespace BusinessLogicLayer.Services
         {
             var goodNote = new GoodNote
             {
-                Code = dto.Code,
+                Code = await _codeGeneratorService.GenerateCodeAsync(CodeType.PX),
                 Date = dto.Date,
                 ReceiverName = dto.ReceiverName,
                 ShipperName = dto.ShipperName,
                 NoteType = GoodNoteEnum.Issue, // Phiếu xuất kho
-                Status = GoodNoteStatusEnum.Completed, // Trạng thái ban đầu là Chờ duyệt
+                Status = GoodNoteStatusEnum.Completed, 
                 GoodRequestId = dto.GoodRequestId
             };
 
