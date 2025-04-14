@@ -44,6 +44,7 @@ namespace Data.Model.Request.GoodNote
         public string? Name { get; set; }
         public DateOnly MfgDate { get; set; }
         public DateOnly ExpDate { get; set; }
+        public DateOnly InboundDate { get; set; }
         //public string? InventoryId { get; set; }
         public string ProductId { get; set; }
         public ProductNoteDTO? Product { get; set; }
@@ -66,8 +67,9 @@ namespace Data.Model.Request.GoodNote
         public string? ShipperName { get; set; }
         [MaxLength(100, ErrorMessage = "Tên người nhận hàng không được vượt quá 100 ký tự.")]
         public string? ReceiverName { get; set; }
-        [Required(ErrorMessage = "Mã phiếu không được để trống.")]
-        [MaxLength(50, ErrorMessage = "Mã phiếu không được vượt quá 50 ký tự.")]
+        [JsonIgnore]
+        //[Required(ErrorMessage = "Mã phiếu không được để trống.")]
+        //[MaxLength(50, ErrorMessage = "Mã phiếu không được vượt quá 50 ký tự.")]
         public string? Code { get; set; }
         [Required(ErrorMessage = "Ngày không được để trống.")]
         public DateTime? Date { get; set; }
@@ -83,8 +85,8 @@ namespace Data.Model.Request.GoodNote
         public string? Note { get; set; }
         [JsonIgnore]
         public string? GoodNoteId { get; set; }
-        public string? BatchId { get; set; }
-        public BatchCreateDTO? NewBatch { get; set; }
+        //public string? BatchId { get; set; }
+        public BatchCreateDTOv2? NewBatch { get; set; }
 
         [JsonIgnore]
         public DateTime? CreatedTime { get; set; }
@@ -122,8 +124,9 @@ namespace Data.Model.Request.GoodNote
         [MaxLength(100, ErrorMessage = "Tên người nhận hàng không được vượt quá 100 ký tự.")]
         public string? ReceiverName { get; set; }
 
-        [Required(ErrorMessage = "Mã phiếu không được để trống.")]
-        [MaxLength(50, ErrorMessage = "Mã phiếu không được vượt quá 50 ký tự.")]
+        //[Required(ErrorMessage = "Mã phiếu không được để trống.")]
+        //[MaxLength(50, ErrorMessage = "Mã phiếu không được vượt quá 50 ký tự.")]
+        [JsonIgnore]
         public string? Code { get; set; }
 
         [Required(ErrorMessage = "Ngày không được để trống.")]

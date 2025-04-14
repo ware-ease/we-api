@@ -32,8 +32,9 @@ namespace Data.Model.Request.GoodRequest
     {
         [MaxLength(200, ErrorMessage = "Ghi chú không được vượt quá 200 ký tự.")]
         public string? Note { get; set; }
-        [Required(ErrorMessage = "Mã yêu cầu không được để trống.")]
-        [MaxLength(50, ErrorMessage = "Mã yêu cầu không được vượt quá 50 ký tự.")]
+        [JsonIgnore]
+        //[Required(ErrorMessage = "Mã yêu cầu không được để trống.")]
+        //[MaxLength(50, ErrorMessage = "Mã yêu cầu không được vượt quá 50 ký tự.")]
         public string? Code { get; set; }
         [Required(ErrorMessage = "Loại yêu cầu không được để trống.")]
         public GoodRequestEnum RequestType { get; set; }

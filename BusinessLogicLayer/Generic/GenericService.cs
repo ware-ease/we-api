@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Data.Entity;
 using Data.Entity.Base;
+using Data.Enum;
 using Data.Model.DTO.Base;
 using Data.Model.Response;
 using DataAccessLayer.Generic;

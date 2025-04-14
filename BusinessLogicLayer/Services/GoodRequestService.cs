@@ -24,13 +24,17 @@ namespace BusinessLogicLayer.Services
         private readonly IMapper _mapper;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IFirebaseService _firebaseService;
+        private readonly ICodeGeneratorService _codeGeneratorService;
 
-        public GoodRequestService(IGenericRepository<GoodRequest> genericRepository, IUnitOfWork unitOfWork, IMapper mapper, IFirebaseService firebaseService) : base(genericRepository, mapper, unitOfWork)
+        public GoodRequestService(
+            IGenericRepository<GoodRequest> genericRepository, IUnitOfWork unitOfWork, IMapper mapper,
+            IFirebaseService firebaseService, ICodeGeneratorService codeGeneratorService) : base(genericRepository, mapper, unitOfWork)
         {
             _goodRequestRepository = unitOfWork.GoodRequestRepository;
             _mapper = mapper;
             _unitOfWork = unitOfWork;
             _firebaseService = firebaseService;
+            _codeGeneratorService = codeGeneratorService;
         }
         public async Task<ServiceResponse> GetById(string id)
         {
@@ -65,20 +69,35 @@ namespace BusinessLogicLayer.Services
                 Data = result
             };
         }
+        private CodeType GetCodeTypeFromRequestEnum(GoodRequestEnum requestType)
+        {
+            return requestType switch
+            {
+                GoodRequestEnum.Receive => CodeType.YCN,
+                GoodRequestEnum.Issue => CodeType.YCX,
+                GoodRequestEnum.Transfer => CodeType.YCC,
+                GoodRequestEnum.Return => CodeType.YCT,
+                _ => throw new ArgumentOutOfRangeException(nameof(requestType), "Invalid request type")
+            };
+        }
 
         public async Task<ServiceResponse> CreateAsync<TResult>(GoodRequestCreateDTO request)
         {
             // Kiểm tra Code có bị trùng không
-            var existingCode = await _goodRequestRepository.GetByCondition(g => g.Code == request.Code);
-            if (existingCode != null)
-            {
-                return new ServiceResponse
-                {
-                    Status = SRStatus.Error,
-                    Message = "Good request code already exists.",
-                    Data = request.Code
-                };
-            }
+            //var existingCode = await _goodRequestRepository.GetByCondition(g => g.Code == request.Code);
+            //if (existingCode != null)
+            //{
+            //    return new ServiceResponse
+            //    {
+            //        Status = SRStatus.Error,
+            //        Message = "Good request code already exists.",
+            //        Data = request.Code
+            //    };
+            //}
+            // 1️⃣ Generate Code
+            var codeType = GetCodeTypeFromRequestEnum(request.RequestType);
+            request.Code = await _codeGeneratorService.GenerateCodeAsync(codeType);
+            
 
             // 2️⃣ Kiểm tra PartnerId có tồn tại trong DB không (nếu có giá trị)
             if (!string.IsNullOrEmpty(request.PartnerId))

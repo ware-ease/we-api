@@ -1,4 +1,5 @@
 using AutoMapper;
+using BusinessLogicLayer.Generic;
 using BusinessLogicLayer.IService;
 using BusinessLogicLayer.IServices;
 using BusinessLogicLayer.Mappings;
@@ -146,6 +147,7 @@ builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddScoped<IGoodRequestService, GoodRequestService>();
 builder.Services.AddScoped<IPartnerService, PartnerService>();
 builder.Services.AddScoped<IGoodNoteService, GoodNoteService>();
+builder.Services.AddScoped<ICodeGeneratorService, CodeGeneratorService>();
 #endregion Services
 
 #region Repositories
