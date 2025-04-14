@@ -83,7 +83,6 @@ namespace Data.Model.Request.GoodNote
         public string? Note { get; set; }
         [JsonIgnore]
         public string? GoodNoteId { get; set; }
-        [Required(ErrorMessage = "Thông tin lô nhập không được để trống.")]
         public string? BatchId { get; set; }
         public BatchCreateDTO? NewBatch { get; set; }
 
