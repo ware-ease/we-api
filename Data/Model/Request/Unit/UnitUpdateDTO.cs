@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Data.Enum;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -14,5 +15,6 @@ namespace Data.Model.Request.Unit
         public string? Id { get; set; }
         public string? Name { get; set; }
         public string? Note { get; set; }
+        public UnitEnum Type { get; set; }
     }
 }

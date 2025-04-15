@@ -126,9 +126,6 @@ namespace BusinessLogicLayer.Services
             if (existingProduct != null)
                 throw new Exception("SKU đã tồn tại trong hệ thống!");
 
-            if ((request.QuantityType != ProductQuantityTypeEnum.Countable) || (request.QuantityType != ProductQuantityTypeEnum.Uncountable))
-                throw new Exception("QuantityType không hợp lệ");
-
             var productType = await _productTypeRepository.GetByCondition(p => p.Id == request.ProductTypeId);
             if (productType == null)
                 throw new Exception("ProductType không tồn tại");
@@ -184,15 +181,7 @@ namespace BusinessLogicLayer.Services
 
                 existingProduct.Sku = request.Sku;
             }
-            if (request.QuantityType.HasValue)
-            {
-                if ((request.QuantityType != ProductQuantityTypeEnum.Countable) || (request.QuantityType != ProductQuantityTypeEnum.Uncountable))
-                {
-                    throw new Exception("QuantityType không hợp lệ");
-                }
-                else
-                    existingProduct.QuantityType = request.QuantityType.Value;
-            }
+            
             if (!string.IsNullOrEmpty(request.imageUrl))
             {
                 existingProduct.imageUrl = request.imageUrl;

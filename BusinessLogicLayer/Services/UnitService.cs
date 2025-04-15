@@ -2,6 +2,7 @@
 using BusinessLogicLayer.Generic;
 using BusinessLogicLayer.IServices;
 using Data.Entity;
+using Data.Enum;
 using Data.Model.DTO;
 using Data.Model.Request.ProductType;
 using Data.Model.Request.Unit;
@@ -64,6 +65,20 @@ namespace BusinessLogicLayer.Services
             };
         }
 
+        public async Task<UnitDTO> AddUnit(UnitCreateDTO request)
+        {
+            if ((request.Type != UnitEnum.Int) && (request.Type != UnitEnum.Float))
+                throw new Exception("Type không hợp lệ");
+            var unit = _mapper.Map<Unit>(request);
+
+            await _genericRepository.Add(unit);
+            await _unitOfWork.SaveAsync();
+            var createdUnit = await _genericRepository.GetByCondition(p => p.Id == unit.Id);
+            if (createdUnit == null)
+                throw new Exception("Add failed, Unit not found after add");
+            return _mapper.Map<UnitDTO>(createdUnit);
+        }
+
         public async Task<UnitDTO> UpdateUnit(UnitUpdateDTO request)
         {
             var existedUnit = await _genericRepository.GetByCondition(p => p.Id == request.Id);
@@ -95,7 +110,7 @@ namespace BusinessLogicLayer.Services
         {
 
             Expression<Func<Unit, bool>> filter = p =>
-                (string.IsNullOrEmpty(keyword) 
+                (string.IsNullOrEmpty(keyword)
                 || (p.Name + " " + p.Note).Contains(keyword));
 
             var totalRecords = await _genericRepository.Count(filter);
