@@ -14,5 +14,10 @@ namespace DataAccessLayer.Repositories
         public BatchRepository(WaseEaseDbContext context) : base(context)
         {
         }
+        public IQueryable<Batch> GetQueryable()
+        {
+            return _context.Batches.AsQueryable();
+        }
+
     }
 }

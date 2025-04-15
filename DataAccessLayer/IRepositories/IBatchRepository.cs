@@ -5,5 +5,6 @@ namespace DataAccessLayer.IRepositories
 {
     public interface IBatchRepository : IGenericRepository<Batch>
     {
+        IQueryable<Batch> GetQueryable();
     }
 }
