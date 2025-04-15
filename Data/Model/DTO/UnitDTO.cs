@@ -1,4 +1,5 @@
-﻿using Data.Model.DTO.Base;
+﻿using Data.Enum;
+using Data.Model.DTO.Base;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +11,7 @@ namespace Data.Model.DTO
     public class UnitDTO : BaseDTO
     {
         public string? Name { get; set; }
+        public UnitEnum Type { get; set; }
         //public string? Note { get; set; }
     }
 }

@@ -16,7 +16,6 @@ namespace Data.Model.DTO
         public string? imageUrl { get; set; }
         //public string Barcode { get; set; }
         public string Sku { get; set; }
-        public ProductQuantityTypeEnum QuantityType { get; set; }
         public string ProductType { get; set; }
         public string Category { get; set; }
         public string Brand { get; set; }
