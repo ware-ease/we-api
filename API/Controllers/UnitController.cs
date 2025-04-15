@@ -59,8 +59,13 @@ namespace API.Controllers
                 request.CreatedBy = authUser.id;
             }
 
-            var result = await _unitService.Add<UnitDTO, UnitCreateDTO>(request);
-            return ControllerResponse.Response(result);
+            var result = await _unitService.AddUnit(request);
+            return ControllerResponse.Response(new ServiceResponse
+            {
+                Status = Data.Enum.SRStatus.Success,
+                Message = "Unit added successfully",
+                Data = result
+            });
         }
 
         [HttpPatch("{id}")]
@@ -73,7 +78,7 @@ namespace API.Controllers
                 return ControllerResponse.Response(new ServiceResponse
                 {
                     Status = Data.Enum.SRStatus.Success,
-                    Message = "Product updated successfully",
+                    Message = "Unit updated successfully",
                     Data = updatedUnit
                 });
             }

@@ -12,6 +12,7 @@ namespace BusinessLogicLayer.IServices
 {
     public interface IUnitService : IGenericService
     {
+        Task<UnitDTO> AddUnit(UnitCreateDTO request);
         Task<UnitDTO> UpdateUnit(UnitUpdateDTO request);
         Task<ServiceResponse> Search<TResult>(int? pageIndex = null, int? pageSize = null,
                                                                    string? keyword = null);
