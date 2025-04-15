@@ -55,7 +55,7 @@ namespace BusinessLogicLayer.Services
 
             var goodNote = await _unitOfWork.GoodNoteRepository.GetByCondition(g => g.GoodRequestId == id);
             var result = _mapper.Map<GoodRequestDTO>(entity);
-
+            result.GoodNoteCount = await _unitOfWork.GoodNoteRepository.Count(g => g.GoodRequestId == id);
             await AttachGoodNoteToGoodRequest(result); // Với 1 đối tượng
 
             if (goodNote != null)
@@ -352,6 +352,7 @@ namespace BusinessLogicLayer.Services
                 var goodnote = await _unitOfWork.GoodNoteRepository.GetByCondition(g => g.GoodRequestId == id);
 
                 var result = _mapper.Map<GoodRequestDTO>(entity);
+                result.GoodNoteCount = await _unitOfWork.GoodNoteRepository.Count(g => g.GoodRequestId == id);
 
                 await AttachGoodNoteToGoodRequest(result); // Với 1 đối tượng
 
@@ -447,6 +448,7 @@ namespace BusinessLogicLayer.Services
                     //    //goodRequest.GoodNote = _mapper.Map<GoodNoteOfGoodRequestDTO>(goodNote);
                     //}
                     await AttachGoodNoteToGoodRequest(goodRequest);
+                    goodRequest.GoodNoteCount = await _unitOfWork.GoodNoteRepository.Count(g => g.GoodRequestId == goodRequest.Id);
 
                 }
 
