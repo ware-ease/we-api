@@ -94,7 +94,7 @@ namespace BusinessLogicLayer.Services
                     CreatedTime = g.CreatedTime.ToString(),
                     CreatedBy = g.CreatedBy,
                     GoodNoteDetails = _mapper.Map<List<GoodNoteDetailDTO>>(details.Where(d => d.GoodNoteId == g.Id).ToList())
-                }).ToList();
+                }).ToList().OrderByDescending(n => n.CreatedTime);
 
                 return new ServiceResponse
                 {

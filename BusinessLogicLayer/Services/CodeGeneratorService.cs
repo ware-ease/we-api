@@ -50,13 +50,23 @@ namespace BusinessLogicLayer.Services
                     break;
 
                 case CodeType.LO:
-                    var batches = await _unitOfWork.BatchRepository.Search(
+                    var batchCodes = await _unitOfWork.BatchRepository.Search(
                         x => x.Code.StartsWith(prefix),
                         q => q.OrderByDescending(x => x.Code),
                         "",
-                        1, 1
+                        1, int.MaxValue
                     );
-                    maxCode = batches.FirstOrDefault()?.Code;
+
+                    int maxNumber = batchCodes
+                        .Select(x =>
+                        {
+                            var numberPart = x.Code.Substring(prefix.Length);
+                            return int.TryParse(numberPart, out int n) ? n : 0;
+                        })
+                        .DefaultIfEmpty(0)
+                        .Max();
+
+                    maxCode = $"{prefix}{maxNumber:D5}";
                     break;
             }
 
