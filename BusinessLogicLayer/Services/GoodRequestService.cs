@@ -83,22 +83,21 @@ namespace BusinessLogicLayer.Services
 
         public async Task<ServiceResponse> CreateAsync<TResult>(GoodRequestCreateDTO request)
         {
-            // Kiểm tra Code có bị trùng không
-            //var existingCode = await _goodRequestRepository.GetByCondition(g => g.Code == request.Code);
-            //if (existingCode != null)
-            //{
-            //    return new ServiceResponse
-            //    {
-            //        Status = SRStatus.Error,
-            //        Message = "Good request code already exists.",
-            //        Data = request.Code
-            //    };
-            //}
             // 1️⃣ Generate Code
             var codeType = GetCodeTypeFromRequestEnum(request.RequestType);
             request.Code = await _codeGeneratorService.GenerateCodeAsync(codeType);
-            
 
+            // Kiểm tra Code có bị trùng không
+            var existingCode = await _goodRequestRepository.GetByCondition(g => g.Code == request.Code);
+            if (existingCode != null)
+            {
+                return new ServiceResponse
+                {
+                    Status = SRStatus.Error,
+                    Message = "Mã yêu cầu đã tồn tại.",
+                    Data = request.Code
+                };
+            }
             // 2️⃣ Kiểm tra PartnerId có tồn tại trong DB không (nếu có giá trị)
             if (!string.IsNullOrEmpty(request.PartnerId))
             {
@@ -225,7 +224,7 @@ namespace BusinessLogicLayer.Services
                 return new ServiceResponse
                 {
                     Status = SRStatus.NotFound,
-                    Message = "Good request not found!",
+                    Message = "Không tìm thấy yêu cầu!",
                     Data = id
                 };
             }
@@ -236,7 +235,7 @@ namespace BusinessLogicLayer.Services
                 return new ServiceResponse
                 {
                     Status = SRStatus.Error,
-                    Message = "Only requests with status 'Pending' can be updated.",
+                    Message = "Chỉ có thể cập nhật phiếu có trạng thái là chờ xử lí.",
                     Data = entity.Status
                 };
             }
@@ -249,7 +248,7 @@ namespace BusinessLogicLayer.Services
                     return new ServiceResponse
                     {
                         Status = SRStatus.Error,
-                        Message = "Good request code already exists.",
+                        Message = "Mã yêu cầu đã tồn tại.",
                         Data = request.Code
                     };
                 }

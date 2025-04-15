@@ -12,6 +12,7 @@ using DataAccessLayer.Repositories;
 using DataAccessLayer.UnitOfWork;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
+using static Org.BouncyCastle.Crypto.Engines.SM2Engine;
 
 namespace BusinessLogicLayer.Services
 {
@@ -172,16 +173,13 @@ namespace BusinessLogicLayer.Services
         public async Task<ServiceResponse> CreateReceiveNoteAsync(GoodNoteCreateDTO request)
         {
             var serviceResponse = new ServiceResponse();
-
-            await _unitOfWork.BeginTransactionAsync();
-
             try
             {
                 // Kiểm tra yêu cầu kho nếu có
-                GoodRequest goodRequest = null;
+                GoodRequest goodRequest = await _unitOfWork.GoodRequestRepository.GetByCondition(x => x.Id == request.GoodRequestId);
                 if (!string.IsNullOrEmpty(request.GoodRequestId))
                 {
-                    goodRequest = await _unitOfWork.GoodRequestRepository.GetByCondition(x => x.Id == request.GoodRequestId);
+                    //goodRequest = await _unitOfWork.GoodRequestRepository.GetByCondition(x => x.Id == request.GoodRequestId);
                     if (goodRequest == null)
                         return Fail("Không tìm thấy yêu cầu kho.", request.GoodRequestId);
                     if (goodRequest.Status == GoodRequestStatusEnum.Pending)
@@ -201,12 +199,6 @@ namespace BusinessLogicLayer.Services
                         return Fail("Yêu cầu kho không hợp lệ.", request.GoodRequestId);
                     }
                 }
-
-                //// Kiểm tra mã phiếu trùng
-                //var existingNote = await _unitOfWork.GoodNoteRepository.GetByCondition(x => x.Code == request.Code);
-                //if (existingNote != null)
-                //    return Fail("Mã phiếu đã tồn tại.", request.Code);
-
                 // Kiểm tra chi tiết có lô
                 if (request.GoodNoteDetails == null || !request.GoodNoteDetails.Any())
                     return Fail("Danh sách chi tiết phiếu kho không được để trống.");
@@ -225,6 +217,15 @@ namespace BusinessLogicLayer.Services
                 goodNote.Status = GoodNoteStatusEnum.Completed;
                 // Sinh mã cho phiếu nhập kho
                 goodNote.Code = await _codeGeneratorService.GenerateCodeAsync(CodeType.PN);
+
+                // Kiểm tra mã phiếu trùng
+                var existingNote = await _unitOfWork.GoodNoteRepository.GetByCondition(x => x.Code == goodNote.Code);
+                if (existingNote != null)
+                    return Fail("Mã phiếu đã tồn tại.", request.Code);
+
+                //bắt đầu transaction trước khi đụng đến db
+                await _unitOfWork.BeginTransactionAsync();
+
                 await _unitOfWork.GoodNoteRepository.Add(goodNote);
 
                 // Tạo batch và chi tiết
@@ -251,6 +252,10 @@ namespace BusinessLogicLayer.Services
                         var batch = _mapper.Map<Batch>(detailDto.NewBatch);
                         // Sinh mã cho batch
                         batch.Code = await _codeGeneratorService.GenerateCodeAsync(CodeType.LO);
+                        // Kiểm tra mã lô trùng
+                        var existingBatch = await _unitOfWork.BatchRepository.GetByCondition(x => x.Code == batch.Code);
+                        if (existingBatch != null)
+                            throw new InvalidOperationException($"Mã lô {batch.Code} đã tồn tại.");
                         if (request.Date.HasValue)
                         {
                             batch.InboundDate = DateOnly.FromDateTime(request.Date.Value);
@@ -278,6 +283,8 @@ namespace BusinessLogicLayer.Services
                 }
 
                 // Cập nhật tồn kho
+                //Gán goodreuqest vào goodnote
+                goodNote.GoodRequest = goodRequest;
                 await UpdateInventories(goodNote, goodNoteDetails);
 
                 // Cập nhật trạng thái yêu cầu kho nếu có
@@ -307,6 +314,11 @@ namespace BusinessLogicLayer.Services
                 serviceResponse.Status = SRStatus.Success;
                 serviceResponse.Message = "Phiếu nhập kho được tạo thành công!";
                 serviceResponse.Data = goodNote.Id;
+            }
+            catch (InvalidOperationException ex)
+            {
+                await _unitOfWork.RollbackTransactionAsync();
+                return Fail(ex.Message, null!);
             }
             catch (Exception ex)
             {
@@ -831,9 +843,6 @@ namespace BusinessLogicLayer.Services
         public async Task<ServiceResponse> CreateIssueNoteAsync(GoodNoteIssueCreateDTO dto)
         {
             var serviceResponse = new ServiceResponse();
-
-            await _unitOfWork.BeginTransactionAsync();  // Bắt đầu transaction
-
             try
             {
                 // Kiểm tra tồn kho
@@ -842,9 +851,11 @@ namespace BusinessLogicLayer.Services
                 {
                     serviceResponse.Status = SRStatus.Error;
                     serviceResponse.Message = "Tồn kho không đủ";
-                    await _unitOfWork.RollbackTransactionAsync();  // Rollback transaction nếu kiểm tra tồn kho thất bại
+                    //await _unitOfWork.RollbackTransactionAsync();  // Rollback transaction nếu kiểm tra tồn kho thất bại
                     return serviceResponse;
                 }
+                // Bắt đầu transaction
+                await _unitOfWork.BeginTransactionAsync();
 
                 // Tạo phiếu xuất kho
                 var goodNote = await CreateGoodNoteIssueAsync(dto);
@@ -949,7 +960,12 @@ namespace BusinessLogicLayer.Services
                 Status = GoodNoteStatusEnum.Completed, 
                 GoodRequestId = dto.GoodRequestId
             };
-
+            // Kiểm tra mã phiếu xuất kho đã tồn tại chưa
+            var existingNote = await _unitOfWork.GoodNoteRepository.GetByCondition(x => x.Code == goodNote.Code);
+            if (existingNote != null)
+            {
+                throw new Exception($"Mã phiếu xuất kho {goodNote.Code} đã tồn tại.");
+            }
             await _unitOfWork.GoodNoteRepository.Add(goodNote);
             return goodNote;
         }
