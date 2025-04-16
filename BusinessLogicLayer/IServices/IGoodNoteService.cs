@@ -18,7 +18,8 @@ namespace BusinessLogicLayer.IServices
                                                                                               string? requestedWarehouseId = null);
         Task<ServiceResponse> GetById(string id);
         Task<ServiceResponse> CreateReceiveNoteAsync(GoodNoteCreateDTO request);
-        Task<ServiceResponse> CreateIssueNoteAsync(GoodNoteIssueCreateDTO dto);
+        Task<ServiceResponse> CreateIssueNoteAsync(GoodNoteIssueCreateDTO dto, CodeType codeType);
+        Task<ServiceResponse> CreateReceiveNoteWithExistingBatchAsync(GoodNoteCreateDTOv2 request, CodeType codeType);
 
         //Task<ServiceResponse> DeleteAsync(string id);
         //Task<ServiceResponse> UpdateStatusAsync(string id, GoodNoteStatusEnum newStatus);

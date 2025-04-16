@@ -11,6 +11,6 @@ namespace DataAccessLayer.IRepositories
     public interface IInventoryRepository : IGenericRepository<Inventory>
     {
         //Task<List<Inventory>> GetInventoriesByProductIdAsync(string productId);
-        Task<List<Inventory>> GetAvailableInventoriesAsync(string productId);
+        Task<List<Inventory>> GetAvailableInventoriesAsync(string productId, string warehouseId);
     }
 }

@@ -28,7 +28,7 @@ namespace API.Controllers
                                                         [FromQuery] int pageSize = 5,
                                                         [FromQuery] string? keyword = null)
         {
-            var response = await _inventoryService.Search<Data.Model.DTO.InventoryDTO>(
+            var response = await _inventoryService.Search(
                 pageIndex, pageSize, keyword);
 
             return ControllerResponse.Response(response);

@@ -9,9 +9,7 @@ namespace Data.Enum
     public enum GoodNoteEnum
     {
         Receive,
-        Issue,
-        //Transfer, // ko can
-        //Return, // ko can
+        Issue
     }
     public enum GoodNoteStatusEnum
     {

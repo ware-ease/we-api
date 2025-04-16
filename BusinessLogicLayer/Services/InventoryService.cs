@@ -59,7 +59,7 @@ namespace BusinessLogicLayer.Services
             };
         }
 
-        public async Task<ServiceResponse> Search<TResult>(int? pageIndex = null, int? pageSize = null,
+        public async Task<ServiceResponse> Search(int? pageIndex = null, int? pageSize = null,
                                                                    string? keyword = null)
         {
 
@@ -73,9 +73,9 @@ namespace BusinessLogicLayer.Services
 
             var results = await _genericRepository.Search(
                 filter: filter, pageIndex: pageIndex, pageSize: pageSize,
-                includeProperties: "Batch,Warehouse");
+                includeProperties: "Warehouse,Batch,Batch.Product,Batch.Product.Unit,Batch.Product.Brand");
 
-            var mappedResults = _mapper.Map<IEnumerable<TResult>>(results);
+            var mappedResults = _mapper.Map<IEnumerable<InventoryDTOv2>>(results);
 
             int totalPages = (int)Math.Ceiling((double)totalRecords / (pageSize ?? totalRecords));
 
@@ -120,7 +120,7 @@ namespace BusinessLogicLayer.Services
             //var locationDtos = _mapper.Map<List<InventoryLocationDTO>>(inventory.InventoryLocations);
 
             var locationsByInventoryDtos = _mapper.Map<InventoryDTOv2>(inventory); 
-            locationsByInventoryDtos.InventoryLocations = _mapper.Map<List<InventoryLocationDTO>>(inventory.InventoryLocations);
+            //locationsByInventoryDtos.InventoryLocations = _mapper.Map<List<InventoryLocationDTO>>(inventory.InventoryLocations);
 
             return new ServiceResponse
             {

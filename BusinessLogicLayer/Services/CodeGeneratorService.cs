@@ -37,16 +37,43 @@ namespace BusinessLogicLayer.Services
                     break;
 
                 case CodeType.PN:
-                case CodeType.PX:
-                case CodeType.PNNB:
-                case CodeType.PXNB:
-                    var goodNotes = await _unitOfWork.GoodNoteRepository.Search(
-                        x => x.Code.StartsWith(prefix),
-                        q => q.OrderByDescending(x => x.Code),
+                    var goodNotesPN = await _unitOfWork.GoodNoteRepository.Search(
+                        x => x.Code.StartsWith("PN") && !x.Code.Contains("NB"), // Chỉ lấy các mã bắt đầu với PN và không có NB
+                        q => q.OrderByDescending(x => x.Code), // Sắp xếp theo mã giảm dần
                         "",
                         1, 1
                     );
-                    maxCode = goodNotes.FirstOrDefault()?.Code;
+                    maxCode = goodNotesPN.FirstOrDefault()?.Code;
+                    break;
+
+                case CodeType.PX:
+                    var goodNotesPX = await _unitOfWork.GoodNoteRepository.Search(
+                        x => x.Code.StartsWith("PX") && !x.Code.Contains("NB"), // Chỉ lấy các mã bắt đầu với PX và không có NB
+                        q => q.OrderByDescending(x => x.Code), // Sắp xếp theo mã giảm dần
+                        "",
+                        1, 1
+                    );
+                    maxCode = goodNotesPX.FirstOrDefault()?.Code;
+                    break;
+
+                case CodeType.PNNB:
+                    var goodNotesPNNB = await _unitOfWork.GoodNoteRepository.Search(
+                        x => x.Code.StartsWith("PN") && x.Code.Contains("NB"), // Lấy các mã có chứa NB
+                        q => q.OrderByDescending(x => x.Code), // Sắp xếp theo mã giảm dần
+                        "",
+                        1, 1
+                    );
+                    maxCode = goodNotesPNNB.FirstOrDefault()?.Code;
+                    break;
+
+                case CodeType.PXNB:
+                    var goodNotesPXNB = await _unitOfWork.GoodNoteRepository.Search(
+                        x => x.Code.StartsWith("PX") && x.Code.Contains("NB"), // Lấy các mã PXNB
+                        q => q.OrderByDescending(x => x.Code), // Sắp xếp theo mã giảm dần
+                        "",
+                        1, 1
+                    );
+                    maxCode = goodNotesPXNB.FirstOrDefault()?.Code;
                     break;
 
                 case CodeType.LO:

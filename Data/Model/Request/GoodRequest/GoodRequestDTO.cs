@@ -54,13 +54,8 @@ namespace Data.Model.Request.GoodRequest
             set => _warehouseId = string.IsNullOrEmpty(value) ? null : value;
         }
 
-        private string? _requestedWarehouseId;
-        public string? RequestedWarehouseId
-        {
-            get => _requestedWarehouseId;
-            set => _requestedWarehouseId = string.IsNullOrEmpty(value) ? null : value;
-        }
-
+        [Required(ErrorMessage = "Kho yêu cầu không được để trống.")]
+        public string? RequestedWarehouseId { get; set; }
         public List<GoodRequestDetailDTO>? GoodRequestDetails { get; set; }
     }
 

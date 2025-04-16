@@ -10,7 +10,7 @@ namespace BusinessLogicLayer.IServices
 {
     public interface IInventoryService : IGenericService
     {
-        Task<ServiceResponse> Search<TResult>(int? pageIndex = null, int? pageSize = null,
+        Task<ServiceResponse> Search(int? pageIndex = null, int? pageSize = null,
                                                                    string? keyword = null);
         Task<ServiceResponse> GetLocationsByInventoryId(string inventoryId);
         Task<ServiceResponse> GetLocationsByBatchId(string batchId);

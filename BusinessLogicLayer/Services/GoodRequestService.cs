@@ -9,6 +9,7 @@ using Data.Model.Response;
 using DataAccessLayer.Generic;
 using DataAccessLayer.IRepositories;
 using DataAccessLayer.UnitOfWork;
+using Org.BouncyCastle.Ocsp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -94,7 +95,7 @@ namespace BusinessLogicLayer.Services
                 return new ServiceResponse
                 {
                     Status = SRStatus.Error,
-                    Message = "Mã yêu cầu đã tồn tại.",
+                    Message = "Mã yêu cầu đã tồn tại!",
                     Data = request.Code
                 };
             }
@@ -107,13 +108,22 @@ namespace BusinessLogicLayer.Services
                     return new ServiceResponse
                     {
                         Status = SRStatus.Error,
-                        Message = "Partner not found.",
+                        Message = "Không tìm thấy đối tác!",
                         Data = request.PartnerId
                     };
                 }
             }
 
-            // 3️⃣ Kiểm tra WarehouseId có tồn tại không
+            // 3️⃣ Kiểm tra WarehouseId có tồn tại không (nếu là Transfer thì bắt buộc)
+            if (request.RequestType == GoodRequestEnum.Transfer && string.IsNullOrEmpty(request.WarehouseId))
+            {
+                return new ServiceResponse
+                {
+                    Status = SRStatus.Error,
+                    Message = "Vui lòng chọn kho gửi (WarehouseId) cho yêu cầu chuyển kho!"
+                };
+            }
+
             if (!string.IsNullOrEmpty(request.WarehouseId))
             {
                 var warehouseExists = await _unitOfWork.WarehouseRepository.GetByCondition(x => x.Id == request.WarehouseId);
@@ -122,26 +132,35 @@ namespace BusinessLogicLayer.Services
                     return new ServiceResponse
                     {
                         Status = SRStatus.Error,
-                        Message = "Warehouse not found.",
+                        Message = "Kho gửi không tồn tại!",
                         Data = request.WarehouseId
                     };
                 }
             }
 
-            // 4️⃣ Kiểm tra RequestedWarehouseId có tồn tại không
-            //if (!string.IsNullOrEmpty(request.RequestedWarehouseId))
-            //{
+            // 4️⃣ Kiểm tra RequestedWarehouseId có tồn tại không (bắt buộc với tất cả loại yêu cầu)
+            if (string.IsNullOrEmpty(request.RequestedWarehouseId))
+            {
+                return new ServiceResponse
+                {
+                    Status = SRStatus.Error,
+                    Message = "Vui lòng chọn kho nhận (RequestedWarehouseId)!"
+                };
+            }
+            else
+            {
                 var requestedWarehouseExists = await _unitOfWork.WarehouseRepository.GetByCondition(x => x.Id == request.RequestedWarehouseId);
                 if (requestedWarehouseExists == null)
                 {
                     return new ServiceResponse
                     {
                         Status = SRStatus.Error,
-                        Message = "Requested Warehouse not found.",
+                        Message = "Kho nhận không tồn tại!",
                         Data = request.RequestedWarehouseId
                     };
                 }
-            //}
+            }
+
 
             // 5️⃣ Kiểm tra danh sách GoodRequestDetails nếu có
             if (request.GoodRequestDetails != null && request.GoodRequestDetails.Any())
@@ -153,7 +172,7 @@ namespace BusinessLogicLayer.Services
                         return new ServiceResponse
                         {
                             Status = SRStatus.Error,
-                            Message = "ProductId cannot be null or empty in GoodRequestDetails."
+                            Message = "Vui lòng chọn sản phẩm trong chi tiết yêu cầu!"
                         };
                     }
 
@@ -163,7 +182,7 @@ namespace BusinessLogicLayer.Services
                         return new ServiceResponse
                         {
                             Status = SRStatus.Error,
-                            Message = $"Product with ID {detail.ProductId} not found.",
+                            Message = $"không tìm thấy sản phẩm với Id {detail.ProductId}!",
                             Data = detail.ProductId
                         };
                     }
@@ -181,9 +200,18 @@ namespace BusinessLogicLayer.Services
                 await _goodRequestRepository.Add(entity);
                 await _unitOfWork.SaveAsync();
                 // Gửi thông báo đến người dùng
-                var userIds = await _unitOfWork.AccountRepository.GetUserIdsByRequestedWarehouseAndGroups(request.RequestedWarehouseId, new List<string> { "Thủ kho" });
-                await _firebaseService.SendNotificationToUsersAsync(userIds, "Yêu cầu mới vừa được tạo.", $"Một yêu cầu kho vừa được tạo với mã yêu cầu: {entity.Code}", NotificationType.GOOD_REQUEST_CREATED, request.RequestedWarehouseId);
-
+                var userOfRequestedWarehouseIds = await _unitOfWork.AccountRepository.GetUserIdsByWarehouseAndGroups(request.RequestedWarehouseId, new List<string> { "Thủ kho" });
+                await _firebaseService.SendNotificationToUsersAsync(userOfRequestedWarehouseIds, "Yêu cầu mới vừa được tạo.",
+                                                                    $"Một yêu cầu kho vừa được tạo với mã yêu cầu: {entity.Code}",
+                                                                    NotificationType.GOOD_REQUEST_CREATED, request.RequestedWarehouseId);
+                // Nếu là chuyển kho thì notify thêm WarehouseId
+                if (request.RequestType == GoodRequestEnum.Transfer)
+                {
+                    var userOfWarehouseIds = await _unitOfWork.AccountRepository.GetUserIdsByWarehouseAndGroups(request.WarehouseId, new List<string> { "Thủ kho" });
+                    await _firebaseService.SendNotificationToUsersAsync(userOfWarehouseIds, "Yêu cầu mới vừa được tạo.",
+                                                                        $"Một yêu cầu kho vừa được tạo với mã yêu cầu: {entity.Code}",
+                                                                        NotificationType.GOOD_REQUEST_CREATED, request.WarehouseId);
+                }
                 var goodRequest = await _goodRequestRepository.GetByCondition(x => x.Id == entity.Id, includeProperties: "GoodRequestDetails,Warehouse,RequestedWarehouse,Partner," +
                                                                                                                          "GoodRequestDetails.Product," +
                                                                                                                          "GoodRequestDetails.Product.Unit," +
@@ -510,7 +538,7 @@ namespace BusinessLogicLayer.Services
             switch (newStatus)
             {
                 case GoodRequestStatusEnum.Approved:
-                    await _firebaseService.SendNotificationToUsersAsync( new List<string> { goodRequest.CreatedBy }, "Yêu cầu kho đã được phê duyệt.", $"Yêu cầu kho với mã yêu cầu: {goodRequest.Code} đã được phê duyệt.", NotificationType.GOOD_REQUEST_APPROVED, goodRequest.RequestedWarehouseId);
+                    await _firebaseService.SendNotificationToUsersAsync(new List<string> { goodRequest.CreatedBy }, "Yêu cầu kho đã được phê duyệt.", $"Yêu cầu kho với mã yêu cầu: {goodRequest.Code} đã được phê duyệt.", NotificationType.GOOD_REQUEST_APPROVED, goodRequest.RequestedWarehouseId);
                     break;
                 case GoodRequestStatusEnum.Rejected:
                     await _firebaseService.SendNotificationToUsersAsync(new List<string> { goodRequest.CreatedBy }, "Yêu cầu kho đã bị từ chối.", $"Yêu cầu kho với mã yêu cầu: {goodRequest.Code} đã bị từ chối.", NotificationType.GOOD_REQUEST_REJECTED, goodRequest.RequestedWarehouseId);
