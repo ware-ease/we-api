@@ -22,10 +22,10 @@ namespace DataAccessLayer.Repositories
         //        .ToListAsync();
         //}
 
-        public async Task<List<Inventory>> GetAvailableInventoriesAsync(string productId)
+        public async Task<List<Inventory>> GetAvailableInventoriesAsync(string productId, string warehouseId)
         {
             return await _context.Inventories
-                .Where(x => x.Batch.ProductId == productId && x.CurrentQuantity > 0)
+                .Where(x => x.Batch.ProductId == productId && x.CurrentQuantity > 0 && x.WarehouseId == warehouseId)
                 .OrderBy(x => x.Batch.InboundDate)  // Sắp xếp theo ngày nhập kho
                 .ToListAsync();
         }

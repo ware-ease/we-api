@@ -290,8 +290,8 @@ namespace BusinessLogicLayer.Services
                 // Cập nhật trạng thái yêu cầu kho nếu có
                 if (goodRequest != null)
                 {
-                    goodRequest.Status = GoodRequestStatusEnum.Approved;
-                    _unitOfWork.GoodRequestRepository.Update(goodRequest);
+                    //goodRequest.Status = GoodRequestStatusEnum.Approved;
+                    //_unitOfWork.GoodRequestRepository.Update(goodRequest);
 
                     // Thông báo cho người yêu cầu
                     if (!string.IsNullOrEmpty(goodRequest.CreatedBy))
@@ -335,19 +335,14 @@ namespace BusinessLogicLayer.Services
             if (goodNote.NoteType != GoodNoteEnum.Receive)
                 throw new Exception("Chức năng này chỉ hỗ trợ cho phiếu nhập kho.");
 
-            var requestedWarehouseId = goodNote.GoodRequest?.RequestedWarehouseId;
-            if (string.IsNullOrEmpty(requestedWarehouseId))
-            {
-                var goodRequest = await _unitOfWork.GoodRequestRepository.GetByCondition(g => g.Id == goodNote.GoodRequestId)
-                    ?? throw new Exception($"Không tìm thấy yêu cầu kho với ID: {goodNote.GoodRequestId}.");
-                requestedWarehouseId = goodRequest.RequestedWarehouseId
-                    ?? throw new Exception("Yêu cầu kho chưa có kho nhận.");
-            }
+            var requestedWarehouseId = goodNote.GoodRequest?.RequestedWarehouseId
+                ?? throw new Exception("Yêu cầu kho chưa có kho nhận.");
+
 
             var batchIds = details.Select(d => d.BatchId).Distinct().ToList();
             var inventories = await _unitOfWork.InventoryRepository.Search(
-                i => batchIds.Contains(i.BatchId),
-                includeProperties: "Warehouse"
+                i => batchIds.Contains(i.BatchId)
+                //includeProperties: "Warehouse"
             );
 
             foreach (var detail in details)
@@ -383,470 +378,50 @@ namespace BusinessLogicLayer.Services
             };
         }
 
-        //public async Task<ServiceResponse> CreateReceiveNoteAsync(GoodNoteCreateDTO request)
-        //{
-        //    await _unitOfWork.BeginTransactionAsync();
-
-        //    if (!string.IsNullOrEmpty(request.GoodRequestId))
-        //    {
-        //        var goodRequest = await _unitOfWork.GoodRequestRepository.GetByCondition(x => x.Id == request.GoodRequestId);
-        //        if (goodRequest == null)
-        //        {
-        //            return new ServiceResponse
-        //            {
-        //                Status = SRStatus.Error,
-        //                Message = "Không tìm thấy yêu cầu kho.",
-        //                Data = request.GoodRequestId
-        //            };
-        //        }
-        //    }
-        //    var goodNoteCodeExists = await _unitOfWork.GoodNoteRepository.GetByCondition(x => x.Code == request.Code);
-        //    if (goodNoteCodeExists != null)
-        //    {
-        //        return new ServiceResponse
-        //        {
-        //            Status = SRStatus.Error,
-        //            Message = "Mã phiếu đã tồn tại.",
-        //            Data = request.Code
-        //        };
-        //    }
-        //    if (request.GoodNoteDetails != null && request.GoodNoteDetails.Any())
-        //    {
-        //        foreach (var detail in request.GoodNoteDetails)
-        //        {
-        //            if (detail.NewBatch == null)
-        //            {
-        //                return new ServiceResponse
-        //                {
-        //                    Status = SRStatus.Error,
-        //                    Message = $"Thiếu thông tin lô!",
-        //                    Data = null
-        //                };
-        //            }
-        //        }
-        //    }
-        //    try
-        //    {
-        //        //Tạo goodnote
-        //        var entity = _mapper.Map<GoodNote>(request);
-        //        entity.CreatedTime = DateTime.Now;
-        //        entity.Status = GoodNoteStatusEnum.Completed;
-        //        await _unitOfWork.GoodNoteRepository.Add(entity);
-
-        //        //cập nhật goodrequest là thành công
-        //        var goodRequest = await _unitOfWork.GoodRequestRepository.GetByCondition(x => x.Id == request.GoodRequestId);
-        //        goodRequest.Status = GoodRequestStatusEnum.Approved;
-        //        _unitOfWork.GoodRequestRepository.Update(goodRequest);
-
-        //        //Tạo goodnoteDetail
-        //        var goodNoteDetails = _mapper.Map<List<GoodNoteDetail>>(request.GoodNoteDetails);
-        //        foreach (var detail in request.GoodNoteDetails!)
-        //        {
-        //            // Nếu có NewBatch thì tạo mới
-        //            var batch = _mapper.Map<Batch>(detail.NewBatch);
-        //            await _unitOfWork.BatchRepository.Add(batch);
-
-        //            //Thêm GoodNoteDetail
-        //            detail.GoodNoteId = entity.Id;
-        //            detail.CreatedTime = DateTime.Now;
-        //            var goodNoteDetail = _mapper.Map<GoodNoteDetail>(detail);
-        //            goodNoteDetail.BatchId = batch.Id; // Gán BatchId mới cho GoodNoteDetail
-        //            await _unitOfWork.GoodNoteDetailRepository.Add(goodNoteDetail);
-
-        //        }
-        //        //Cập nhật tồn kho
-        //        await UpdateInventories(entity, goodNoteDetails);
-
-        //        await _unitOfWork.SaveAsync();
-
-        //         // thông báo cho người tạo yêu cầu
-        //        if (goodRequest.CreatedBy != null)
-        //        {
-        //            await _firebaseService.SendNotificationToUsersAsync(
-        //                new List<string> { goodRequest.CreatedBy },
-        //                "Thông báo",
-        //                $"Phiếu kho {entity.Code} đã được tạo thành công từ yêu cầu kho {goodRequest.Code}.",
-        //                NotificationType.GOOD_REQUEST_APPROVED,
-        //                goodRequest.RequestedWarehouseId
-        //            );
-        //        }
-
-        //        await _unitOfWork.CommitTransactionAsync();
-
-        //        return new ServiceResponse
-        //        {
-        //            Status = SRStatus.Success,
-        //            Message = "Phiếu kho được tạo thành công!",
-        //            Data = "GoodNoteId: " + entity.Id
-        //        };
-        //    }
-        //    catch (DbUpdateException dbEx)
-        //    {
-        //        await _unitOfWork.RollbackTransactionAsync();  // Rollback transaction nếu có lỗi
-        //        return new ServiceResponse
-        //        {
-        //            Status = SRStatus.Error,
-        //            Message = $"Lỗi dữ liệu: {dbEx.InnerException?.Message ?? dbEx.Message}"
-        //        };
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        await _unitOfWork.RollbackTransactionAsync();  // Rollback transaction nếu có lỗi
-        //        return new ServiceResponse
-        //        {
-        //            Status = SRStatus.Error,
-        //            Message = $"Lỗi khi tạo phiếu kho: {ex.Message}"
-        //        };
-        //    }
-        //}
-
-        //private async Task UpdateInventories(GoodNote goodNote, List<GoodNoteDetail> details)
-        //{
-        //    try
-        //    {
-        //        if (goodNote == null)
-        //        {
-        //            throw new Exception("Phiếu kho không được để trống.");
-        //        }
-
-        //        if (details == null || !details.Any())
-        //        {
-        //            throw new Exception("Danh sách chi tiết phiếu kho không được để trống.");
-        //        }
-
-        //        if (goodNote.NoteType != GoodNoteEnum.Receive)
-        //        {
-        //            throw new Exception("Chức năng này chỉ hỗ trợ cho phiếu nhập kho.");
-        //        }
-
-        //        var batchIds = details.Select(d => d.BatchId).Distinct().ToList();
-        //        if (!batchIds.Any())
-        //        {
-        //            throw new Exception("Không tìm thấy BatchId trong chi tiết phiếu kho.");
-        //        }
-
-        //        var goodRequest = await _unitOfWork.GoodRequestRepository.GetByCondition(g => g.Id == goodNote.GoodRequestId);
-        //        if (goodRequest == null)
-        //        {
-        //            throw new Exception($"Không tìm thấy yêu cầu kho với ID: {goodNote.GoodRequestId}.");
-        //        }
-
-        //        var requestedWarehouseId = goodRequest.RequestedWarehouseId
-        //            ?? throw new Exception("Yêu cầu kho chưa có kho nhận.");
-
-        //        // Lấy danh sách tồn kho hiện tại của các Batch liên quan
-        //        var inventories = await _unitOfWork.InventoryRepository.Search(
-        //            i => batchIds.Contains(i.BatchId),
-        //            includeProperties: "Warehouse"
-        //        );
-
-        //        foreach (var detail in details)
-        //        {
-        //            var targetInventory = inventories.FirstOrDefault(i => i.BatchId == detail.BatchId && i.WarehouseId == requestedWarehouseId);
-
-        //            if (targetInventory == null)
-        //            {
-        //                // Nếu chưa có tồn kho → tạo mới
-        //                targetInventory = new Inventory
-        //                {
-        //                    WarehouseId = requestedWarehouseId,
-        //                    BatchId = detail.BatchId,
-        //                    CurrentQuantity = detail.Quantity
-        //                };
-        //                await _unitOfWork.InventoryRepository.Add(targetInventory);
-        //            }
-        //            else
-        //            {
-        //                // Nếu đã có tồn kho → cộng thêm số lượng
-        //                targetInventory.CurrentQuantity += detail.Quantity;
-        //                _unitOfWork.InventoryRepository.Update(targetInventory);
-        //            }
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        throw new Exception($"Lỗi khi cập nhật tồn kho: {ex.Message}");
-        //    }
-        //}
-
-        //private async Task UpdateInventories(GoodNote goodNote, List<GoodNoteDetail> details)
-        //{
-        //    try
-        //    {
-        //        if (goodNote == null)
-        //        {
-        //            throw new Exception("GoodNote cannot be null.");
-        //        }
-
-        //        if (details == null || !details.Any())
-        //        {
-        //            throw new Exception("GoodNoteDetails cannot be null or empty.");
-        //        }
-        //        var batchIds = details.Select(d => d.BatchId).Distinct().ToList();
-        //        if (!batchIds.Any())
-        //        {
-        //            throw new Exception("No batch IDs found in GoodNoteDetails.");
-        //        }
-        //        var goodRequest = await _unitOfWork.GoodRequestRepository.GetByCondition(g => g.Id == goodNote.GoodRequestId);
-        //        if (goodRequest == null)
-        //        {
-        //            throw new Exception($"Good request {goodNote.GoodRequestId} not found.");
-        //        }
-
-        //        var warehouseId = goodRequest.WarehouseId; // 🔥 Chỉ dùng khi Transfer
-        //        var requestedWarehouseId = goodRequest.RequestedWarehouseId ?? throw new Exception("Requested warehouse ID is missing."); // 🔥 Dùng cho tất cả các loại phiếu
-
-        //        // Lấy danh sách Inventory cho tất cả Batch liên quan
-        //        var inventories = await _unitOfWork.InventoryRepository.Search(i => batchIds.Contains(i.BatchId), includeProperties: "Warehouse");
-
-        //        foreach (var detail in details)
-        //        {
-        //            Inventory? sourceInventory = null;
-        //            Inventory? targetInventory = null;
-
-        //            switch (goodNote.NoteType)
-        //            {
-        //                case GoodNoteEnum.Receive:
-        //                    // 🟢 Hàng nhập vào requestedWarehouseId
-        //                    targetInventory = inventories.FirstOrDefault(i => i.BatchId == detail.BatchId && i.WarehouseId == requestedWarehouseId);
-        //                    if (targetInventory == null)
-        //                    {
-        //                        targetInventory = new Inventory
-        //                        {
-        //                            WarehouseId = requestedWarehouseId,
-        //                            BatchId = detail.BatchId,
-        //                            CurrentQuantity = detail.Quantity,
-        //                            //ArrangedQuantity = 0,
-        //                            //NotArrgangedQuantity = detail.Quantity,
-        //                        };
-        //                        await _unitOfWork.InventoryRepository.Add(targetInventory);
-        //                        break;
-        //                    }
-        //                    targetInventory.CurrentQuantity += detail.Quantity;
-        //                    //targetInventory.NotArrgangedQuantity += detail.Quantity;
-        //                    _unitOfWork.InventoryRepository.Update(targetInventory);
-        //                    break;
-        //                case GoodNoteEnum.Issue:
-        //                    // 🔴 Xuất hàng từ requestedWarehouseId
-        //                    sourceInventory = inventories.FirstOrDefault(i => i.BatchId == detail.BatchId && i.WarehouseId == requestedWarehouseId);
-        //                    if (sourceInventory == null || sourceInventory.CurrentQuantity < detail.Quantity)
-        //                    {
-        //                        throw new Exception($"Không đủ hàng trong lô  {detail.Batch.Code} để xuất ở kho {sourceInventory.Warehouse.Name ?? null}.");
-        //                    }
-        //                    sourceInventory.CurrentQuantity -= detail.Quantity;
-        //                    //sourceInventory.NotArrgangedQuantity -= detail.Quantity;
-        //                    _unitOfWork.InventoryRepository.Update(sourceInventory);
-        //                    break;
-        //            }
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        throw new Exception($"Lỗi khi tạo tồn kho: {ex.Message}");
-        //    }
-        //}
-
-
-        //public async Task<ServiceResponse> DeleteAsync(string id)
-        //{
-        //    var entity = await _goodNoteRepository.GetByCondition(x => x.Id == id);
-        //    if (entity == null)
-        //    {
-        //        return new ServiceResponse
-        //        {
-        //            Status = SRStatus.NotFound,
-        //            Message = "Good note not found!",
-        //            Data = id
-        //        };
-        //    }
-
-        //    try
-        //    {
-        //        _goodNoteRepository.Delete(entity);
-        //        await _unitOfWork.SaveAsync();
-
-        //        return new ServiceResponse
-        //        {
-        //            Status = SRStatus.Success,
-        //            Message = "Good note deleted successfully!",
-        //            Data = id
-        //        };
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return new ServiceResponse
-        //        {
-        //            Status = SRStatus.Error,
-        //            Message = $"Error deleting good note: {ex.Message}"
-        //        };
-        //    }
-        //}
-        //public async Task<ServiceResponse> UpdateStatusAsync(string id, GoodNoteStatusEnum newStatus)
-        //{
-        //    var goodNote = await _goodNoteRepository.GetByCondition(x => x.Id == id);
-        //    if (goodNote == null)
-        //    {
-        //        return new ServiceResponse
-        //        {
-        //            Status = SRStatus.NotFound,
-        //            Message = "GoodNote không tồn tại.",
-        //            Data = id
-        //        };
-        //    }
-
-        //    // Kiểm tra quy tắc cập nhật trạng thái
-        //    if (!CanUpdateStatus(goodNote.Status, newStatus))
-        //    {
-        //        return new ServiceResponse
-        //        {
-        //            Status = SRStatus.Error,
-        //            Message = $"Không thể chuyển từ trạng thái {goodNote.Status} sang {newStatus}.",
-        //            Data = id
-        //        };
-        //    }
-
-        //    // Nếu chuyển sang Completed thì mới cập nhật Inventory
-        //    if (newStatus == GoodNoteStatusEnum.Completed)
-        //    {
-        //        var goodNoteDetails = await _unitOfWork.GoodNoteDetailRepository.Search(x => x.GoodNoteId == id);
-        //        if (!goodNoteDetails.Any())
-        //        {
-        //            return new ServiceResponse
-        //            {
-        //                Status = SRStatus.Error,
-        //                Message = "Không có chi tiết hàng hóa để cập nhật tồn kho.",
-        //                Data = id
-        //            };
-        //        }
-
-        //        try
-        //        {
-        //            await UpdateInventories(goodNote, goodNoteDetails.ToList());
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            return new ServiceResponse
-        //            {
-        //                Status = SRStatus.Error,
-        //                Message = $"Lỗi khi cập nhật tồn kho: {ex.Message}"
-        //            };
-        //        }
-        //    }
-
-        //    goodNote.Status = newStatus;
-        //    _goodNoteRepository.Update(goodNote);
-        //    await _unitOfWork.SaveAsync();
-
-        //    return new ServiceResponse
-        //    {
-        //        Status = SRStatus.Success,
-        //        Message = "Cập nhật trạng thái thành công.",
-        //        Data = new { goodNoteId = id, newStatus = goodNote.Status }
-        //    };
-        //}
-
-
-        ///// <summary>
-        ///// Kiểm tra xem trạng thái có thể cập nhật không
-        ///// </summary>
-        //private bool CanUpdateStatus(GoodNoteStatusEnum currentStatus, GoodNoteStatusEnum newStatus)
-        //{
-        //    var validTransitions = new Dictionary<GoodNoteStatusEnum, List<GoodNoteStatusEnum>>()
-        //    {
-        //        { GoodNoteStatusEnum.Pending, new List<GoodNoteStatusEnum> { GoodNoteStatusEnum.Completed, GoodNoteStatusEnum.Canceled, GoodNoteStatusEnum.Failed } },
-        //        { GoodNoteStatusEnum.Completed, new List<GoodNoteStatusEnum>() }, // Không thể đổi từ Completed
-        //        { GoodNoteStatusEnum.Canceled, new List<GoodNoteStatusEnum>() }, // Không thể đổi từ Canceled
-        //        { GoodNoteStatusEnum.Failed, new List<GoodNoteStatusEnum> { GoodNoteStatusEnum.Pending } } // Có thể thử lại từ Failed -> Pending
-        //    };
-        //    return validTransitions.ContainsKey(currentStatus) && validTransitions[currentStatus].Contains(newStatus);
-        //}
-
-        //public async Task<ServiceResponse> UpdateAsync(string id, GoodNoteUpdateDTO request)
-        //{
-        //    var goodNote = await _goodNoteRepository.GetByCondition(x => x.Id == id);
-        //    if (goodNote == null)
-        //    {
-        //        return new ServiceResponse
-        //        {
-        //            Status = SRStatus.NotFound,
-        //            Message = "GoodNote không tồn tại.",
-        //            Data = id
-        //        };
-        //    }
-
-        //    // ❌ Không cho cập nhật nếu trạng thái là Completed
-        //    if (goodNote.Status == GoodNoteStatusEnum.Completed)
-        //    {
-        //        return new ServiceResponse
-        //        {
-        //            Status = SRStatus.Error,
-        //            Message = "Không thể cập nhật GoodNote đã hoàn thành.",
-        //            Data = id
-        //        };
-        //    }
-
-        //    // ✅ Chỉ cập nhật các trường được truyền xuống (PATCH)
-        //    if (request.ShipperName != null) goodNote.ShipperName = request.ShipperName;
-        //    if (request.ReceiverName != null) goodNote.ReceiverName = request.ReceiverName;
-        //    if (request.Code != null)
-        //    {
-        //        var goodNoteCodeExists = await _unitOfWork.GoodNoteRepository.GetByCondition(x => x.Code == request.Code && x.Id != request.Id);
-        //        if (goodNoteCodeExists != null)
-        //        {
-        //            return new ServiceResponse
-        //            {
-        //                Status = SRStatus.Error,
-        //                Message = "Goodnote code already exists for this code.",
-        //                Data = request.Code
-        //            };
-        //        }
-        //        goodNote.Code = request.Code;
-        //    }
-        //    if (request.Date.HasValue) goodNote.Date = request.Date.Value;
-        //    if (request.NoteType != null) goodNote.NoteType = request.NoteType.Value;
-
-        //    // ⚡ Xử lý cập nhật danh sách GoodNoteDetails
-        //    if (request.GoodNoteDetails != null && request.GoodNoteDetails.Any())
-        //    {
-        //        // 🗑️ Xóa từng phần tử trong danh sách cũ
-        //        var oldDetails = await _unitOfWork.GoodNoteDetailRepository.Search(x => x.GoodNoteId == id);
-        //        foreach (var oldDetail in oldDetails)
-        //        {
-        //            _unitOfWork.GoodNoteDetailRepository.Delete(oldDetail);
-        //        }
-
-        //        // ➕ Thêm từng phần tử mới
-        //        foreach (var detail in request.GoodNoteDetails)
-        //        {
-        //            var newDetail = new GoodNoteDetail
-        //            {
-        //                GoodNoteId = id,
-        //                BatchId = detail.BatchId,
-        //                Quantity = detail.Quantity,
-        //                Note = detail.Note,
-        //                CreatedTime = DateTime.Now
-        //            };
-        //            await _unitOfWork.GoodNoteDetailRepository.Add(newDetail);
-        //        }
-        //    }
-
-        //    _goodNoteRepository.Update(goodNote);
-        //    await _unitOfWork.SaveAsync();
-
-        //    return new ServiceResponse
-        //    {
-        //        Status = SRStatus.Success,
-        //        Message = "Cập nhật GoodNote thành công.",
-        //        Data = new { goodNoteId = id }
-        //    };
-        //}
-        public async Task<ServiceResponse> CreateIssueNoteAsync(GoodNoteIssueCreateDTO dto)
+        public async Task<ServiceResponse> CreateIssueNoteAsync(GoodNoteIssueCreateDTO dto, CodeType codeType)
         {
             var serviceResponse = new ServiceResponse();
             try
             {
+                //validate
+                var goodRequest = await _unitOfWork.GoodRequestRepository.GetByCondition(x => x.Id == dto.GoodRequestId);
+                if (goodRequest == null)
+                {
+                    serviceResponse.Status = SRStatus.Error;
+                    serviceResponse.Message = "Không tìm thấy yêu cầu kho.";
+                    //await _unitOfWork.RollbackTransactionAsync();  // Rollback transaction nếu không tìm thấy yêu cầu kho
+                    return serviceResponse;
+                }
+                if (goodRequest.RequestType != GoodRequestEnum.Issue && goodRequest.RequestType != GoodRequestEnum.Transfer)
+                {
+                    serviceResponse.Status = SRStatus.Error;
+                    serviceResponse.Message = "Yêu cầu kho không phải là yêu cầu xuất kho hoặc điều chuyển kho.";
+                    //await _unitOfWork.RollbackTransactionAsync();  // Rollback transaction nếu yêu cầu không phải xuất kho
+                    return serviceResponse;
+                }
+                if (goodRequest.Status != GoodRequestStatusEnum.Approved)
+                {
+                    serviceResponse.Status = SRStatus.Error;
+                    serviceResponse.Message = "Yêu cầu kho chưa được chấp thuận.";
+                    //await _unitOfWork.RollbackTransactionAsync();  // Rollback transaction nếu yêu cầu chưa được chấp thuận
+                    return serviceResponse;
+                }
+                string? checkWarehouseId = codeType switch
+                {
+                    CodeType.PXNB => goodRequest.WarehouseId,
+                    CodeType.PX => goodRequest.RequestedWarehouseId,
+                    _ => null
+                };
+
+                if (string.IsNullOrEmpty(checkWarehouseId))
+                {
+                    serviceResponse.Status = SRStatus.Error;
+                    serviceResponse.Message = "Không tìm thấy kho để kiểm tra và trừ tồn kho.";
+                    return serviceResponse;
+                }
+
                 // Kiểm tra tồn kho
-                var checkResult = await CheckInventorySufficientAsync(dto);
+                var checkResult = await CheckInventorySufficientAsync(dto, checkWarehouseId);
                 if (!checkResult)
                 {
                     serviceResponse.Status = SRStatus.Error;
@@ -858,10 +433,10 @@ namespace BusinessLogicLayer.Services
                 await _unitOfWork.BeginTransactionAsync();
 
                 // Tạo phiếu xuất kho
-                var goodNote = await CreateGoodNoteIssueAsync(dto);
+                var goodNote = await CreateGoodNoteIssueAsync(dto, codeType);
                
                 // Trừ tồn kho và tạo chi tiết phiếu xuất
-                var deductResult = await DeductInventoryAndCreateDetailsAsync(dto, goodNote.Id);
+                var deductResult = await DeductInventoryAndCreateDetailsAsync(dto, goodNote.Id, checkWarehouseId);
                 if (!deductResult)
                 {
                     serviceResponse.Status = SRStatus.Error;
@@ -869,25 +444,9 @@ namespace BusinessLogicLayer.Services
                     await _unitOfWork.RollbackTransactionAsync();  // Rollback transaction nếu không trừ được tồn kho
                     return serviceResponse;
                 }
-
-                var goodRequest = await _unitOfWork.GoodRequestRepository.GetByCondition(x => x.Id == dto.GoodRequestId);
-                if (goodRequest == null)
-                {
-                    serviceResponse.Status = SRStatus.Error;
-                    serviceResponse.Message = "Không tìm thấy yêu cầu kho.";
-                    await _unitOfWork.RollbackTransactionAsync();  // Rollback transaction nếu không tìm thấy yêu cầu kho
-                    return serviceResponse;
-                }
-                if (goodRequest.RequestType != GoodRequestEnum.Issue && goodRequest.RequestType != GoodRequestEnum.Transfer)
-                {
-                    serviceResponse.Status = SRStatus.Error;
-                    serviceResponse.Message = "Yêu cầu kho không phải là yêu cầu xuất kho hoặc điều chuyển kho.";
-                    await _unitOfWork.RollbackTransactionAsync();  // Rollback transaction nếu yêu cầu không phải xuất kho
-                    return serviceResponse;
-                }
                 // Cập nhật trạng thái yêu cầu kho
-                goodRequest.Status = GoodRequestStatusEnum.Approved;
-                _unitOfWork.GoodRequestRepository.Update(goodRequest);
+                //goodRequest.Status = GoodRequestStatusEnum.Approved;
+                //_unitOfWork.GoodRequestRepository.Update(goodRequest);
 
                 // Lưu vào cơ sở dữ liệu và commit transaction
                 await _unitOfWork.SaveAsync();
@@ -900,14 +459,14 @@ namespace BusinessLogicLayer.Services
                     .ToList();
 
 
-                var keeperIds = await _unitOfWork.AccountRepository.GetUserIdsByRequestedWarehouseAndGroups(goodRequest.RequestedWarehouseId, new List<string> { "Thủ kho" });
+                var keeperIds = await _unitOfWork.AccountRepository.GetUserIdsByWarehouseAndGroups(checkWarehouseId, new List<string> { "Thủ kho" });
 
                 await SendIssueNoteNotificationAsync(
                     keeperIds,
                     goodRequest.CreatedBy,
                     goodNote.Code,
                     batchMessages,
-                    goodRequest.RequestedWarehouseId
+                    checkWarehouseId
                 );
 
                 await _unitOfWork.CommitTransactionAsync();  // Commit transaction nếu mọi thứ thành công
@@ -926,7 +485,7 @@ namespace BusinessLogicLayer.Services
             return serviceResponse;
         }
 
-        private async Task<bool> CheckInventorySufficientAsync(GoodNoteIssueCreateDTO dto)
+        private async Task<bool> CheckInventorySufficientAsync(GoodNoteIssueCreateDTO dto, string warehouseId)
         {
             var productGroups = dto.GoodNoteDetails
                 .GroupBy(x => x.ProductId)
@@ -935,7 +494,7 @@ namespace BusinessLogicLayer.Services
 
             foreach (var product in productGroups)
             {
-                var inventories = await _unitOfWork.InventoryRepository.GetAvailableInventoriesAsync(product.ProductId);
+                var inventories = await _unitOfWork.InventoryRepository.GetAvailableInventoriesAsync(product.ProductId, warehouseId);
 
                 var totalStock = inventories.Sum(x => x.CurrentQuantity);
 
@@ -948,11 +507,11 @@ namespace BusinessLogicLayer.Services
             return true; // Tồn kho đủ
         }
 
-        private async Task<GoodNote> CreateGoodNoteIssueAsync(GoodNoteIssueCreateDTO dto)
+        private async Task<GoodNote> CreateGoodNoteIssueAsync(GoodNoteIssueCreateDTO dto, CodeType codeType)
         {
             var goodNote = new GoodNote
             {
-                Code = await _codeGeneratorService.GenerateCodeAsync(CodeType.PX),
+                Code = await _codeGeneratorService.GenerateCodeAsync(codeType),
                 Date = dto.Date,
                 ReceiverName = dto.ReceiverName,
                 ShipperName = dto.ShipperName,
@@ -970,13 +529,13 @@ namespace BusinessLogicLayer.Services
             return goodNote;
         }
 
-        private async Task<bool> DeductInventoryAndCreateDetailsAsync(GoodNoteIssueCreateDTO dto, string goodNoteId)
+        private async Task<bool> DeductInventoryAndCreateDetailsAsync(GoodNoteIssueCreateDTO dto, string goodNoteId, string warehouseId)
         {
             foreach (var detailDto in dto.GoodNoteDetails)
             {
                 float remainQuantity = detailDto.Quantity;
 
-                var availableInventories = await _unitOfWork.InventoryRepository.GetAvailableInventoriesAsync(detailDto.ProductId);
+                var availableInventories = await _unitOfWork.InventoryRepository.GetAvailableInventoriesAsync(detailDto.ProductId, warehouseId);
 
                 foreach (var inventory in availableInventories)
                 {
@@ -1027,6 +586,114 @@ namespace BusinessLogicLayer.Services
                 NotificationType.GOOD_REQUEST_APPROVED,
                 requestedWarehouseId
             );
+        }
+
+        public async Task<ServiceResponse> CreateReceiveNoteWithExistingBatchAsync(GoodNoteCreateDTOv2 request, CodeType codeType)
+        {
+            var serviceResponse = new ServiceResponse();
+            try
+            {
+                // Kiểm tra yêu cầu kho nếu có
+                GoodRequest goodRequest = null;
+                if (!string.IsNullOrEmpty(request.GoodRequestId))
+                {
+                    goodRequest = await _unitOfWork.GoodRequestRepository.GetByCondition(x => x.Id == request.GoodRequestId);
+                    if (goodRequest == null)
+                        return Fail("Không tìm thấy yêu cầu kho.", request.GoodRequestId);
+
+                    if (goodRequest.Status == GoodRequestStatusEnum.Pending)
+                        return Fail("Không thể tạo phiếu cho yêu cầu chưa được chấp thuận.", request.GoodRequestId);
+                    if (goodRequest.Status == GoodRequestStatusEnum.Completed)
+                        return Fail("Không thể tạo phiếu cho yêu cầu đã hoàn thành.", request.GoodRequestId);
+                    if (goodRequest.Status == GoodRequestStatusEnum.Rejected)
+                        return Fail("Không thể tạo phiếu cho yêu cầu đã bị từ chối.", request.GoodRequestId);
+
+                    if (goodRequest.RequestType != GoodRequestEnum.Transfer
+                        && goodRequest.RequestType != GoodRequestEnum.Return)
+                        return Fail("Yêu cầu kho không hợp lệ.", request.GoodRequestId);
+                }
+
+                if (request.GoodNoteDetails == null || !request.GoodNoteDetails.Any())
+                    return Fail("Danh sách chi tiết phiếu kho không được để trống.");
+
+                // Kiểm tra mỗi chi tiết đều có BatchId
+                foreach (var detail in request.GoodNoteDetails)
+                {
+                    if (string.IsNullOrEmpty(detail.BatchId))
+                        return Fail("Thiếu BatchId trong chi tiết phiếu kho.", null);
+
+                    var existingBatch = await _unitOfWork.BatchRepository.GetByCondition(x => x.Id == detail.BatchId);
+                    if (existingBatch == null)
+                        return Fail($"Không tìm thấy lô hàng với Id {detail.BatchId}.", null);
+                }
+
+                // Tạo phiếu
+                var goodNote = _mapper.Map<GoodNote>(request);
+                goodNote.CreatedTime = DateTime.Now;
+                goodNote.Status = GoodNoteStatusEnum.Completed;
+                goodNote.Code = await _codeGeneratorService.GenerateCodeAsync(codeType); // codetype là PNNB hoặc PN cho Phiếu nhập kho nội bộ hoặc Phiếu trả hàng
+
+                var existingNote = await _unitOfWork.GoodNoteRepository.GetByCondition(x => x.Code == goodNote.Code);
+                if (existingNote != null)
+                    return Fail("Mã phiếu đã tồn tại.", goodNote.Code);
+
+                await _unitOfWork.BeginTransactionAsync();
+                await _unitOfWork.GoodNoteRepository.Add(goodNote);
+
+                var goodNoteDetails = new List<GoodNoteDetail>();
+
+                foreach (var detailDto in request.GoodNoteDetails)
+                {
+                    var detail = _mapper.Map<GoodNoteDetail>(detailDto);
+                    detail.GoodNoteId = goodNote.Id;
+                    detail.CreatedTime = DateTime.Now;
+                    await _unitOfWork.GoodNoteDetailRepository.Add(detail);
+                    goodNoteDetails.Add(detail);
+                }
+
+                goodNote.GoodRequest = goodRequest;
+
+                await UpdateInventories(goodNote, goodNoteDetails);
+
+                await _unitOfWork.SaveAsync();
+
+
+                if (goodRequest != null && !string.IsNullOrEmpty(goodRequest.CreatedBy))
+                {
+                    await _firebaseService.SendNotificationToUsersAsync(
+                        new List<string> { goodRequest.CreatedBy },
+                        "Thông báo",
+                        $"Phiếu nhập kho {goodNote.Code} đã được tạo từ yêu cầu kho {goodRequest.Code}.",
+                        NotificationType.GOOD_REQUEST_APPROVED,
+                        goodRequest.RequestedWarehouseId
+                    );
+                }
+                // Thông báo cho thủ kho
+                var batchMessages = goodNoteDetails
+                    .Select(x => $"{x.Batch.Code} ({x.Quantity})")
+                    .ToList();
+                var keeperIds = await _unitOfWork.AccountRepository.GetUserIdsByWarehouseAndGroups(goodRequest.RequestedWarehouseId, new List<string> { "Thủ kho" });
+                await _firebaseService.SendNotificationToUsersAsync(
+                    keeperIds,
+                    "Thông báo nhập kho",
+                    $"Phiếu nhập {goodNote.Code} đã nhập các lô: {string.Join(", ", batchMessages)}",
+                    NotificationType.RECEIVE_NOTE_CREATED,
+                    goodRequest.RequestedWarehouseId
+                );
+
+                await _unitOfWork.CommitTransactionAsync();
+
+                serviceResponse.Status = SRStatus.Success;
+                serviceResponse.Message = "Phiếu nhập kho được tạo thành công!";
+                serviceResponse.Data = goodNote.Id;
+            }
+            catch (Exception ex)
+            {
+                await _unitOfWork.RollbackTransactionAsync();
+                return Fail($"Lỗi khi tạo phiếu kho: {ex.Message}", null);
+            }
+
+            return serviceResponse;
         }
 
     }

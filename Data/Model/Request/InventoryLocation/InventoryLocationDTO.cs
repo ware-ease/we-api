@@ -50,9 +50,11 @@ namespace Data.Model.Request.InventoryLocation
         public float CurrentQuantity { get; set; }
         public float? ArrangedQuantity { get; set; }
         public float? NotArrgangedQuantity { get; set; }
+        public string WarehouseId { get; set; }
+        public WarehouseDTO Warehouse { get; set; }
         public string BatchId { get; set; }
         public BatchNoteDTO Batch { get; set; }
-        public List<InventoryLocationDTO> InventoryLocations { get; set; } = [];
+        //public List<InventoryLocationDTO> InventoryLocations { get; set; } = [];
     }
     public class InventoryLocationDTO : BaseDTO
     {

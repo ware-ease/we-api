@@ -129,7 +129,7 @@ namespace BusinessLogicLayer.Mappings
                 .ForMember(d => d.WarehouseName, opt => opt.MapFrom(src => $"{src.Warehouse.Name}".Trim()))
                 .ReverseMap();
 
-            CreateMap<Inventory, InventoryDTOv2>().ForMember(d => d.InventoryLocations, opt => opt.MapFrom(src => src.InventoryLocations))
+            CreateMap<Inventory, InventoryDTOv2>()/*.ForMember(d => d.InventoryLocations, opt => opt.MapFrom(src => src.InventoryLocations))*/
                 .ReverseMap();
             CreateMap<InventoryLocation, InventoryLocationDTO>().ReverseMap();
             #endregion
@@ -292,8 +292,10 @@ namespace BusinessLogicLayer.Mappings
                 //.ForMember(dest => dest.GoodNoteDetails, opt => opt.MapFrom(src => src.GoodNoteDetails))
                 .ReverseMap();
 
+            //v1 goodnote create
             CreateMap<GoodNoteCreateDTO, GoodNote>().ReverseMap();
             CreateMap<GoodNoteDetail, GoodNoteDetailCreateDTO>().ReverseMap();
+
             CreateMap<GoodNoteDetail, GoodNoteDTO>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.GoodNote.Id))
                 .ForMember(dest => dest.ReceiverName, opt => opt.MapFrom(src => src.GoodNote.ReceiverName))
@@ -313,6 +315,11 @@ namespace BusinessLogicLayer.Mappings
             CreateMap<Batch, BatchNoteDTO>().ReverseMap();
             CreateMap<Product, ProductNoteDTO>().ReverseMap();
             CreateMap<GoodRequest, GoodRequestOfGoodNoteDTO>().ReverseMap();
+
+            //v2 goodnote create
+            CreateMap<GoodNote, GoodNoteCreateDTOv2>().ReverseMap();
+            CreateMap<GoodNoteDetail, GoodNoteDetailCreateDTOv2>().ReverseMap();
+
             #endregion
 
             #region Partner
