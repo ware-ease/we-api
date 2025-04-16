@@ -14,6 +14,8 @@ namespace Data.Model.Request.Product
         public string? Name { get; set; }
         [Required(ErrorMessage = "Sku không được để trống")]
         public string? Sku { get; set; }
+        [Required(ErrorMessage = "IsBatchManaged không được để trống")]
+        public bool IsBatchManaged { get; set; } = true;
         public string? imageUrl { get; set; }
         [Required(ErrorMessage = "ProductTypeId không được để trống")]
         public string ProductTypeId { get; set; }
