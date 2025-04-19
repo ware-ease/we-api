@@ -287,6 +287,18 @@ namespace BusinessLogicLayer.Services
                 goodNote.GoodRequest = goodRequest;
                 await UpdateInventories(goodNote, goodNoteDetails);
 
+                // Thong báo cho thủ kho
+                var batchMessages = goodNoteDetails
+                    .Select(x => $"{x.Batch.Code} ({x.Quantity})")
+                    .ToList();
+                var keeperIds = await _unitOfWork.AccountRepository.GetUserIdsByWarehouseAndGroups(goodRequest.RequestedWarehouseId, new List<string> { "Thủ kho" });
+                await _firebaseService.SendNotificationToUsersAsync(
+                    keeperIds,
+                    "Thông báo nhập kho",
+                    $"Phiếu nhập {goodNote.Code} đã nhập các lô: {string.Join(", ", batchMessages)}",
+                    NotificationType.RECEIVE_NOTE_CREATED,
+                    goodRequest.RequestedWarehouseId
+                );
                 // Cập nhật trạng thái yêu cầu kho nếu có
                 if (goodRequest != null)
                 {
@@ -305,7 +317,6 @@ namespace BusinessLogicLayer.Services
                         );
                     }
                 }
-
                 await _unitOfWork.SaveAsync();
                 // Thông báo cho thủ kho
                 //++++
@@ -463,8 +474,8 @@ namespace BusinessLogicLayer.Services
 
                 await SendIssueNoteNotificationAsync(
                     keeperIds,
-                    goodRequest.CreatedBy,
-                    goodNote.Code,
+                    goodRequest.CreatedBy!,
+                    goodNote.Code!,
                     batchMessages,
                     checkWarehouseId
                 );
@@ -651,7 +662,7 @@ namespace BusinessLogicLayer.Services
                     goodNoteDetails.Add(detail);
                 }
 
-                goodNote.GoodRequest = goodRequest;
+                goodNote.GoodRequest = goodRequest!;
 
                 await UpdateInventories(goodNote, goodNoteDetails);
 

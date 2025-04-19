@@ -529,6 +529,20 @@ namespace BusinessLogicLayer.Services
                     Data = id
                 };
             }
+            // Kiểm tra quy tắc cập nhật trạng thái complete
+            if(newStatus == GoodRequestStatusEnum.Completed)
+            {
+                var goodNote = await _unitOfWork.GoodNoteRepository.GetByCondition(g => g.GoodRequestId == id);
+                if (goodNote == null)
+                {
+                    return new ServiceResponse
+                    {
+                        Status = SRStatus.Error,
+                        Message = "Không thể hoàn thành yêu cầu này vì không có phiếu giao hàng nào được tạo cho yêu cầu này.",
+                        Data = id
+                    };
+                }
+            }
 
             goodRequest.Status = newStatus;
             _goodRequestRepository.Update(goodRequest);
