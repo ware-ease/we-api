@@ -106,6 +106,25 @@ namespace API.Controllers
 
             var result = await _goodNoteService.CreateReceiveNoteWithExistingBatchAsync(request, CodeType.PNNB);
             return ControllerResponse.Response(result);
+        }    
+        
+        [Authorize]
+        [HttpPost("return-receive-note")]
+        public async Task<IActionResult> CreateReturnReceiveNote([FromBody] GoodNoteCreateDTOv2 request)
+        {
+            var authUser = AuthHelper.GetCurrentUser(HttpContext.Request);
+            if (authUser != null)
+            {
+                request.CreatedBy = authUser.id;
+                //request.GoodNoteDetails.ForEach(x =>
+                //{
+                //    x.CreatedBy = authUser.id;
+                //    x.NewBatch!.CreatedBy = authUser.id;
+                //});
+            }
+
+            var result = await _goodNoteService.CreateReceiveNoteWithExistingBatchAsync(request, CodeType.PN);
+            return ControllerResponse.Response(result);
         }
         //[HttpPut("{id}/status")]
         //public async Task<IActionResult> UpdateStatus(string id, [FromQuery] GoodNoteStatusEnum noteStatus)
