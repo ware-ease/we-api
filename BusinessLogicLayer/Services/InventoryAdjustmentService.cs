@@ -3,6 +3,7 @@ using BusinessLogicLayer.Generic;
 using BusinessLogicLayer.IServices;
 using Data.Entity;
 using Data.Model.DTO;
+using Data.Model.Request.GoodRequest;
 using Data.Model.Request.InventoryAdjustment;
 using Data.Model.Request.InventoryCount;
 using Data.Model.Response;
@@ -22,29 +23,173 @@ namespace BusinessLogicLayer.Services
     {
         IGenericRepository<InventoryAdjustmentDetail> _inventoryAdjustmentDetailRepository;
         IGenericRepository<Warehouse> _warehouseRepository;
-        IGenericRepository<LocationLog> _locationLogRepository;
-        IGenericRepository<Location> _locationRepository;
         IGenericRepository<Inventory> _inventoryRepository;
         IGenericRepository<InventoryCount> _inventoryCountRepository;
-        IGenericRepository<InventoryLocation> _inventoryLocationRepository;
+        IGenericRepository<Batch> _batchRepository;
+        private readonly IGoodRequestService _goodRequestService;
+        private readonly IGoodNoteService _goodNoteService;
         public InventoryAdjustmentService(IGenericRepository<InventoryAdjustment> genericRepository,
             IGenericRepository<InventoryAdjustmentDetail> inventoryAdjustmentDetailRepository,
             IGenericRepository<Warehouse> warehouseRepository,
-            IGenericRepository<LocationLog> locationLogRepository,
-            IGenericRepository<Location> locationRepository,
             IGenericRepository<Inventory> inventoryRepository,
             IGenericRepository<InventoryCount> inventoryCountRepository,
-            IGenericRepository<InventoryLocation> inventoryLocationRepository,
+            IGenericRepository<Batch> batchRepository,
+            IGoodRequestService goodRequestService,
+            IGoodNoteService goodNoteService,
             IMapper mapper, IUnitOfWork unitOfWork) : base(genericRepository, mapper, unitOfWork)
         {
             _inventoryAdjustmentDetailRepository = inventoryAdjustmentDetailRepository;
             _warehouseRepository = warehouseRepository;
-            _locationLogRepository = locationLogRepository;
-            _locationRepository = locationRepository;
             _inventoryRepository = inventoryRepository;
+            _batchRepository = batchRepository;
             _inventoryCountRepository = inventoryCountRepository;
-            _inventoryLocationRepository = inventoryLocationRepository;
+            _goodRequestService = goodRequestService;
+            _goodNoteService = goodNoteService;
+
         }
+
+
+        public async Task<InventoryAdjustmentDTO> AddInventoryAdjustment(InventoryAdjustmentCreateDTO request)
+        {
+
+
+            try
+            {
+                if (request.Date > DateTime.Now)
+                    throw new Exception("Date không được ở tương lai");
+
+                var warehouse = await _warehouseRepository.GetByCondition(p => p.Id == request.WarehouseId);
+                if (warehouse == null)
+                    throw new Exception("Warehouse không tồn tại");
+
+                var inventoryAdjustment = _mapper.Map<InventoryAdjustment>(request);
+                inventoryAdjustment.WarehouseId = request.WarehouseId;
+
+                if (request.DocumentType.HasValue && (request.DocumentType != Data.Enum.DocumentType.GoodNote && request.DocumentType != Data.Enum.DocumentType.InventoryCount))
+                    throw new Exception("DocumentType không hợp lệ");
+                if (!string.IsNullOrEmpty(request.RelatedDocument))
+                {
+                    var inventoryCount = await _inventoryCountRepository.GetByCondition(p => p.Id == request.RelatedDocument);
+                    if (inventoryCount != null)
+                    {
+                        inventoryCount.Status = Data.Enum.InventoryCountStatus.Balanced;
+                        _inventoryCountRepository.Update(inventoryCount);
+                    }
+                }
+
+                await _genericRepository.Insert(inventoryAdjustment);
+                //await _unitOfWork.SaveAsync();
+
+
+
+
+                //==================================================================================================//
+
+
+                foreach (var detailDto in request.InventoryAdjustmentDetails)
+                {
+                    var inventoryAdjustmentDetail = _mapper.Map<InventoryAdjustmentDetail>(detailDto);
+                    inventoryAdjustmentDetail.InventoryAdjustmentId = inventoryAdjustment.Id;
+
+                    var inventory = await _inventoryRepository.GetByCondition(p => p.Id == detailDto.InventoryId);
+                    if (inventory == null)
+                        throw new Exception($"Inventory với Id {detailDto.InventoryId} không tồn tại");
+                    if (inventory.WarehouseId != request.WarehouseId)
+                        throw new Exception($"Inventory với Id {detailDto.InventoryId} không thuộc Warehouse với Id {request.WarehouseId}");
+                    var batch = await _batchRepository.GetByCondition(p => p.Id == inventory.BatchId);
+                    if (batch == null)
+                        throw new Exception($"Batch với Id {inventory.BatchId} không tồn tại");
+                    if (detailDto.ProductId != batch.ProductId)
+                        throw new Exception($"Batch với Id {inventory.BatchId} không thuộc Product với Id {detailDto.ProductId}");
+
+
+                    //await _inventoryAdjustmentDetailRepository.Insert(inventoryAdjustmentDetail);
+                    //await _unitOfWork.SaveAsync();
+
+                }
+
+                var goodRequestDTO = new GoodRequestCreateDTO
+                {
+                    Note = request.Note,
+                    RequestType = request.RequestType,
+                    WarehouseId = request.WarehouseId,
+                    RequestedWarehouseId = request.WarehouseId,
+                    CreatedBy = request.CreatedBy,
+                    GoodRequestDetails = request.InventoryAdjustmentDetails.Select(d => new GoodRequestDetailDTO
+                    {
+                        Quantity = d.NewQuantity,
+                        ProductId = d.ProductId,
+                        CreatedBy = request.CreatedBy,
+                    }).ToList()
+                };
+
+                var goodRequest = await _goodRequestService.CreateAsync<GoodRequestDTO>(goodRequestDTO);
+                await _unitOfWork.SaveAsync();
+
+                return _mapper.Map<InventoryAdjustmentDTO>(inventoryAdjustment);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Lỗi khi thêm InventoryAdjustment: {ex.Message}");
+            }
+
+
+        }
+
+
+        public override async Task<ServiceResponse> Get<TResult>()
+        {
+            var inventoryAdjustments = await _genericRepository.GetAllNoPaging(
+                includeProperties: "InventoryAdjustmentDetails,Warehouse"
+            );
+
+            List<TResult> mappedResults = _mapper.Map<List<TResult>>(inventoryAdjustments);
+
+            return new ServiceResponse
+            {
+                Status = Data.Enum.SRStatus.Success,
+                Message = "Get successfully!",
+                Data = mappedResults
+            };
+        }
+
+        public async Task<ServiceResponse> Search<TResult>(int? pageIndex = null, int? pageSize = null,
+                                                                   string? keyword = null, string? warehouseId = null)
+        {
+
+            Expression<Func<InventoryAdjustment, bool>> filter = p =>
+                (string.IsNullOrEmpty(keyword) || p.Reason.Contains(keyword)
+                || p.Note.Contains(keyword)
+                || p.Warehouse.Name.Contains(keyword)
+                || p.InventoryAdjustmentDetails.Any(d => d.Note != null && d.Note.Contains(keyword))
+                &&
+                (string.IsNullOrEmpty(warehouseId) || p.WarehouseId == warehouseId));
+
+            var totalRecords = await _genericRepository.Count(filter);
+
+            var results = await _genericRepository.Search(
+                filter: filter, pageIndex: pageIndex, pageSize: pageSize,
+                includeProperties: "InventoryAdjustmentDetails,Warehouse");
+
+            var mappedResults = _mapper.Map<IEnumerable<TResult>>(results);
+
+            int totalPages = (int)Math.Ceiling((double)totalRecords / (pageSize ?? totalRecords));
+
+            return new ServiceResponse
+            {
+                Status = Data.Enum.SRStatus.Success,
+                Message = "Search successful!",
+                Data = new
+                {
+                    TotalRecords = totalRecords,
+                    TotalPages = totalPages,
+                    PageIndex = pageIndex ?? 1,
+                    PageSize = pageSize ?? totalRecords,
+                    Records = mappedResults
+                }
+            };
+        }
+
 
         /*public override async Task<ServiceResponse> Get<TResult>()
         {

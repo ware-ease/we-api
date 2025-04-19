@@ -14,6 +14,8 @@ namespace Data.Model.Request.InventoryAdjustment
         public DateTime? Date { get; set; }
         [Required(ErrorMessage = "Reason không được để trống")]
         public string? Reason { get; set; }
+        [Required(ErrorMessage = "Loại yêu cầu không được để trống.")]
+        public GoodRequestEnum RequestType { get; set; }
         [Required(ErrorMessage = "Note không được để trống")]
         public string? Note { get; set; }
         public DocumentType? DocumentType { get; set; }
@@ -32,8 +34,7 @@ namespace Data.Model.Request.InventoryAdjustment
         public float ChangeInQuantity { get; set; }
         [Required(ErrorMessage = "Note không được để trống")]
         public string? Note { get; set; }
-        [Required(ErrorMessage = "LocationId không được để trống")]
-        public string? LocationId { get; set; }
+        public string? ProductId { get; set; }
         [Required(ErrorMessage = "InventoryId không được để trống")]
         public string? InventoryId { get; set; }
     }

@@ -181,7 +181,10 @@ namespace BusinessLogicLayer.Services
 
                 existingProduct.Sku = request.Sku;
             }
-            
+
+            if (request.IsBatchManaged.HasValue)
+                existingProduct.IsBatchManaged = request.IsBatchManaged.Value;
+
             if (!string.IsNullOrEmpty(request.imageUrl))
             {
                 existingProduct.imageUrl = request.imageUrl;
@@ -227,7 +230,8 @@ namespace BusinessLogicLayer.Services
         }
 
         public async Task<ServiceResponse> Search<TResult>(int? pageIndex = null, int? pageSize = null,
-                                                                   string? keyword = null)
+            bool? IsBatchManaged = true,
+            string? keyword = null)
         {
 
             Expression<Func<Product, bool>> filter = p =>
@@ -235,7 +239,8 @@ namespace BusinessLogicLayer.Services
                 || p.Sku.Contains(keyword)
                 || p.ProductType.Name.Contains(keyword)
                 || p.Brand.Name.Contains(keyword)
-                || (p.ProductType.Category.Name + " " + p.ProductType.Category.Note).Contains(keyword));
+                || (p.ProductType.Category.Name + " " + p.ProductType.Category.Note).Contains(keyword))
+                && (!IsBatchManaged.HasValue || p.IsBatchManaged == IsBatchManaged.Value);
 
             var totalRecords = await _genericRepository.Count(filter);
 

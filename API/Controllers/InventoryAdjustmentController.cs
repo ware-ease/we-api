@@ -23,7 +23,7 @@ namespace API.Controllers
             _inventoryAdjustmentService = inventoryAdjustmentService;
         }
 
-        /*[HttpGet]
+        [HttpGet]
         public async Task<IActionResult> SearchPartners([FromQuery] int pageIndex = 1,
                                                         [FromQuery] int pageSize = 5,
                                                         [FromQuery] string? keyword = null, string? warehouseId = null)
@@ -86,7 +86,7 @@ namespace API.Controllers
             }
         }
 
-        [HttpPatch("{id}")]
+        /*[HttpPatch("{id}")]
         public async Task<IActionResult> Update(string id, [FromBody] InventoryAdjustmentUpdateDTO request)
         {
             try
