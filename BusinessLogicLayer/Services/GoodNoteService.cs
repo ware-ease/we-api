@@ -207,7 +207,7 @@ namespace BusinessLogicLayer.Services
                 {
                     if (detail.NewBatch == null)
                     {
-                        return Fail("Thiếu thông tin lô trong chi tiết phiếu kho.", null);
+                        return Fail("Thiếu thông tin lô trong chi tiết phiếu kho.", null!);
                     }
                 }
 
@@ -221,7 +221,7 @@ namespace BusinessLogicLayer.Services
                 // Kiểm tra mã phiếu trùng
                 var existingNote = await _unitOfWork.GoodNoteRepository.GetByCondition(x => x.Code == goodNote.Code);
                 if (existingNote != null)
-                    return Fail("Mã phiếu đã tồn tại.", request.Code);
+                    return Fail("Mã phiếu đã tồn tại.", request.Code!);
 
                 //bắt đầu transaction trước khi đụng đến db
                 await _unitOfWork.BeginTransactionAsync();
@@ -291,7 +291,7 @@ namespace BusinessLogicLayer.Services
                 var batchMessages = goodNoteDetails
                     .Select(x => $"{x.Batch.Code} ({x.Quantity})")
                     .ToList();
-                var keeperIds = await _unitOfWork.AccountRepository.GetUserIdsByWarehouseAndGroups(goodRequest.RequestedWarehouseId, new List<string> { "Thủ kho" });
+                var keeperIds = await _unitOfWork.AccountRepository.GetUserIdsByWarehouseAndGroups(goodRequest.RequestedWarehouseId!, new List<string> { "Thủ kho" });
                 await _firebaseService.SendNotificationToUsersAsync(
                     keeperIds,
                     "Thông báo nhập kho",
@@ -379,7 +379,7 @@ namespace BusinessLogicLayer.Services
         }
 
         // Helper fail response
-        private ServiceResponse Fail(string message, object data = null)
+        private ServiceResponse Fail(string message, object data = null!)
         {
             return new ServiceResponse
             {
@@ -395,7 +395,7 @@ namespace BusinessLogicLayer.Services
             try
             {
                 //validate
-                var goodRequest = await _unitOfWork.GoodRequestRepository.GetByCondition(x => x.Id == dto.GoodRequestId);
+                var goodRequest = await _unitOfWork.GoodRequestRepository.GetByCondition(x => x.Id == dto.GoodRequestId, includeProperties: "Warehouse");
                 if (goodRequest == null)
                 {
                     serviceResponse.Status = SRStatus.Error;
@@ -445,7 +445,7 @@ namespace BusinessLogicLayer.Services
 
                 // Tạo phiếu xuất kho
                 var goodNote = await CreateGoodNoteIssueAsync(dto, codeType);
-               
+
                 // Trừ tồn kho và tạo chi tiết phiếu xuất
                 var deductResult = await DeductInventoryAndCreateDetailsAsync(dto, goodNote.Id, checkWarehouseId);
                 if (!deductResult)
@@ -456,8 +456,11 @@ namespace BusinessLogicLayer.Services
                     return serviceResponse;
                 }
                 // Cập nhật trạng thái yêu cầu kho
-                //goodRequest.Status = GoodRequestStatusEnum.Approved;
-                //_unitOfWork.GoodRequestRepository.Update(goodRequest);
+                if (codeType == CodeType.PXNB && goodRequest.RequestType == GoodRequestEnum.Transfer)
+                {
+                    goodRequest.Status = GoodRequestStatusEnum.Issued;
+                    _unitOfWork.GoodRequestRepository.Update(goodRequest);
+                }
 
                 // Lưu vào cơ sở dữ liệu và commit transaction
                 await _unitOfWork.SaveAsync();
@@ -480,6 +483,29 @@ namespace BusinessLogicLayer.Services
                     checkWarehouseId
                 );
 
+                //// Gửi thông báo cho người yêu cầu
+                //if (!string.IsNullOrEmpty(goodRequest.CreatedBy))
+                //{
+                //    await _firebaseService.SendNotificationToUsersAsync(
+                //        new List<string> { goodRequest.CreatedBy },
+                //        "Thông báo yêu cầu kho",
+                //        $"Yêu cầu kho {goodRequest.Code} đã được tạo phiếu xuất: {goodNote.Code}",
+                //        NotificationType.GOOD_REQUEST_APPROVED,
+                //        checkWarehouseId
+                //    );
+                //}
+                // Gửi thông báo cho kho nhận
+                if (codeType == CodeType.PXNB)
+                {
+                    var receiverIds = await _unitOfWork.AccountRepository.GetUserIdsByWarehouseAndGroups(goodRequest.RequestedWarehouseId!, new List<string> { "Thủ kho" });
+                    await _firebaseService.SendNotificationToUsersAsync(
+                        receiverIds,
+                        "Thông báo điều chuyuển kho",
+                        $"Phiếu xuất {goodNote.Code} đã xuất các lô: {string.Join(", ", batchMessages)} từ kho {goodRequest.Warehouse!.Name}",
+                        NotificationType.ISSUE_NOTE_CREATED,
+                        goodRequest.RequestedWarehouseId
+                    );
+                }
                 await _unitOfWork.CommitTransactionAsync();  // Commit transaction nếu mọi thứ thành công
 
                 serviceResponse.Status = SRStatus.Success;
@@ -527,7 +553,7 @@ namespace BusinessLogicLayer.Services
                 ReceiverName = dto.ReceiverName,
                 ShipperName = dto.ShipperName,
                 NoteType = GoodNoteEnum.Issue, // Phiếu xuất kho
-                Status = GoodNoteStatusEnum.Completed, 
+                Status = GoodNoteStatusEnum.Completed,
                 GoodRequestId = dto.GoodRequestId
             };
             // Kiểm tra mã phiếu xuất kho đã tồn tại chưa
@@ -605,7 +631,7 @@ namespace BusinessLogicLayer.Services
             try
             {
                 // Kiểm tra yêu cầu kho nếu có
-                GoodRequest goodRequest = null;
+                GoodRequest goodRequest = null!;
                 if (!string.IsNullOrEmpty(request.GoodRequestId))
                 {
                     goodRequest = await _unitOfWork.GoodRequestRepository.GetByCondition(x => x.Id == request.GoodRequestId);
@@ -618,6 +644,8 @@ namespace BusinessLogicLayer.Services
                         return Fail("Không thể tạo phiếu cho yêu cầu đã hoàn thành.", request.GoodRequestId);
                     if (goodRequest.Status == GoodRequestStatusEnum.Rejected)
                         return Fail("Không thể tạo phiếu cho yêu cầu đã bị từ chối.", request.GoodRequestId);
+                    if(codeType == CodeType.PNNB && goodRequest.Status != GoodRequestStatusEnum.Issued && goodRequest.RequestType == GoodRequestEnum.Transfer)
+                        return Fail("Không thể tạo phiếu nhập nội bộ cho yêu cầu điều chuyển chưa được xuất kho.", request.GoodRequestId);
 
                     if (goodRequest.RequestType != GoodRequestEnum.Transfer
                         && goodRequest.RequestType != GoodRequestEnum.Return)
@@ -631,11 +659,11 @@ namespace BusinessLogicLayer.Services
                 foreach (var detail in request.GoodNoteDetails)
                 {
                     if (string.IsNullOrEmpty(detail.BatchId))
-                        return Fail("Thiếu BatchId trong chi tiết phiếu kho.", null);
+                        return Fail("Thiếu BatchId trong chi tiết phiếu kho.", null!);
 
                     var existingBatch = await _unitOfWork.BatchRepository.GetByCondition(x => x.Id == detail.BatchId);
                     if (existingBatch == null)
-                        return Fail($"Không tìm thấy lô hàng với Id {detail.BatchId}.", null);
+                        return Fail($"Không tìm thấy lô hàng với Id {detail.BatchId}.", null!);
                 }
 
                 // Tạo phiếu
@@ -683,7 +711,7 @@ namespace BusinessLogicLayer.Services
                 var batchMessages = goodNoteDetails
                     .Select(x => $"{x.Batch.Code} ({x.Quantity})")
                     .ToList();
-                var keeperIds = await _unitOfWork.AccountRepository.GetUserIdsByWarehouseAndGroups(goodRequest.RequestedWarehouseId, new List<string> { "Thủ kho" });
+                var keeperIds = await _unitOfWork.AccountRepository.GetUserIdsByWarehouseAndGroups(goodRequest!.RequestedWarehouseId!, new List<string> { "Thủ kho" });
                 await _firebaseService.SendNotificationToUsersAsync(
                     keeperIds,
                     "Thông báo nhập kho",
@@ -701,7 +729,7 @@ namespace BusinessLogicLayer.Services
             catch (Exception ex)
             {
                 await _unitOfWork.RollbackTransactionAsync();
-                return Fail($"Lỗi khi tạo phiếu kho: {ex.Message}", null);
+                return Fail($"Lỗi khi tạo phiếu kho: {ex.Message}", null!);
             }
 
             return serviceResponse;

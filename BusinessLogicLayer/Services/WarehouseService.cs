@@ -669,7 +669,7 @@ namespace BusinessLogicLayer.Services
             };
         }
 
-        public async Task<ServiceResponse> GetGoodsFlowHistogramAsync(int? month, int? year)
+        public async Task<ServiceResponse> GetGoodsFlowHistogramAsync(int? month, int? year, string? warehouseId)
         {
             DateTime now = DateTime.Now;
             int selectedMonth = month ?? now.Month;
@@ -685,7 +685,18 @@ namespace BusinessLogicLayer.Services
                 includeProperties: "GoodNote,GoodNote.GoodRequest,GoodNote.GoodRequest.RequestedWarehouse,GoodNote.GoodRequest.Warehouse"
             );
 
-            var warehouses = await _unitOfWork.WarehouseRepository.Search();
+            var warehouses = string.IsNullOrEmpty(warehouseId)
+                ? await _unitOfWork.WarehouseRepository.Search()
+                : new List<Warehouse> { await _unitOfWork.WarehouseRepository.GetByCondition(w => w.Id == warehouseId) };
+
+            if (warehouses == null || !warehouses.Any())
+            {
+                return new ServiceResponse
+                {
+                    Status = SRStatus.NotFound,
+                    Message = "Warehouse not found."
+                };
+            }
 
             var result = new List<object>();
 
@@ -694,9 +705,10 @@ namespace BusinessLogicLayer.Services
                 var totalPutIn = 0;
                 var totalTakeOut = 0;
 
-                int daysInMonth = (selectedMonth == now.Month && selectedYear == now.Year)
-                    ? now.Day
-                    : DateTime.DaysInMonth(selectedYear, selectedMonth);
+                //int daysInMonth = (selectedMonth == now.Month && selectedYear == now.Year)
+                //    ? now.Day
+                //    : DateTime.DaysInMonth(selectedYear, selectedMonth);
+                int daysInMonth = DateTime.DaysInMonth(selectedYear, selectedMonth);
 
                 var dailyRecords = new List<object>();
 
@@ -709,9 +721,7 @@ namespace BusinessLogicLayer.Services
                     var putIn = dayDetails
                         .Where(d =>
                             d.GoodNote.NoteType == GoodNoteEnum.Receive &&
-                            (
-                                d.GoodNote.GoodRequest.RequestedWarehouseId == warehouse.Id
-                            )
+                            d.GoodNote.GoodRequest.RequestedWarehouseId == warehouse.Id
                         )
                         .Sum(d => d.Quantity);
 

@@ -27,7 +27,7 @@ namespace BusinessLogicLayer.IServices
         Task<ServiceResponse> GetWarehouseStatisticsAsync(string? warehouseId);
         //Task<ServiceResponse> GetGoodsFlowHistogramAsync(string? warehouseId);
         Task<ServiceResponse> GetStockCard(string productId, string warehouseId, DateTime? from = null, DateTime? to = null);
-        Task<ServiceResponse> GetGoodsFlowHistogramAsync(int? month, int? year);
+        Task<ServiceResponse> GetGoodsFlowHistogramAsync(int? month, int? year, string? warehouseId);
         Task<ServiceResponse> GetStockLineChartAsync(int? year, int? startMonth, int? endMonth);
         Task<ServiceResponse> GetStockPieChartAsync();
     }

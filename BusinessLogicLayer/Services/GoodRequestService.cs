@@ -578,6 +578,8 @@ namespace BusinessLogicLayer.Services
             {
                 { GoodRequestStatusEnum.Pending, new List<GoodRequestStatusEnum> { GoodRequestStatusEnum.Approved,/* GoodRequestStatusEnum.Canceled,*/ GoodRequestStatusEnum.Rejected } },
                 { GoodRequestStatusEnum.Approved, new List<GoodRequestStatusEnum> { GoodRequestStatusEnum.Completed, /*GoodRequestStatusEnum.Canceled*/ } },
+                { GoodRequestStatusEnum.Issued, new List<GoodRequestStatusEnum> { GoodRequestStatusEnum.Completed } },
+                //{ GoodRequestStatusEnum.Rejected, new List<GoodRequestStatusEnum> { GoodRequestStatusEnum.Pending } },
                 //{ GoodRequestStatusEnum.Canceled, new List<GoodRequestStatusEnum>() }, // Không thể đổi từ Canceled                
                 { GoodRequestStatusEnum.Completed, new List<GoodRequestStatusEnum>() }, // Không thể đổi từ Completed
                 { GoodRequestStatusEnum.Rejected, new List<GoodRequestStatusEnum>() } // Không thể đổi từ Rejected
