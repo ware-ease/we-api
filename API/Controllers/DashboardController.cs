@@ -19,18 +19,29 @@ namespace API.Controllers
         }
 
         [HttpGet("4cards")]
-        public async Task<IActionResult> Get4CardsInfo()
+        public async Task<IActionResult> Get4CardsInfo(string? warehouseId)
         {
-            var result = await _warehouseService.GetWarehouseStatisticsAsync(null);
-
+            var result = await _warehouseService.GetWarehouseStatisticsAsync(warehouseId);
             return ControllerResponse.Response(result);
         }
         [HttpGet("histogram")]
-        public async Task<IActionResult> GetGoodsFlowHistogram()
+        public async Task<IActionResult> GetGoodsFlowHistogram(/*string? warehouseId,*/ int? month, int? year)
         {
-            var response = await _warehouseService.GetGoodsFlowHistogramAsync(null);
+            //var response = await _warehouseService.GetGoodsFlowHistogramAsync(warehouseId);
+            var response = await _warehouseService.GetGoodsFlowHistogramAsync(month,year);
             return ControllerResponse.Response(response);
         }
-
+        [HttpGet("linechart")]
+        public async Task<IActionResult> GetStockLineChart(int? year, int? startMonth, int? endMonth)
+        {
+            var response = await _warehouseService.GetStockLineChartAsync(year, startMonth, endMonth);
+            return ControllerResponse.Response(response);
+        }
+        [HttpGet("piechart")]
+        public async Task<IActionResult> GetStockPieChart()
+        {
+            var response = await _warehouseService.GetStockPieChartAsync();
+            return ControllerResponse.Response(response);
+        }
     }
 }
