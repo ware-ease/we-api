@@ -19,6 +19,7 @@ namespace Data.Enum
         Approved, // cứ tạo good note thì thành approved
         Rejected, // từ chối yêu cầu
         Completed, // thủ kho xác nhận
+        Issued, // đã xuất kho cho yêu cầu điều chuyển
         //Canceled, // bỏ
     }
 }

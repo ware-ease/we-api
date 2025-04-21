@@ -25,10 +25,10 @@ namespace API.Controllers
             return ControllerResponse.Response(result);
         }
         [HttpGet("histogram")]
-        public async Task<IActionResult> GetGoodsFlowHistogram(/*string? warehouseId,*/ int? month, int? year)
+        public async Task<IActionResult> GetGoodsFlowHistogram(string? warehouseId, int? month, int? year)
         {
             //var response = await _warehouseService.GetGoodsFlowHistogramAsync(warehouseId);
-            var response = await _warehouseService.GetGoodsFlowHistogramAsync(month,year);
+            var response = await _warehouseService.GetGoodsFlowHistogramAsync(month,year,warehouseId);
             return ControllerResponse.Response(response);
         }
         [HttpGet("linechart")]
