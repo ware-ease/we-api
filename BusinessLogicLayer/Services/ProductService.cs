@@ -230,7 +230,7 @@ namespace BusinessLogicLayer.Services
         }
 
         public async Task<ServiceResponse> Search<TResult>(int? pageIndex = null, int? pageSize = null,
-            bool? IsBatchManaged = true,
+            bool? IsBatchManaged = null,
             string? keyword = null)
         {
 
