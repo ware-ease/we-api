@@ -1,3 +1,4 @@
+using API.Middlewares;
 using AutoMapper;
 using BusinessLogicLayer.Generic;
 using BusinessLogicLayer.IService;
@@ -173,6 +174,9 @@ builder.Services.AddScoped<IBatchRepository, BatchRepository>();
 builder.Services.AddScoped<IInventoryRepository, InventoryRepository>();
 builder.Services.AddScoped<IInventoryLocationRepository, InventoryLocationRepository>();
 builder.Services.AddScoped<ILocationLogRepository, LocationLogRepository>();
+builder.Services.AddScoped<IGroupPermissionRepository, GroupPermissionRepository>();
+builder.Services.AddScoped<IAccountPermissionRepository, AccountPermissionRepository>();
+builder.Services.AddScoped<IAccountGroupRepository, AccountGroupRepository>();
 #endregion Repositories
 
 builder.Services.AddAuthentication(options =>
@@ -236,6 +240,7 @@ app.UseSwaggerUI();
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+app.UseMiddleware<PermissionMiddleware>();
 
 
 app.MapControllers();

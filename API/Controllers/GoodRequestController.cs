@@ -1,4 +1,5 @@
-﻿using API.Utils;
+﻿using API.Middlewares;
+using API.Utils;
 using BusinessLogicLayer.IServices;
 using Data.Enum;
 using Data.Model.Request.GoodRequest;
@@ -7,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Sprache;
 
 namespace API.Controllers
@@ -23,6 +25,7 @@ namespace API.Controllers
         }
 
         [HttpGet()]
+        [Authorize]
         public async Task<IActionResult> Search([FromQuery] int pageIndex = 1,
                                                 [FromQuery] int pageSize = 5,
                                                 [FromQuery] string? keyword = null,
@@ -43,7 +46,7 @@ namespace API.Controllers
 
         [Authorize]
         [HttpPost]
-        public async Task<IActionResult> Add([FromBody] GoodRequestCreateDTO request)
+        public async Task<IActionResult> CreateGoodRequestAsync([FromBody] GoodRequestCreateDTO request)
         {
             var authUser = AuthHelper.GetCurrentUser(HttpContext.Request);
             if (authUser != null)

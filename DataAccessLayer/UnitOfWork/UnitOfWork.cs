@@ -92,6 +92,9 @@ namespace DataAccessLayer.UnitOfWork
         public IInventoryRepository InventoryRepository => GetIRepository<IInventoryRepository>();
         public IInventoryLocationRepository InventoryLocationRepository => GetIRepository<IInventoryLocationRepository>();
         public ILocationLogRepository LocationLogRepository => GetIRepository<ILocationLogRepository>();
+        public IGroupPermissionRepository GroupPermissionRepository => GetIRepository<IGroupPermissionRepository>();
+        public IAccountPermissionRepository AccountPermissionRepository => GetIRepository<IAccountPermissionRepository>();
+        public IAccountGroupRepository AccountGroupRepository => GetIRepository<IAccountGroupRepository>();
 
         public TRepository GetIRepository<TRepository>()
         {

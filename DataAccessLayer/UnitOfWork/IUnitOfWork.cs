@@ -34,5 +34,8 @@ namespace DataAccessLayer.UnitOfWork
         IInventoryRepository InventoryRepository { get; }
         IInventoryLocationRepository InventoryLocationRepository { get; }
         ILocationLogRepository LocationLogRepository { get; }
+        IGroupPermissionRepository GroupPermissionRepository { get; }
+        IAccountPermissionRepository AccountPermissionRepository { get; }
+        IAccountGroupRepository AccountGroupRepository { get; }
     }
 }

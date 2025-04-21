@@ -146,5 +146,35 @@ namespace BusinessLogicLayer.Services
 
             return false;
         }
+        public async Task<bool> HasPermissionAsync(string userId, string permissionKey)
+        {
+            var permission = await _unitOfWork.PermissionRepository
+                .GetByCondition(p => p.Code == permissionKey);
+
+            if (permission == null)
+                return false;
+
+            // Check trực tiếp permission gán cho account
+            var userPermissions = await _unitOfWork.AccountPermissionRepository
+                .GetByCondition(up => up.Id == userId && up.PermissionId == permission.Id);
+
+            if (userPermissions != null)
+                return true;
+
+            // Lấy tất cả group của account
+            var accountGroups = await _unitOfWork.AccountGroupRepository
+                .Search(ag => ag.AccountId == userId);
+
+            if (!accountGroups.Any())
+                return false;
+
+            var groupIds = accountGroups.Select(ag => ag.GroupId).ToList();
+
+            // Check permission của các group đó
+            var groupPermissions = await _unitOfWork.GroupPermissionRepository
+                .Search(gp => groupIds.Contains(gp.GroupId) && gp.PermissionId == permission.Id);
+
+            return groupPermissions.Any();
+        }
     }
 }
