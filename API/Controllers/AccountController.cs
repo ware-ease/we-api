@@ -61,7 +61,7 @@ namespace API.Controllers
         public async Task<IActionResult> GetMe()
         {
             var currentUser = AuthHelper.GetCurrentUser(HttpContext.Request);
-            var result = await _accountService.Get<AccountDTO>(currentUser.id);
+            var result = await _accountService.Get<AccountDTO>(currentUser!.id!);
 
             return ControllerResponse.Response(result);
         }

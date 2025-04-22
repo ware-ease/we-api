@@ -49,7 +49,7 @@ namespace BusinessLogicLayer.Services
                         (g.GoodRequest.Warehouse != null && g.GoodRequest.Warehouse.Name.Contains(keyword))) &&
                     (!goodNoteType.HasValue || g.NoteType == goodNoteType.Value) &&
                     (!status.HasValue || g.Status == status.Value) &&
-                    (string.IsNullOrEmpty(requestedWarehouseId) || g.GoodRequest.RequestedWarehouseId == requestedWarehouseId);
+                    (string.IsNullOrEmpty(requestedWarehouseId) || g.GoodRequest.RequestedWarehouseId == requestedWarehouseId || (g.GoodRequest.WarehouseId == requestedWarehouseId && g.NoteType == GoodNoteEnum.Issue));
 
                 // Dùng Search
                 var pagedGoodNotes = await _unitOfWork.GoodNoteRepository.Search(
