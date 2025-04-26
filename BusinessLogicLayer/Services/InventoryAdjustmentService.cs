@@ -72,7 +72,7 @@ namespace BusinessLogicLayer.Services
                     var inventoryCount = await _inventoryCountRepository.GetByCondition(p => p.Id == request.RelatedDocument);
                     if (inventoryCount != null)
                     {
-                        inventoryCount.Status = Data.Enum.InventoryCountStatus.Balanced;
+                        //inventoryCount.Status = Data.Enum.InventoryCountStatus.Balanced;
                         _inventoryCountRepository.Update(inventoryCount);
                     }
                 }

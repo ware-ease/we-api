@@ -6,10 +6,12 @@ using System.Threading.Tasks;
 
 namespace Data.Enum
 {
-    public enum InventoryCountStatus
+    public enum InventoryCountDetailStatus
     {
-        Inprogress,
-        OnTime,
-        Overdue
+        Uncounted,
+        Counting,
+        Balanced,
+        Understock,
+        Overstock
     }
 }
