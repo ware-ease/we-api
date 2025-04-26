@@ -29,6 +29,7 @@ namespace Data.Model.DTO
     public class InventoryCountDetailDTO : BaseDTO
     {
         public string Id { get; set; }
+        public InventoryCountDetailStatus Status { get; set; }
         public float ExpectedQuantity { get; set; }
         public float CountedQuantity { get; set; }
         public string? Note { get; set; }

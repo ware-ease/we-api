@@ -35,8 +35,8 @@ namespace Data.Model.Request.InventoryCount
 
     public class InventoryCountDetailCreateDTO : BaseCreateDTO
     {
-        [Required(ErrorMessage = "Status không được để trống")]
-        //[JsonIgnore]
+        //[Required(ErrorMessage = "Status không được để trống")]
+        [JsonIgnore]
         public InventoryCountDetailStatus Status { get; set; }
         //[Required(ErrorMessage = "ExpectedQuantity không được để trống")]
         [JsonIgnore]
