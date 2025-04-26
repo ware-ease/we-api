@@ -191,15 +191,15 @@ namespace BusinessLogicLayer.Services
                             switch (existingDetail.CountedQuantity)
                             {
                                 case var c when c < existingDetail.ExpectedQuantity:
-                                    existingInventoryCount.Status = InventoryCountStatus.Understock;
+                                    existingDetail.Status = InventoryCountDetailStatus.Understock;
                                     break;
 
                                 case var c when c > existingDetail.ExpectedQuantity:
-                                    existingInventoryCount.Status = InventoryCountStatus.Overstock;
+                                    existingDetail.Status = InventoryCountDetailStatus.Overstock;
                                     break;
 
                                 case var c when c == existingDetail.ExpectedQuantity:
-                                    existingInventoryCount.Status = InventoryCountStatus.Balanced;
+                                    existingDetail.Status = InventoryCountDetailStatus.Balanced;
                                     break;
                             }
                         }
