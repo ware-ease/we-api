@@ -1,12 +1,9 @@
 ﻿using API.Utils;
 using BusinessLogicLayer.IServices;
-using BusinessLogicLayer.Services;
 using Data.Enum;
 using Data.Model.Request.GoodNote;
-using Data.Model.Request.GoodRequest;
 using Data.Model.Response;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers

@@ -4,20 +4,13 @@ using BusinessLogicLayer.IServices;
 using BusinessLogicLayer.Utils;
 using Data.Entity;
 using Data.Model.DTO;
-using Data.Model.DTO.Base;
 using Data.Model.Request.Account;
 using Data.Model.Response;
 using DataAccessLayer.Generic;
-using DataAccessLayer.Migrations;
 using DataAccessLayer.UnitOfWork;
 using DotNetEnv;
 using MailKit.Security;
 using MimeKit;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BusinessLogicLayer.Services
 {

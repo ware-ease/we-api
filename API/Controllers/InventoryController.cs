@@ -24,12 +24,14 @@ namespace API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> SearchPartners([FromQuery] int pageIndex = 1,
+        public async Task<IActionResult> SearchInventories([FromQuery] int pageIndex = 1,
                                                         [FromQuery] int pageSize = 5,
-                                                        [FromQuery] string? keyword = null)
+                                                        [FromQuery] string? keyword = null,
+                                                        [FromQuery] string? warehouseId = null,
+                                                        [FromQuery] string? productId = null)
         {
             var response = await _inventoryService.Search(
-                pageIndex, pageSize, keyword);
+                pageIndex, pageSize, keyword, warehouseId, productId);
 
             return ControllerResponse.Response(response);
         }
