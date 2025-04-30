@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Azure;
 using BusinessLogicLayer.Generic;
 using BusinessLogicLayer.IServices;
 using Data.Entity;
@@ -8,11 +7,8 @@ using Data.Model.Request.GoodNote;
 using Data.Model.Response;
 using DataAccessLayer.Generic;
 using DataAccessLayer.IRepositories;
-using DataAccessLayer.Repositories;
 using DataAccessLayer.UnitOfWork;
-using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
-using static Org.BouncyCastle.Crypto.Engines.SM2Engine;
 
 namespace BusinessLogicLayer.Services
 {

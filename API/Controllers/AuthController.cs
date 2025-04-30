@@ -4,10 +4,7 @@ using Data.Model.DTO;
 using Data.Model.Request.Auth;
 using Data.Model.Response;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
 
 namespace API.Controllers
 {

@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Azure.Core;
 using BusinessLogicLayer.IServices;
 using BusinessLogicLayer.Utils;
 using Data.Entity;
@@ -8,14 +7,10 @@ using Data.Model.Response;
 using DataAccessLayer.UnitOfWork;
 using DotNetEnv;
 using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace BusinessLogicLayer.Services
 {
