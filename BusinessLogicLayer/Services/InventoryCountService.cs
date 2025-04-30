@@ -122,6 +122,20 @@ namespace BusinessLogicLayer.Services
 
                     //var expectedQuantity = await SumInventoryLocationQuantityByLocationLevel0AndInventory(inventoryCount.LocationId, detail.InventoryId);
                     var expectedQuantity = inventory.CurrentQuantity;
+                    switch(detail.CountedQuantity)
+                    {
+                        case var c when c < expectedQuantity:
+                            detail.Status = InventoryCountDetailStatus.Understock;
+                            break;
+
+                        case var c when c > expectedQuantity:
+                            detail.Status = InventoryCountDetailStatus.Overstock;
+                            break;
+
+                        case var c when c == expectedQuantity:
+                            detail.Status = InventoryCountDetailStatus.Balanced;
+                            break;
+                    }
 
                     var inventoryCountDetail = _mapper.Map<InventoryCountDetail>(detail);
                     inventoryCountDetail.InventoryCountId = inventoryCount.Id;
@@ -191,15 +205,15 @@ namespace BusinessLogicLayer.Services
                             switch (existingDetail.CountedQuantity)
                             {
                                 case var c when c < existingDetail.ExpectedQuantity:
-                                    existingInventoryCount.Status = InventoryCountStatus.Understock;
+                                    existingDetail.Status = InventoryCountDetailStatus.Understock;
                                     break;
 
                                 case var c when c > existingDetail.ExpectedQuantity:
-                                    existingInventoryCount.Status = InventoryCountStatus.Overstock;
+                                    existingDetail.Status = InventoryCountDetailStatus.Overstock;
                                     break;
 
                                 case var c when c == existingDetail.ExpectedQuantity:
-                                    existingInventoryCount.Status = InventoryCountStatus.Balanced;
+                                    existingDetail.Status = InventoryCountDetailStatus.Balanced;
                                     break;
                             }
                         }
