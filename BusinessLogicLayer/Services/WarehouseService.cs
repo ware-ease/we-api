@@ -834,147 +834,8 @@ namespace BusinessLogicLayer.Services
             }
         }
 
-        //public async Task<ServiceResponse> GetStockLineChartAsync(int? year, int? startMonth, int? endMonth)
-        //{
-        //    DateTime now = DateTime.Now;
-        //    int targetYear = year ?? now.Year;
-        //    int fromMonth = startMonth ?? 1;
-        //    int toMonth = endMonth ?? now.Month;
-        //    var months = Enumerable.Range(fromMonth, toMonth - fromMonth + 1).ToList();
 
-        //    // Lấy tất cả kho
-        //    var warehouses = await _unitOfWork.WarehouseRepository.Search();
-
-        //    var result = new List<object>();
-        //    var totalByMonth = new Dictionary<int, int>();
-
-        //    foreach (var warehouse in warehouses)
-        //    {
-        //        var monthlyStocks = new List<object>();
-        //        int? firstMonthStock = null;
-
-        //        // Lấy tất cả GoodRequest của kho này
-        //        var goodRequests = await _unitOfWork.GoodRequestRepository.Search(
-        //            gr => gr.RequestedWarehouseId == warehouse.Id
-        //        );
-
-        //        var goodRequestIds = goodRequests.Select(gr => gr.Id).ToList();
-
-        //        if (!goodRequestIds.Any())
-        //        {
-        //            // Nếu kho này chưa có request nào, set 0 cho tất cả tháng
-        //            foreach (var month in months)
-        //            {
-        //                monthlyStocks.Add(new
-        //                {
-        //                    Month = month,
-        //                    Quantity = 0,
-        //                    ChangePercent = 0
-        //                });
-
-        //                if (totalByMonth.ContainsKey(month))
-        //                    totalByMonth[month] += 0;
-        //                else
-        //                    totalByMonth[month] = 0;
-        //            }
-
-        //            result.Add(new
-        //            {
-        //                Warehouse = warehouse.Name,
-        //                Data = monthlyStocks
-        //            });
-
-        //            continue;
-        //        }
-
-        //        // Lấy tất cả GoodNote của các request đó
-        //        var goodNotes = await _unitOfWork.GoodNoteRepository.Search(
-        //            gn => goodRequestIds.Contains(gn.GoodRequestId) &&
-        //                  gn.Date.HasValue &&
-        //                  gn.Date.Value.Year == targetYear &&
-        //                  gn.Date.Value.Month >= fromMonth &&
-        //                  gn.Date.Value.Month <= toMonth
-        //        );
-
-        //        var goodNoteIds = goodNotes.Select(gn => gn.Id).ToList();
-
-        //        // Lấy tất cả GoodNoteDetail của các note này
-        //        var goodNoteDetails = await _unitOfWork.GoodNoteDetailRepository.Search(
-        //            d => goodNoteIds.Contains(d.GoodNoteId),
-        //            includeProperties: "GoodNote"
-        //        );
-
-        //        foreach (var month in months)
-        //        {
-        //            var stockIn = goodNoteDetails
-        //                .Where(d => d.GoodNote.NoteType == GoodNoteEnum.Receive &&
-        //                            d.GoodNote.Date.Value.Month <= month)
-        //                .Sum(d => d.Quantity);
-
-        //            var stockOut = goodNoteDetails
-        //                .Where(d => d.GoodNote.NoteType == GoodNoteEnum.Issue &&
-        //                            d.GoodNote.Date.Value.Month <= month)
-        //                .Sum(d => d.Quantity);
-
-        //            var stock = stockIn - stockOut;
-
-        //            if (firstMonthStock == null)
-        //                firstMonthStock = (int)stock;
-
-        //            double changePercent = firstMonthStock == 0 ? 0 :
-        //                ((double)(stock - firstMonthStock.Value) / firstMonthStock.Value) * 100;
-
-        //            monthlyStocks.Add(new
-        //            {
-        //                Month = month,
-        //                Quantity = stock,
-        //                ChangePercent = Math.Round(changePercent, 2)
-        //            });
-
-        //            if (totalByMonth.ContainsKey(month))
-        //                totalByMonth[month] += (int)stock;
-        //            else
-        //                totalByMonth[month] = (int)stock;
-        //        }
-
-        //        result.Add(new
-        //        {
-        //            Warehouse = warehouse.Name,
-        //            Data = monthlyStocks
-        //        });
-        //    }
-
-        //    // Tính % tăng giảm tổng toàn hệ thống
-        //    var totalStats = new List<object>();
-        //    int? firstMonthTotal = totalByMonth.ContainsKey(fromMonth) ? totalByMonth[fromMonth] : 0;
-
-        //    foreach (var month in months)
-        //    {
-        //        var total = totalByMonth.ContainsKey(month) ? totalByMonth[month] : 0;
-        //        double totalChangePercent = firstMonthTotal == 0 ? 0 :
-        //            ((double)(total - firstMonthTotal.Value) / firstMonthTotal.Value) * 100;
-
-        //        totalStats.Add(new
-        //        {
-        //            Month = month,
-        //            Quantity = total,
-        //            ChangePercent = Math.Round(totalChangePercent, 2)
-        //        });
-        //    }
-
-        //    return new ServiceResponse
-        //    {
-        //        Status = SRStatus.Success,
-        //        Message = "Stock line chart data retrieved successfully.",
-        //        Data = new
-        //        {
-        //            Warehouses = result,
-        //            TotalStats = totalStats
-        //        }
-        //    };
-        //}
-
-        public async Task<ServiceResponse> GetStockLineChartAsync(int? year, int? startMonth, int? endMonth)
+        public async Task<ServiceResponse> GetStockLineChartAsync(int? year, int? startMonth, int? endMonth, string? warehouseId)
         {
             DateTime now = DateTime.Now;
             int targetYear = year ?? now.Year;
@@ -982,7 +843,7 @@ namespace BusinessLogicLayer.Services
             int toMonth = endMonth ?? now.Month;
             var months = Enumerable.Range(fromMonth, toMonth - fromMonth + 1).ToList();
 
-            var warehouses = await _unitOfWork.WarehouseRepository.Search();
+            var warehouses = await _unitOfWork.WarehouseRepository.Search(w => string.IsNullOrEmpty(warehouseId) || w.Id == warehouseId);
 
             var result = new List<object>();
             var totalByMonth = new Dictionary<int, int>();
@@ -1187,6 +1048,55 @@ namespace BusinessLogicLayer.Services
             };
         }
 
+        public async Task<ServiceResponse> GetStockPieChartByWarehouseAsync(string warehouseId)
+        {
+            var now = DateTime.Now;
+            var details = await _unitOfWork.GoodNoteDetailRepository.Search(
+                d => d.GoodNote.Date.HasValue &&
+                     (d.GoodNote.GoodRequest.RequestedWarehouseId == warehouseId ||
+                      (d.GoodNote.GoodRequest.RequestType == GoodRequestEnum.Transfer &&
+                       d.GoodNote.GoodRequest.RequestedWarehouseId == warehouseId)) ||
+                     (d.GoodNote.GoodRequest.RequestType == GoodRequestEnum.Transfer &&
+                      d.GoodNote.GoodRequest.WarehouseId == warehouseId),
+                includeProperties: "GoodNote,GoodNote.GoodRequest,Batch,Batch.Product,Batch.Product.ProductType,Batch.Product.ProductType.Category"
+            );
+
+            var grouped = details.GroupBy(d => d.Batch.Product.ProductType.CategoryId).Select(g =>
+            {
+                var stockIn = g.Where(d => d.GoodNote.NoteType == GoodNoteEnum.Receive &&
+                                           d.GoodNote.GoodRequest.RequestedWarehouseId == warehouseId)
+                               .Sum(d => d.Quantity);
+
+                var stockOut = g.Where(d => d.GoodNote.NoteType == GoodNoteEnum.Issue &&
+                                            (
+                                                (d.GoodNote.GoodRequest.RequestType == GoodRequestEnum.Transfer &&
+                                                 d.GoodNote.GoodRequest.WarehouseId == warehouseId) ||
+                                                (d.GoodNote.GoodRequest.RequestType != GoodRequestEnum.Transfer &&
+                                                 d.GoodNote.GoodRequest.RequestedWarehouseId == warehouseId)
+                                            ))
+                                .Sum(d => d.Quantity);
+
+                return new
+                {
+                    Caregory = g.First().Batch.Product.ProductType.Category.Name,
+                    Quantity = stockIn - stockOut
+                };
+            }).Where(x => x.Quantity > 0).ToList();
+
+            var total = grouped.Sum(x => x.Quantity);
+
+            return new ServiceResponse
+            {
+                Status = SRStatus.Success,
+                Message = "Pie chart data retrieved for warehouse.",
+                Data = new
+                {
+                    WarehouseId = warehouseId,
+                    TotalStock = total,
+                    Category = grouped
+                }
+            };
+        }
 
     }
 }
