@@ -32,15 +32,21 @@ namespace API.Controllers
             return ControllerResponse.Response(response);
         }
         [HttpGet("linechart")]
-        public async Task<IActionResult> GetStockLineChart(int? year, int? startMonth, int? endMonth)
+        public async Task<IActionResult> GetStockLineChart(int? year, int? startMonth, int? endMonth, string? warehouseId)
         {
-            var response = await _warehouseService.GetStockLineChartAsync(year, startMonth, endMonth);
+            var response = await _warehouseService.GetStockLineChartAsync(year, startMonth, endMonth, warehouseId);
             return ControllerResponse.Response(response);
         }
         [HttpGet("piechart")]
         public async Task<IActionResult> GetStockPieChart()
         {
             var response = await _warehouseService.GetStockPieChartAsync();
+            return ControllerResponse.Response(response);
+        }
+        [HttpGet("piechart/warehouse/{warehouseId}")]
+        public async Task<IActionResult> GetStockPieChartOfAWarehouse(string warehouseId)
+        {
+            var response = await _warehouseService.GetStockPieChartByWarehouseAsync(warehouseId);
             return ControllerResponse.Response(response);
         }
     }
