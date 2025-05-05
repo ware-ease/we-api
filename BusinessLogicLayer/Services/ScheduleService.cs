@@ -34,7 +34,7 @@ namespace BusinessLogicLayer.Services
         {
 
             Expression<Func<Schedule, bool>> filter = p =>
-                (string.IsNullOrEmpty(keyword) || p.Location.Name.Contains(keyword));
+                (string.IsNullOrEmpty(keyword));
 
             var totalRecords = await _genericRepository.Count(filter);
 
@@ -123,13 +123,7 @@ namespace BusinessLogicLayer.Services
                 existingSchedule.EndTime = request.EndTime;
             }
 
-            if (!string.IsNullOrEmpty(request.LocationId))
-            {
-                var location = await _locationRepository.GetByCondition(p => p.Id == request.LocationId);
-                if (location == null)
-                    throw new Exception("Location not found");
-                existingSchedule.LocationId = request.LocationId;
-            }
+            
 
             _genericRepository.Update(existingSchedule);
             await _unitOfWork.SaveAsync();
