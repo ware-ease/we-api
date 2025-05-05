@@ -190,7 +190,6 @@ namespace BusinessLogicLayer.Mappings
 
             #region Schedule
             CreateMap<Schedule, ScheduleDTO>()
-                .ForMember(dest => dest.LocationName, opt => opt.MapFrom(src => $"{src.Location.Name}".Trim()))
                 .ReverseMap();
 
             CreateMap<Schedule, ScheduleCreateDTO>().ReverseMap();
