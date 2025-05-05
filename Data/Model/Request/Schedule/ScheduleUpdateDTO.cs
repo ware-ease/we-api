@@ -17,6 +17,6 @@ namespace Data.Model.Request.Schedule
         public TimeOnly? StartTime { get; set; }
         [JsonConverter(typeof(TimeOnlyJsonConverter))]
         public TimeOnly? EndTime { get; set; }
-        public string LocationId { get; set; }
+        public string WarehouseId { get; set; }
     }
 }

@@ -22,11 +22,14 @@ namespace BusinessLogicLayer.Services
     public class ScheduleService : GenericService<Schedule>, IScheduleService
     {
         private readonly ILocationRepository _locationRepository;
+        private readonly IGenericRepository<Warehouse> _warehouseRepository;
         public ScheduleService(IGenericRepository<Schedule> genericRepository,
             ILocationRepository locationRepository,
+            IGenericRepository<Warehouse> warehouseRepository,
             IMapper mapper, IUnitOfWork unitOfWork) : base(genericRepository, mapper, unitOfWork)
         {
             _locationRepository = locationRepository;
+            _warehouseRepository = warehouseRepository;
         }
 
         public async Task<ServiceResponse> Search<TResult>(int? pageIndex = null, int? pageSize = null,
@@ -93,9 +96,9 @@ namespace BusinessLogicLayer.Services
             if (request.Date < DateOnly.FromDateTime(DateTime.Now))
                 throw new Exception("Không được đặt lịch ở quá khứ");
 
-            var location = await _locationRepository.GetByCondition(p => p.Id == request.LocationId);
-            if (location == null)
-                throw new Exception("Location không tồn tại");
+            var warehouse = await _warehouseRepository.GetByCondition(p => p.Id == request.WarehouseId);
+            if (warehouse == null)
+                throw new Exception("Warehouse không tồn tại");
 
             var schedule = _mapper.Map<Schedule>(request);
             await _genericRepository.Insert(schedule);
@@ -122,7 +125,13 @@ namespace BusinessLogicLayer.Services
             {
                 existingSchedule.EndTime = request.EndTime;
             }
-
+            if (!string.IsNullOrEmpty(request.WarehouseId))
+            {
+                var warehouse = await _warehouseRepository.GetByCondition(p => p.Id == request.WarehouseId);
+                if (warehouse == null)
+                    throw new Exception("Warehouse không tồn tại");
+                existingSchedule.WarehouseId = request.WarehouseId;
+            }
             
 
             _genericRepository.Update(existingSchedule);
