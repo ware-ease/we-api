@@ -13,7 +13,7 @@ namespace Data.Model.DTO
         public DateOnly? Date { get; set; }
         public TimeOnly? StartTime { get; set; }
         public TimeOnly? EndTime { get; set; }
-        public string LocationId { get; set; }
-        public string LocationName { get; set; }
+        public string WarehouseId { get; set; }
+        public string WarehouseName { get; set; }
     }
 }

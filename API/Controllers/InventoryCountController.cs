@@ -11,6 +11,7 @@ using Data.Model.Response;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Transactions;
 
 namespace API.Controllers
 {
@@ -29,10 +30,11 @@ namespace API.Controllers
         public async Task<IActionResult> SearchPartners([FromQuery] int pageIndex = 1,
                                                         [FromQuery] int pageSize = 5,
                                                         [FromQuery] string? keyword = null,
-                                                        [FromQuery] InventoryCountStatus? status = 0)
+                                                        [FromQuery] InventoryCountStatus? status = 0,
+                                                        [FromQuery] string? warehouseId = null)
         {
             var response = await _inventoryCountService.Search<InventoryCountDTO>(
-                pageIndex, pageSize, keyword, status);
+                pageIndex, pageSize, keyword, status, warehouseId);
 
             return ControllerResponse.Response(response);
         }
@@ -84,31 +86,36 @@ namespace API.Controllers
         [HttpPost]
         public async Task<IActionResult> Add([FromBody] InventoryCountCreateDTO request)
         {
-            try
+            using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
             {
-                var authUser = AuthHelper.GetCurrentUser(HttpContext.Request);
-
-                if (authUser != null)
+                try
                 {
-                    request.CreatedBy = authUser.id;
+                    var authUser = AuthHelper.GetCurrentUser(HttpContext.Request);
+
+                    if (authUser != null)
+                    {
+                        request.CreatedBy = authUser.id;
+                    }
+
+                    var inventoryCount = await _inventoryCountService.AddInventoryCount(request);
+                    scope.Complete();
+                    return ControllerResponse.Response(new ServiceResponse
+                    {
+                        Status = SRStatus.Success,
+                        Message = "Product created successfully",
+                        Data = inventoryCount
+                    });
+                    
                 }
-
-                var inventoryCount = await _inventoryCountService.AddInventoryCount(request);
-                return ControllerResponse.Response(new ServiceResponse
+                catch (Exception ex)
                 {
-                    Status = SRStatus.Success,
-                    Message = "Product created successfully",
-                    Data = inventoryCount
-                });
-            }
-            catch (Exception ex)
-            {
-                return ControllerResponse.Response(new ServiceResponse
-                {
-                    Status = SRStatus.Error,
-                    Message = ex.Message,
-                    Data = null
-                });
+                    return ControllerResponse.Response(new ServiceResponse
+                    {
+                        Status = SRStatus.Error,
+                        Message = ex.Message,
+                        Data = null
+                    });
+                }
             }
         }
 

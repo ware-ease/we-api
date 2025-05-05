@@ -81,14 +81,14 @@ namespace BusinessLogicLayer.Services
             if (request.EndTime < request.StartTime)
                 throw new Exception("EndTime không được ở trước StartTime");
 
-            /*var schedule = await _scheduleRepository.GetByCondition(p => p.Id == request.ScheduleId);
+            var schedule = await _scheduleRepository.GetByCondition(p => p.Id == request.ScheduleId);
             if (schedule == null)
                 throw new Exception("Schedule không tồn tại");
             var existedSchedule = await _genericRepository.GetByCondition(p => p.ScheduleId == request.ScheduleId);
             if (existedSchedule != null)
                 throw new Exception("Schedule này đã có phiếu kiểm kê");
 
-            var location = await _locationRepository.GetByCondition(p => p.Id == request.LocationId);
+            /*var location = await _locationRepository.GetByCondition(p => p.Id == request.LocationId);
             if (location != null)
             {
                 if (location.Level != 0)
@@ -119,6 +119,9 @@ namespace BusinessLogicLayer.Services
                     var inventory = await _inventoryRepository.GetByCondition(p => p.Id == detail.InventoryId);
                     if (inventory == null)
                         throw new Exception($"Inventory với ID {detail.InventoryId} không tồn tại");
+
+                    if (inventoryCount.Schedule.WarehouseId != inventory.WarehouseId)
+                        throw new Exception("Inventory phải nằm trong đúng Warehouse");
 
                     //var expectedQuantity = await SumInventoryLocationQuantityByLocationLevel0AndInventory(inventoryCount.LocationId, detail.InventoryId);
                     var expectedQuantity = inventory.CurrentQuantity;
@@ -260,7 +263,7 @@ namespace BusinessLogicLayer.Services
         }
 
         public async Task<ServiceResponse> Search<TResult>(int? pageIndex = null, int? pageSize = null,
-                                                                   string? keyword = null, InventoryCountStatus? status = null)
+                                                                   string? keyword = null, InventoryCountStatus? status = null, string? WarehouseId = null)
         {
 
             Expression<Func<InventoryCount, bool>> filter = p =>
@@ -269,8 +272,8 @@ namespace BusinessLogicLayer.Services
                 || p.Note.Contains(keyword)
                 || p.InventoryCheckDetails.Any(d => d.Note != null && d.Note.Contains(keyword)))
                 //|| p.InventoryCheckDetails.Any(d => d.Product != null && d.Product.Name.Contains(keyword)))
-                );/* &&
-                (string.IsNullOrEmpty(warehouseId) || p.Location.Warehouse.Id == warehouseId);*/
+                ) &&
+                (string.IsNullOrEmpty(WarehouseId) || p.Schedule.Warehouse.Id == WarehouseId);
 
             var totalRecords = await _genericRepository.Count(filter);
 
