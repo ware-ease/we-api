@@ -43,7 +43,7 @@ namespace BusinessLogicLayer.Services
 
             var results = await _genericRepository.Search(
                 filter: filter, pageIndex: pageIndex, pageSize: pageSize,
-                includeProperties: "Location");
+                includeProperties: "Warehouse");
 
             var mappedResults = _mapper.Map<IEnumerable<TResult>>(results);
 
@@ -68,7 +68,7 @@ namespace BusinessLogicLayer.Services
         {
             var schedule = await _genericRepository.GetByCondition(
                 p => p.Id == id,
-                includeProperties: "Location"
+                includeProperties: "Warehouse"
             );
 
             if (schedule == null)

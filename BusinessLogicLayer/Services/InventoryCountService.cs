@@ -5,6 +5,7 @@ using Data.Entity;
 using Data.Enum;
 using Data.Model.DTO;
 using Data.Model.Request.InventoryCount;
+using Data.Model.Request.Schedule;
 using Data.Model.Response;
 using DataAccessLayer.Generic;
 using DataAccessLayer.UnitOfWork;
@@ -26,6 +27,7 @@ namespace BusinessLogicLayer.Services
         private readonly IGenericRepository<Inventory> _inventoryRepository;
         private readonly IGenericRepository<InventoryLocation> _inventoryLocationRepository;
         private readonly IGenericRepository<Batch> _batchRepository;
+        private readonly IGenericRepository<Warehouse> _warehouseRepository;
         public InventoryCountService(IGenericRepository<InventoryCount> genericRepository,
             IGenericRepository<Schedule> scheduleRepository,
             IGenericRepository<Location> locationRepository,
@@ -33,6 +35,7 @@ namespace BusinessLogicLayer.Services
             IGenericRepository<Inventory> inventoryRepository,
             IGenericRepository<InventoryLocation> inventoryLocationRepository,
             IGenericRepository<Batch> batchRepository,
+            IGenericRepository<Warehouse> warehouseRepository,
             IGenericRepository<InventoryCountDetail> inventoryCountDetailRepository,
             IMapper mapper, IUnitOfWork unitOfWork) : base(genericRepository, mapper, unitOfWork)
         {
@@ -42,6 +45,7 @@ namespace BusinessLogicLayer.Services
             _inventoryRepository = inventoryRepository;
             _inventoryLocationRepository = inventoryLocationRepository;
             _batchRepository = batchRepository;
+            _warehouseRepository = warehouseRepository;
             _inventoryCountDetailRepository = inventoryCountDetailRepository;
         }
 
@@ -81,12 +85,33 @@ namespace BusinessLogicLayer.Services
             if (request.EndTime < request.StartTime)
                 throw new Exception("EndTime không được ở trước StartTime");
 
-            var schedule = await _scheduleRepository.GetByCondition(p => p.Id == request.ScheduleId);
+            /*var schedule = await _scheduleRepository.GetByCondition(p => p.Id == request.ScheduleId);
             if (schedule == null)
                 throw new Exception("Schedule không tồn tại");
             var existedSchedule = await _genericRepository.GetByCondition(p => p.ScheduleId == request.ScheduleId);
             if (existedSchedule != null)
-                throw new Exception("Schedule này đã có phiếu kiểm kê");
+                throw new Exception("Schedule này đã có phiếu kiểm kê");*/
+
+            //========================Temporary========================
+            if (request.Date < DateOnly.FromDateTime(DateTime.Now))
+                throw new Exception("Không được đặt lịch ở quá khứ");
+
+            var warehouse = await _warehouseRepository.GetByCondition(p => p.Id == request.WarehouseId);
+            if (warehouse == null)
+                throw new Exception("Warehouse không tồn tại");
+            var scheduleCreate = new ScheduleCreateDTO
+            {
+                Date = request.Date,
+                StartTime = request.StartTime,
+                EndTime = request.EndTime,
+                WarehouseId = request.WarehouseId
+            };
+            var schedule = _mapper.Map<Schedule>(scheduleCreate);
+            await _scheduleRepository.Insert(schedule);
+            await _unitOfWork.SaveAsync();
+
+            request.ScheduleId = schedule.Id;
+            //========================================================
 
             /*var location = await _locationRepository.GetByCondition(p => p.Id == request.LocationId);
             if (location != null)
@@ -125,7 +150,7 @@ namespace BusinessLogicLayer.Services
 
                     //var expectedQuantity = await SumInventoryLocationQuantityByLocationLevel0AndInventory(inventoryCount.LocationId, detail.InventoryId);
                     var expectedQuantity = inventory.CurrentQuantity;
-                    switch(detail.CountedQuantity)
+                    switch (detail.CountedQuantity)
                     {
                         case var c when c < expectedQuantity:
                             detail.Status = InventoryCountDetailStatus.Understock;
@@ -179,6 +204,15 @@ namespace BusinessLogicLayer.Services
 
             if (request.EndTime.HasValue)
                 existingInventoryCount.EndTime = request.EndTime;
+
+            //==========================Temporary========================
+            var existingSchedule = await _scheduleRepository.GetByCondition(p => p.Id == existingInventoryCount.ScheduleId);
+            existingSchedule.Date = request.Date;
+            existingSchedule.StartTime = request.StartTime;
+            existingSchedule.EndTime = request.EndTime;
+
+            _scheduleRepository.Update(existingSchedule);
+            //===========================================================
 
             /*if (!string.IsNullOrEmpty(request.ScheduleId))
             {
