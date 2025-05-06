@@ -3,6 +3,7 @@ using BusinessLogicLayer.Generic;
 using BusinessLogicLayer.IServices;
 using Data.Entity;
 using Data.Model.DTO;
+using Data.Model.Request.Batch;
 using Data.Model.Request.GoodNote;
 using Data.Model.Request.GoodRequest;
 using Data.Model.Request.InventoryAdjustment;
@@ -63,6 +64,15 @@ namespace BusinessLogicLayer.Services
                 if (warehouse == null)
                     throw new Exception("Warehouse không tồn tại");
 
+                var inventoryCount = await _inventoryCountRepository.GetByCondition(x => x.Id == request.InventoryCountId,
+                    includeProperties: "InventoryCheckDetails,InventoryCheckDetails.Inventory.Batch.Product"
+);
+                if (inventoryCount == null)
+                    throw new Exception("InventoryCount không tồn tại");
+
+
+
+
                 var inventoryAdjustment = _mapper.Map<InventoryAdjustment>(request);
                 inventoryAdjustment.WarehouseId = request.WarehouseId;
 
@@ -70,7 +80,7 @@ namespace BusinessLogicLayer.Services
                     throw new Exception("DocumentType không hợp lệ");
                 if (!string.IsNullOrEmpty(request.RelatedDocument))
                 {
-                    var inventoryCount = await _inventoryCountRepository.GetByCondition(p => p.Id == request.RelatedDocument);
+                    //var inventoryCount = await _inventoryCountRepository.GetByCondition(p => p.Id == request.RelatedDocument);
                     if (inventoryCount != null)
                     {
                         //inventoryCount.Status = Data.Enum.InventoryCountStatus.Balanced;
@@ -79,7 +89,7 @@ namespace BusinessLogicLayer.Services
                 }
 
                 await _genericRepository.Insert(inventoryAdjustment);
-                //await _unitOfWork.SaveAsync();
+                await _unitOfWork.SaveAsync();
 
 
 
@@ -87,12 +97,219 @@ namespace BusinessLogicLayer.Services
                 //==================================================================================================//
 
 
-                foreach (var detailDto in request.InventoryAdjustmentDetails)
+                foreach (var detailDto in inventoryCount.InventoryCheckDetails)
                 {
-                    var inventoryAdjustmentDetail = _mapper.Map<InventoryAdjustmentDetail>(detailDto);
-                    inventoryAdjustmentDetail.InventoryAdjustmentId = inventoryAdjustment.Id;
+                    /*var inventoryAdjustmentDetail = _mapper.Map<InventoryAdjustmentDetail>(detailDto);
+                    inventoryAdjustmentDetail.InventoryAdjustmentId = inventoryAdjustment.Id;*/
+                    float changeInQuantity = 0;
+                    float newQuantity = 0;
 
-                    var inventory = await _inventoryRepository.GetByCondition(p => p.Id == detailDto.InventoryId);
+
+
+                    switch (detailDto.Status)
+                    {
+                        case Data.Enum.InventoryCountDetailStatus.Overstock:
+                            {
+                                changeInQuantity = detailDto.CountedQuantity - detailDto.ExpectedQuantity;
+                                newQuantity = detailDto.CountedQuantity;
+
+                                var adjustmentDetail = new InventoryAdjustmentDetailCreateDTO
+                                {
+                                    NewQuantity = newQuantity,
+                                    ChangeInQuantity = changeInQuantity,
+                                    Note = detailDto.Note,
+                                    //ProductId = detailDto.ProductId,
+                                    InventoryId = detailDto.InventoryId,
+                                };
+                                var inventoryAdjustmentDetail = _mapper.Map<InventoryAdjustmentDetail>(adjustmentDetail);
+                                inventoryAdjustmentDetail.InventoryAdjustmentId = inventoryAdjustment.Id;
+
+                                await _inventoryAdjustmentDetailRepository.Insert(inventoryAdjustmentDetail);
+
+                                var goodRequestDTO = new GoodRequestCreateDTO
+                                {
+                                    Note = request.Note,
+                                    RequestType = Data.Enum.GoodRequestEnum.Receive,
+                                    WarehouseId = request.WarehouseId,
+                                    RequestedWarehouseId = request.WarehouseId,
+                                    CreatedBy = request.CreatedBy,
+                                    GoodRequestDetails = new List<GoodRequestDetailDTO>
+                                    {
+                                        new GoodRequestDetailDTO
+                                        {
+                                            Quantity = changeInQuantity,
+                                            ProductId = detailDto.Inventory.Batch.ProductId,
+                                            CreatedBy = request.CreatedBy
+                                        }
+                                    }
+                                };
+
+                                var serviceResponse = await _goodRequestService.CreateAsync<GoodRequestDTO>(goodRequestDTO);
+                                await _unitOfWork.SaveAsync();
+
+                                var goodRequestData = serviceResponse.Data as GoodRequestDTO;
+                                if (goodRequestData == null)
+                                    throw new Exception($"Không thể lấy thông tin GoodRequest từ ServiceResponse. Data: {System.Text.Json.JsonSerializer.Serialize(serviceResponse.Data)}");
+
+                                // Fix for CS0747: Invalid initializer member declarator
+                                // The issue is caused by the incorrect use of an object initializer for `BatchCreateDTOv2`.
+                                // The `new` keyword is missing for the `BatchCreateDTOv2` object inside the `GoodNoteDetailCreateDTO` initializer.
+
+                                var goodNoteDTO = new GoodNoteCreateDTO
+                                {
+                                    NoteType = Data.Enum.GoodNoteEnum.Receive,
+                                    ShipperName = null,
+                                    ReceiverName = null,
+                                    Code = "PXDC",
+                                    Date = request.Date,
+                                    GoodRequestId = goodRequestData.Id,
+                                    GoodNoteDetails = new List<GoodNoteDetailCreateDTO>
+                                    {
+                                        new GoodNoteDetailCreateDTO
+                                        {
+                                            Quantity = changeInQuantity,
+                                            Note = "Adjustment for overstock",
+                                            CreatedBy = request.CreatedBy,
+                                            NewBatch = new BatchCreateDTOv2
+                                            {
+                                                ProductId = detailDto.Inventory.Batch.ProductId,
+                                                Name = detailDto.Inventory.Batch.Name,
+                                                Code = detailDto.Inventory.Batch.Code,
+                                            }
+                                        }
+                                    }
+                                };
+
+                                var goodNote = await _goodNoteService.CreateReceiveNoteAsync(goodNoteDTO);
+                                var goodNoteData = goodNote.Data as GoodNoteDTO;
+                                if (goodNoteData == null)
+                                    throw new Exception($"Không thể lấy thông tin GoodNote từ ServiceResponse. Data: {System.Text.Json.JsonSerializer.Serialize(goodNote.Data)}");
+                                detailDto.Status = Data.Enum.InventoryCountDetailStatus.Balanced;
+                                break;
+                            }
+                        case Data.Enum.InventoryCountDetailStatus.Understock:
+                            {
+                                changeInQuantity = detailDto.ExpectedQuantity - detailDto.CountedQuantity;
+                                newQuantity = detailDto.CountedQuantity;
+
+                                var adjustmentDetail = new InventoryAdjustmentDetailCreateDTO
+                                {
+                                    NewQuantity = newQuantity,
+                                    ChangeInQuantity = changeInQuantity,
+                                    Note = detailDto.Note,
+                                    //ProductId = detailDto.ProductId,
+                                    InventoryId = detailDto.InventoryId,
+                                };
+
+                                var inventoryAdjustmentDetail = _mapper.Map<InventoryAdjustmentDetail>(adjustmentDetail);
+                                inventoryAdjustmentDetail.InventoryAdjustmentId = inventoryAdjustment.Id;
+
+                                await _inventoryAdjustmentDetailRepository.Insert(inventoryAdjustmentDetail);
+
+                                var goodRequestDTO = new GoodRequestCreateDTO
+                                {
+                                    Note = request.Note,
+                                    RequestType = Data.Enum.GoodRequestEnum.Issue,
+                                    WarehouseId = request.WarehouseId,
+                                    RequestedWarehouseId = request.WarehouseId,
+                                    CreatedBy = request.CreatedBy,
+                                    GoodRequestDetails = new List<GoodRequestDetailDTO>
+                                    {
+                                        new GoodRequestDetailDTO
+                                        {
+                                            Quantity = changeInQuantity,
+                                            ProductId = detailDto.Inventory.Batch.ProductId,
+                                            CreatedBy = request.CreatedBy
+                                        }
+                                    }
+                                };
+
+                                var serviceResponse = await _goodRequestService.CreateAsync<GoodRequestDTO>(goodRequestDTO);
+                                await _unitOfWork.SaveAsync();
+
+                                var goodRequestData = serviceResponse.Data as GoodRequestDTO;
+                                if (goodRequestData == null)
+                                    throw new Exception($"Không thể lấy thông tin GoodRequest từ ServiceResponse. Data: {System.Text.Json.JsonSerializer.Serialize(serviceResponse.Data)}");
+
+                                // Fix for CS0747: Invalid initializer member declarator
+                                // The issue is caused by the incorrect use of an object initializer for `BatchCreateDTOv2`.
+                                // The `new` keyword is missing for the `BatchCreateDTOv2` object inside the `GoodNoteDetailCreateDTO` initializer.
+
+                                var goodNoteDTO = new GoodNoteCreateDTO
+                                {
+                                    NoteType = Data.Enum.GoodNoteEnum.Issue,
+                                    ShipperName = null,
+                                    ReceiverName = null,
+                                    Code = "PXDC",
+                                    Date = request.Date,
+                                    GoodRequestId = goodRequestData.Id,
+                                    GoodNoteDetails = new List<GoodNoteDetailCreateDTO>
+                                    {
+                                        new GoodNoteDetailCreateDTO
+                                        {
+                                            Quantity = changeInQuantity,
+                                            Note = "Adjustment for understock",
+                                            CreatedBy = request.CreatedBy,
+                                            NewBatch = new BatchCreateDTOv2
+                                            {
+                                                ProductId = detailDto.Inventory.Batch.ProductId,
+                                                Name = detailDto.Inventory.Batch.Name,
+                                                Code = detailDto.Inventory.Batch.Code,
+                                            }
+                                        }
+                                    }
+                                };
+                                var goodNote = await _goodNoteService.CreateReceiveNoteAsync(goodNoteDTO);
+                                var goodNoteData = goodNote.Data as GoodNoteDTO;
+                                if (goodNoteData == null)
+                                    throw new Exception($"Không thể lấy thông tin GoodNote từ ServiceResponse. Data: {System.Text.Json.JsonSerializer.Serialize(goodNote.Data)}");
+
+                                detailDto.Status = Data.Enum.InventoryCountDetailStatus.Balanced;
+                                break;
+                            }
+                        default:
+                            continue;
+                    }
+                    /*var goodRequestDTO = new GoodRequestCreateDTO
+                    {
+                        Note = request.Note,
+                        RequestType = Data.Enum.GoodRequestEnum.Transfer,
+                        WarehouseId = request.WarehouseId,
+                        RequestedWarehouseId = request.WarehouseId,
+                        CreatedBy = request.CreatedBy,
+                        GoodRequestDetails = new List<GoodRequestDetailDTO>
+                        {
+                            new GoodRequestDetailDTO
+                            {
+                                Quantity = changeInQuantity,
+
+                                CreatedBy = request.CreatedBy
+                            }
+                        }
+                    };
+
+                    var serviceResponse = await _goodRequestService.CreateAsync<GoodRequestDTO>(goodRequestDTO);
+                    await _unitOfWork.SaveAsync();
+
+                    var goodRequestData = serviceResponse.Data as GoodRequestDTO;
+                    if (goodRequestData == null)
+                        throw new Exception("Không thể lấy thông tin GoodRequest từ ServiceResponse.");
+
+                    var goodNoteDTO = new GoodNoteCreateDTO
+                    {
+                        NoteType = Data.Enum.GoodNoteEnum.Receive,
+                        ShipperName = null,
+                        ReceiverName = null,
+                        Date = request.Date,
+                        GoodRequestId = goodRequestData.Id,
+                        GoodNoteDetails = request.InventoryAdjustmentDetails.Select(d => new GoodNoteDetailCreateDTO
+                        {
+                            Quantity = d.NewQuantity,
+                            Note = d.Note,
+                            CreatedBy = request.CreatedBy,
+                        }).ToList()
+                    };*/
+                    /*var inventory = await _inventoryRepository.GetByCondition(p => p.Id == detailDto.InventoryId);
                     if (inventory == null)
                         throw new Exception($"Inventory với Id {detailDto.InventoryId} không tồn tại");
                     if (inventory.WarehouseId != request.WarehouseId)
@@ -101,50 +318,17 @@ namespace BusinessLogicLayer.Services
                     if (batch == null)
                         throw new Exception($"Batch với Id {inventory.BatchId} không tồn tại");
                     if (detailDto.ProductId != batch.ProductId)
-                        throw new Exception($"Batch với Id {inventory.BatchId} không thuộc Product với Id {detailDto.ProductId}");
+                        throw new Exception($"Batch với Id {inventory.BatchId} không thuộc Product với Id {detailDto.ProductId}");*/
 
 
                     //await _inventoryAdjustmentDetailRepository.Insert(inventoryAdjustmentDetail);
                     //await _unitOfWork.SaveAsync();
 
+                    //await _inventoryAdjustmentDetailRepository.Insert(inventoryAdjustmentDetail);
+                    await _unitOfWork.SaveAsync();
                 }
 
-                var goodRequestDTO = new GoodRequestCreateDTO
-                {
-                    Note = request.Note,
-                    RequestType = request.RequestType,
-                    WarehouseId = request.WarehouseId,
-                    RequestedWarehouseId = request.WarehouseId,
-                    CreatedBy = request.CreatedBy,
-                    GoodRequestDetails = request.InventoryAdjustmentDetails.Select(d => new GoodRequestDetailDTO
-                    {
-                        Quantity = d.NewQuantity,
-                        ProductId = d.ProductId,
-                        CreatedBy = request.CreatedBy,
-                    }).ToList()
-                };
 
-                var serviceResponse = await _goodRequestService.CreateAsync<GoodRequestDTO>(goodRequestDTO);
-                await _unitOfWork.SaveAsync();
-
-                var goodRequestData = serviceResponse.Data as GoodRequestDTO;
-                if (goodRequestData == null)
-                    throw new Exception("Không thể lấy thông tin GoodRequest từ ServiceResponse.");
-
-                var goodNoteDTO = new GoodNoteCreateDTO
-                {
-                    NoteType = Data.Enum.GoodNoteEnum.Receive,
-                    ShipperName = null,
-                    ReceiverName = null,
-                    Date = request.Date,
-                    GoodRequestId = goodRequestData.Id,
-                    GoodNoteDetails = request.InventoryAdjustmentDetails.Select(d => new GoodNoteDetailCreateDTO
-                    {
-                        Quantity = d.NewQuantity,
-                        Note = d.Note,
-                        CreatedBy = request.CreatedBy,
-                    }).ToList()
-                };
 
                 return _mapper.Map<InventoryAdjustmentDTO>(inventoryAdjustment);
             }

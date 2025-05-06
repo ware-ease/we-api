@@ -313,7 +313,7 @@ namespace BusinessLogicLayer.Services
 
             var results = await _genericRepository.Search(
                 filter: filter, pageIndex: pageIndex, pageSize: pageSize,
-                includeProperties: "InventoryCheckDetails");
+                includeProperties: "InventoryCheckDetails,Schedule.Warehouse,InventoryCheckDetails.Inventory.Batch.Product");
 
             var mappedResults = _mapper.Map<IEnumerable<TResult>>(results);
 
