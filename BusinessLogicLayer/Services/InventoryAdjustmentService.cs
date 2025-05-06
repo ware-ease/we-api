@@ -3,6 +3,7 @@ using BusinessLogicLayer.Generic;
 using BusinessLogicLayer.IServices;
 using Data.Entity;
 using Data.Model.DTO;
+using Data.Model.Request.GoodNote;
 using Data.Model.Request.GoodRequest;
 using Data.Model.Request.InventoryAdjustment;
 using Data.Model.Request.InventoryCount;
@@ -123,8 +124,27 @@ namespace BusinessLogicLayer.Services
                     }).ToList()
                 };
 
-                var goodRequest = await _goodRequestService.CreateAsync<GoodRequestDTO>(goodRequestDTO);
+                var serviceResponse = await _goodRequestService.CreateAsync<GoodRequestDTO>(goodRequestDTO);
                 await _unitOfWork.SaveAsync();
+
+                var goodRequestData = serviceResponse.Data as GoodRequestDTO;
+                if (goodRequestData == null)
+                    throw new Exception("Không thể lấy thông tin GoodRequest từ ServiceResponse.");
+
+                var goodNoteDTO = new GoodNoteCreateDTO
+                {
+                    NoteType = Data.Enum.GoodNoteEnum.Receive,
+                    ShipperName = null,
+                    ReceiverName = null,
+                    Date = request.Date,
+                    GoodRequestId = goodRequestData.Id,
+                    GoodNoteDetails = request.InventoryAdjustmentDetails.Select(d => new GoodNoteDetailCreateDTO
+                    {
+                        Quantity = d.NewQuantity,
+                        Note = d.Note,
+                        CreatedBy = request.CreatedBy,
+                    }).ToList()
+                };
 
                 return _mapper.Map<InventoryAdjustmentDTO>(inventoryAdjustment);
             }
