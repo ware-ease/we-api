@@ -1,4 +1,5 @@
 ﻿using Data.Entity.Base;
+using Data.Enum;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -15,7 +16,7 @@ namespace Data.Entity
         public string Username { get; set; }
         public string Password { get; set; }
         public string Email { get; set; }
-
+        public AccountStatus Status { get; set; } = AccountStatus.Unverified;
         public Profile? Profile { get; set; }
 
         public ICollection<AccountGroup> AccountGroups { get; set; } = [];

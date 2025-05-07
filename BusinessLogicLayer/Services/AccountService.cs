@@ -109,7 +109,7 @@ namespace BusinessLogicLayer.Services
 
                 //account.Id = Guid.NewGuid().ToString();
                 account.Profile!.Id = Guid.NewGuid().ToString();
-                string password = account.Username;
+                string password = Guid.NewGuid().ToString("N");
                 account.Password = PasswordHelper.ConvertToEncrypt(password);
                 account.Profile.CreatedTime = DateTime.Now;
                 account.CreatedTime = DateTime.Now;
@@ -150,7 +150,7 @@ namespace BusinessLogicLayer.Services
                                         <p>Bạn đã được tạo tài khoản thành công trên hệ thống.</p>
                                         <p><strong>Username:</strong> {request.Username}</p>
                                         <p><strong>Password:</strong> {password}</p>
-                                        <p>Vui lòng đăng nhập và đổi mật khẩu để bảo mật hơn.</p>
+                                        <p>Vui lòng đăng nhập và đổi mật khẩu trong vòng 7 ngày để bảo mật hơn.</p>
                                         <p>Trân trọng,</p>
                                         <p>Đội ngũ hỗ trợ</p>";
 
@@ -287,7 +287,7 @@ namespace BusinessLogicLayer.Services
             }
 
             account.Password = PasswordHelper.ConvertToEncrypt(password);
-
+            account.Status = Data.Enum.AccountStatus.Verified;
             _unitOfWork.AccountRepository.Update(account);
             await _unitOfWork.SaveAsync();
 
