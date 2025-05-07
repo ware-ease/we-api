@@ -14,7 +14,7 @@ namespace BusinessLogicLayer.IServices
     public interface IInventoryCountService : IGenericService
     {
         Task<ServiceResponse> Search<TResult>(int? pageIndex = null, int? pageSize = null,
-                                                                   string? keyword = null, InventoryCountStatus? status = null);
+                                                                   string? keyword = null, InventoryCountStatus? status = null, string? WarehouseId = null);
         Task<InventoryCountDTO> AddInventoryCount(InventoryCountCreateDTO request);
         Task<InventoryCountDTO> UpdateInventoryCount(InventoryCountUpdateDTO request);
         Task<InventoryByLocationDTO> GetInventoriesByLocationLevel0Async(string locationLevel0Id);

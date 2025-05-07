@@ -4,6 +4,7 @@ using DataAccessLayer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccessLayer.Migrations
 {
     [DbContext(typeof(WaseEaseDbContext))]
-    partial class WaseEaseDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250505181734_Update_DBXIX")]
+    partial class Update_DBXIX
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -902,9 +905,6 @@ namespace DataAccessLayer.Migrations
                     b.Property<string>("Note")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ScheduleId")
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<TimeOnly?>("StartTime")
                         .HasColumnType("time");
 
@@ -912,10 +912,6 @@ namespace DataAccessLayer.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ScheduleId")
-                        .IsUnique()
-                        .HasFilter("[ScheduleId] IS NOT NULL");
 
                     b.ToTable("InventoryCount");
                 });
@@ -1705,6 +1701,9 @@ namespace DataAccessLayer.Migrations
                     b.Property<TimeOnly?>("EndTime")
                         .HasColumnType("time");
 
+                    b.Property<string>("InventoryCountId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
@@ -1722,6 +1721,8 @@ namespace DataAccessLayer.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("InventoryCountId");
 
                     b.HasIndex("WarehouseId");
 
@@ -2157,16 +2158,6 @@ namespace DataAccessLayer.Migrations
                     b.Navigation("InventoryAdjustment");
                 });
 
-            modelBuilder.Entity("Data.Entity.InventoryCount", b =>
-                {
-                    b.HasOne("Data.Entity.Schedule", "Schedule")
-                        .WithOne("InventoryCount")
-                        .HasForeignKey("Data.Entity.InventoryCount", "ScheduleId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.Navigation("Schedule");
-                });
-
             modelBuilder.Entity("Data.Entity.InventoryCountDetail", b =>
                 {
                     b.HasOne("Data.Entity.InventoryCount", "InventoryCount")
@@ -2364,11 +2355,18 @@ namespace DataAccessLayer.Migrations
 
             modelBuilder.Entity("Data.Entity.Schedule", b =>
                 {
+                    b.HasOne("Data.Entity.InventoryCount", "InventoryCount")
+                        .WithMany()
+                        .HasForeignKey("InventoryCountId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
                     b.HasOne("Data.Entity.Warehouse", "Warehouse")
                         .WithMany("Schedules")
                         .HasForeignKey("WarehouseId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
+
+                    b.Navigation("InventoryCount");
 
                     b.Navigation("Warehouse");
                 });
@@ -2517,11 +2515,6 @@ namespace DataAccessLayer.Migrations
             modelBuilder.Entity("Data.Entity.Route", b =>
                 {
                     b.Navigation("Permissions");
-                });
-
-            modelBuilder.Entity("Data.Entity.Schedule", b =>
-                {
-                    b.Navigation("InventoryCount");
                 });
 
             modelBuilder.Entity("Data.Entity.Unit", b =>

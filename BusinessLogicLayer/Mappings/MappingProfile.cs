@@ -137,10 +137,10 @@ namespace BusinessLogicLayer.Mappings
             #region InventoryCount
             CreateMap<InventoryCount, InventoryCountDTO>()
                 /*.ForMember(dest => dest.LocationName, opt => opt.MapFrom(src => $"{src.Location.Name}".Trim()))
-                .ForMember(dest => dest.LocationId, opt => opt.MapFrom(src => $"{src.Location.Id}".Trim()))
-                .ForMember(dest => dest.WarehouseName, opt => opt.MapFrom(src => src.Location.Warehouse.Name))
-                .ForMember(dest => dest.WarehouseId, opt => opt.MapFrom(src => src.Location.Warehouse.Id))*/
-                //.ForMember(dest => dest.ScheduleDate, opt => opt.MapFrom(src => src.Schedule.Date))
+                .ForMember(dest => dest.LocationId, opt => opt.MapFrom(src => $"{src.Location.Id}".Trim()))*/
+                .ForMember(dest => dest.WarehouseName, opt => opt.MapFrom(src => src.Schedule.Warehouse.Name))
+                .ForMember(dest => dest.WarehouseId, opt => opt.MapFrom(src => src.Schedule.Warehouse.Id))
+                .ForMember(dest => dest.ScheduleDate, opt => opt.MapFrom(src => src.Schedule.Date))
                 .ForMember(dest => dest.InventoryCountDetailDTO, opt => opt.MapFrom(src => src.InventoryCheckDetails))
                 .ReverseMap();
 
@@ -182,6 +182,7 @@ namespace BusinessLogicLayer.Mappings
                 .ForMember(dest => dest.InventoryId, opt => opt.MapFrom(src => src.Inventory.Id))
                 .ForMember(dest => dest.BatchId, opt => opt.MapFrom(src => src.Inventory.BatchId))
                 .ForMember(dest => dest.BatchCode, opt => opt.MapFrom(src => src.Inventory.Batch.Code))
+                .ForMember(dest => dest.ProductName, opt => opt.MapFrom(src => src.Inventory.Batch.Product.Name))
                 .ReverseMap();
 
             CreateMap<InventoryCountDetail, InventoryCountDetailCreateDTO>().ReverseMap();
@@ -190,7 +191,7 @@ namespace BusinessLogicLayer.Mappings
 
             #region Schedule
             CreateMap<Schedule, ScheduleDTO>()
-                .ForMember(dest => dest.LocationName, opt => opt.MapFrom(src => $"{src.Location.Name}".Trim()))
+                .ForMember(dest => dest.WarehouseName, opt => opt.MapFrom(src => src.Warehouse.Name))
                 .ReverseMap();
 
             CreateMap<Schedule, ScheduleCreateDTO>().ReverseMap();

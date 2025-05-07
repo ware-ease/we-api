@@ -26,9 +26,11 @@ namespace Data.Model.Request.InventoryCount
         [Required(ErrorMessage = "EndTime không được để trống")]
         [JsonConverter(typeof(TimeOnlyJsonConverter))]
         public TimeOnly? EndTime { get; set; }
-        /*[Required(ErrorMessage = "ScheduleId không được để trống")]
-        public string ScheduleId { get; set; }
-        [Required(ErrorMessage = "LocationId không được để trống")]
+        public string WarehouseId { get; set; }
+        //[Required(ErrorMessage = "ScheduleId không được để trống")]
+        [JsonIgnore]
+        public string? ScheduleId { get; set; }
+        /*[Required(ErrorMessage = "LocationId không được để trống")]
         public string LocationId { get; set; }*/
         public List<InventoryCountDetailCreateDTO> InventoryCountDetails { get; set; } = new();
     }

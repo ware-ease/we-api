@@ -20,8 +20,8 @@ namespace Data.Model.Request.Schedule
         //[Required(ErrorMessage = "Name không được để trống")]
         [JsonConverter(typeof(TimeOnlyJsonConverter))]
         public TimeOnly? EndTime { get; set; }
-        [Required(ErrorMessage = "LocationId không được để trống")]
-        public string LocationId { get; set; }
+        [Required(ErrorMessage = "WarehouseId không được để trống")]
+        public string WarehouseId { get; set; }
 
         public class TimeOnlyJsonConverter : JsonConverter<TimeOnly>
         {

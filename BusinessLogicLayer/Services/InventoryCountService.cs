@@ -5,6 +5,7 @@ using Data.Entity;
 using Data.Enum;
 using Data.Model.DTO;
 using Data.Model.Request.InventoryCount;
+using Data.Model.Request.Schedule;
 using Data.Model.Response;
 using DataAccessLayer.Generic;
 using DataAccessLayer.UnitOfWork;
@@ -26,6 +27,7 @@ namespace BusinessLogicLayer.Services
         private readonly IGenericRepository<Inventory> _inventoryRepository;
         private readonly IGenericRepository<InventoryLocation> _inventoryLocationRepository;
         private readonly IGenericRepository<Batch> _batchRepository;
+        private readonly IGenericRepository<Warehouse> _warehouseRepository;
         public InventoryCountService(IGenericRepository<InventoryCount> genericRepository,
             IGenericRepository<Schedule> scheduleRepository,
             IGenericRepository<Location> locationRepository,
@@ -33,6 +35,7 @@ namespace BusinessLogicLayer.Services
             IGenericRepository<Inventory> inventoryRepository,
             IGenericRepository<InventoryLocation> inventoryLocationRepository,
             IGenericRepository<Batch> batchRepository,
+            IGenericRepository<Warehouse> warehouseRepository,
             IGenericRepository<InventoryCountDetail> inventoryCountDetailRepository,
             IMapper mapper, IUnitOfWork unitOfWork) : base(genericRepository, mapper, unitOfWork)
         {
@@ -42,6 +45,7 @@ namespace BusinessLogicLayer.Services
             _inventoryRepository = inventoryRepository;
             _inventoryLocationRepository = inventoryLocationRepository;
             _batchRepository = batchRepository;
+            _warehouseRepository = warehouseRepository;
             _inventoryCountDetailRepository = inventoryCountDetailRepository;
         }
 
@@ -86,9 +90,30 @@ namespace BusinessLogicLayer.Services
                 throw new Exception("Schedule không tồn tại");
             var existedSchedule = await _genericRepository.GetByCondition(p => p.ScheduleId == request.ScheduleId);
             if (existedSchedule != null)
-                throw new Exception("Schedule này đã có phiếu kiểm kê");
+                throw new Exception("Schedule này đã có phiếu kiểm kê");*/
 
-            var location = await _locationRepository.GetByCondition(p => p.Id == request.LocationId);
+            //========================Temporary========================
+            if (request.Date < DateOnly.FromDateTime(DateTime.Now))
+                throw new Exception("Không được đặt lịch ở quá khứ");
+
+            var warehouse = await _warehouseRepository.GetByCondition(p => p.Id == request.WarehouseId);
+            if (warehouse == null)
+                throw new Exception("Warehouse không tồn tại");
+            var scheduleCreate = new ScheduleCreateDTO
+            {
+                Date = request.Date,
+                StartTime = request.StartTime,
+                EndTime = request.EndTime,
+                WarehouseId = request.WarehouseId
+            };
+            var schedule = _mapper.Map<Schedule>(scheduleCreate);
+            await _scheduleRepository.Insert(schedule);
+            await _unitOfWork.SaveAsync();
+
+            request.ScheduleId = schedule.Id;
+            //========================================================
+
+            /*var location = await _locationRepository.GetByCondition(p => p.Id == request.LocationId);
             if (location != null)
             {
                 if (location.Level != 0)
@@ -120,9 +145,12 @@ namespace BusinessLogicLayer.Services
                     if (inventory == null)
                         throw new Exception($"Inventory với ID {detail.InventoryId} không tồn tại");
 
+                    if (inventoryCount.Schedule.WarehouseId != inventory.WarehouseId)
+                        throw new Exception("Inventory phải nằm trong đúng Warehouse");
+
                     //var expectedQuantity = await SumInventoryLocationQuantityByLocationLevel0AndInventory(inventoryCount.LocationId, detail.InventoryId);
                     var expectedQuantity = inventory.CurrentQuantity;
-                    switch(detail.CountedQuantity)
+                    switch (detail.CountedQuantity)
                     {
                         case var c when c < expectedQuantity:
                             detail.Status = InventoryCountDetailStatus.Understock;
@@ -176,6 +204,15 @@ namespace BusinessLogicLayer.Services
 
             if (request.EndTime.HasValue)
                 existingInventoryCount.EndTime = request.EndTime;
+
+            //==========================Temporary========================
+            var existingSchedule = await _scheduleRepository.GetByCondition(p => p.Id == existingInventoryCount.ScheduleId);
+            existingSchedule.Date = request.Date;
+            existingSchedule.StartTime = request.StartTime;
+            existingSchedule.EndTime = request.EndTime;
+
+            _scheduleRepository.Update(existingSchedule);
+            //===========================================================
 
             /*if (!string.IsNullOrEmpty(request.ScheduleId))
             {
@@ -260,7 +297,7 @@ namespace BusinessLogicLayer.Services
         }
 
         public async Task<ServiceResponse> Search<TResult>(int? pageIndex = null, int? pageSize = null,
-                                                                   string? keyword = null, InventoryCountStatus? status = null)
+                                                                   string? keyword = null, InventoryCountStatus? status = null, string? WarehouseId = null)
         {
 
             Expression<Func<InventoryCount, bool>> filter = p =>
@@ -269,14 +306,14 @@ namespace BusinessLogicLayer.Services
                 || p.Note.Contains(keyword)
                 || p.InventoryCheckDetails.Any(d => d.Note != null && d.Note.Contains(keyword)))
                 //|| p.InventoryCheckDetails.Any(d => d.Product != null && d.Product.Name.Contains(keyword)))
-                );/* &&
-                (string.IsNullOrEmpty(warehouseId) || p.Location.Warehouse.Id == warehouseId);*/
+                ) &&
+                (string.IsNullOrEmpty(WarehouseId) || p.Schedule.Warehouse.Id == WarehouseId);
 
             var totalRecords = await _genericRepository.Count(filter);
 
             var results = await _genericRepository.Search(
                 filter: filter, pageIndex: pageIndex, pageSize: pageSize,
-                includeProperties: "InventoryCheckDetails");
+                includeProperties: "InventoryCheckDetails,Schedule.Warehouse,InventoryCheckDetails.Inventory.Batch.Product");
 
             var mappedResults = _mapper.Map<IEnumerable<TResult>>(results);
 
