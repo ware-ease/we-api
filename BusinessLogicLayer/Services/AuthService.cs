@@ -40,6 +40,15 @@ namespace BusinessLogicLayer.Services
                 };
             }
 
+            if (user.Status == Data.Enum.AccountStatus.Locked)
+            {
+                return new ServiceResponse
+                {
+                    Status = Data.Enum.SRStatus.Unauthorized,
+                    Message = "Account is locked!",
+                    Data = { }
+                };
+            }
             var result = _mapper.Map<AccountDTO>(user);
             return new ServiceResponse
             {
