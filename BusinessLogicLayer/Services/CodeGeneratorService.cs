@@ -38,7 +38,7 @@ namespace BusinessLogicLayer.Services
 
                 case CodeType.PN:
                     var goodNotesPN = await _unitOfWork.GoodNoteRepository.Search(
-                        x => x.Code.StartsWith("PN") && !x.Code.Contains("NB"), // Chỉ lấy các mã bắt đầu với PN và không có NB
+                        x => x.Code.StartsWith("PN") && !x.Code.Contains("NB") && !x.Code.Contains("DC"), // Chỉ lấy các mã bắt đầu với PN và không có NB
                         q => q.OrderByDescending(x => x.Code), // Sắp xếp theo mã giảm dần
                         "",
                         1, 1
@@ -48,7 +48,7 @@ namespace BusinessLogicLayer.Services
 
                 case CodeType.PX:
                     var goodNotesPX = await _unitOfWork.GoodNoteRepository.Search(
-                        x => x.Code.StartsWith("PX") && !x.Code.Contains("NB"), // Chỉ lấy các mã bắt đầu với PX và không có NB
+                        x => x.Code.StartsWith("PX") && !x.Code.Contains("NB") && !x.Code.Contains("DC"), // Chỉ lấy các mã bắt đầu với PX và không có NB
                         q => q.OrderByDescending(x => x.Code), // Sắp xếp theo mã giảm dần
                         "",
                         1, 1
@@ -58,7 +58,7 @@ namespace BusinessLogicLayer.Services
 
                 case CodeType.PNNB:
                     var goodNotesPNNB = await _unitOfWork.GoodNoteRepository.Search(
-                        x => x.Code.StartsWith("PN") && x.Code.Contains("NB"), // Lấy các mã có chứa NB
+                        x => x.Code.StartsWith("PN") && x.Code.Contains("NB") && !x.Code.Contains("DC"), // Lấy các mã có chứa NB
                         q => q.OrderByDescending(x => x.Code), // Sắp xếp theo mã giảm dần
                         "",
                         1, 1
@@ -68,14 +68,31 @@ namespace BusinessLogicLayer.Services
 
                 case CodeType.PXNB:
                     var goodNotesPXNB = await _unitOfWork.GoodNoteRepository.Search(
-                        x => x.Code.StartsWith("PX") && x.Code.Contains("NB"), // Lấy các mã PXNB
+                        x => x.Code.StartsWith("PX") && x.Code.Contains("NB") && !x.Code.Contains("DC"), // Lấy các mã PXNB
                         q => q.OrderByDescending(x => x.Code), // Sắp xếp theo mã giảm dần
                         "",
                         1, 1
                     );
                     maxCode = goodNotesPXNB.FirstOrDefault()?.Code;
                     break;
-
+                case CodeType.PNDC:
+                    var goodNotesPNDC = await _unitOfWork.GoodNoteRepository.Search(
+                        x => x.Code.StartsWith("PN") && x.Code.Contains("DC") && !x.Code.Contains("NB"), // Lấy các mã PXNB
+                        q => q.OrderByDescending(x => x.Code), // Sắp xếp theo mã giảm dần
+                        "",
+                        1, 1
+                    );
+                    maxCode = goodNotesPNDC.FirstOrDefault()?.Code;
+                    break;
+                case CodeType.PXDC:
+                        var goodNotesPXDC = await _unitOfWork.GoodNoteRepository.Search(
+                        x => x.Code.StartsWith("PX") && x.Code.Contains("DC") && !x.Code.Contains("NB"), // Lấy các mã PXNB
+                        q => q.OrderByDescending(x => x.Code), // Sắp xếp theo mã giảm dần
+                        "",
+                        1, 1
+                    );
+                    maxCode = goodNotesPXDC.FirstOrDefault()?.Code;
+                    break;
                 case CodeType.LO:
                     var batchCodes = await _unitOfWork.BatchRepository.Search(
                         x => x.Code.StartsWith(prefix),
