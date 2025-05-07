@@ -766,34 +766,134 @@ namespace BusinessLogicLayer.Services
         }
 
 
+        //public async Task<ServiceResponse> GetStockCard(string productId, string warehouseId, DateTime? from = null, DateTime? to = null)
+        //{
+        //    try
+        //    {
+        //        var goodNoteDetails = await _unitOfWork.GoodNoteDetailRepository
+        //            .Search(d => d.Batch.ProductId == productId &&
+        //                              d.GoodNote.GoodRequest.RequestedWarehouseId == warehouseId &&
+        //                              (!from.HasValue || d.GoodNote.Date.Value >= from.Value) &&
+        //                              (!to.HasValue || d.GoodNote.Date.Value < to.Value.Date.AddDays(1)),
+        //                         includeProperties: "GoodNote,Batch,Batch.Product,Batch.Product.Unit,GoodNote.GoodRequest.RequestedWarehouse");
+
+        //        var sortedDetails = goodNoteDetails.OrderBy(d => d.GoodNote.Date).ToList();
+
+        //        var product = sortedDetails.FirstOrDefault()?.Batch.Product;
+        //        var warehouse = sortedDetails.FirstOrDefault()?.GoodNote?.GoodRequest.RequestedWarehouse;
+
+        //        float stock = 0;
+        //        var result = new List<StockCardDetailDTO>();
+
+        //        foreach (var detail in sortedDetails)
+        //        {
+        //            var type = detail.GoodNote.NoteType;
+        //            float importQty = 0, exportQty = 0;
+
+        //            if (type == GoodNoteEnum.Receive /*|| type == GoodNoteEnum.Return*/)
+        //                importQty = detail.Quantity;
+        //            else if (type == GoodNoteEnum.Issue/* || type == GoodNoteEnum.Transfer*/)
+        //                exportQty = detail.Quantity;
+
+        //            stock += importQty - exportQty;
+
+        //            result.Add(new StockCardDetailDTO
+        //            {
+        //                Date = detail.GoodNote.Date,
+        //                Code = detail.GoodNote.Code,
+        //                Description = detail.Note,
+        //                Import = importQty,
+        //                Export = exportQty,
+        //                Stock = stock,
+        //                Note = detail.Batch.Code
+        //            });
+        //        }
+
+        //        return new ServiceResponse
+        //        {
+        //            Status = SRStatus.Success,
+        //            Message = "Thẻ kho được truy xuất thành công.",
+        //            Data = new StockCardDTO
+        //            {
+        //                ProductCode = product?.Sku,
+        //                ProductName = product?.Name,
+        //                UnitName = product?.Unit?.Name,
+        //                WarehouseName = warehouse?.Name,
+        //                Details = result
+        //            }
+        //        };
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return new ServiceResponse
+        //        {
+        //            Status = SRStatus.Error,
+        //            Message = "Lỗi khi lấy dữ liệu thẻ kho.",
+        //            Data = null
+        //        };
+        //    }
+        //}
+
         public async Task<ServiceResponse> GetStockCard(string productId, string warehouseId, DateTime? from = null, DateTime? to = null)
         {
             try
             {
                 var goodNoteDetails = await _unitOfWork.GoodNoteDetailRepository
-                    .Search(d => d.Batch.ProductId == productId &&
-                                      d.GoodNote.GoodRequest.RequestedWarehouseId == warehouseId &&
-                                      (!from.HasValue || d.GoodNote.Date.Value >= from.Value) &&
-                                      (!to.HasValue || d.GoodNote.Date.Value < to.Value.Date.AddDays(1)),
-                                 includeProperties: "GoodNote,Batch,Batch.Product,Batch.Product.Unit,GoodNote.GoodRequest.RequestedWarehouse");
+                    .Search(d =>
+                        d.Batch.ProductId == productId &&
+                        (
+                            // Nhập: luôn về RequestedWarehouse
+                            (d.GoodNote.NoteType == GoodNoteEnum.Receive &&
+                             d.GoodNote.GoodRequest.RequestedWarehouseId == warehouseId) ||
+
+                            // Xuất: tùy theo loại phiếu
+                            (d.GoodNote.NoteType == GoodNoteEnum.Issue &&
+                             (
+                                 // Nếu là điều chuyển: kho xuất là WarehouseId
+                                 (d.GoodNote.GoodRequest.RequestType == GoodRequestEnum.Transfer &&
+                                  d.GoodNote.GoodRequest.WarehouseId == warehouseId) ||
+
+                                 // Nếu là xuất thường: kho vẫn là RequestedWarehouseId
+                                 (d.GoodNote.GoodRequest.RequestType != GoodRequestEnum.Transfer &&
+                                  d.GoodNote.GoodRequest.RequestedWarehouseId == warehouseId)
+                             ))
+                        ) &&
+                        (!from.HasValue || d.GoodNote.Date.Value >= from.Value) &&
+                        (!to.HasValue || d.GoodNote.Date.Value < to.Value.Date.AddDays(1)),
+                        includeProperties: "GoodNote,Batch,Batch.Product,Batch.Product.Unit,GoodNote.GoodRequest,GoodNote.GoodRequest.RequestedWarehouse,GoodNote.GoodRequest.Warehouse"
+                    );
 
                 var sortedDetails = goodNoteDetails.OrderBy(d => d.GoodNote.Date).ToList();
 
                 var product = sortedDetails.FirstOrDefault()?.Batch.Product;
-                var warehouse = sortedDetails.FirstOrDefault()?.GoodNote?.GoodRequest.RequestedWarehouse;
+                var warehouse = sortedDetails.FirstOrDefault()?.GoodNote.GoodRequest.RequestedWarehouse
+                                ?? sortedDetails.FirstOrDefault()?.GoodNote.GoodRequest.Warehouse;
 
                 float stock = 0;
                 var result = new List<StockCardDetailDTO>();
 
                 foreach (var detail in sortedDetails)
                 {
-                    var type = detail.GoodNote.NoteType;
                     float importQty = 0, exportQty = 0;
+                    var type = detail.GoodNote.NoteType;
+                    var request = detail.GoodNote.GoodRequest;
 
-                    if (type == GoodNoteEnum.Receive /*|| type == GoodNoteEnum.Return*/)
+                    if (type == GoodNoteEnum.Receive &&
+                        request.RequestedWarehouseId == warehouseId)
+                    {
                         importQty = detail.Quantity;
-                    else if (type == GoodNoteEnum.Issue/* || type == GoodNoteEnum.Transfer*/)
+                    }
+                    else if (type == GoodNoteEnum.Issue &&
+                             (
+                                 (request.RequestType == GoodRequestEnum.Transfer &&
+                                  request.WarehouseId == warehouseId) ||
+
+                                 (request.RequestType != GoodRequestEnum.Transfer &&
+                                  request.RequestedWarehouseId == warehouseId)
+                             ))
+                    {
                         exportQty = detail.Quantity;
+                    }
 
                     stock += importQty - exportQty;
 
@@ -823,7 +923,7 @@ namespace BusinessLogicLayer.Services
                     }
                 };
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return new ServiceResponse
                 {
@@ -833,7 +933,6 @@ namespace BusinessLogicLayer.Services
                 };
             }
         }
-
 
         public async Task<ServiceResponse> GetStockLineChartAsync(int? year, int? startMonth, int? endMonth, string? warehouseId)
         {
