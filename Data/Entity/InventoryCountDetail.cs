@@ -14,8 +14,9 @@ namespace Data.Entity
     {
         public InventoryCountDetailStatus Status { get; set; }
         public float ExpectedQuantity { get; set; }
-        public float CountedQuantity { get; set; }
+        public float? CountedQuantity { get; set; }
         public string? Note { get; set; }
+        public string? AccountId { get; set; }
 
         [ForeignKey("InventoryCount")]
         public string InventoryCountId { get; set; }

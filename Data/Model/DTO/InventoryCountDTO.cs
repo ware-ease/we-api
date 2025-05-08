@@ -13,6 +13,7 @@ namespace Data.Model.DTO
     {
         public string Id { get; set; }
         public InventoryCountStatus Status { get; set; }
+        public InventoryCountCheckStatus CheckStatus { get; set; }
         public string? Code { get; set; }
         public string? Note { get; set; }
         public DateOnly? Date { get; set; }
@@ -33,10 +34,36 @@ namespace Data.Model.DTO
         public float ExpectedQuantity { get; set; }
         public float CountedQuantity { get; set; }
         public string? Note { get; set; }
+        public string? AccountId { get; set; }
         public string InventoryId { get; set; }
         public string BatchId { get; set; }
         public string BatchCode { get; set; }
         public string ProductName { get; set; }
+    }
+
+    public class InventoryCountResponesDTO : BaseDTO
+    {
+        public string Id { get; set; }
+        public InventoryCountStatus Status { get; set; }
+        public InventoryCountCheckStatus CheckStatus { get; set; }
+        public string? Code { get; set; }
+        public string? Note { get; set; }
+        public DateOnly? Date { get; set; }
+        public TimeOnly? StartTime { get; set; }
+        public TimeOnly? EndTime { get; set; }
+        public DateOnly? ScheduleDate { get; set; }
+        public List<InventoryCountDetailResponseDTO> InventoryCountDetailDTO { get; set; }
+    }
+
+    public class InventoryCountDetailResponseDTO : BaseDTO
+    {
+        public string Id { get; set; }
+        public InventoryCountDetailStatus Status { get; set; }
+        public float ExpectedQuantity { get; set; }
+        public float CountedQuantity { get; set; }
+        public string? Note { get; set; }
+        public string? AccountId { get; set; }
+        public string InventoryId { get; set; }
     }
 
     public class InventoryByLocationDTO : BaseDTO

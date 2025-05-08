@@ -4,6 +4,7 @@ using DataAccessLayer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccessLayer.Migrations
 {
     [DbContext(typeof(WaseEaseDbContext))]
-    partial class WaseEaseDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250508170045_Update_DBXX")]
+    partial class Update_DBXX
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -575,9 +578,6 @@ namespace DataAccessLayer.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
-                    b.Property<string>("StatusNote")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("WarehouseId")
                         .HasColumnType("nvarchar(450)");
 
@@ -937,7 +937,7 @@ namespace DataAccessLayer.Migrations
                     b.Property<string>("AccountId")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<float?>("CountedQuantity")
+                    b.Property<float>("CountedQuantity")
                         .HasColumnType("real");
 
                     b.Property<string>("CreatedBy")

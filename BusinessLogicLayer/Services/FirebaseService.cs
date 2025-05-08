@@ -82,5 +82,8 @@ namespace BusinessLogicLayer.Services
         BATCH_UPDATED,
         RECEIVE_NOTE_CREATED,
         ISSUE_NOTE_CREATED,
+        INVENTORY_COUNT_ASSIGNED,
+        INVENTORY_COUNT_UNASSIGNED,
+        INVENTORY_COUNT_COMPLETED,
     }
 }
