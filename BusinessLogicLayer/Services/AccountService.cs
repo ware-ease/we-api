@@ -315,16 +315,16 @@ namespace BusinessLogicLayer.Services
                 };
             }
 
-            // Kiểm tra quy tắc cập nhật trạng thái
-            if (!CanUpdateStatus(account.Status, newStatus))
-            {
-                return new ServiceResponse
-                {
-                    Status = SRStatus.Error,
-                    Message = $"Không thể chuyển từ trạng thái {account.Status.ToString()} sang {newStatus.ToString()}.",
-                    Data = id
-                };
-            }
+            //// Kiểm tra quy tắc cập nhật trạng thái
+            //if (!CanUpdateStatus(account.Status, newStatus))
+            //{
+            //    return new ServiceResponse
+            //    {
+            //        Status = SRStatus.Error,
+            //        Message = $"Không thể chuyển từ trạng thái {account.Status.ToString()} sang {newStatus.ToString()}.",
+            //        Data = id
+            //    };
+            //}
 
             account.Status = newStatus;
             _unitOfWork.AccountRepository.Update(account);
@@ -332,11 +332,11 @@ namespace BusinessLogicLayer.Services
 
             // Send mail 
             if(account.Email  != null) {
-                if (account.Status != AccountStatus.Locked)
+                if (account.Status == AccountStatus.Locked)
                 {
                     string emailSubject = "Cập nhật trạng thái tài khoản";
                     string emailBody = $@"<h3>Chào {account.Username},</h3>
-                                        <p>Trạng thái tài khoản của bạn đã được cập nhật thành công.</p>
+                                        <p>Tài khoản của bạn đã bị khóa.</p>
                                         <p><strong>Trạng thái tài khoản:</strong> {newStatus.ToString()}</p>
                                         <p>Trân trọng,</p>
                                         <p>Đội ngũ hỗ trợ</p>";
@@ -347,7 +347,7 @@ namespace BusinessLogicLayer.Services
                 {
                     string emailSubject = "Cập nhật trạng thái tài khoản";
                     string emailBody = $@"<h3>Chào {account.Username},</h3>
-                                        <p>Tài khoản của bạn đã bị khóa.</p>
+                                        <p>Trạng thái tài khoản của bạn đã được cập nhật thành công.</p>
                                         <p><strong>Trạng thái tài khoản:</strong> {newStatus.ToString()}</p>
                                         <p>Trân trọng,</p>
                                         <p>Đội ngũ hỗ trợ</p>";
