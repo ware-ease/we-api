@@ -110,6 +110,7 @@ namespace Data.Model.Request.GoodNote
 
         public GoodRequestEnum RequestType { get; set; }
         public GoodRequestStatusEnum Status { get; set; } = GoodRequestStatusEnum.Pending;
+        public string? StatusNote { get; set; } = string.Empty;
 
         //public ICollection<GoodRequestDetail> GoodRequestDetails { get; set; } = [];
         public PartnerDTO? Partner { get; set; }

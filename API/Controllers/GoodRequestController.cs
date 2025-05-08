@@ -67,9 +67,9 @@ namespace API.Controllers
             return ControllerResponse.Response(result);
         }
         [HttpPut("{id}/status")]
-        public async Task<IActionResult> UpdateStatus(string id, [FromQuery] GoodRequestStatusEnum requestStatus)
+        public async Task<IActionResult> UpdateStatus(string id, [FromQuery] GoodRequestStatusEnum requestStatus, string? statusNote)
         {
-            var response = await _goodRequestService.UpdateStatusAsync(id, requestStatus);
+            var response = await _goodRequestService.UpdateStatusAsync(id, requestStatus, statusNote);
             return ControllerResponse.Response(response);
         }
     }

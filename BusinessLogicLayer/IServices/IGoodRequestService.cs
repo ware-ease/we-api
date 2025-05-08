@@ -18,6 +18,6 @@ namespace BusinessLogicLayer.IServices
         Task<ServiceResponse> SearchGoodRequests(int? pageIndex = null, int? pageSize = null,
                                                                        string? keyword = null, GoodRequestEnum? requestType = null,
                                                                                                GoodRequestStatusEnum? status = null);
-        Task<ServiceResponse> UpdateStatusAsync(string id, GoodRequestStatusEnum newStatus);
+        Task<ServiceResponse> UpdateStatusAsync(string id, GoodRequestStatusEnum newStatus, string? statusNote);
     }
 }

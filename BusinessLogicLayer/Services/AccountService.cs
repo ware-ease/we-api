@@ -3,6 +3,7 @@ using BusinessLogicLayer.Generic;
 using BusinessLogicLayer.IServices;
 using BusinessLogicLayer.Utils;
 using Data.Entity;
+using Data.Enum;
 using Data.Model.DTO;
 using Data.Model.Request.Account;
 using Data.Model.Response;
@@ -11,6 +12,7 @@ using DataAccessLayer.UnitOfWork;
 using DotNetEnv;
 using MailKit.Security;
 using MimeKit;
+using System.Linq;
 
 namespace BusinessLogicLayer.Services
 {
@@ -297,6 +299,80 @@ namespace BusinessLogicLayer.Services
                 Message = "Update successfully!",
                 Data = { }
             };
+        }
+
+        public async Task<ServiceResponse> UpdateStatus(string id, AccountStatus newStatus)
+        {
+            var account = await _unitOfWork.AccountRepository.GetByCondition(a => a.Id == id);
+
+            if (account == null)
+            {
+                return new ServiceResponse
+                {
+                    Status = Data.Enum.SRStatus.NotFound,
+                    Message = "Account not found!",
+                    Data = id,
+                };
+            }
+
+            // Kiểm tra quy tắc cập nhật trạng thái
+            if (!CanUpdateStatus(account.Status, newStatus))
+            {
+                return new ServiceResponse
+                {
+                    Status = SRStatus.Error,
+                    Message = $"Không thể chuyển từ trạng thái {account.Status.ToString()} sang {newStatus.ToString()}.",
+                    Data = id
+                };
+            }
+
+            account.Status = newStatus;
+            _unitOfWork.AccountRepository.Update(account);
+            await _unitOfWork.SaveAsync();
+
+            // Gửi email thông báo
+            if(account.Email  != null) {
+                if (account.Status != AccountStatus.Locked)
+                {
+                    string emailSubject = "Cập nhật trạng thái tài khoản";
+                    string emailBody = $@"<h3>Chào {account.Username},</h3>
+                                        <p>Trạng thái tài khoản của bạn đã được cập nhật thành công.</p>
+                                        <p><strong>Trạng thái tài khoản:</strong> {newStatus.ToString()}</p>
+                                        <p>Trân trọng,</p>
+                                        <p>Đội ngũ hỗ trợ</p>";
+
+                    await SendEmailAsync(account.Email!, emailSubject, emailBody);
+                }
+                else
+                {
+                    string emailSubject = "Cập nhật trạng thái tài khoản";
+                    string emailBody = $@"<h3>Chào {account.Username},</h3>
+                                        <p>Tài khoản của bạn đã bị khóa.</p>
+                                        <p><strong>Trạng thái tài khoản:</strong> {newStatus.ToString()}</p>
+                                        <p>Trân trọng,</p>
+                                        <p>Đội ngũ hỗ trợ</p>";
+
+                    await SendEmailAsync(account.Email!, emailSubject, emailBody);
+                }
+            }
+            return new ServiceResponse
+            {
+                Status = Data.Enum.SRStatus.Success,
+                Message = "Update status successfully!",
+                Data = { }
+            };
+        }
+
+        private bool CanUpdateStatus(AccountStatus currentStatus, AccountStatus newStatus)
+        {
+            var validTransitions = new Dictionary<AccountStatus, List<AccountStatus>>()
+            {
+                { AccountStatus.Verified, new List<AccountStatus> { AccountStatus.Locked } },
+                { AccountStatus.Unverified, new List<AccountStatus> { AccountStatus.Locked , AccountStatus.Verified} },
+                { AccountStatus.Locked, new List<AccountStatus> { AccountStatus.Verified , AccountStatus.Unverified} },
+            };
+
+            return validTransitions.ContainsKey(currentStatus) && validTransitions[currentStatus].Contains(newStatus);
         }
     }
 }

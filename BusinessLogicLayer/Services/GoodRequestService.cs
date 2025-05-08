@@ -500,7 +500,7 @@ namespace BusinessLogicLayer.Services
                 };
             }
         }
-        public async Task<ServiceResponse> UpdateStatusAsync(string id, GoodRequestStatusEnum newStatus)
+        public async Task<ServiceResponse> UpdateStatusAsync(string id, GoodRequestStatusEnum newStatus, string? statusNote)
         {
             var goodRequest = await _goodRequestRepository.GetByCondition(x => x.Id == id);
             if (goodRequest == null)
@@ -538,7 +538,20 @@ namespace BusinessLogicLayer.Services
                 }
             }
 
+            if(newStatus == GoodRequestStatusEnum.Rejected)
+            {
+                if(string.IsNullOrEmpty(statusNote))
+                {
+                    return new ServiceResponse
+                    {
+                        Status = SRStatus.Error,
+                        Message = "Vui lòng nhập lý do từ chối yêu cầu.",
+                        Data = id
+                    };
+                }
+            }
             goodRequest.Status = newStatus;
+            goodRequest.StatusNote = statusNote;
             _goodRequestRepository.Update(goodRequest);
             await _unitOfWork.SaveAsync();
             // Gửi thông báo đến người dùng
@@ -549,7 +562,7 @@ namespace BusinessLogicLayer.Services
                     await _firebaseService.SendNotificationToUsersAsync(new List<string> { goodRequest.CreatedBy }, "Yêu cầu kho đã được phê duyệt.", $"Yêu cầu kho với mã yêu cầu: {goodRequest.Code} đã được phê duyệt.", NotificationType.GOOD_REQUEST_APPROVED, goodRequest.RequestedWarehouseId);
                     break;
                 case GoodRequestStatusEnum.Rejected:
-                    await _firebaseService.SendNotificationToUsersAsync(new List<string> { goodRequest.CreatedBy }, "Yêu cầu kho đã bị từ chối.", $"Yêu cầu kho với mã yêu cầu: {goodRequest.Code} đã bị từ chối.", NotificationType.GOOD_REQUEST_REJECTED, goodRequest.RequestedWarehouseId);
+                    await _firebaseService.SendNotificationToUsersAsync(new List<string> { goodRequest.CreatedBy }, "Yêu cầu kho đã bị từ chối.", $"Yêu cầu kho với mã yêu cầu: {goodRequest.Code} đã bị từ chối. Lí do: {goodRequest.StatusNote}", NotificationType.GOOD_REQUEST_REJECTED, goodRequest.RequestedWarehouseId);
                     break;
                 case GoodRequestStatusEnum.Completed:
                     await _firebaseService.SendNotificationToUsersAsync(new List<string> { goodRequest.CreatedBy }, "Yêu cầu kho đã hoàn thành.", $"Yêu cầu kho với mã yêu cầu: {goodRequest.Code} đã hoàn thành.", NotificationType.GOOD_REQUEST_CONFIRMED, goodRequest.RequestedWarehouseId);
@@ -570,11 +583,9 @@ namespace BusinessLogicLayer.Services
         {
             var validTransitions = new Dictionary<GoodRequestStatusEnum, List<GoodRequestStatusEnum>>()
             {
-                { GoodRequestStatusEnum.Pending, new List<GoodRequestStatusEnum> { GoodRequestStatusEnum.Approved,/* GoodRequestStatusEnum.Canceled,*/ GoodRequestStatusEnum.Rejected } },
-                { GoodRequestStatusEnum.Approved, new List<GoodRequestStatusEnum> { GoodRequestStatusEnum.Completed, /*GoodRequestStatusEnum.Canceled*/ } },
+                { GoodRequestStatusEnum.Pending, new List<GoodRequestStatusEnum> { GoodRequestStatusEnum.Approved, GoodRequestStatusEnum.Rejected } },
+                { GoodRequestStatusEnum.Approved, new List<GoodRequestStatusEnum> { GoodRequestStatusEnum.Completed } },
                 { GoodRequestStatusEnum.Issued, new List<GoodRequestStatusEnum> { GoodRequestStatusEnum.Completed } },
-                //{ GoodRequestStatusEnum.Rejected, new List<GoodRequestStatusEnum> { GoodRequestStatusEnum.Pending } },
-                //{ GoodRequestStatusEnum.Canceled, new List<GoodRequestStatusEnum>() }, // Không thể đổi từ Canceled                
                 { GoodRequestStatusEnum.Completed, new List<GoodRequestStatusEnum>() }, // Không thể đổi từ Completed
                 { GoodRequestStatusEnum.Rejected, new List<GoodRequestStatusEnum>() } // Không thể đổi từ Rejected
             };
