@@ -21,7 +21,7 @@ namespace Data.Entity
         //public ICollection<ReceivingDetail> ReceivingDetails { get; set; } = [];
         public ICollection<GoodNoteDetail> GoodNoteDetails { get; set; } = [];
 
-        public string? InventoryId { get; set; }
+        //public string? InventoryId { get; set; }
 
         [ForeignKey("Product")]
         public string ProductId { get; set; }

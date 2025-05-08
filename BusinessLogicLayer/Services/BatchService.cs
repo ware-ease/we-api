@@ -169,10 +169,10 @@ namespace BusinessLogicLayer.Services
                 existingBatch.ExpDate = request.ExpDate.Value;
             }*/
 
-            if (!string.IsNullOrEmpty(request.InventoryId))
+            /*if (!string.IsNullOrEmpty(request.InventoryId))
             {
                 existingBatch.InventoryId = request.InventoryId;
-            }
+            }*/
 
             _batchRepository.Update(existingBatch);
             await _unitOfWork.SaveAsync();
