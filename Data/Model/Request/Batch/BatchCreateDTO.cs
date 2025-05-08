@@ -25,7 +25,7 @@ namespace Data.Model.Request.Batch
         public DateOnly? MfgDate { get; set; }
         [DataType(DataType.Date)]
         public DateOnly? ExpDate { get; set; }
-        //public string? InventoryId { get; set; }
+        public string? InventoryId { get; set; }
     }
     //Make by Ban
     public class BatchCreateDTOv2 : BaseCreateDTO
@@ -44,6 +44,6 @@ namespace Data.Model.Request.Batch
         public DateOnly? MfgDate { get; set; }
         [DataType(DataType.Date)]
         public DateOnly? ExpDate { get; set; }
-        //public string? InventoryId { get; set; }
+        public string? InventoryId { get; set; }
     }
 }
