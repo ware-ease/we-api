@@ -16,6 +16,7 @@ using DataAccessLayer.UnitOfWork;
 using DotNetEnv;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -40,6 +41,7 @@ builder.Configuration
 var connectionString = Environment.GetEnvironmentVariable("DB_URL");
 
 builder.Services.AddControllers();
+builder.Services.AddHostedService<WorkerService>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddDbContext<WaseEaseDbContext>(options =>
