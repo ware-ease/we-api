@@ -17,6 +17,8 @@ namespace Data.Model.Request.InventoryCount
         //[Required(ErrorMessage = "Status không được để trống")]
         [JsonIgnore]
         public InventoryCountStatus? Status { get; set; }
+        [JsonIgnore]
+        public InventoryCountCheckStatus? CheckStatus { get; set; }
         //[Required(ErrorMessage = "Code không được để trống")]
         public string? Code { get; set; }
         public string? Note { get; set; }
@@ -44,6 +46,7 @@ namespace Data.Model.Request.InventoryCount
         //[Required(ErrorMessage = "CountedQuantity không được để trống")]
         public float? CountedQuantity { get; set; }
         public string? Note { get; set; }
+        public string? AccountId { get; set; }
         //[Required(ErrorMessage = "ProductId không được để trống")]
         public string? InventoryId { get; set; }
         public string? ErrorTicketId { get; set; }

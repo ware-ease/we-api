@@ -28,6 +28,9 @@ namespace BusinessLogicLayer.Services
         private readonly IGenericRepository<InventoryLocation> _inventoryLocationRepository;
         private readonly IGenericRepository<Batch> _batchRepository;
         private readonly IGenericRepository<Warehouse> _warehouseRepository;
+        private readonly IGenericRepository<Account> _accountRepository;
+        private readonly IGenericRepository<AccountGroup> _accountGroupRepository;
+        private readonly IFirebaseService _firebaseService;
         public InventoryCountService(IGenericRepository<InventoryCount> genericRepository,
             IGenericRepository<Schedule> scheduleRepository,
             IGenericRepository<Location> locationRepository,
@@ -36,7 +39,10 @@ namespace BusinessLogicLayer.Services
             IGenericRepository<InventoryLocation> inventoryLocationRepository,
             IGenericRepository<Batch> batchRepository,
             IGenericRepository<Warehouse> warehouseRepository,
+            IGenericRepository<Account> accountRepository,
+            IGenericRepository<AccountGroup> accountGroupRepository,
             IGenericRepository<InventoryCountDetail> inventoryCountDetailRepository,
+            IFirebaseService firebaseService,
             IMapper mapper, IUnitOfWork unitOfWork) : base(genericRepository, mapper, unitOfWork)
         {
             _scheduleRepository = scheduleRepository;
@@ -46,7 +52,10 @@ namespace BusinessLogicLayer.Services
             _inventoryLocationRepository = inventoryLocationRepository;
             _batchRepository = batchRepository;
             _warehouseRepository = warehouseRepository;
+            _accountRepository = accountRepository;
+            _accountGroupRepository = accountGroupRepository;
             _inventoryCountDetailRepository = inventoryCountDetailRepository;
+            _firebaseService = firebaseService;
         }
 
 
@@ -139,8 +148,19 @@ namespace BusinessLogicLayer.Services
             {
                 var inventoryCountDetails = new List<InventoryCountDetail>();
 
+
                 foreach (var detail in request.InventoryCountDetails)
                 {
+                    var employeeAccountIds = new List<string>();
+                    var account = await _accountRepository.GetByCondition(a => a.Id == detail.AccountId);
+                    if (account == null)
+                        throw new Exception($"Account với ID {detail.AccountId} không tồn tại");
+                    var accountGroup = await _accountGroupRepository.GetByCondition(ag => ag.AccountId == detail.AccountId && ag.GroupId == "3");
+                    if (accountGroup == null)
+                        throw new Exception($"Account với ID {detail.AccountId} không thuộc nhân viên kho");
+
+                    employeeAccountIds.Add(detail.AccountId);
+
                     var inventory = await _inventoryRepository.GetByCondition(p => p.Id == detail.InventoryId);
                     if (inventory == null)
                         throw new Exception($"Inventory với ID {detail.InventoryId} không tồn tại");
@@ -149,7 +169,7 @@ namespace BusinessLogicLayer.Services
                         throw new Exception("Inventory phải nằm trong đúng Warehouse");
 
                     //var expectedQuantity = await SumInventoryLocationQuantityByLocationLevel0AndInventory(inventoryCount.LocationId, detail.InventoryId);
-                    var expectedQuantity = inventory.CurrentQuantity;
+                    /*var expectedQuantity = inventory.CurrentQuantity;
                     switch (detail.CountedQuantity)
                     {
                         case var c when c < expectedQuantity:
@@ -163,7 +183,7 @@ namespace BusinessLogicLayer.Services
                         case var c when c == expectedQuantity:
                             detail.Status = InventoryCountDetailStatus.Balanced;
                             break;
-                    }
+                    }*/
 
                     var inventoryCountDetail = _mapper.Map<InventoryCountDetail>(detail);
                     inventoryCountDetail.InventoryCountId = inventoryCount.Id;
@@ -172,7 +192,13 @@ namespace BusinessLogicLayer.Services
 
                     await _inventoryCountDetailRepository.Insert(inventoryCountDetail);
                     await _unitOfWork.SaveAsync();
+
+                    await _firebaseService.SendNotificationToUsersAsync(employeeAccountIds, $"Nhân viên được sắp xếp kiểm kê",
+                                                                    $"Nhân viên vừa được sắp xếp vào vai trò kiểm kê với Id kho là: {detail.InventoryId}",
+                                                                    NotificationType.INVENTORY_COUNT_ASSIGNED, request.WarehouseId);
                 }
+
+
             }
 
             return _mapper.Map<InventoryCountDTO>(inventoryCount);
@@ -187,8 +213,8 @@ namespace BusinessLogicLayer.Services
             if (existingInventoryCount == null)
                 throw new Exception("InventoryCount not found");
 
-            if (request.Status.HasValue)
-                existingInventoryCount.Status = request.Status.Value;
+            /*if (request.Status.HasValue)
+                existingInventoryCount.Status = request.Status.Value;*/
 
             if (!string.IsNullOrEmpty(request.Code))
                 existingInventoryCount.Code = request.Code;
@@ -236,6 +262,21 @@ namespace BusinessLogicLayer.Services
                                                 .FirstOrDefault(d => d.Id == detailDto.Id);
                         if (existingDetail == null)
                             throw new Exception($"InventoryCountDetail with ID {detailDto.Id} not found");
+
+                        bool changeEmployee = false;
+                        var oldEmployee = existingDetail.AccountId;
+                        if (!string.IsNullOrEmpty(detailDto.AccountId))
+                        {
+                            var account = await _accountRepository.GetByCondition(a => a.Id == detailDto.AccountId);
+                            if (account == null)
+                                throw new Exception($"Account với Id {detailDto.AccountId} không tồn tại");
+                            var accountGroup = await _accountGroupRepository.GetByCondition(ag => ag.AccountId == detailDto.AccountId && ag.GroupId == "3");
+                            if (accountGroup == null)
+                                throw new Exception($"Account với ID {detailDto.AccountId} không thuộc nhân viên kho");
+                            existingDetail.AccountId = detailDto.AccountId;
+                            changeEmployee = true;
+                        }
+
                         if (detailDto.CountedQuantity != null)
                         {
                             existingDetail.CountedQuantity = detailDto.CountedQuantity.Value;
@@ -267,8 +308,23 @@ namespace BusinessLogicLayer.Services
                         }
                         if (!string.IsNullOrEmpty(detailDto.ErrorTicketId))
                             existingDetail.ErrorTicketId = detailDto.ErrorTicketId;
+
+                        if (changeEmployee)
+                        {
+                            var employeeAccountIds = new List<string>();
+                            var oldEmployeeAccountIds = new List<string>();
+                            employeeAccountIds.Add(detailDto.AccountId);
+                            oldEmployeeAccountIds.Add(oldEmployee);
+                            await _firebaseService.SendNotificationToUsersAsync(employeeAccountIds, $"Nhân viên được sắp xếp kiểm kê",
+                                                                    $"Nhân viên vừa được sắp xếp vào vai trò kiểm kê với Id kho là: {detailDto.InventoryId}",
+                                                                    NotificationType.INVENTORY_COUNT_ASSIGNED, existingInventoryCount.Schedule.WarehouseId);
+
+                            await _firebaseService.SendNotificationToUsersAsync(oldEmployeeAccountIds, $"Nhân viên đã thay đổi",
+                                                                    $"Nhân viên vừa bị thay đổi khỏi vị trí kiểm kê với detail Id là: {detailDto.Id}",
+                                                                    NotificationType.INVENTORY_COUNT_UNASSIGNED, existingInventoryCount.Schedule.WarehouseId);
+                        }
                     }
-                    else
+                    /*else
                     {
                         var inventory = await _inventoryRepository.GetByCondition(p => p.Id == detailDto.InventoryId);
                         if (inventory == null)
@@ -277,8 +333,30 @@ namespace BusinessLogicLayer.Services
                         var newDetail = _mapper.Map<InventoryCountDetail>(detailDto);
                         newDetail.InventoryCountId = existingInventoryCount.Id;
                         await _inventoryCountDetailRepository.Insert(newDetail);
-                    }
+                    }*/
                 }
+            }
+
+            bool allCounted = existingInventoryCount.InventoryCheckDetails
+                .All(detail => detail.Status != InventoryCountDetailStatus.Uncounted);
+
+            if (allCounted)
+            {
+                existingInventoryCount.CheckStatus = InventoryCountCheckStatus.Completed;
+
+                var combinedDateTime = existingInventoryCount.Date.Value.ToDateTime(existingInventoryCount.EndTime.Value);
+                if (combinedDateTime < DateTime.Now)
+                {
+                    existingInventoryCount.Status = InventoryCountStatus.Overdue;
+                }
+                else
+                {
+                    existingInventoryCount.Status = InventoryCountStatus.OnTime;
+                }
+                var userOfRequestedWarehouseIds = await _unitOfWork.AccountRepository.GetUserIdsByWarehouseAndGroups(existingInventoryCount.Schedule.WarehouseId, new List<string> { "Thủ kho" });
+                await _firebaseService.SendNotificationToUsersAsync(userOfRequestedWarehouseIds, $"Phiếu kiểm kê đã hoàn thành",
+                                                                    $"Phiếu kiểm kê với Id là: {existingInventoryCount.Id} đã hoàn thành",
+                                                                    NotificationType.INVENTORY_COUNT_COMPLETED, existingInventoryCount.Schedule.WarehouseId);
             }
 
             _genericRepository.Update(existingInventoryCount);
@@ -286,7 +364,7 @@ namespace BusinessLogicLayer.Services
 
             var updatedInventoryCount = await _genericRepository.GetByCondition(
                 ic => ic.Id == existingInventoryCount.Id,
-                includeProperties: "InventoryCheckDetails.Product,InventoryCheckDetails"
+                includeProperties: "InventoryCheckDetails,Schedule.Warehouse,InventoryCheckDetails.Inventory.Batch.Product"
             );
 
             if (updatedInventoryCount == null)

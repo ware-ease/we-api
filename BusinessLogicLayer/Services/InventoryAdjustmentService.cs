@@ -113,8 +113,8 @@ namespace BusinessLogicLayer.Services
                         {
                             case Data.Enum.InventoryCountDetailStatus.Overstock:
                                 {
-                                    changeInQuantity = detailDto.CountedQuantity - detailDto.ExpectedQuantity;
-                                    newQuantity = detailDto.CountedQuantity;
+                                    changeInQuantity = detailDto.CountedQuantity.Value - detailDto.ExpectedQuantity;
+                                    newQuantity = detailDto.CountedQuantity.Value;
 
                                     var adjustmentDetail = new InventoryAdjustmentDetailCreateDTO
                                     {
@@ -228,8 +228,8 @@ namespace BusinessLogicLayer.Services
                                 }
                             case Data.Enum.InventoryCountDetailStatus.Understock:
                                 {
-                                    changeInQuantity = detailDto.ExpectedQuantity - detailDto.CountedQuantity;
-                                    newQuantity = detailDto.CountedQuantity;
+                                    changeInQuantity = detailDto.ExpectedQuantity - detailDto.CountedQuantity.Value;
+                                    newQuantity = detailDto.CountedQuantity.Value;
 
                                     var adjustmentDetail = new InventoryAdjustmentDetailCreateDTO
                                     {
