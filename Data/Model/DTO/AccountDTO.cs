@@ -1,4 +1,5 @@
-﻿using Data.Model.DTO.Base;
+﻿using Data.Enum;
+using Data.Model.DTO.Base;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +12,7 @@ namespace Data.Model.DTO
     {
         public string Username { get; set; }
         public string Email { get; set; }
+        public AccountStatus Status { get; set; }
         public AccountDTOProfile Profile { get; set; }
 
         public IEnumerable<AccountDTOGroup>? Groups { get; set; }
