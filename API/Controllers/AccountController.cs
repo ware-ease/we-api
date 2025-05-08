@@ -5,6 +5,7 @@ using API.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Data.Model.Request.Account;
 using BusinessLogicLayer.IServices;
+using Data.Enum;
 
 namespace API.Controllers
 {
@@ -95,6 +96,14 @@ namespace API.Controllers
             }
 
             return BadRequest();
+        }
+
+        [Authorize]
+        [HttpPut("{id}/status")]
+        public async Task<IActionResult> UpdateStatus(string id, [FromQuery] AccountStatus status)
+        {
+            var response = await _accountService.UpdateStatus(id, status);
+            return ControllerResponse.Response(response);
         }
     }
 }

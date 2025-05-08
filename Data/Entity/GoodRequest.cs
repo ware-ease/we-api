@@ -12,6 +12,7 @@ namespace Data.Entity
 
         public GoodRequestEnum RequestType { get; set; }
         public GoodRequestStatusEnum Status { get; set; } = GoodRequestStatusEnum.Pending;
+        public string? StatusNote { get; set; }
 
         public ICollection<GoodNote> GoodNotes { get; set; } = [];
         public ICollection<GoodRequestDetail> GoodRequestDetails { get; set; } = [];

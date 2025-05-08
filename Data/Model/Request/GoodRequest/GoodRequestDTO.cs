@@ -14,6 +14,7 @@ namespace Data.Model.Request.GoodRequest
         public string? Code { get; set; }
         public GoodRequestEnum RequestType { get; set; }
         public GoodRequestStatusEnum Status { get; set; }
+        public string? StatusNote { get; set; }
         public string? PartnerId { get; set; }
         //public string? PartnerName { get; set; }
         public PartnerDTO? Partner { get; set; }
