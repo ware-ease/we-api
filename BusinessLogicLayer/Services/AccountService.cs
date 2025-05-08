@@ -330,7 +330,7 @@ namespace BusinessLogicLayer.Services
             _unitOfWork.AccountRepository.Update(account);
             await _unitOfWork.SaveAsync();
 
-            // Gửi email thông báo
+            // Send mail 
             if(account.Email  != null) {
                 if (account.Status != AccountStatus.Locked)
                 {
