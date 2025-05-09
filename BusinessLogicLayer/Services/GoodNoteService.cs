@@ -257,6 +257,7 @@ namespace BusinessLogicLayer.Services
                             batch.InboundDate = DateOnly.FromDateTime(DateTime.Now);
                         }
                         await _unitOfWork.BatchRepository.Add(batch);
+                        await _unitOfWork.SaveAsync();
                         detail.BatchId = batch.Id;
                     }
                     await _unitOfWork.GoodNoteDetailRepository.Add(detail);
