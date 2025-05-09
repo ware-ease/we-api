@@ -231,13 +231,6 @@ namespace BusinessLogicLayer.Services
                 {
                     // Kiểm tra điều kiện: chỉ được có 1 trong 2
                     var hasNewBatch = detailDto.NewBatch != null;
-                    //var hasBatchId = !string.IsNullOrEmpty(detailDto.BatchId);
-                    // Nếu cả 2 đều có hoặc cả 2 đều không có thì báo lỗi
-                    //if (hasNewBatch == hasBatchId) // tức là hoặc cả 2 true hoặc cả 2 false
-                    //{
-                    //    return Fail("Mỗi chi tiết phải có đúng một trong thông tin lô hoặc lô Id.", null);
-                    //}
-
                     // Tạo chi tiết
                     var detail = _mapper.Map<GoodNoteDetail>(detailDto);
                     detail.GoodNoteId = goodNote.Id;
@@ -248,6 +241,7 @@ namespace BusinessLogicLayer.Services
                         var batch = _mapper.Map<Batch>(detailDto.NewBatch);
                         // Sinh mã cho batch
                         batch.Code = await _codeGeneratorService.GenerateCodeAsync(CodeType.LO);
+                        batch.Name = goodNote.Code;
                         // Kiểm tra mã lô trùng
                         var existingBatch = await _unitOfWork.BatchRepository.GetByCondition(x => x.Code == batch.Code);
                         if (existingBatch != null)
