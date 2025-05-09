@@ -40,10 +40,8 @@ namespace Data.Model.Request.Batch
         public string? Name { get; set; }
         [JsonIgnore]
         public DateOnly? InboundDate { get; set; }
-        [DataType(DataType.Date)]
-        public DateOnly? MfgDate { get; set; }
-        [DataType(DataType.Date)]
-        public DateOnly? ExpDate { get; set; }
+        public DateTime? MfgDate { get; set; }
+        public DateTime? ExpDate { get; set; }
         //public string? InventoryId { get; set; }
     }
 }

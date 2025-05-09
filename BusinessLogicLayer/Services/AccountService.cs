@@ -314,18 +314,11 @@ namespace BusinessLogicLayer.Services
                     Data = id,
                 };
             }
-
-            //// Kiểm tra quy tắc cập nhật trạng thái
-            //if (!CanUpdateStatus(account.Status, newStatus))
-            //{
-            //    return new ServiceResponse
-            //    {
-            //        Status = SRStatus.Error,
-            //        Message = $"Không thể chuyển từ trạng thái {account.Status.ToString()} sang {newStatus.ToString()}.",
-            //        Data = id
-            //    };
-            //}
-
+                
+            if(newStatus == AccountStatus.Unverified)
+            {
+                account.UnverifiedAt = DateTime.Now;
+            }
             account.Status = newStatus;
             _unitOfWork.AccountRepository.Update(account);
             await _unitOfWork.SaveAsync();
@@ -361,18 +354,6 @@ namespace BusinessLogicLayer.Services
                 Message = "Update status successfully!",
                 Data = { }
             };
-        }
-
-        private bool CanUpdateStatus(AccountStatus currentStatus, AccountStatus newStatus)
-        {
-            var validTransitions = new Dictionary<AccountStatus, List<AccountStatus>>()
-            {
-                { AccountStatus.Verified, new List<AccountStatus> { AccountStatus.Locked } },
-                { AccountStatus.Unverified, new List<AccountStatus> { AccountStatus.Locked , AccountStatus.Verified} },
-                { AccountStatus.Locked, new List<AccountStatus> { AccountStatus.Verified , AccountStatus.Unverified} },
-            };
-
-            return validTransitions.ContainsKey(currentStatus) && validTransitions[currentStatus].Contains(newStatus);
         }
     }
 }

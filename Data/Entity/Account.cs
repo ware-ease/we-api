@@ -17,8 +17,8 @@ namespace Data.Entity
         public string Password { get; set; }
         public string Email { get; set; }
         public AccountStatus Status { get; set; } = AccountStatus.Unverified;
+        public DateTime UnverifiedAt { get; set; } = DateTime.Now;
         public Profile? Profile { get; set; }
-
         public ICollection<AccountGroup> AccountGroups { get; set; } = [];
         public ICollection<AccountPermission> AccountPermissions { get; set; } = [];
         //public ICollection<Notification> Notifications { get; set; } = [];

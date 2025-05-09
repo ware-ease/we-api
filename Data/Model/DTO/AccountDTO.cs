@@ -13,6 +13,7 @@ namespace Data.Model.DTO
         public string Username { get; set; }
         public string Email { get; set; }
         public AccountStatus Status { get; set; }
+        public DateTime UnverifiedAt { get; set; }
         public AccountDTOProfile Profile { get; set; }
 
         public IEnumerable<AccountDTOGroup>? Groups { get; set; }

@@ -264,15 +264,6 @@ namespace BusinessLogicLayer.Services
                         await _unitOfWork.BatchRepository.Add(batch);
                         detail.BatchId = batch.Id;
                     }
-                    //else if (hasBatchId)
-                    //{
-                    //    // Kiểm tra lô cũ có tồn tại không
-                    //    var oldBatch = await _unitOfWork.BatchRepository.GetByCondition(x => x.Id == detailDto.BatchId);
-                    //    if (oldBatch == null)
-                    //        return Fail("Không tìm thấy lô hàng.", detailDto.BatchId);
-
-                    //    detail.BatchId = oldBatch.Id;
-                    //}
                     await _unitOfWork.GoodNoteDetailRepository.Add(detail);
 
                     goodNoteDetails.Add(detail);
@@ -479,17 +470,6 @@ namespace BusinessLogicLayer.Services
                     checkWarehouseId
                 );
 
-                //// Gửi thông báo cho người yêu cầu
-                //if (!string.IsNullOrEmpty(goodRequest.CreatedBy))
-                //{
-                //    await _firebaseService.SendNotificationToUsersAsync(
-                //        new List<string> { goodRequest.CreatedBy },
-                //        "Thông báo yêu cầu kho",
-                //        $"Yêu cầu kho {goodRequest.Code} đã được tạo phiếu xuất: {goodNote.Code}",
-                //        NotificationType.GOOD_REQUEST_APPROVED,
-                //        checkWarehouseId
-                //    );
-                //}
                 // Gửi thông báo cho kho nhận
                 if (codeType == CodeType.PXNB)
                 {
