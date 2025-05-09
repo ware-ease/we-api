@@ -98,4 +98,16 @@ namespace Data.Model.Request.Warehouse
         public DateTime OperateFrom { get; set; }
         public IEnumerable<InventoryDTO>? Inventories { get; set; }
     }
+    public class ProductWithQuantityDTO
+    {
+        public string ProductId { get; set; }
+        public string ProductName { get; set; }
+        public string Sku { get; set; }
+
+        public string UnitName { get; set; }
+        public string BrandName { get; set; }
+
+        public double TotalQuantity { get; set; }
+    }
+
 }

@@ -87,6 +87,11 @@ namespace API.Controllers
             var result = await _inventoryService.GetLocationLogsByInventoryIdAsync(inventoryId, pageIndex, pageSize);
             return StatusCode((int)result.Status, result);
         }
-
+        [HttpGet("available-products")]
+        public async Task<IActionResult> GetAvailableProductsInWarehouse([FromQuery] string warehouseId)
+        {
+            var result = await _inventoryService.GetAvailableProductsInWarehouse(warehouseId);
+            return StatusCode((int)result.Status, result);
+        }
     }
 }
