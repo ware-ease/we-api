@@ -611,43 +611,43 @@ namespace BusinessLogicLayer.Services
 
             var allDetails = await _unitOfWork.GoodNoteDetailRepository.Search(
                 d => (string.IsNullOrEmpty(warehouseId) || d.GoodNote.GoodRequest.RequestedWarehouseId == warehouseId) &&
-                     d.GoodNote.Date >= startOfLastMonth && d.GoodNote.Date <= endOfMonth,
+                     d.GoodNote.CreatedTime >= startOfLastMonth && d.GoodNote.CreatedTime <= endOfMonth,
                 includeProperties: "GoodNote,GoodNote.GoodRequest"
             );
 
-            var currentMonthDetails = allDetails.Where(d => d.GoodNote.Date >= startOfMonth && d.GoodNote.Date <= endOfMonth);
-            var lastMonthDetails = allDetails.Where(d => d.GoodNote.Date >= startOfLastMonth && d.GoodNote.Date <= endOfLastMonth);
+            var currentMonthDetails = allDetails.Where(d => d.GoodNote.CreatedTime >= startOfMonth && d.GoodNote.CreatedTime <= endOfMonth);
+            var lastMonthDetails = allDetails.Where(d => d.GoodNote.CreatedTime >= startOfLastMonth && d.GoodNote.CreatedTime <= endOfLastMonth);
 
             // Hàm tính tổng số lượng theo loại phiếu
-            int SumByNoteType(IEnumerable<GoodNoteDetail> details, GoodNoteEnum type) =>
-                (int)details.Where(d => d.GoodNote.NoteType == type).Sum(d => d.Quantity);
+            float SumByNoteType(IEnumerable<GoodNoteDetail> details, GoodNoteEnum type) =>
+                details.Where(d => d.GoodNote.NoteType == type).Sum(d => d.Quantity);
 
             // Chuyển kho tính theo phiếu Issue thôi để tránh double
-            int SumTransfer(IEnumerable<GoodNoteDetail> details) =>
-                (int)details
+            float SumTransfer(IEnumerable<GoodNoteDetail> details) =>
+                details
                     .Where(d => d.GoodNote.GoodRequest.RequestType == GoodRequestEnum.Transfer
                                 && d.GoodNote.NoteType == GoodNoteEnum.Issue)
                     .Sum(d => d.Quantity);
 
             // Hàm tính phần trăm thay đổi
-            double CalcChangePercent(int current, int previous)
+            double CalcChangePercent(float current, float previous)
             {
                 if (previous == 0) return current == 0 ? 0 : 100;
                 return Math.Round(((double)(current - previous) / previous) * 100, 2);
             }
 
             // Tháng này
-            int totalPutIn = SumByNoteType(currentMonthDetails, GoodNoteEnum.Receive);
-            int totalTakeOut = SumByNoteType(currentMonthDetails, GoodNoteEnum.Issue);
-            int totalTransfer = SumTransfer(currentMonthDetails);
+            float totalPutIn = SumByNoteType(currentMonthDetails, GoodNoteEnum.Receive);
+            float totalTakeOut = SumByNoteType(currentMonthDetails, GoodNoteEnum.Issue);
+            float totalTransfer = SumTransfer(currentMonthDetails);
             
 
             // Tháng trước
-            int lastPutIn = SumByNoteType(lastMonthDetails, GoodNoteEnum.Receive);
-            int lastTakeOut = SumByNoteType(lastMonthDetails, GoodNoteEnum.Issue);
-            int lastTransfer = SumTransfer(lastMonthDetails);
-            int lastStockChange = lastPutIn - lastTakeOut;
-            int currentStockChange = lastStockChange + totalPutIn - totalTakeOut;
+            float lastPutIn = SumByNoteType(lastMonthDetails, GoodNoteEnum.Receive);
+            float lastTakeOut = SumByNoteType(lastMonthDetails, GoodNoteEnum.Issue);
+            float lastTransfer = SumTransfer(lastMonthDetails);
+            float lastStockChange = lastPutIn - lastTakeOut;
+            float currentStockChange = lastStockChange + totalPutIn - totalTakeOut;
 
             return new ServiceResponse
             {
@@ -680,9 +680,9 @@ namespace BusinessLogicLayer.Services
             DateTime toDate = fromDate.AddMonths(1).AddDays(-1);
 
             var details = await _unitOfWork.GoodNoteDetailRepository.Search(
-                gnd => gnd.GoodNote.Date.HasValue &&
-                       gnd.GoodNote.Date.Value.Date >= fromDate.Date &&
-                       gnd.GoodNote.Date.Value.Date <= toDate.Date,
+                gnd => gnd.GoodNote.CreatedTime.HasValue &&
+                       gnd.GoodNote.CreatedTime.Value.Date >= fromDate.Date &&
+                       gnd.GoodNote.CreatedTime.Value.Date <= toDate.Date,
                 includeProperties: "GoodNote,GoodNote.GoodRequest,GoodNote.GoodRequest.RequestedWarehouse,GoodNote.GoodRequest.Warehouse"
             );
 
@@ -703,8 +703,8 @@ namespace BusinessLogicLayer.Services
 
             foreach (var warehouse in warehouses)
             {
-                var totalPutIn = 0;
-                var totalTakeOut = 0;
+                float totalPutIn = 0;
+                float totalTakeOut = 0;
 
                 //int daysInMonth = (selectedMonth == now.Month && selectedYear == now.Year)
                 //    ? now.Day
@@ -717,7 +717,7 @@ namespace BusinessLogicLayer.Services
                 {
                     DateTime currentDate = new DateTime(selectedYear, selectedMonth, day);
 
-                    var dayDetails = details.Where(d => d.GoodNote.Date.Value.Date == currentDate);
+                    var dayDetails = details.Where(d => d.GoodNote.CreatedTime.Value.Date == currentDate);
 
                     var putIn = dayDetails
                         .Where(d =>
@@ -738,8 +738,8 @@ namespace BusinessLogicLayer.Services
                         )
                         .Sum(d => d.Quantity);
 
-                    totalPutIn += (int)putIn;
-                    totalTakeOut += (int)takeOut;
+                    totalPutIn += putIn;
+                    totalTakeOut += takeOut;
 
                     dailyRecords.Add(new
                     {
@@ -789,12 +789,12 @@ namespace BusinessLogicLayer.Services
                                   d.GoodNote.GoodRequest.RequestedWarehouseId == warehouseId)
                              ))
                         ) &&
-                        (!from.HasValue || d.GoodNote.Date.Value >= from.Value) &&
-                        (!to.HasValue || d.GoodNote.Date.Value < to.Value.Date.AddDays(1)),
+                        (!from.HasValue || d.GoodNote.CreatedTime.Value >= from.Value) &&
+                        (!to.HasValue || d.GoodNote.CreatedTime.Value < to.Value.Date.AddDays(1)),
                         includeProperties: "GoodNote,Batch,Batch.Product,Batch.Product.Unit,GoodNote.GoodRequest,GoodNote.GoodRequest.RequestedWarehouse,GoodNote.GoodRequest.Warehouse"
                     );
 
-                var sortedDetails = goodNoteDetails.OrderBy(d => d.GoodNote.Date).ToList();
+                var sortedDetails = goodNoteDetails.OrderBy(d => d.GoodNote.CreatedTime).ToList();
 
                 var product = sortedDetails.FirstOrDefault()?.Batch.Product;
                 var warehouse = sortedDetails.FirstOrDefault()?.GoodNote.GoodRequest.RequestedWarehouse
@@ -876,28 +876,28 @@ namespace BusinessLogicLayer.Services
             var warehouses = await _unitOfWork.WarehouseRepository.Search(w => string.IsNullOrEmpty(warehouseId) || w.Id == warehouseId);
 
             var result = new List<object>();
-            var totalByMonth = new Dictionary<int, int>();
+            var totalByMonth = new Dictionary<float, float>();
 
             // Lấy toàn bộ GoodNoteDetail kèm GoodNote và GoodRequest
             var details = await _unitOfWork.GoodNoteDetailRepository.Search(
-                d => d.GoodNote.Date.HasValue &&
-                     d.GoodNote.Date.Value.Year == targetYear &&
-                     d.GoodNote.Date.Value.Month >= fromMonth &&
-                     d.GoodNote.Date.Value.Month <= toMonth,
+                d => d.GoodNote.CreatedTime.HasValue &&
+                     d.GoodNote.CreatedTime.Value.Year == targetYear &&
+                     d.GoodNote.CreatedTime.Value.Month >= fromMonth &&
+                     d.GoodNote.CreatedTime.Value.Month <= toMonth,
                 includeProperties: "GoodNote,GoodNote.GoodRequest"
             );
 
             foreach (var warehouse in warehouses)
             {
                 var monthlyStocks = new List<object>();
-                int? firstMonthStock = null;
+                float? firstMonthStock = null;
 
                 foreach (var month in months)
                 {
                     var stockIn = details
                         .Where(d =>
                             d.GoodNote.NoteType == GoodNoteEnum.Receive &&
-                            d.GoodNote.Date.Value.Month <= month &&
+                            d.GoodNote.CreatedTime.Value.Month <= month &&
                             (
                                 d.GoodNote.GoodRequest.RequestedWarehouseId == warehouse.Id ||
                                 (d.GoodNote.GoodRequest.RequestType == GoodRequestEnum.Transfer &&
@@ -909,7 +909,7 @@ namespace BusinessLogicLayer.Services
                     var stockOut = details
                         .Where(d =>
                             d.GoodNote.NoteType == GoodNoteEnum.Issue &&
-                            d.GoodNote.Date.Value.Month <= month &&
+                            d.GoodNote.CreatedTime.Value.Month <= month &&
                             (
                                 (d.GoodNote.GoodRequest.RequestType == GoodRequestEnum.Transfer &&
                                  d.GoodNote.GoodRequest.WarehouseId == warehouse.Id) ||
@@ -922,7 +922,7 @@ namespace BusinessLogicLayer.Services
                     var stock = stockIn - stockOut;
 
                     if (firstMonthStock == null)
-                        firstMonthStock = (int)stock;
+                        firstMonthStock = stock;
 
                     double changePercent = firstMonthStock == 0 ? 0 :
                         ((double)(stock - firstMonthStock.Value) / firstMonthStock.Value) * 100;
@@ -935,9 +935,9 @@ namespace BusinessLogicLayer.Services
                     });
 
                     if (totalByMonth.ContainsKey(month))
-                        totalByMonth[month] += (int)stock;
+                        totalByMonth[month] += stock;
                     else
-                        totalByMonth[month] = (int)stock;
+                        totalByMonth[month] = stock;
                 }
 
                 result.Add(new
@@ -949,7 +949,7 @@ namespace BusinessLogicLayer.Services
 
             // Tính % tăng giảm tổng toàn hệ thống
             var totalStats = new List<object>();
-            int? firstMonthTotal = totalByMonth.ContainsKey(fromMonth) ? totalByMonth[fromMonth] : 0;
+            float? firstMonthTotal = totalByMonth.ContainsKey(fromMonth) ? totalByMonth[fromMonth] : 0;
 
             foreach (var month in months)
             {
@@ -985,8 +985,8 @@ namespace BusinessLogicLayer.Services
 
             var warehouses = await _unitOfWork.WarehouseRepository.Search();
             var pieChartData = new List<object>();
-            int totalStock = 0;
-            int lastMonthTotalStock = 0;
+            float totalStock = 0;
+            float lastMonthTotalStock = 0;
 
             var details = await _unitOfWork.GoodNoteDetailRepository.Search(
                 includeProperties: "GoodNote,GoodNote.GoodRequest"
@@ -1019,14 +1019,14 @@ namespace BusinessLogicLayer.Services
                     .Sum(d => d.Quantity);
 
                 var currentStock = stockIn - stockOut;
-                totalStock += (int)currentStock;
+                totalStock += currentStock;
 
                 // Tính tồn kho tới hết tháng trước
                 var lastMonthStockIn = details
                     .Where(d =>
-                        d.GoodNote.Date.HasValue &&
-                        (d.GoodNote.Date.Value.Year < currentYear ||
-                         (d.GoodNote.Date.Value.Year == currentYear && d.GoodNote.Date.Value.Month < currentMonth)) &&
+                        d.GoodNote.CreatedTime.HasValue &&
+                        (d.GoodNote.CreatedTime.Value.Year < currentYear ||
+                         (d.GoodNote.CreatedTime.Value.Year == currentYear && d.GoodNote.CreatedTime.Value.Month < currentMonth)) &&
                         d.GoodNote.NoteType == GoodNoteEnum.Receive &&
                         (
                             d.GoodNote.GoodRequest.RequestedWarehouseId == warehouse.Id ||
@@ -1038,9 +1038,9 @@ namespace BusinessLogicLayer.Services
 
                 var lastMonthStockOut = details
                     .Where(d =>
-                        d.GoodNote.Date.HasValue &&
-                        (d.GoodNote.Date.Value.Year < currentYear ||
-                         (d.GoodNote.Date.Value.Year == currentYear && d.GoodNote.Date.Value.Month < currentMonth)) &&
+                        d.GoodNote.CreatedTime.HasValue &&
+                        (d.GoodNote.CreatedTime.Value.Year < currentYear ||
+                         (d.GoodNote.CreatedTime.Value.Year == currentYear && d.GoodNote.CreatedTime.Value.Month < currentMonth)) &&
                         d.GoodNote.NoteType == GoodNoteEnum.Issue &&
                         (
                             (d.GoodNote.GoodRequest.RequestType == GoodRequestEnum.Transfer &&
@@ -1052,7 +1052,7 @@ namespace BusinessLogicLayer.Services
                     .Sum(d => d.Quantity);
 
                 var lastMonthStock = lastMonthStockIn - lastMonthStockOut;
-                lastMonthTotalStock += (int)lastMonthStock;
+                lastMonthTotalStock += lastMonthStock;
 
                 pieChartData.Add(new
                 {
@@ -1082,7 +1082,7 @@ namespace BusinessLogicLayer.Services
         {
             var now = DateTime.Now;
             var details = await _unitOfWork.GoodNoteDetailRepository.Search(
-                d => d.GoodNote.Date.HasValue &&
+                d => d.GoodNote.CreatedTime.HasValue &&
                      (d.GoodNote.GoodRequest.RequestedWarehouseId == warehouseId ||
                       (d.GoodNote.GoodRequest.RequestType == GoodRequestEnum.Transfer &&
                        d.GoodNote.GoodRequest.RequestedWarehouseId == warehouseId)) ||
@@ -1142,8 +1142,8 @@ namespace BusinessLogicLayer.Services
                 // 2. Lấy tất cả các GoodNoteDetail liên quan đến kho này (cả nhập và xuất)
                 var allDetails = await _unitOfWork.GoodNoteDetailRepository.Search(
                     d =>
-                        d.GoodNote.Date >= startDate.AddMonths(-1) &&
-                        d.GoodNote.Date < endDate &&
+                        d.GoodNote.CreatedTime >= startDate.AddMonths(-1) &&
+                        d.GoodNote.CreatedTime < endDate &&
                         (
                             // Nhập vào RequestedWarehouse
                             (d.GoodNote.NoteType == GoodNoteEnum.Receive && d.GoodNote.GoodRequest.RequestedWarehouseId == warehouseId) ||
@@ -1159,7 +1159,7 @@ namespace BusinessLogicLayer.Services
                     includeProperties: "GoodNote,Batch,Batch.Product,GoodNote.GoodRequest"
                 );
 
-                var sortedDetails = allDetails.OrderBy(d => d.GoodNote.Date).ThenBy(d => d.GoodNote.Code).ToList();
+                var sortedDetails = allDetails.OrderBy(d => d.GoodNote.CreatedTime).ThenBy(d => d.GoodNote.Code).ToList();
 
                 var result = new List<object>();
                 var stockMap = new Dictionary<string, float>(); // batchId -> tồn
@@ -1220,7 +1220,7 @@ namespace BusinessLogicLayer.Services
                     {
                         WarehouseName = warehouse.Name,
                         Address = warehouse.Address,
-                        InCharge = warehouse.AccountWarehouses.FirstOrDefault().Account.Profile.LastName,
+                        InCharge = warehouse.AccountWarehouses.FirstOrDefault().Account.Profile.LastName +" "+ warehouse.AccountWarehouses.FirstOrDefault().Account.Profile.FirstName,
                         Details = result
                     }
                 };
