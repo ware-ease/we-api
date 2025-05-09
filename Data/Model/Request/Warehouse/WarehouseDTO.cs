@@ -1,5 +1,6 @@
 ﻿using Data.Entity;
 using Data.Entity.Base;
+using Data.Enum;
 using Data.Model.DTO.Base;
 using Data.Model.Request.Inventory;
 using System;
@@ -100,11 +101,16 @@ namespace Data.Model.Request.Warehouse
     }
     public class ProductWithQuantityDTO
     {
-        public string ProductId { get; set; }
-        public string ProductName { get; set; }
+        public string Id { get; set; }
+        public string Name { get; set; }
+        public string? imageUrl { get; set; }
         public string Sku { get; set; }
+        public bool IsBatchManaged { get; set; }
+        public string ProductTypeName { get; set; }
+        public string CategoryName { get; set; }
 
         public string UnitName { get; set; }
+        public UnitEnum UnitType { get; set; }
         public string BrandName { get; set; }
 
         public double TotalQuantity { get; set; }
