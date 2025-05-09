@@ -8,6 +8,7 @@ using Data.Model.Request.Customer;
 using Data.Model.Request.InventoryLocation;
 using Data.Model.Request.Warehouse;
 using Data.Model.Response;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Sprache;
 
@@ -148,10 +149,16 @@ namespace API.Controllers
             return ControllerResponse.Response(response);
         }
 
+        [Authorize]
         [HttpGet("stock-book")]
         public async Task<IActionResult> GetStockBook([FromQuery] string warehouseId, [FromQuery] int month, [FromQuery] int year)
         {
-            var response = await _warehouseService.GetStockBookAsync(warehouseId, month, year);
+            var authUser = AuthHelper.GetCurrentUser(HttpContext.Request);
+            if (authUser == null)
+            {
+                return Unauthorized();
+            }
+            var response = await _warehouseService.GetStockBookAsync(warehouseId, month, year, authUser.id);
             return ControllerResponse.Response(response);
         }
     }

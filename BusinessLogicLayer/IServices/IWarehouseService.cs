@@ -31,6 +31,6 @@ namespace BusinessLogicLayer.IServices
         Task<ServiceResponse> GetStockLineChartAsync(int? year, int? startMonth, int? endMonth, string? warehouseId);
         Task<ServiceResponse> GetStockPieChartAsync();
         Task<ServiceResponse> GetStockPieChartByWarehouseAsync(string warehouseId);
-        Task<ServiceResponse> GetStockBookAsync(string warehouseId, int month, int year);
+        Task<ServiceResponse> GetStockBookAsync(string warehouseId, int month, int year, string userId);
     }
 }
