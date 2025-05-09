@@ -24,9 +24,13 @@ namespace DataAccessLayer.Repositories
 
         public async Task<List<Inventory>> GetAvailableInventoriesAsync(string productId, string warehouseId)
         {
+            var today = DateOnly.FromDateTime(DateTime.Today);
+
             return await _context.Inventories
-                .Where(x => x.Batch.ProductId == productId && x.CurrentQuantity > 0 && x.WarehouseId == warehouseId)
-                .OrderBy(x => x.Batch.InboundDate)  // Sắp xếp theo ngày nhập kho
+                .Where(x => x.Batch.ProductId == productId && x.CurrentQuantity > 0 && x.WarehouseId == warehouseId && (x.Batch.ExpDate == null || x.Batch.ExpDate >= today))
+                .OrderBy(x => x.Batch.ExpDate == null) 
+                .ThenBy(x => x.Batch.ExpDate)
+                .ThenBy(x => x.Batch.InboundDate)     
                 .ToListAsync();
         }
     }
