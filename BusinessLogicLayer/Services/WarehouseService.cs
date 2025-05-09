@@ -1127,6 +1127,114 @@ namespace BusinessLogicLayer.Services
                 }
             };
         }
+        public async Task<ServiceResponse> GetStockBookAsync(string warehouseId, int month, int year)
+        {
+            try
+            {
+                // 1. Lấy thông tin kho
+                var warehouse = await _unitOfWork.WarehouseRepository.GetByCondition(w => w.Id == warehouseId, includeProperties: "AccountWarehouses,AccountWarehouses.Account,AccountWarehouses.Account.Profile");
+                if (warehouse == null)
+                    return new ServiceResponse { Status = SRStatus.Error, Message = "Không tìm thấy kho." };
+
+                var startDate = new DateTime(year, month, 1);
+                var endDate = startDate.AddMonths(1);
+
+                // 2. Lấy tất cả các GoodNoteDetail liên quan đến kho này (cả nhập và xuất)
+                var allDetails = await _unitOfWork.GoodNoteDetailRepository.Search(
+                    d =>
+                        d.GoodNote.Date >= startDate.AddMonths(-1) &&
+                        d.GoodNote.Date < endDate &&
+                        (
+                            // Nhập vào RequestedWarehouse
+                            (d.GoodNote.NoteType == GoodNoteEnum.Receive && d.GoodNote.GoodRequest.RequestedWarehouseId == warehouseId) ||
+                            // Xuất: điều chuyển từ WarehouseId
+                            (d.GoodNote.NoteType == GoodNoteEnum.Issue &&
+                                (
+                                    (d.GoodNote.GoodRequest.RequestType == GoodRequestEnum.Transfer &&
+                                     d.GoodNote.GoodRequest.WarehouseId == warehouseId) ||
+                                    (d.GoodNote.GoodRequest.RequestType != GoodRequestEnum.Transfer &&
+                                     d.GoodNote.GoodRequest.RequestedWarehouseId == warehouseId)
+                                ))
+                        ),
+                    includeProperties: "GoodNote,Batch,Batch.Product,GoodNote.GoodRequest"
+                );
+
+                var sortedDetails = allDetails.OrderBy(d => d.GoodNote.Date).ThenBy(d => d.GoodNote.Code).ToList();
+
+                var result = new List<object>();
+                var stockMap = new Dictionary<string, float>(); // batchId -> tồn
+
+                foreach (var detail in sortedDetails)
+                {
+                    var date = detail.GoodNote.Date?.ToString("dd/MM/yyyy") ?? "";
+                    var code = detail.GoodNote.Code;
+                    var description = detail.Note;
+                    var batch = detail.Batch;
+                    var product = batch.Product;
+                    var batchId = batch.Id;
+
+                    float import = 0, export = 0;
+                    float prevStock = stockMap.ContainsKey(batchId) ? stockMap[batchId] : 0;
+
+                    if (detail.GoodNote.NoteType == GoodNoteEnum.Receive &&
+                        detail.GoodNote.GoodRequest.RequestedWarehouseId == warehouseId)
+                    {
+                        import = detail.Quantity;
+                    }
+                    else if (detail.GoodNote.NoteType == GoodNoteEnum.Issue &&
+                             (
+                                 (detail.GoodNote.GoodRequest.RequestType == GoodRequestEnum.Transfer &&
+                                  detail.GoodNote.GoodRequest.WarehouseId == warehouseId) ||
+                                 (detail.GoodNote.GoodRequest.RequestType != GoodRequestEnum.Transfer &&
+                                  detail.GoodNote.GoodRequest.RequestedWarehouseId == warehouseId)
+                             ))
+                    {
+                        export = detail.Quantity;
+                    }
+
+                    float currentStock = prevStock + import - export;
+                    stockMap[batchId] = currentStock;
+
+                    // Chỉ lấy dữ liệu trong tháng yêu cầu
+                    if (detail.GoodNote.Date >= startDate && detail.GoodNote.Date < endDate)
+                    {
+                        result.Add(new
+                        {
+                            Date = date,
+                            Code = code,
+                            Description = description,
+                            Import = import,
+                            Export = export,
+                            OpeningStock = prevStock,
+                            ClosingStock = currentStock,
+                            Note = $"Lô: {batch.Code} - {product?.Name}"
+                        });
+                    }
+                }
+
+                return new ServiceResponse
+                {
+                    Status = SRStatus.Success,
+                    Message = $"Sổ kho tháng {month:00}/{year} đã được lấy thành công.",
+                    Data = new
+                    {
+                        WarehouseName = warehouse.Name,
+                        Address = warehouse.Address,
+                        InCharge = warehouse.AccountWarehouses.FirstOrDefault().Account.Profile.LastName,
+                        Details = result
+                    }
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ServiceResponse
+                {
+                    Status = SRStatus.Error,
+                    Message = "Lỗi khi truy xuất sổ kho.",
+                    Data = ex.Message
+                };
+            }
+        }
 
     }
 }

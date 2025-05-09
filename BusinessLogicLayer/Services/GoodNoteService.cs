@@ -209,6 +209,7 @@ namespace BusinessLogicLayer.Services
 
                 // Tạo phiếu nhập kho
                 var goodNote = _mapper.Map<GoodNote>(request);
+                goodNote.Date = DateTime.Now;
                 goodNote.CreatedTime = DateTime.Now;
                 goodNote.Status = GoodNoteStatusEnum.Completed;
                 // Sinh mã cho phiếu nhập kho
@@ -519,7 +520,7 @@ namespace BusinessLogicLayer.Services
             var goodNote = new GoodNote
             {
                 Code = await _codeGeneratorService.GenerateCodeAsync(codeType),
-                Date = dto.Date,
+                Date = /*dto.Date*/ DateTime.Now,
                 ReceiverName = dto.ReceiverName,
                 ShipperName = dto.ShipperName,
                 NoteType = GoodNoteEnum.Issue, // Phiếu xuất kho
@@ -638,6 +639,7 @@ namespace BusinessLogicLayer.Services
 
                 // Tạo phiếu
                 var goodNote = _mapper.Map<GoodNote>(request);
+                goodNote.Date = DateTime.Now;   
                 goodNote.CreatedTime = DateTime.Now;
                 goodNote.Status = GoodNoteStatusEnum.Completed;
                 goodNote.Code = await _codeGeneratorService.GenerateCodeAsync(codeType); // codetype là PNNB hoặc PN cho Phiếu nhập kho nội bộ hoặc Phiếu trả hàng
