@@ -1239,6 +1239,75 @@ namespace BusinessLogicLayer.Services
                 };
             }
         }
+        public async Task<ServiceResponse> GetAvailableProductsInWarehouse(string warehouseId)
+        {
+            if (string.IsNullOrEmpty(warehouseId))
+            {
+                return new ServiceResponse
+                {
+                    Status = SRStatus.Error,
+                    Message = "WarehouseId is required."
+                };
+            }
 
+            var inventories = await _unitOfWork.InventoryRepository.Search(
+                i => i.WarehouseId == warehouseId && i.CurrentQuantity > 0,
+                includeProperties: "Batch,Batch.Product,Batch.Product.Unit," +
+                                    "Batch.Product.Brand," +
+                                    "Batch.Product.ProductType," +
+                                    "Batch.Product.ProductType.Category"
+                                );
+
+            if (inventories == null || !inventories.Any())
+            {
+                return new ServiceResponse
+                {
+                    Status = SRStatus.NotFound,
+                    Message = "No available products found in the warehouse.",
+                    Data = warehouseId
+                };
+            }
+
+            //var grouped = inventories
+            //    .GroupBy(i => i.Batch.ProductId)
+            //    .Select(g => new ProductWithQuantityDTO
+            //    {
+            //        ProductId = g.Key.Id,
+            //        ProductName = g.Key.Name,
+            //        Sku = g.Key.Sku,
+            //        UnitName = g.Key.Unit?.Name,
+            //        BrandName = g.Key.Brand?.Name,
+            //        TotalQuantity = g.Sum(i => i.CurrentQuantity)
+            //    })
+            //    .ToList();
+            var grouped = inventories
+                .GroupBy(i => i.Batch.ProductId)
+                .Select(g =>
+                {
+                    var firstProduct = g.First().Batch.Product;
+                    return new ProductWithQuantityDTO
+                    {
+                        Id = g.Key,
+                        Name = firstProduct.Name,
+                        imageUrl = firstProduct.imageUrl,
+                        Sku = firstProduct.Sku,
+                        IsBatchManaged = firstProduct.IsBatchManaged,
+                        ProductTypeName = firstProduct.ProductType.Name, 
+                        CategoryName = firstProduct.ProductType.Category.Name,
+                        UnitName = firstProduct.Unit?.Name,
+                        UnitType = firstProduct.Unit.Type,
+                        BrandName = firstProduct.Brand?.Name,
+                        TotalQuantity = g.Sum(i => i.CurrentQuantity)
+                    };
+                })
+                .ToList();
+
+            return new ServiceResponse
+            {
+                Status = SRStatus.Success,
+                Message = "Available products retrieved successfully.",
+                Data = grouped
+            };
+        }
     }
 }

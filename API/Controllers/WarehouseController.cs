@@ -1,5 +1,6 @@
 ﻿using API.Utils;
 using BusinessLogicLayer.IServices;
+using BusinessLogicLayer.Services;
 using BusinessLogicLayer.Utils;
 using Data.Enum;
 using Data.Model.DTO;
@@ -160,6 +161,12 @@ namespace API.Controllers
             }
             var response = await _warehouseService.GetStockBookAsync(warehouseId, month, year, authUser.id);
             return ControllerResponse.Response(response);
+        }
+        [HttpGet("{id}/products")]
+        public async Task<IActionResult> GetAvailableProductsInWarehouse(string id)
+        {
+            var result = await _warehouseService.GetAvailableProductsInWarehouse(id);
+            return ControllerResponse.Response(result);
         }
     }
 }
