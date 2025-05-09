@@ -42,6 +42,7 @@ var connectionString = Environment.GetEnvironmentVariable("DB_URL");
 
 builder.Services.AddControllers();
 builder.Services.AddHostedService<WorkerService>();
+builder.Services.AddHostedService<BatchCheckService>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddDbContext<WaseEaseDbContext>(options =>
