@@ -37,7 +37,7 @@ namespace Data.Model.Request.Batch
         //[Required(ErrorMessage = "Mã lô không được để trống")]
         [JsonIgnore]
         public string? Code { get; set; }
-        public string? Name { get; set; }
+        //public string? Name { get; set; }
         [JsonIgnore]
         public DateOnly? InboundDate { get; set; }
         public DateTime? MfgDate { get; set; }

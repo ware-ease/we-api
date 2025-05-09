@@ -147,5 +147,12 @@ namespace API.Controllers
             var response = await _warehouseService.GetStockCard(productId, warehouseId, from, to);
             return ControllerResponse.Response(response);
         }
+
+        [HttpGet("stock-book")]
+        public async Task<IActionResult> GetStockBook([FromQuery] string warehouseId, [FromQuery] int month, [FromQuery] int year)
+        {
+            var response = await _warehouseService.GetStockBookAsync(warehouseId, month, year);
+            return ControllerResponse.Response(response);
+        }
     }
 }

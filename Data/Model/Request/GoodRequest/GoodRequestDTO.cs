@@ -116,6 +116,7 @@ namespace Data.Model.Request.GoodRequest
         public string? Sku { get; set; }
         public string? imageUrl { get; set; }
         public string? UnitName { get; set; }
+        public UnitEnum UnitType { get; set; }
         public string? BrandName { get; set; }
     }
     public class GoodNoteOfGoodRequestDTO : BaseDTO
