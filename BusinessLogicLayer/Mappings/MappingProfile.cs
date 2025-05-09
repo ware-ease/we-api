@@ -213,7 +213,9 @@ namespace BusinessLogicLayer.Mappings
                 .ForMember(dest => dest.ProductName, opt => opt.MapFrom(src => src.Product.Name))
                 .ReverseMap();
             CreateMap<Batch, BatchCreateDTO>().ReverseMap();
-            CreateMap<Batch, BatchCreateDTOv2>().ReverseMap();
+            CreateMap<BatchCreateDTOv2, Batch>()
+                .ForMember(dest => dest.MfgDate, opt => opt.MapFrom(src => src.MfgDate.HasValue ? DateOnly.FromDateTime(src.MfgDate.Value) : (DateOnly?)null))
+                .ForMember(dest => dest.ExpDate, opt => opt.MapFrom(src => src.ExpDate.HasValue ? DateOnly.FromDateTime(src.ExpDate.Value) : (DateOnly?)null)).ReverseMap();
             CreateMap<Batch, BatchUpdateDTO>().ReverseMap();
             #endregion
 

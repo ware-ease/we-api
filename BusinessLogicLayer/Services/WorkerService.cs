@@ -47,9 +47,9 @@ namespace BusinessLogicLayer.Services
                 var accountService = scope.ServiceProvider.GetRequiredService<IAccountService>();
                 var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
-                // Get 100 account with unverified status with created time more than 7 days each time
+                // Get 100 account with unverified status with unveifiedAt more than 7 days each time
                 var expiredAccounts = await accountRepo.Search(
-                    filter: a => a.Status == AccountStatus.Unverified && a.CreatedTime.Value.AddDays(7) <= DateTime.Now,
+                    filter: a => a.Status == AccountStatus.Unverified && a.UnverifiedAt.AddDays(7) <= DateTime.Now,
                     orderBy: q => q.OrderBy(a => a.CreatedTime), //order by CreatedTime
                     pageIndex: skip / batchSize, // Page index
                     pageSize: batchSize
