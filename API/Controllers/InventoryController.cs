@@ -1,4 +1,5 @@
-﻿using BusinessLogicLayer.IServices;
+﻿using Azure;
+using BusinessLogicLayer.IServices;
 using BusinessLogicLayer.Services;
 using Data.Enum;
 using Data.Model.DTO;
@@ -81,17 +82,17 @@ namespace API.Controllers
 
             return ControllerResponse.Response(response);
         }
-        [HttpGet("{inventoryId}/location-logs")]
-        public async Task<IActionResult> GetLogsByInventory(string inventoryId, int pageIndex = 1, int pageSize = 5)
-        {
-            var result = await _inventoryService.GetLocationLogsByInventoryIdAsync(inventoryId, pageIndex, pageSize);
-            return StatusCode((int)result.Status, result);
-        }
+        //[HttpGet("{inventoryId}/location-logs")]
+        //public async Task<IActionResult> GetLogsByInventory(string inventoryId, int pageIndex = 1, int pageSize = 5)
+        //{
+        //    var result = await _inventoryService.GetLocationLogsByInventoryIdAsync(inventoryId, pageIndex, pageSize);
+        //    return StatusCode((int)result.Status, result);
+        //}
         [HttpGet("available-products")]
         public async Task<IActionResult> GetAvailableProductsInWarehouse([FromQuery] string warehouseId)
         {
             var result = await _inventoryService.GetAvailableProductsInWarehouse(warehouseId);
-            return StatusCode((int)result.Status, result);
+            return ControllerResponse.Response(result);
         }
     }
 }

@@ -1127,7 +1127,7 @@ namespace BusinessLogicLayer.Services
                 }
             };
         }
-        public async Task<ServiceResponse> GetStockBookAsync(string warehouseId, int month, int year)
+        public async Task<ServiceResponse> GetStockBookAsync(string warehouseId, int month, int year, string userIds)
         {
             try
             {
@@ -1136,6 +1136,7 @@ namespace BusinessLogicLayer.Services
                 if (warehouse == null)
                     return new ServiceResponse { Status = SRStatus.Error, Message = "Không tìm thấy kho." };
 
+                var profile = await _unitOfWork.ProfileRepository.GetByCondition(p => p.AccountId == userIds);
                 var startDate = new DateTime(year, month, 1);
                 var endDate = startDate.AddMonths(1);
 
@@ -1207,7 +1208,10 @@ namespace BusinessLogicLayer.Services
                             Export = export,
                             OpeningStock = prevStock,
                             ClosingStock = currentStock,
-                            Note = $"Lô: {batch.Code} - {product?.Name}"
+                            ProductName = product?.Name,
+                            Sku = product?.Sku,
+                            BatchCode = batch?.Code,
+                            //Note = $"Lô: {batch.Code} - {product?.Name}"
                         });
                     }
                 }
@@ -1220,7 +1224,7 @@ namespace BusinessLogicLayer.Services
                     {
                         WarehouseName = warehouse.Name,
                         Address = warehouse.Address,
-                        InCharge = warehouse.AccountWarehouses.FirstOrDefault().Account.Profile.LastName +" "+ warehouse.AccountWarehouses.FirstOrDefault().Account.Profile.FirstName,
+                        InCharge = profile.LastName +" "+profile.FirstName,
                         Details = result
                     }
                 };
