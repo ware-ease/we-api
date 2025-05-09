@@ -257,6 +257,7 @@ namespace BusinessLogicLayer.Services
                             batch.InboundDate = DateOnly.FromDateTime(DateTime.Now);
                         }
                         await _unitOfWork.BatchRepository.Add(batch);
+                        await _unitOfWork.SaveAsync();
                         detail.BatchId = batch.Id;
                     }
                     await _unitOfWork.GoodNoteDetailRepository.Add(detail);
@@ -270,17 +271,17 @@ namespace BusinessLogicLayer.Services
                 await UpdateInventories(goodNote, goodNoteDetails);
 
                 // Thong báo cho thủ kho
-                var batchMessages = goodNoteDetails
-                    .Select(x => $"{x.Batch.Code} ({x.Quantity})")
-                    .ToList();
-                var keeperIds = await _unitOfWork.AccountRepository.GetUserIdsByWarehouseAndGroups(goodRequest.RequestedWarehouseId!, new List<string> { "Thủ kho" });
-                await _firebaseService.SendNotificationToUsersAsync(
-                    keeperIds,
-                    "Thông báo nhập kho",
-                    $"Phiếu nhập {goodNote.Code} đã nhập các lô: {string.Join(", ", batchMessages)}",
-                    NotificationType.RECEIVE_NOTE_CREATED,
-                    goodRequest.RequestedWarehouseId
-                );
+                //var batchMessages = goodNoteDetails
+                //    .Select(x => $"{x.Batch.Code} ({x.Quantity})")
+                //    .ToList();
+                //var keeperIds = await _unitOfWork.AccountRepository.GetUserIdsByWarehouseAndGroups(goodRequest.RequestedWarehouseId!, new List<string> { "Thủ kho" });
+                //await _firebaseService.SendNotificationToUsersAsync(
+                //    keeperIds,
+                //    "Thông báo nhập kho",
+                //    $"Phiếu nhập {goodNote.Code} đã nhập các lô: {string.Join(", ", batchMessages)}",
+                //    NotificationType.RECEIVE_NOTE_CREATED,
+                //    goodRequest.RequestedWarehouseId
+                //);
                 // Cập nhật trạng thái yêu cầu kho nếu có
                 if (goodRequest != null)
                 {
@@ -576,16 +577,16 @@ namespace BusinessLogicLayer.Services
         }
         public async Task SendIssueNoteNotificationAsync(List<string> warehouseKeeperIds, string requesterId, string issueNoteCode, List<string> batchMessages, string requestedWarehouseId)
         {
-            var keeperMessage = $"Phiếu xuất {issueNoteCode} đã xuất các lô: {string.Join(", ", batchMessages)}";
+            //var keeperMessage = $"Phiếu xuất {issueNoteCode} đã xuất các lô: {string.Join(", ", batchMessages)}";
             var requesterMessage = $"Yêu cầu của bạn đã được tạo phiếu xuất: {issueNoteCode}";
 
-            await _firebaseService.SendNotificationToUsersAsync(
-                warehouseKeeperIds,
-                "Thông báo xuất kho",
-                keeperMessage,
-                NotificationType.ISSUE_NOTE_CREATED,
-                requestedWarehouseId
-            );
+            //await _firebaseService.SendNotificationToUsersAsync(
+            //    warehouseKeeperIds,
+            //    "Thông báo xuất kho",
+            //    keeperMessage,
+            //    NotificationType.ISSUE_NOTE_CREATED,
+            //    requestedWarehouseId
+            //);
 
             await _firebaseService.SendNotificationToUsersAsync(
                 new List<string> { requesterId },
@@ -679,18 +680,18 @@ namespace BusinessLogicLayer.Services
                         goodRequest.RequestedWarehouseId
                     );
                 }
-                // Thông báo cho thủ kho
-                var batchMessages = goodNoteDetails
-                    .Select(x => $"{x.Batch.Code} ({x.Quantity})")
-                    .ToList();
-                var keeperIds = await _unitOfWork.AccountRepository.GetUserIdsByWarehouseAndGroups(goodRequest!.RequestedWarehouseId!, new List<string> { "Thủ kho" });
-                await _firebaseService.SendNotificationToUsersAsync(
-                    keeperIds,
-                    "Thông báo nhập kho",
-                    $"Phiếu nhập {goodNote.Code} đã nhập các lô: {string.Join(", ", batchMessages)}",
-                    NotificationType.RECEIVE_NOTE_CREATED,
-                    goodRequest.RequestedWarehouseId
-                );
+                //// Thông báo cho thủ kho
+                //var batchMessages = goodNoteDetails
+                //    .Select(x => $"{x.Batch.Code} ({x.Quantity})")
+                //    .ToList();
+                //var keeperIds = await _unitOfWork.AccountRepository.GetUserIdsByWarehouseAndGroups(goodRequest!.RequestedWarehouseId!, new List<string> { "Thủ kho" });
+                //await _firebaseService.SendNotificationToUsersAsync(
+                //    keeperIds,
+                //    "Thông báo nhập kho",
+                //    $"Phiếu nhập {goodNote.Code} đã nhập các lô: {string.Join(", ", batchMessages)}",
+                //    NotificationType.RECEIVE_NOTE_CREATED,
+                //    goodRequest.RequestedWarehouseId
+                //);
 
                 await _unitOfWork.CommitTransactionAsync();
 

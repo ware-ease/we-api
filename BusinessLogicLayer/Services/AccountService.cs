@@ -24,7 +24,7 @@ namespace BusinessLogicLayer.Services
 
         public override async Task<ServiceResponse> Get<AccountDTO>()
         {
-            var results = _unitOfWork.AccountRepository.GetWithFullInfo();
+            var results = _unitOfWork.AccountRepository.GetWithFullInfo().OrderByDescending(a => a.CreatedTime);
 
             List<Data.Model.DTO.AccountDTO> mappedResults = _mapper.Map<List<Data.Model.DTO.AccountDTO>>(results);
 
