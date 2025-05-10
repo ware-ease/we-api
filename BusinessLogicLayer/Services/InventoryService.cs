@@ -77,7 +77,7 @@ namespace BusinessLogicLayer.Services
                 filter: filter, pageIndex: pageIndex, pageSize: pageSize,
                 includeProperties: "Warehouse,Batch,Batch.Product,Batch.Product.Unit,Batch.Product.Brand");
 
-            var mappedResults = _mapper.Map<IEnumerable<InventoryDTOv2>>(results);
+            var mappedResults = _mapper.Map<IEnumerable<InventoryDTOv2>>(results).ToList();
             foreach (var inventory in mappedResults)
             {
                 var createdByAccount = await _unitOfWork.AccountRepository.GetByCondition(a => a.Id == inventory.CreatedBy, "Profile,AccountGroups,AccountGroups.Group");

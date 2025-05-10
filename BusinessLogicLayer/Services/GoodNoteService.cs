@@ -89,7 +89,7 @@ namespace BusinessLogicLayer.Services
                     CreatedTime = g.CreatedTime.ToString(),
                     CreatedBy = g.CreatedBy,
                     GoodNoteDetails = _mapper.Map<List<GoodNoteDetailDTO>>(details.Where(d => d.GoodNoteId == g.Id).ToList())
-                });
+                }).ToList();
 
                 foreach (var item in groupedResults)
                 {
@@ -571,6 +571,7 @@ namespace BusinessLogicLayer.Services
                         BatchId = inventory.BatchId,
                         CreatedBy = dto.CreatedBy,
                     };
+                    detail.CreatedBy = dto.CreatedBy;
                     await _unitOfWork.GoodNoteDetailRepository.Add(detail);
 
                     inventory.CurrentQuantity -= usedQuantity;

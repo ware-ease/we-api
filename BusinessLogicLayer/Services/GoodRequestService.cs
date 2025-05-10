@@ -461,7 +461,7 @@ namespace BusinessLogicLayer.Services
                     pageSize: pageSize
                 );
 
-                var mappedResults = _mapper.Map<IEnumerable<GoodRequestDTO>>(results);
+                var mappedResults = _mapper.Map<IEnumerable<GoodRequestDTO>>(results).ToList();
 
                 foreach (var goodRequest in mappedResults)
                 {
