@@ -256,10 +256,12 @@ namespace BusinessLogicLayer.Services
                             // gán giá trị mặc định
                             batch.InboundDate = DateOnly.FromDateTime(DateTime.Now);
                         }
+                        batch.CreatedBy = request.CreatedBy;
                         await _unitOfWork.BatchRepository.Add(batch);
                         await _unitOfWork.SaveAsync();
                         detail.BatchId = batch.Id;
                     }
+                    detail.CreatedBy = request.CreatedBy;
                     await _unitOfWork.GoodNoteDetailRepository.Add(detail);
 
                     goodNoteDetails.Add(detail);
@@ -351,6 +353,7 @@ namespace BusinessLogicLayer.Services
                         BatchId = detail.BatchId,
                         CurrentQuantity = detail.Quantity
                     };
+                    inventory.CreatedBy = goodNote.CreatedBy;
                     await _unitOfWork.InventoryRepository.Add(inventory);
                 }
                 else
@@ -526,7 +529,8 @@ namespace BusinessLogicLayer.Services
                 ShipperName = dto.ShipperName,
                 NoteType = GoodNoteEnum.Issue, // Phiếu xuất kho
                 Status = GoodNoteStatusEnum.Completed,
-                GoodRequestId = dto.GoodRequestId
+                GoodRequestId = dto.GoodRequestId,
+                CreatedBy = dto.CreatedBy,
             };
             // Kiểm tra mã phiếu xuất kho đã tồn tại chưa
             var existingNote = await _unitOfWork.GoodNoteRepository.GetByCondition(x => x.Code == goodNote.Code);
@@ -559,6 +563,7 @@ namespace BusinessLogicLayer.Services
                         GoodNoteId = goodNoteId,
                         BatchId = inventory.BatchId
                     };
+                    detail.CreatedBy = dto.CreatedBy;
                     await _unitOfWork.GoodNoteDetailRepository.Add(detail);
 
                     inventory.CurrentQuantity -= usedQuantity;
@@ -659,6 +664,7 @@ namespace BusinessLogicLayer.Services
                     var detail = _mapper.Map<GoodNoteDetail>(detailDto);
                     detail.GoodNoteId = goodNote.Id;
                     detail.CreatedTime = DateTime.Now;
+                    detail.CreatedBy = request.CreatedBy;
                     await _unitOfWork.GoodNoteDetailRepository.Add(detail);
                     goodNoteDetails.Add(detail);
                 }

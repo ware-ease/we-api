@@ -102,7 +102,7 @@ namespace Data.Model.Request.GoodRequest
             set => _productId = string.IsNullOrEmpty(value) ? null : value;
         }
     }
-    public class GoodRequestDetailInfoDTO /*: BaseCreateDTO*/
+    public class GoodRequestDetailInfoDTO : BaseDTO
     {
         public float Quantity { get; set; }
 

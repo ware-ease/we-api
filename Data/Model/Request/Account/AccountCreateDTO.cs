@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Data.Model.Request.Account
 {
-    public class AccountCreateDTO
+    public class AccountCreateDTO : BaseCreateDTO
     {
         [Required]
         public string? Username { get; set; }
@@ -17,8 +17,8 @@ namespace Data.Model.Request.Account
         [Required]
         public string? Email { get; set; }
 
-        [JsonIgnore]
-        public string? CreatedBy { get; set; }
+        //[JsonIgnore]
+        //public string? CreatedBy { get; set; }
 
         public ProfileCreateDTO Profile { get; set; }
 

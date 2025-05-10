@@ -33,13 +33,28 @@ using Data.Model.Request.InventoryAdjustment;
 using Data.Model.Request.InventoryLocation;
 using Data.Model.Request.LocationLog;
 using Data.Model.Request.ErrorTicket;
+using DataAccessLayer.UnitOfWork;
+using DataAccessLayer.IRepositories;
 
 namespace BusinessLogicLayer.Mappings
 {
     public class MappingProfile : AutoMapper.Profile
     {
-        public MappingProfile()
+        private readonly IUnitOfWork _unitOfWork;
+        private (string avatarUrl, string fullName, string groupName) GetCreatedByInfo(string createdById)
         {
+            var createdBy = _unitOfWork.AccountRepository.GetWithFullInfo(createdById).Result;
+
+            return (
+                avatarUrl: createdBy?.Profile?.AvatarUrl ?? string.Empty,
+                fullName: createdBy?.Profile?.LastName ?? string.Empty,
+                groupName: createdBy?.AccountGroups?.FirstOrDefault()?.Group?.Name ?? string.Empty
+            );
+        }
+
+        public MappingProfile(IUnitOfWork unitOfWork)
+        {
+            _unitOfWork = unitOfWork;
             CreateMap<Partner, Data.Model.DTO.CustomerDTO>().ReverseMap();
             CreateMap<CustomerCreateDTO, Partner>().ReverseMap();
             CreateMap<CustomerUpdateDTO, Partner>().ReverseMap();
@@ -51,7 +66,13 @@ namespace BusinessLogicLayer.Mappings
                 .ForMember(dest => dest.Groups, opt => opt.MapFrom(src => src.AccountGroups.Select(ag => ag.Group)))
                 .ForMember(dest => dest.Permissions, opt => opt.MapFrom(src => src.AccountPermissions.Select(ag => ag.Permission)))
                 .ForMember(dest => dest.Warehouses, opt => opt.MapFrom(src => src.AccountWarehouses.Select(aw => aw.Warehouse)))
-                .ReverseMap();
+                .AfterMap((src, dest) =>
+                {
+                    var (avatarUrl, fullName, groupName) = GetCreatedByInfo(src.CreatedBy);
+                    dest.CreatedByAvatarUrl = avatarUrl;
+                    dest.CreatedByFullName = fullName;
+                    dest.CreatedByGroup = groupName;
+                });
             CreateMap<Account, AccountUpdateDTO>().ReverseMap();
             CreateMap<Account, AccountCreateDTO>().ReverseMap();
             CreateMap<AccountDTO, AccountCreateDTO>().ReverseMap();
@@ -72,6 +93,13 @@ namespace BusinessLogicLayer.Mappings
             #region ProductType
             CreateMap<ProductType, ProductTypeDTO>()
                 .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => $"{src.Category.Name} {src.Category.Note}".Trim()))
+                 .AfterMap((src, dest) =>
+                 {
+                     var (avatarUrl, fullName, groupName) = GetCreatedByInfo(src.CreatedBy);
+                     dest.CreatedByAvatarUrl = avatarUrl;
+                     dest.CreatedByFullName = fullName;
+                     dest.CreatedByGroup = groupName;
+                 })
                 .ReverseMap();
             CreateMap<ProductType, ProductTypeCreateDTO>().ReverseMap();
             CreateMap<ProductType, ProductTypeUpdateDTO>().ReverseMap();
@@ -80,6 +108,13 @@ namespace BusinessLogicLayer.Mappings
             #region Category
             CreateMap<Category, CategoryDTO>()
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => $"{src.Name} {src.Note}".Trim()))
+                 .AfterMap((src, dest) =>
+                 {
+                     var (avatarUrl, fullName, groupName) = GetCreatedByInfo(src.CreatedBy);
+                     dest.CreatedByAvatarUrl = avatarUrl;
+                     dest.CreatedByFullName = fullName;
+                     dest.CreatedByGroup = groupName;
+                 })
                 .ReverseMap();
 
             CreateMap<Category, CategoryCreateDTO>().ReverseMap();
@@ -91,7 +126,13 @@ namespace BusinessLogicLayer.Mappings
             #endregion
 
             #region Supplier
-            CreateMap<Partner, SupplierDTO>().ReverseMap();
+            CreateMap<Partner, SupplierDTO>().AfterMap((src, dest) =>
+            {
+                var (avatarUrl, fullName, groupName) = GetCreatedByInfo(src.CreatedBy);
+                dest.CreatedByAvatarUrl = avatarUrl;
+                dest.CreatedByFullName = fullName;
+                dest.CreatedByGroup = groupName;
+            }).ReverseMap();
 
             CreateMap<Partner, SupplierCreateDTO>().ReverseMap();
 
@@ -99,7 +140,13 @@ namespace BusinessLogicLayer.Mappings
             #endregion
 
             #region Customer
-            CreateMap<Partner, CustomerDTO>().ReverseMap();
+            CreateMap<Partner, CustomerDTO>().AfterMap((src, dest) =>
+            {
+                var (avatarUrl, fullName, groupName) = GetCreatedByInfo(src.CreatedBy);
+                dest.CreatedByAvatarUrl = avatarUrl;
+                dest.CreatedByFullName = fullName;
+                dest.CreatedByGroup = groupName;
+            }).ReverseMap();
 
             CreateMap<Partner, CustomerCreateDTO>().ReverseMap();
 
@@ -117,6 +164,13 @@ namespace BusinessLogicLayer.Mappings
                 .ForMember(dest => dest.Category, opt => opt.MapFrom(src => $"{src.ProductType.Category.Name} {src.ProductType.Category.Note}".Trim()))
                 .ForMember(dest => dest.Brand, opt => opt.MapFrom(src => $"{src.Brand.Name}".Trim()))
                 .ForMember(dest => dest.Unit, opt => opt.MapFrom(src => $"{src.Unit.Name} {src.Unit.Note}".Trim()))
+                 .AfterMap((src, dest) =>
+                 {
+                     var (avatarUrl, fullName, groupName) = GetCreatedByInfo(src.CreatedBy);
+                     dest.CreatedByAvatarUrl = avatarUrl;
+                     dest.CreatedByFullName = fullName;
+                     dest.CreatedByGroup = groupName;
+                 })
                 .ReverseMap();
 
             CreateMap<ProductCreateDTO, Product>().ReverseMap();
@@ -128,9 +182,23 @@ namespace BusinessLogicLayer.Mappings
                 .ForMember(d => d.BatchName, opt => opt.MapFrom(src => $"{src.Batch.Name}".Trim()))
                 .ForMember(d => d.BatchCode, opt => opt.MapFrom(src => $"{src.Batch.Code}".Trim()))
                 .ForMember(d => d.WarehouseName, opt => opt.MapFrom(src => $"{src.Warehouse.Name}".Trim()))
+                 .AfterMap((src, dest) =>
+                 {
+                     var (avatarUrl, fullName, groupName) = GetCreatedByInfo(src.CreatedBy);
+                     dest.CreatedByAvatarUrl = avatarUrl;
+                     dest.CreatedByFullName = fullName;
+                     dest.CreatedByGroup = groupName;
+                 })
                 .ReverseMap();
 
             CreateMap<Inventory, InventoryDTOv2>()/*.ForMember(d => d.InventoryLocations, opt => opt.MapFrom(src => src.InventoryLocations))*/
+                 .AfterMap((src, dest) =>
+                 {
+                     var (avatarUrl, fullName, groupName) = GetCreatedByInfo(src.CreatedBy);
+                     dest.CreatedByAvatarUrl = avatarUrl;
+                     dest.CreatedByFullName = fullName;
+                     dest.CreatedByGroup = groupName;
+                 })
                 .ReverseMap();
             CreateMap<InventoryLocation, InventoryLocationDTO>().ReverseMap();
             #endregion
@@ -143,6 +211,13 @@ namespace BusinessLogicLayer.Mappings
                 .ForMember(dest => dest.WarehouseId, opt => opt.MapFrom(src => src.Schedule.Warehouse.Id))
                 .ForMember(dest => dest.ScheduleDate, opt => opt.MapFrom(src => src.Schedule.Date))
                 .ForMember(dest => dest.InventoryCountDetailDTO, opt => opt.MapFrom(src => src.InventoryCheckDetails))
+                 .AfterMap((src, dest) =>
+                 {
+                     var (avatarUrl, fullName, groupName) = GetCreatedByInfo(src.CreatedBy);
+                     dest.CreatedByAvatarUrl = avatarUrl;
+                     dest.CreatedByFullName = fullName;
+                     dest.CreatedByGroup = groupName;
+                 })
                 .ReverseMap();
 
             CreateMap<InventoryCount, InventoryCountCreateDTO>().ReverseMap();
@@ -211,6 +286,13 @@ namespace BusinessLogicLayer.Mappings
             #region Batch
             CreateMap<Batch, BatchDTO>()
                 .ForMember(dest => dest.ProductName, opt => opt.MapFrom(src => src.Product.Name))
+                 .AfterMap((src, dest) =>
+                 {
+                     var (avatarUrl, fullName, groupName) = GetCreatedByInfo(src.CreatedBy);
+                     dest.CreatedByAvatarUrl = avatarUrl;
+                     dest.CreatedByFullName = fullName;
+                     dest.CreatedByGroup = groupName;
+                 })
                 .ReverseMap();
             CreateMap<Batch, BatchCreateDTO>().ReverseMap();
             CreateMap<BatchCreateDTOv2, Batch>()
@@ -222,6 +304,13 @@ namespace BusinessLogicLayer.Mappings
             #region Brand
             CreateMap<Brand, BrandDTO>()
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => $"{src.Name}".Trim()))
+                 .AfterMap((src, dest) =>
+                 {
+                     var (avatarUrl, fullName, groupName) = GetCreatedByInfo(src.CreatedBy);
+                     dest.CreatedByAvatarUrl = avatarUrl;
+                     dest.CreatedByFullName = fullName;
+                     dest.CreatedByGroup = groupName;
+                 })
                 .ReverseMap();
 
             CreateMap<BrandCreateDTO, Brand>().ReverseMap();
@@ -231,6 +320,13 @@ namespace BusinessLogicLayer.Mappings
             #region Unit
             CreateMap<Unit, UnitDTO>()
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => $"{src.Name} {src.Note}".Trim()))
+                 .AfterMap((src, dest) =>
+                 {
+                     var (avatarUrl, fullName, groupName) = GetCreatedByInfo(src.CreatedBy);
+                     dest.CreatedByAvatarUrl = avatarUrl;
+                     dest.CreatedByFullName = fullName;
+                     dest.CreatedByGroup = groupName;
+                 })
                 .ReverseMap();
 
             CreateMap<UnitCreateDTO, Unit>().ReverseMap();
@@ -241,6 +337,13 @@ namespace BusinessLogicLayer.Mappings
             CreateMap<Group, GroupDTO>()
                 .ForMember(dest => dest.Accounts, opt => opt.MapFrom(src => src.AccountGroups.Select(ag => ag.Account)))
                 .ForMember(dest => dest.Permissions, opt => opt.MapFrom(src => src.GroupPermissions.Select(ga => ga.Permission)))
+                 .AfterMap((src, dest) =>
+                 {
+                     var (avatarUrl, fullName, groupName) = GetCreatedByInfo(src.CreatedBy);
+                     dest.CreatedByAvatarUrl = avatarUrl;
+                     dest.CreatedByFullName = fullName;
+                     dest.CreatedByGroup = groupName;
+                 })
                 .ReverseMap();
             //CreateMap<Group, CreateGroupDTO>().ReverseMap();
             CreateMap<Account, GroupDTOAccount>().ReverseMap();
@@ -250,21 +353,52 @@ namespace BusinessLogicLayer.Mappings
             CreateMap<Permission, Data.Model.DTO.PermissionDTO>()
                 .ForMember(dest => dest.Url, opt => opt.MapFrom(src => src.Route.Url))
                 .ForMember(dest => dest.RouteCode, opt => opt.MapFrom(src => src.Route.Code))
+                 .AfterMap((src, dest) =>
+                 {
+                     var (avatarUrl, fullName, groupName) = GetCreatedByInfo(src.CreatedBy);
+                     dest.CreatedByAvatarUrl = avatarUrl;
+                     dest.CreatedByFullName = fullName;
+                     dest.CreatedByGroup = groupName;
+                 })
                 .ReverseMap();
             #endregion
 
             #region Route
-            CreateMap<Route, RouteDTO>().ReverseMap();
+            CreateMap<Route, RouteDTO>().AfterMap((src, dest) =>
+            {
+                var (avatarUrl, fullName, groupName) = GetCreatedByInfo(src.CreatedBy);
+                dest.CreatedByAvatarUrl = avatarUrl;
+                dest.CreatedByFullName = fullName;
+                dest.CreatedByGroup = groupName;
+            }).ReverseMap();
             #endregion
 
             #region Warehouse
-            CreateMap<Warehouse, WarehouseDTO>().ReverseMap();
+            CreateMap<Warehouse, WarehouseDTO>().AfterMap((src, dest) =>
+            {
+                var (avatarUrl, fullName, groupName) = GetCreatedByInfo(src.CreatedBy);
+                dest.CreatedByAvatarUrl = avatarUrl;
+                dest.CreatedByFullName = fullName;
+                dest.CreatedByGroup = groupName;
+            }).ReverseMap();
             CreateMap<Warehouse, CreateWarehouseDTO>().ReverseMap();
             CreateMap<Warehouse, UpdateWarehouseDTO>().ReverseMap();
-            CreateMap<Warehouse, WarehouseFullInfoDTO>().ReverseMap();
+            CreateMap<Warehouse, WarehouseFullInfoDTO>().AfterMap((src, dest) =>
+            {
+                var (avatarUrl, fullName, groupName) = GetCreatedByInfo(src.CreatedBy);
+                dest.CreatedByAvatarUrl = avatarUrl;
+                dest.CreatedByFullName = fullName;
+                dest.CreatedByGroup = groupName;
+            }).ReverseMap();
             CreateMap<Location, LocationDto>().ReverseMap();
             CreateMap<Location, LocationCreateDto>().ReverseMap();
-            CreateMap<Warehouse, WarehouseInventoryDTO>().ReverseMap();
+            CreateMap<Warehouse, WarehouseInventoryDTO>().AfterMap((src, dest) =>
+            {
+                var (avatarUrl, fullName, groupName) = GetCreatedByInfo(src.CreatedBy);
+                dest.CreatedByAvatarUrl = avatarUrl;
+                dest.CreatedByFullName = fullName;
+                dest.CreatedByGroup = groupName;
+            }).ReverseMap();
             #region Inventory
             CreateMap<Inventory, Data.Model.Request.Inventory.InventoryDTO>().ReverseMap();
             #endregion
@@ -273,9 +407,16 @@ namespace BusinessLogicLayer.Mappings
             #region GoodRequest
             CreateMap<GoodRequest, GoodRequestDTO>()
                            .ForMember(dest => dest.GoodRequestDetails, opt => opt.MapFrom(src => src.GoodRequestDetails))
-                           //.ForMember(dest => dest.PartnerName, opt => opt.MapFrom(src => src.Partner.Name))
-                           //.ForMember(dest => dest.WarehouseName, opt => opt.MapFrom(src => src.Warehouse.Name))
-                           //.ForMember(dest => dest.RequestedWarehouseName, opt => opt.MapFrom(src => src.RequestedWarehouse.Name))
+                            //.ForMember(dest => dest.PartnerName, opt => opt.MapFrom(src => src.Partner.Name))
+                            //.ForMember(dest => dest.WarehouseName, opt => opt.MapFrom(src => src.Warehouse.Name))
+                            //.ForMember(dest => dest.RequestedWarehouseName, opt => opt.MapFrom(src => src.RequestedWarehouse.Name))
+                            .AfterMap((src, dest) =>
+                            {
+                                var (avatarUrl, fullName, groupName) = GetCreatedByInfo(src.CreatedBy);
+                                dest.CreatedByAvatarUrl = avatarUrl;
+                                dest.CreatedByFullName = fullName;
+                                dest.CreatedByGroup = groupName;
+                            })
                            .ReverseMap();
             CreateMap<GoodRequestCreateDTO, GoodRequest>().ReverseMap();
             CreateMap<GoodRequestUpdateDTO, GoodRequest>().ReverseMap();
@@ -287,14 +428,40 @@ namespace BusinessLogicLayer.Mappings
                             .ForMember(dest => dest.BrandName, opt => opt.MapFrom(src => src.Product.Brand.Name))
                             .ForMember(dest => dest.UnitName, opt => opt.MapFrom(src => src.Product.Unit.Name))
                             .ForMember(dest => dest.UnitType, opt => opt.MapFrom(src => src.Product.Unit.Type))
+                             .AfterMap((src, dest) =>
+                             {
+                                 var (avatarUrl, fullName, groupName) = GetCreatedByInfo(src.CreatedBy);
+                                 dest.CreatedByAvatarUrl = avatarUrl;
+                                 dest.CreatedByFullName = fullName;
+                                 dest.CreatedByGroup = groupName;
+                             })
                             .ReverseMap();
-            CreateMap<GoodNoteOfGoodRequestDTO, GoodNote>().ReverseMap();
-            CreateMap<GoodNoteDTOv2, GoodNote>().ReverseMap();
+            CreateMap<GoodNote, GoodNoteOfGoodRequestDTO>().AfterMap((src, dest) =>
+            {
+                var (avatarUrl, fullName, groupName) = GetCreatedByInfo(src.CreatedBy);
+                dest.CreatedByAvatarUrl = avatarUrl;
+                dest.CreatedByFullName = fullName;
+                dest.CreatedByGroup = groupName;
+            }).ReverseMap();
+            CreateMap<GoodNote, GoodNoteDTOv2>().AfterMap((src, dest) =>
+            {
+                var (avatarUrl, fullName, groupName) = GetCreatedByInfo(src.CreatedBy);
+                dest.CreatedByAvatarUrl = avatarUrl;
+                dest.CreatedByFullName = fullName;
+                dest.CreatedByGroup = groupName;
+            }).ReverseMap();
             #endregion
 
             #region GoodNote
             CreateMap<GoodNote, GoodNoteDTO>()
                 //.ForMember(dest => dest.GoodNoteDetails, opt => opt.MapFrom(src => src.GoodNoteDetails))
+                .AfterMap((src, dest) =>
+                {
+                    var (avatarUrl, fullName, groupName) = GetCreatedByInfo(src.CreatedBy);
+                    dest.CreatedByAvatarUrl = avatarUrl;
+                    dest.CreatedByFullName = fullName;
+                    dest.CreatedByGroup = groupName;
+                })
                 .ReverseMap();
 
             //v1 goodnote create
@@ -311,15 +478,48 @@ namespace BusinessLogicLayer.Mappings
                 .ForMember(dest => dest.Date, opt => opt.MapFrom(src => src.GoodNote.Date))
                 .ForMember(dest => dest.CreatedTime, opt => opt.MapFrom(src => src.GoodNote.CreatedTime))
                 .ForMember(dest => dest.CreatedBy, opt => opt.MapFrom(src => src.GoodNote.CreatedBy))
+                .AfterMap((src, dest) =>
+                {
+                    var (avatarUrl, fullName, groupName) = GetCreatedByInfo(src.CreatedBy);
+                    dest.CreatedByAvatarUrl = avatarUrl;
+                    dest.CreatedByFullName = fullName;
+                    dest.CreatedByGroup = groupName;
+                })
                 .ReverseMap();
 
             CreateMap<GoodNoteDetail, GoodNoteDetailDTO>()
                 .ForMember(dest => dest.Batch, opt => opt.MapFrom(src => src.Batch))
                 //.ForMember(dest => dest.Batch.Product, opt => opt.MapFrom(src => src.Batch.Product))
+                .AfterMap((src, dest) =>
+                {
+                    var (avatarUrl, fullName, groupName) = GetCreatedByInfo(src.CreatedBy);
+                    dest.CreatedByAvatarUrl = avatarUrl;
+                    dest.CreatedByFullName = fullName;
+                    dest.CreatedByGroup = groupName;
+                })
                 .ReverseMap();
-            CreateMap<Batch, BatchNoteDTO>().ReverseMap();
+            CreateMap<Batch, BatchNoteDTO>().AfterMap((src, dest) =>
+            {
+                var (avatarUrl, fullName, groupName) = GetCreatedByInfo(src.CreatedBy);
+                dest.CreatedByAvatarUrl = avatarUrl;
+                dest.CreatedByFullName = fullName;
+                dest.CreatedByGroup = groupName;
+            }).ReverseMap();
+            //CreateMap<Product, ProductNoteDTO>().AfterMap((src, dest) =>
+            //{
+            //    var (avatarUrl, fullName, groupName) = GetCreatedByInfo(src.CreatedBy);
+            //    dest.CreatedByAvatarUrl = avatarUrl;
+            //    dest.CreatedByFullName = fullName;
+            //    dest.CreatedByGroup = groupName;
+            //}).ReverseMap();
             CreateMap<Product, ProductNoteDTO>().ReverseMap();
-            CreateMap<GoodRequest, GoodRequestOfGoodNoteDTO>().ReverseMap();
+            CreateMap<GoodRequest, GoodRequestOfGoodNoteDTO>().AfterMap((src, dest) =>
+            {
+                var (avatarUrl, fullName, groupName) = GetCreatedByInfo(src.CreatedBy);
+                dest.CreatedByAvatarUrl = avatarUrl;
+                dest.CreatedByFullName = fullName;
+                dest.CreatedByGroup = groupName;
+            }).ReverseMap();
 
             //v2 goodnote create
             CreateMap<GoodNote, GoodNoteCreateDTOv2>().ReverseMap();
@@ -329,7 +529,13 @@ namespace BusinessLogicLayer.Mappings
 
             #region Partner
             // Map từ Entity -> DTO
-            CreateMap<Partner, PartnerDTO>().ReverseMap();
+            CreateMap<Partner, PartnerDTO>().AfterMap((src, dest) =>
+            {
+                var (avatarUrl, fullName, groupName) = GetCreatedByInfo(src.CreatedBy);
+                dest.CreatedByAvatarUrl = avatarUrl;
+                dest.CreatedByFullName = fullName;
+                dest.CreatedByGroup = groupName;
+            }).ReverseMap();
 
             // Map từ CreateDTO -> Entity
             CreateMap<PartnerCreateDTO, Partner>();

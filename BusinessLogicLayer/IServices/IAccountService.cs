@@ -2,6 +2,7 @@
 using BusinessLogicLayer.Models.Pagination;
 using Data.Enum;
 using Data.Model.DTO;
+using Data.Model.DTO.Base;
 using Data.Model.Request.Account;
 using Data.Model.Response;
 using System;
@@ -18,5 +19,7 @@ namespace BusinessLogicLayer.IServices
         Task<ServiceResponse> Update(string id, AccountUpdateDTO request);
         Task<ServiceResponse> ChangePassword(string id, string oldPassword, string password);
         Task<ServiceResponse> UpdateStatus(string id, AccountStatus status);
+        Task<BaseDTOExtended> GetAccountInfoAsync(string createdById);
+
     }
 }

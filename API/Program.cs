@@ -85,12 +85,19 @@ builder.Services.AddSwaggerGen(option =>
     });
 });
 
-var mapper = new MapperConfiguration(mc =>
+//var mapper = new MapperConfiguration(mc =>
+//{
+//    mc.AddProfile<MappingProfile>();
+//});
+//builder.Services.AddSingleton(mapper.CreateMapper());
+//builder.Services.AddScoped(typeof(BaseDTOExtendedFiller<>));
+//builder.Services.AddAutoMapper(typeof(MappingProfile));
+builder.Services.AddSingleton(provider => new MapperConfiguration(cfg =>
 {
-    mc.AddProfile<MappingProfile>();
-});
-builder.Services.AddSingleton(mapper.CreateMapper());
+    cfg.AddProfile(new MappingProfile(provider.CreateScope().ServiceProvider.GetService<IUnitOfWork>()));
 
+}).CreateMapper());
+//builder.Services.AddScoped(typeof(BaseDTOExtendedFiller<>));
 #region Generic
 builder.Services.AddScoped<IGenericRepository<Warehouse>, GenericRepository<Warehouse>>();
 builder.Services.AddScoped<IGenericRepository<Partner>, GenericRepository<Partner>>();
@@ -180,6 +187,13 @@ builder.Services.AddScoped<IGroupPermissionRepository, GroupPermissionRepository
 builder.Services.AddScoped<IAccountPermissionRepository, AccountPermissionRepository>();
 builder.Services.AddScoped<IAccountGroupRepository, AccountGroupRepository>();
 #endregion Repositories
+
+//builder.Services.AddSingleton(provider => new MapperConfiguration(cfg =>
+//{
+//    cfg.AddProfile(new MappingProfile(provider.CreateScope().ServiceProvider.GetService<IAccountService>()));
+
+//}).CreateMapper());
+
 
 builder.Services.AddAuthentication(options =>
 {

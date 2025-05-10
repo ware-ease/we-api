@@ -70,6 +70,13 @@ namespace DataAccessLayer.Repositories
 
             return userIds;
         }
-
+        public Account GetWithFullInfoNotAsync(string createdById)
+        {
+            return _context.Accounts
+                .Include(account => account.Profile)
+                .Include(account => account.AccountGroups)
+                    .ThenInclude(group => group.Group)
+                .FirstOrDefault(account => account.Id == createdById);  // Trả về kết quả đồng bộ
+        }
     }
 }

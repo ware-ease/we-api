@@ -5,6 +5,7 @@ using BusinessLogicLayer.Utils;
 using Data.Entity;
 using Data.Enum;
 using Data.Model.DTO;
+using Data.Model.DTO.Base;
 using Data.Model.Request.Account;
 using Data.Model.Response;
 using DataAccessLayer.Generic;
@@ -353,6 +354,21 @@ namespace BusinessLogicLayer.Services
                 Status = Data.Enum.SRStatus.Success,
                 Message = "Update status successfully!",
                 Data = { }
+            };
+        }
+        public async Task<BaseDTOExtended> GetAccountInfoAsync(string createdById)
+        {
+            var acc = await _unitOfWork.AccountRepository.GetByCondition(
+                a => a.Id == createdById,
+                includeProperties: "Profile,AccountGroups,AccountGroups.Group");
+
+            if (acc == null) return null;
+
+            return new BaseDTOExtended
+            {
+                CreatedByFullName = acc.Profile.LastName + " " + acc.Profile.FirstName,
+                CreatedByAvatarUrl = acc.Profile.AvatarUrl,
+                CreatedByGroup = acc.AccountGroups.FirstOrDefault()?.Group?.Name
             };
         }
     }

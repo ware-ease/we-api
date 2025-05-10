@@ -39,20 +39,16 @@ namespace API.Controllers
             return ControllerResponse.Response(response);
         }
 
-        //[Authorize]
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> Add([FromBody] CreateWarehouseDTO request)
         {
-            //var authUser = AuthHelper.GetCurrentUser(HttpContext.Request);
+            var authUser = AuthHelper.GetCurrentUser(HttpContext.Request);
 
-            //if (authUser != null)
-            //{
-            //    request.CreatedBy = authUser.id;
-            //}
-            //else
-            //{
-            //    return Unauthorized();
-            //}
+            if (authUser != null)
+            {
+                request.CreatedBy = authUser.id;
+            }
 
             var result = await _warehouseService.Add<WarehouseDTO, CreateWarehouseDTO>(request);
 
