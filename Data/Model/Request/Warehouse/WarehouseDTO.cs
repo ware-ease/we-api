@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace Data.Model.Request.Warehouse
 {
-    public class CreateWarehouseDTO
+    public class CreateWarehouseDTO : BaseCreateDTO
     {
         [Required(ErrorMessage = "Warehouse name is required.")]
         [MaxLength(255, ErrorMessage = "Warehouse name cannot exceed 255 characters.")]

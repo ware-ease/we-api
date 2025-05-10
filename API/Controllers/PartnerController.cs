@@ -1,6 +1,8 @@
-﻿using BusinessLogicLayer.IServices;
+﻿using API.Utils;
+using BusinessLogicLayer.IServices;
 using Data.Model.Request.Partner;
 using Data.Model.Response;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Sprache;
 
@@ -23,7 +25,7 @@ namespace API.Controllers
                                                        [FromQuery] string? keyword = null,
                                                        [FromQuery] int? partnerType = null)
         {
-            var response = await _partnerService.SearchPartners<PartnerDTO>(
+            var response = await _partnerService.SearchPartners(
                 pageIndex, pageSize, keyword, partnerType);
 
             return ControllerResponse.Response(response);
@@ -36,9 +38,15 @@ namespace API.Controllers
             return ControllerResponse.Response(result);
         }
 
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> Add([FromBody] PartnerCreateDTO request)
         {
+            var authUser = AuthHelper.GetCurrentUser(HttpContext.Request);
+            if (authUser != null)
+            {
+                request.CreatedBy = authUser.id;
+            }
             var result = await _partnerService.CreateAsync<PartnerDTO>(request);
             return ControllerResponse.Response(result);
         }

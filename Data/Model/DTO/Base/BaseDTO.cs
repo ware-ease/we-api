@@ -11,5 +11,8 @@ namespace Data.Model.DTO.Base
         public string? Id { get; set; }
         public string? CreatedBy { get; set; }
         public string? CreatedTime { get; set; }
+        public string? CreatedByAvatarUrl { get; set; }
+        public string? CreatedByFullName { get; set; }
+        public string? CreatedByGroup { get; set; }
     }
 }

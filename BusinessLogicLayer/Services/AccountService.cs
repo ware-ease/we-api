@@ -32,15 +32,12 @@ namespace BusinessLogicLayer.Services
             {
                 if (mappedResult.CreatedBy != null)
                 {
-                    var createdBy = await GetCreatedBy(mappedResult.CreatedBy);
-
-                    if (createdBy != null)
+                    var createdByAccount = await _unitOfWork.AccountRepository.GetByCondition(a => a.Id == mappedResult.CreatedBy/*, "Profile,AccountGroups,Group"*/);
+                    if (createdByAccount != null)
                     {
-                        mappedResult.CreatedBy = createdBy!.Username;
-                    }
-                    else
-                    {
-                        mappedResult.CreatedBy = "Deleted user";
+                        mappedResult.CreatedByAvatarUrl = createdByAccount.Profile!.AvatarUrl;
+                        mappedResult.CreatedByFullName = $"{createdByAccount.Profile.FirstName} {createdByAccount.Profile.LastName}";
+                        mappedResult.CreatedByGroup = createdByAccount.AccountGroups.FirstOrDefault()?.Group?.Name;
                     }
                 }
             }

@@ -78,6 +78,16 @@ namespace BusinessLogicLayer.Services
                 includeProperties: "Warehouse,Batch,Batch.Product,Batch.Product.Unit,Batch.Product.Brand");
 
             var mappedResults = _mapper.Map<IEnumerable<InventoryDTOv2>>(results);
+            foreach (var inventory in mappedResults)
+            {
+                var createdByAccount = await _unitOfWork.AccountRepository.GetByCondition(a => a.Id == inventory.CreatedBy, "Profile,AccountGroups,AccountGroups.Group");
+                if (createdByAccount != null)
+                {
+                    inventory.CreatedByAvatarUrl = createdByAccount.Profile!.AvatarUrl;
+                    inventory.CreatedByFullName = $"{createdByAccount.Profile.FirstName} {createdByAccount.Profile.LastName}";
+                    inventory.CreatedByGroup = createdByAccount.AccountGroups.FirstOrDefault()?.Group?.Name;
+                }
+            }
 
             int totalPages = (int)Math.Ceiling((double)totalRecords / (pageSize ?? totalRecords));
 

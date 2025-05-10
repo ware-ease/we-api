@@ -14,7 +14,7 @@ namespace BusinessLogicLayer.IServices
     {
         Task<ServiceResponse> GetFullWarehouseInfo<TResult>(string id);
         Task<ServiceResponse> CreateStructureAsync(CreateWarehouseStructureRequest request);
-        Task<ServiceResponse> SearchWarehouses<TResult>(
+        Task<ServiceResponse> SearchWarehouses(
                                                         int? pageIndex = null,
                                                         int? pageSize = null,
                                                         string? keyword = null,

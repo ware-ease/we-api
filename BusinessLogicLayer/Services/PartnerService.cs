@@ -8,6 +8,7 @@ using Data.Model.Response;
 using DataAccessLayer.Generic;
 using DataAccessLayer.IRepositories;
 using DataAccessLayer.UnitOfWork;
+using Sprache;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -63,7 +64,6 @@ namespace BusinessLogicLayer.Services
         {
             var entities = await _partnerRepository.GetAllNoPaging();
             var result = _mapper.Map<List<TResult>>(entities);
-
             return new ServiceResponse
             {
                 Status = SRStatus.Success,
@@ -199,7 +199,7 @@ namespace BusinessLogicLayer.Services
                 };
             }
         }
-        public async Task<ServiceResponse> SearchPartners<TResult>(int? pageIndex = null, int? pageSize = null,
+        public async Task<ServiceResponse> SearchPartners(int? pageIndex = null, int? pageSize = null,
                                                                    string? keyword = null, int? partnerType = null)
         {
             PartnerEnum? partnerTypeEnum = partnerType.HasValue ? (PartnerEnum?)partnerType.Value : null;
@@ -213,8 +213,18 @@ namespace BusinessLogicLayer.Services
             var results = await _partnerRepository.Search(
                 filter: filter, pageIndex: pageIndex, pageSize: pageSize);
 
-            var mappedResults = _mapper.Map<IEnumerable<TResult>>(results);
+            var mappedResults = _mapper.Map<IEnumerable<PartnerDTO>>(results);
 
+            foreach (var mappedResult in mappedResults)
+            {
+                var createdByAccount = await _unitOfWork.AccountRepository.GetByCondition(a => a.Id == mappedResult.CreatedBy, "Profile,AccountGroups,AccountGroups.Group");
+                if (createdByAccount != null)
+                {
+                    mappedResult.CreatedByAvatarUrl = createdByAccount.Profile!.AvatarUrl;
+                    mappedResult.CreatedByFullName = $"{createdByAccount.Profile.FirstName} {createdByAccount.Profile.LastName}";
+                    mappedResult.CreatedByGroup = createdByAccount.AccountGroups.FirstOrDefault()?.Group?.Name;
+                }
+            }
             int totalPages = (int)Math.Ceiling((double)totalRecords / (pageSize ?? totalRecords));
 
             return new ServiceResponse

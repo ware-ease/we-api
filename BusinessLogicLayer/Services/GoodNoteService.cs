@@ -8,6 +8,8 @@ using Data.Model.Response;
 using DataAccessLayer.Generic;
 using DataAccessLayer.IRepositories;
 using DataAccessLayer.UnitOfWork;
+using Microsoft.IdentityModel.Tokens;
+using System;
 using System.Linq.Expressions;
 
 namespace BusinessLogicLayer.Services
@@ -30,8 +32,8 @@ namespace BusinessLogicLayer.Services
             _codeGeneratorService = codeGeneratorService;
         }
         public async Task<ServiceResponse> SearchGoodNotes(int? pageIndex = null, int? pageSize = null,
-                                                                    string? keyword = null, GoodNoteEnum? goodNoteType = null,
-                                                                    GoodNoteStatusEnum? status = null, string? requestedWarehouseId = null)
+                                                            string? keyword = null, GoodNoteEnum? goodNoteType = null,
+                                                            GoodNoteStatusEnum? status = null, string? requestedWarehouseId = null)
         {
             try
             {
@@ -81,17 +83,24 @@ namespace BusinessLogicLayer.Services
                     ShipperName = g.ShipperName,
                     NoteType = g.NoteType,
                     Status = g.Status,
-                    //GoodRequestId = g.GoodRequestId,
-                    //GoodRequestCode = g.GoodRequest?.Code,
-                    //RequestedWarehouseName = g.GoodRequest?.RequestedWarehouse?.Name,
                     GoodRequest = _mapper.Map<GoodRequestOfGoodNoteDTO>(g.GoodRequest),
                     Code = g.Code,
                     Date = g.Date,
                     CreatedTime = g.CreatedTime.ToString(),
                     CreatedBy = g.CreatedBy,
                     GoodNoteDetails = _mapper.Map<List<GoodNoteDetailDTO>>(details.Where(d => d.GoodNoteId == g.Id).ToList())
-                }).ToList().OrderByDescending(n => n.CreatedTime);
+                });
 
+                foreach (var item in groupedResults)
+                {
+                    var createdByAccount = await _unitOfWork.AccountRepository.GetByCondition(a => a.Id == item.CreatedBy, "Profile,AccountGroups,AccountGroups.Group");
+                    if (createdByAccount != null)
+                    {
+                        item.CreatedByAvatarUrl = createdByAccount.Profile!.AvatarUrl;
+                        item.CreatedByFullName = $"{createdByAccount.Profile.FirstName} {createdByAccount.Profile.LastName}";
+                        item.CreatedByGroup = createdByAccount.AccountGroups.FirstOrDefault()?.Group?.Name;
+                    }
+                }   
                 return new ServiceResponse
                 {
                     Status = Data.Enum.SRStatus.Success,
@@ -102,7 +111,7 @@ namespace BusinessLogicLayer.Services
                         TotalPages = totalPages,
                         PageIndex = pageIndex ?? 1,
                         PageSize = pageSize ?? 5,
-                        Records = groupedResults
+                        Records = groupedResults/*.OrderByDescending(g => g.CreatedTime).ToList()*/
                     }
                 };
             }
@@ -116,8 +125,6 @@ namespace BusinessLogicLayer.Services
                 };
             }
         }
-
-
         public async Task<ServiceResponse> GetById(string id)
         {
             var entities = await _unitOfWork.GoodNoteDetailRepository.Search(g => g.GoodNoteId == id, includeProperties: "GoodNote," +
@@ -256,10 +263,12 @@ namespace BusinessLogicLayer.Services
                             // gán giá trị mặc định
                             batch.InboundDate = DateOnly.FromDateTime(DateTime.Now);
                         }
+                        batch.CreatedBy =  goodNote.CreatedBy;
                         await _unitOfWork.BatchRepository.Add(batch);
                         await _unitOfWork.SaveAsync();
                         detail.BatchId = batch.Id;
                     }
+                    detail.CreatedBy = goodNote.CreatedBy;
                     await _unitOfWork.GoodNoteDetailRepository.Add(detail);
 
                     goodNoteDetails.Add(detail);
@@ -351,6 +360,7 @@ namespace BusinessLogicLayer.Services
                         BatchId = detail.BatchId,
                         CurrentQuantity = detail.Quantity
                     };
+                    inventory.CreatedBy = goodNote.CreatedBy;
                     await _unitOfWork.InventoryRepository.Add(inventory);
                 }
                 else
@@ -526,7 +536,8 @@ namespace BusinessLogicLayer.Services
                 ShipperName = dto.ShipperName,
                 NoteType = GoodNoteEnum.Issue, // Phiếu xuất kho
                 Status = GoodNoteStatusEnum.Completed,
-                GoodRequestId = dto.GoodRequestId
+                GoodRequestId = dto.GoodRequestId,
+                CreatedBy = dto.CreatedBy,
             };
             // Kiểm tra mã phiếu xuất kho đã tồn tại chưa
             var existingNote = await _unitOfWork.GoodNoteRepository.GetByCondition(x => x.Code == goodNote.Code);
@@ -557,7 +568,8 @@ namespace BusinessLogicLayer.Services
                         Quantity = usedQuantity,
                         Note = detailDto.Note,
                         GoodNoteId = goodNoteId,
-                        BatchId = inventory.BatchId
+                        BatchId = inventory.BatchId,
+                        CreatedBy = dto.CreatedBy,
                     };
                     await _unitOfWork.GoodNoteDetailRepository.Add(detail);
 
@@ -659,6 +671,7 @@ namespace BusinessLogicLayer.Services
                     var detail = _mapper.Map<GoodNoteDetail>(detailDto);
                     detail.GoodNoteId = goodNote.Id;
                     detail.CreatedTime = DateTime.Now;
+                    detail.CreatedBy = goodNote.CreatedBy;
                     await _unitOfWork.GoodNoteDetailRepository.Add(detail);
                     goodNoteDetails.Add(detail);
                 }

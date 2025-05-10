@@ -47,11 +47,6 @@ namespace API.Controllers
             if (authUser != null)
             {
                 request.CreatedBy = authUser.id;
-                //request.GoodNoteDetails.ForEach(x =>
-                //{
-                //    x.CreatedBy = authUser.id;
-                //    x.NewBatch!.CreatedBy = authUser.id;
-                //});
             }
 
             var result = await _goodNoteService.CreateReceiveNoteAsync(request);
@@ -94,11 +89,6 @@ namespace API.Controllers
             if (authUser != null)
             {
                 request.CreatedBy = authUser.id;
-                //request.GoodNoteDetails.ForEach(x =>
-                //{
-                //    x.CreatedBy = authUser.id;
-                //    x.NewBatch!.CreatedBy = authUser.id;
-                //});
             }
 
             var result = await _goodNoteService.CreateReceiveNoteWithExistingBatchAsync(request, CodeType.PNNB);
@@ -113,11 +103,6 @@ namespace API.Controllers
             if (authUser != null)
             {
                 request.CreatedBy = authUser.id;
-                //request.GoodNoteDetails.ForEach(x =>
-                //{
-                //    x.CreatedBy = authUser.id;
-                //    x.NewBatch!.CreatedBy = authUser.id;
-                //});
             }
 
             var result = await _goodNoteService.CreateReceiveNoteWithExistingBatchAsync(request, CodeType.PN);

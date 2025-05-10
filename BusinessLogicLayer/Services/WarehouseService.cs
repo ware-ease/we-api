@@ -4,6 +4,7 @@ using BusinessLogicLayer.Generic;
 using BusinessLogicLayer.IServices;
 using Data.Entity;
 using Data.Enum;
+using Data.Model.DTO;
 using Data.Model.DTO.Base;
 using Data.Model.Request.Area;
 using Data.Model.Request.Inventory;
@@ -17,6 +18,7 @@ using DataAccessLayer.UnitOfWork;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualBasic;
 using Org.BouncyCastle.Tls;
+using Sprache;
 using System;
 using System.Linq.Expressions;
 
@@ -241,7 +243,7 @@ namespace BusinessLogicLayer.Services
             }
         }
 
-        public async Task<ServiceResponse> SearchWarehouses<TResult>(int? pageIndex = null, int? pageSize = null,
+        public async Task<ServiceResponse> SearchWarehouses(int? pageIndex = null, int? pageSize = null,
                                                                      string? keyword = null, float? minArea = null, float? maxArea = null)
         {
             Expression<Func<Warehouse, bool>> filter = w =>
@@ -254,8 +256,17 @@ namespace BusinessLogicLayer.Services
             var results = await _warehouseRepository.Search(
                 filter: filter, pageIndex: pageIndex, pageSize: pageSize);
 
-            var mappedResults = _mapper.Map<IEnumerable<TResult>>(results);
-
+            var mappedResults = _mapper.Map<IEnumerable<WarehouseDTO>>(results);
+            foreach (var mappedResult in mappedResults)
+            {
+                var createdByAccount = await _unitOfWork.AccountRepository.GetByCondition(a => a.Id == mappedResult.CreatedBy, "Profile,AccountGroups,AccountGroups.Group");
+                if (createdByAccount != null)
+                {
+                    mappedResult.CreatedByAvatarUrl = createdByAccount.Profile!.AvatarUrl;
+                    mappedResult.CreatedByFullName = $"{createdByAccount.Profile.FirstName} {createdByAccount.Profile.LastName}";
+                    mappedResult.CreatedByGroup = createdByAccount.AccountGroups.FirstOrDefault()?.Group?.Name;
+                }
+            }
             int totalPages = (int)Math.Ceiling((double)totalRecords / (pageSize ?? totalRecords));
 
             return new ServiceResponse
@@ -291,7 +302,7 @@ namespace BusinessLogicLayer.Services
                 };
             }
             var result = _mapper.Map<WarehouseInventoryDTO>(warehouse);
-            result.Inventories = _mapper.Map<IEnumerable<InventoryDTO>>(warehouse.Inventories);
+            result.Inventories = _mapper.Map<IEnumerable<Data.Model.Request.Inventory.InventoryDTO>>(warehouse.Inventories);
 
             return new ServiceResponse
             {
