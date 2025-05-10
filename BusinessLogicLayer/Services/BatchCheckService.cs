@@ -39,6 +39,8 @@ namespace BusinessLogicLayer.Services
 
                 using var scope = _scopeFactory.CreateScope();
                 var _warehouseRepository = scope.ServiceProvider.GetRequiredService<IGenericRepository<Warehouse>>();
+                var _batchRepository = scope.ServiceProvider.GetRequiredService<IGenericRepository<Batch>>();
+                var _productRepository = scope.ServiceProvider.GetRequiredService<IGenericRepository<Product>>();
                 var _inventoryRepository = scope.ServiceProvider.GetRequiredService<IGenericRepository<Inventory>>();
                 var _accountRepository = scope.ServiceProvider.GetRequiredService<IGenericRepository<Account>>();
                 var _firebaseService = scope.ServiceProvider.GetRequiredService<IFirebaseService>();
@@ -82,6 +84,7 @@ namespace BusinessLogicLayer.Services
                                 continue;
 
                             var daysUntilExpiry = (batch.ExpDate.Value.ToDateTime(TimeOnly.MinValue) - DateTime.Now).TotalDays;
+                            var product = await _productRepository.GetByCondition(p => p.Id == batch.ProductId);
 
                             switch (daysUntilExpiry)
                             {
@@ -94,10 +97,11 @@ namespace BusinessLogicLayer.Services
                                         else
                                         {
                                             batch.AlertLevel = 2;
-                                            _inventoryRepository.Update(inventory);
+                                            _batchRepository.Update(batch);
                                             await _unitOfWork.SaveAsync();
-                                            await _firebaseService.SendNotificationToUsersAsync(managers, "Lô gần hết hạn.", $"Batch Id: {batch.Id}", NotificationType.ALERT_LEVEL_2, null);
-                                            _logger.LogInformation($"[BatchCheckService] Gửi cảnh báo bậc 2 cho batch {batch.Id} tại kho {warehouse.Name}, hết hạn sau {daysUntilExpiry} ngày.");
+                                            await _firebaseService.SendNotificationToUsersAsync(managers, "Lô gần hết hạn.", $"Lô {batch.Code} thuộc sản phẩm {product.Sku} sẽ hết hạn vào ngày {batch.ExpDate.Value.ToString("dd/MM/yyyy")}(còn {daysUntilExpiry} ngày trước khi hết hạn)", NotificationType.ALERT_LEVEL_2, null);
+                                            //_logger.LogInformation($"[BatchCheckService] Gửi cảnh báo bậc 2 cho batch {batch.Id} tại kho {warehouse.Name}, hết hạn sau {daysUntilExpiry} ngày.");
+                                            //_logger.LogInformation($"Lô {batch.Code} thuộc sản phẩm {product.Sku} sẽ hết hạn vào ngày {batch.ExpDate.Value.ToString("dd/MM/yyyy")}");
                                         }
                                         break;
                                     }
@@ -110,10 +114,11 @@ namespace BusinessLogicLayer.Services
                                         else
                                         {
                                             batch.AlertLevel = 1;
-                                            _inventoryRepository.Update(inventory);
+                                            _batchRepository.Update(batch);
                                             await _unitOfWork.SaveAsync();
-                                            await _firebaseService.SendNotificationToUsersAsync(managers, "Lô sắp hết hạn.", $"Batch Id: {batch.Id}", NotificationType.ALERT_LEVEL_1, null);
-                                            _logger.LogInformation($"[BatchCheckService] Gửi cảnh báo bậc 1 cho batch {batch.Id} tại kho {warehouse.Name}, hết hạn sau {daysUntilExpiry} ngày.");
+                                            await _firebaseService.SendNotificationToUsersAsync(managers, "Lô gần hết hạn.", $"Lô {batch.Code} thuộc sản phẩm {product.Sku} sẽ hết hạn vào ngày {batch.ExpDate.Value.ToString("dd/MM/yyyy")}(còn {daysUntilExpiry} ngày trước khi hết hạn)", NotificationType.ALERT_LEVEL_1, null);
+                                            //_logger.LogInformation($"[BatchCheckService] Gửi cảnh báo bậc 1 cho batch {batch.Id} tại kho {warehouse.Name}, hết hạn sau {daysUntilExpiry} ngày.");
+                                            //_logger.LogInformation($"Lô {batch.Code} thuộc sản phẩm {product.Sku} sẽ hết hạn vào ngày {batch.ExpDate.Value.ToString("dd/MM/yyyy")}");
                                         }
                                         break;
                                     }
@@ -124,6 +129,7 @@ namespace BusinessLogicLayer.Services
                         
                     }
                     skip += batchSize;
+                    //await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken);
                     await Task.Delay(TimeSpan.FromMinutes(5), stoppingToken);
                 }
             }
