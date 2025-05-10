@@ -180,6 +180,7 @@ namespace BusinessLogicLayer.Services
                             Data = detail.ProductId
                         };
                     }
+                    detail.CreatedBy = request.CreatedBy;
                 }
             }
 
@@ -460,7 +461,7 @@ namespace BusinessLogicLayer.Services
                     pageSize: pageSize
                 );
 
-                var mappedResults = _mapper.Map<IEnumerable<GoodRequestDTO>>(results);
+                var mappedResults = _mapper.Map<IEnumerable<GoodRequestDTO>>(results).ToList();
 
                 foreach (var goodRequest in mappedResults)
                 {
@@ -469,6 +470,13 @@ namespace BusinessLogicLayer.Services
                     //{
                     //    //goodRequest.GoodNote = _mapper.Map<GoodNoteOfGoodRequestDTO>(goodNote);
                     //}
+                    var createdByAccount = await _unitOfWork.AccountRepository.GetByCondition(a => a.Id == goodRequest.CreatedBy, "Profile,AccountGroups,AccountGroups.Group");
+                    if (createdByAccount != null)
+                    {
+                        goodRequest.CreatedByAvatarUrl = createdByAccount.Profile!.AvatarUrl;
+                        goodRequest.CreatedByFullName = $"{createdByAccount.Profile.FirstName} {createdByAccount.Profile.LastName}";
+                        goodRequest.CreatedByGroup = createdByAccount.AccountGroups.FirstOrDefault()?.Group?.Name;
+                    }
                     await AttachGoodNoteToGoodRequest(goodRequest);
                     goodRequest.GoodNoteCount = await _unitOfWork.GoodNoteRepository.Count(g => g.GoodRequestId == goodRequest.Id);
 
