@@ -237,23 +237,21 @@ namespace BusinessLogicLayer.Services
 
                 foreach (var detailDto in request.GoodNoteDetails)
                 {
-                    // Kiểm tra điều kiện: chỉ được có 1 trong 2
-                    var hasNewBatch = detailDto.NewBatch != null;
                     // Tạo chi tiết
                     var detail = _mapper.Map<GoodNoteDetail>(detailDto);
                     detail.GoodNoteId = goodNote.Id;
                     detail.CreatedTime = DateTime.Now;
-                    if (hasNewBatch)
+                    if (detailDto.NewBatch != null)
                     {
                         // Tạo batch mới
                         var batch = _mapper.Map<Batch>(detailDto.NewBatch);
                         // Sinh mã cho batch
-                        batch.Code = await _codeGeneratorService.GenerateCodeAsync(CodeType.LO);
+                        batch.Code = await _codeGeneratorService.GenerateBatchCodeByProductAsync(batch.ProductId);
                         batch.Name = goodNote.Code;
                         // Kiểm tra mã lô trùng
-                        var existingBatch = await _unitOfWork.BatchRepository.GetByCondition(x => x.Code == batch.Code);
-                        if (existingBatch != null)
-                            throw new InvalidOperationException($"Mã lô {batch.Code} đã tồn tại.");
+                        //var existingBatch = await _unitOfWork.BatchRepository.GetByCondition(x => x.Code == batch.Code);
+                        //if (existingBatch != null)
+                        //    throw new InvalidOperationException($"Mã lô {batch.Code} đã tồn tại.");
                         if (request.Date.HasValue)
                         {
                             batch.InboundDate = DateOnly.FromDateTime(request.Date.Value);

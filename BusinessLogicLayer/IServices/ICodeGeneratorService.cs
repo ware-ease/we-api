@@ -10,5 +10,6 @@ namespace BusinessLogicLayer.IServices
     public interface ICodeGeneratorService
     {
         Task<string> GenerateCodeAsync(CodeType codeType);
+        Task<string> GenerateBatchCodeByProductAsync(string productId);
     }
 }

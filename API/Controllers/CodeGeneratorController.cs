@@ -28,5 +28,18 @@ namespace API.Controllers
                 return BadRequest(new { error = ex.Message });
             }
         }
+        [HttpGet("generate-batch-code")]
+        public async Task<IActionResult> GenerateBatchCodeByProduct([FromQuery] string productId)
+        {
+            try
+            {
+                var newCode = await _codeGeneratorService.GenerateBatchCodeByProductAsync(productId);
+                return Ok(new { productId, newCode });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
     }
 }
