@@ -124,5 +124,31 @@ namespace BusinessLogicLayer.Services
 
             return $"{prefix}{nextNumber:D5}";
         }
+        public async Task<string> GenerateBatchCodeByProductAsync(string productId)
+        {
+            string datePart = DateTime.Now.ToString("yyyyMMdd");
+            string prefix = $"B{datePart}";
+
+            var batches = await _unitOfWork.BatchRepository.Search(
+                x => x.ProductId == productId && x.Code.StartsWith(prefix),
+                q => q.OrderBy(x => x.Code),
+                "",
+                1, int.MaxValue
+            );
+
+            int maxIndex = batches
+                .Select(b =>
+                {
+                    var parts = b.Code.Split('-');
+                    return parts.Length == 2 && int.TryParse(parts[1], out int n) ? n : 0;
+                })
+                .DefaultIfEmpty(0)
+                .Max();
+
+            int nextIndex = maxIndex + 1;
+
+            return $"{prefix}-{nextIndex}";
+        }
+
     }
 }
