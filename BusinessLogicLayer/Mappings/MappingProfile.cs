@@ -167,6 +167,7 @@ namespace BusinessLogicLayer.Mappings
                 .ReverseMap();
 
             CreateMap<InventoryAdjustment, InventoryAdjustmentCreateDTO>().ReverseMap();
+            CreateMap<InventoryAdjustment, InventoryAdjustmentCreateDTOv2>().ReverseMap();
             CreateMap<InventoryAdjustment, InventoryAdjustmentUpdateDTO>().ReverseMap();
             #endregion
 
@@ -175,6 +176,7 @@ namespace BusinessLogicLayer.Mappings
                 .ReverseMap();
 
             CreateMap<InventoryAdjustmentDetail, InventoryAdjustmentDetailCreateDTO>().ReverseMap();
+            CreateMap<InventoryAdjustmentDetail, InventoryAdjustmentDetailCreateDTOv2>().ReverseMap();
             CreateMap<InventoryAdjustmentDetail, InventoryAdjustmentDetailUpdateDTO>().ReverseMap();
             #endregion
 
