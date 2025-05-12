@@ -52,6 +52,193 @@ namespace BusinessLogicLayer.Services
             _codeGeneratorService = codeGeneratorService;
         }
 
+        public async Task<InventoryAdjustmentDTO> AddInventoryAdjustmentWithDetail(InventoryAdjustmentCreateDTOv2 request)
+        {
+            using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+            {
+                try
+                {
+                    if (request.Date > DateTime.Now)
+                        throw new Exception("Date không được ở tương lai");
+                    var warehouse = await _warehouseRepository.GetByCondition(p => p.Id == request.WarehouseId);
+                    if (warehouse == null)
+                        throw new Exception("Warehouse không tồn tại");
+                    var inventoryAdjustment = _mapper.Map<InventoryAdjustment>(request);
+                    inventoryAdjustment.WarehouseId = request.WarehouseId;
+                    if (request.DocumentType.HasValue && (request.DocumentType != Data.Enum.DocumentType.GoodNote && request.DocumentType != Data.Enum.DocumentType.InventoryCount))
+                        throw new Exception("DocumentType không hợp lệ");
+                    if (!string.IsNullOrEmpty(request.RelatedDocument))
+                    {
+                        var inventoryCount = await _inventoryCountRepository.GetByCondition(p => p.Id == request.RelatedDocument);
+                        if (inventoryCount != null)
+                        {
+                            inventoryCount.Status = Data.Enum.InventoryCountStatus.OnTime;
+                            _inventoryCountRepository.Update(inventoryCount);
+                        }
+                    }
+                    await _genericRepository.Insert(inventoryAdjustment);
+                    await _unitOfWork.SaveAsync();
+                    foreach (var detailDto in request.InventoryAdjustmentDetails)
+                    {
+                        var inventoryAdjustmentDetail = _mapper.Map<InventoryAdjustmentDetail>(detailDto);
+                        inventoryAdjustmentDetail.InventoryAdjustmentId = inventoryAdjustment.Id;
+                        switch (detailDto.ChangeInQuantity)
+                        {
+                            case > 0:
+                                {
+                                    var inventory = await _inventoryRepository.GetByCondition(p => p.Id == detailDto.InventoryId,
+                                        includeProperties: "Batch");
+                                    if (inventory == null)
+                                        throw new Exception($"Inventory với Id {detailDto.InventoryId} không tồn tại");
+                                    if (inventory.WarehouseId != request.WarehouseId)
+                                        throw new Exception($"Inventory với Id {detailDto.InventoryId} không thuộc Warehouse với Id {request.WarehouseId}");
+
+                                    inventoryAdjustmentDetail.NewQuantity = inventory.CurrentQuantity + detailDto.ChangeInQuantity;
+
+                                    await _inventoryAdjustmentDetailRepository.Insert(inventoryAdjustmentDetail);
+                                    await _unitOfWork.SaveAsync();
+
+                                    var goodRequestEntity = new GoodRequest
+                                    {
+                                        Note = "From adjustment detail ID: " + inventoryAdjustmentDetail.Id,
+                                        Code = await _codeGeneratorService.GenerateCodeAsync(Data.Enum.CodeType.YCN),
+                                        RequestType = Data.Enum.GoodRequestEnum.Receive,
+                                        //WarehouseId = null,
+                                        RequestedWarehouseId = request.WarehouseId,
+                                        CreatedBy = request.CreatedBy,
+                                        Status = Data.Enum.GoodRequestStatusEnum.Completed,
+                                        GoodRequestDetails = new List<GoodRequestDetail>
+                                        {
+                                            new GoodRequestDetail
+                                            {
+                                                Quantity = detailDto.ChangeInQuantity,
+                                                ProductId = inventory.Batch.ProductId,
+                                                CreatedBy = request.CreatedBy
+                                            }
+                                        }
+                                    };
+                                    await _unitOfWork.GoodRequestRepository.Insert(goodRequestEntity);
+                                    await _unitOfWork.SaveAsync();
+
+
+                                    var goodNoteEntity = new GoodNote
+                                    {
+                                        NoteType = Data.Enum.GoodNoteEnum.Receive,
+                                        ShipperName = null,
+                                        ReceiverName = null,
+                                        Code = await _codeGeneratorService.GenerateCodeAsync(Data.Enum.CodeType.PNDC),
+                                        Date = request.Date,
+                                        GoodRequestId = goodRequestEntity.Id,
+                                    };
+                                    await _unitOfWork.GoodNoteRepository.Insert(goodNoteEntity);
+                                    await _unitOfWork.SaveAsync();
+
+                                    var goodNoteDetailEntity = new GoodNoteDetail
+                                    {
+                                        Quantity = detailDto.ChangeInQuantity,
+                                        Note = "Receive Adjustment with manually created Details",
+                                        CreatedBy = request.CreatedBy,
+                                        BatchId = inventory.BatchId,
+                                        GoodNoteId = goodNoteEntity.Id
+                                    };
+                                    await _unitOfWork.GoodNoteDetailRepository.Insert(goodNoteDetailEntity);
+                                    await _unitOfWork.SaveAsync();
+
+                                    var inventoryUpdate = await _inventoryRepository.GetByCondition(p => p.Id == detailDto.InventoryId);
+                                    if (inventoryUpdate == null)
+                                        throw new Exception($"Inventory với Id {detailDto.InventoryId} không tồn tại");
+                                    inventoryUpdate.CurrentQuantity = inventoryUpdate.CurrentQuantity + detailDto.ChangeInQuantity;
+                                    _inventoryRepository.Update(inventoryUpdate);
+                                    await _unitOfWork.SaveAsync();
+
+                                    break;
+                                }
+                            case < 0:
+                                {
+                                    {
+                                        var inventory = await _inventoryRepository.GetByCondition(p => p.Id == detailDto.InventoryId,
+                                            includeProperties: "Inventory.Batch");
+                                        if (inventory == null)
+                                            throw new Exception($"Inventory với Id {detailDto.InventoryId} không tồn tại");
+                                        if (inventory.WarehouseId != request.WarehouseId)
+                                            throw new Exception($"Inventory với Id {detailDto.InventoryId} không thuộc Warehouse với Id {request.WarehouseId}");
+
+                                        inventoryAdjustmentDetail.NewQuantity = inventory.CurrentQuantity + detailDto.ChangeInQuantity;
+
+                                        await _inventoryAdjustmentDetailRepository.Insert(inventoryAdjustmentDetail);
+                                        await _unitOfWork.SaveAsync();
+
+                                        var goodRequestEntity = new GoodRequest
+                                        {
+                                            Note = "From adjustment detail ID: " + inventoryAdjustmentDetail.Id,
+                                            Code = await _codeGeneratorService.GenerateCodeAsync(Data.Enum.CodeType.YCN),
+                                            RequestType = Data.Enum.GoodRequestEnum.Issue,
+                                            //WarehouseId = null,
+                                            RequestedWarehouseId = request.WarehouseId,
+                                            CreatedBy = request.CreatedBy,
+                                            Status = Data.Enum.GoodRequestStatusEnum.Completed,
+                                            GoodRequestDetails = new List<GoodRequestDetail>
+                                        {
+                                            new GoodRequestDetail
+                                            {
+                                                Quantity = detailDto.ChangeInQuantity,
+                                                ProductId = inventory.Batch.ProductId,
+                                                CreatedBy = request.CreatedBy
+                                            }
+                                        }
+                                        };
+                                        await _unitOfWork.GoodRequestRepository.Insert(goodRequestEntity);
+                                        await _unitOfWork.SaveAsync();
+
+
+                                        var goodNoteEntity = new GoodNote
+                                        {
+                                            NoteType = Data.Enum.GoodNoteEnum.Issue,
+                                            ShipperName = null,
+                                            ReceiverName = null,
+                                            Code = await _codeGeneratorService.GenerateCodeAsync(Data.Enum.CodeType.PNDC),
+                                            Date = request.Date,
+                                            GoodRequestId = goodRequestEntity.Id,
+                                        };
+                                        await _unitOfWork.GoodNoteRepository.Insert(goodNoteEntity);
+                                        await _unitOfWork.SaveAsync();
+
+                                        var goodNoteDetailEntity = new GoodNoteDetail
+                                        {
+                                            Quantity = detailDto.ChangeInQuantity,
+                                            Note = "Issue Adjustment with manually created Details",
+                                            CreatedBy = request.CreatedBy,
+                                            BatchId = inventory.BatchId,
+                                            GoodNoteId = goodNoteEntity.Id
+                                        };
+                                        await _unitOfWork.GoodNoteDetailRepository.Insert(goodNoteDetailEntity);
+                                        await _unitOfWork.SaveAsync();
+
+                                        var inventoryUpdate = await _inventoryRepository.GetByCondition(p => p.Id == detailDto.InventoryId);
+                                        if (inventoryUpdate == null)
+                                            throw new Exception($"Inventory với Id {detailDto.InventoryId} không tồn tại");
+                                        inventoryUpdate.CurrentQuantity = inventoryUpdate.CurrentQuantity + detailDto.ChangeInQuantity;
+                                        _inventoryRepository.Update(inventoryUpdate);
+                                        await _unitOfWork.SaveAsync();
+
+                                        break;
+                                    }
+                                }
+                            default:
+                                throw new Exception("ChangeInQuantity không hợp lệ");
+                        }
+                        //await _genericRepository.Insert(inventoryAdjustment);
+                        await _unitOfWork.SaveAsync();
+                    }
+                    scope.Complete();
+                    return _mapper.Map<InventoryAdjustmentDTO>(inventoryAdjustment);
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception($"Lỗi khi thêm InventoryAdjustment: {ex.Message}");
+                }
+            }
+        }
 
         public async Task<InventoryAdjustmentDTO> AddInventoryAdjustment(InventoryAdjustmentCreateDTO request)
         {
@@ -68,8 +255,7 @@ namespace BusinessLogicLayer.Services
                         throw new Exception("Warehouse không tồn tại");
 
                     var inventoryCount = await _inventoryCountRepository.GetByCondition(x => x.Id == request.InventoryCountId,
-                        includeProperties: "InventoryCheckDetails,InventoryCheckDetails.Inventory.Batch.Product"
-    );
+                        includeProperties: "InventoryCheckDetails,InventoryCheckDetails.Inventory.Batch.Product");
                     if (inventoryCount == null)
                         throw new Exception("InventoryCount không tồn tại");
 
