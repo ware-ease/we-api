@@ -68,7 +68,7 @@ namespace DataAccessLayer.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Account");
+                    b.ToTable("Account", (string)null);
                 });
 
             modelBuilder.Entity("Data.Entity.AccountGroup", b =>
@@ -111,7 +111,7 @@ namespace DataAccessLayer.Migrations
 
                     b.HasIndex("GroupId");
 
-                    b.ToTable("AccountGroup");
+                    b.ToTable("AccountGroup", (string)null);
                 });
 
             modelBuilder.Entity("Data.Entity.AccountNotification", b =>
@@ -154,7 +154,7 @@ namespace DataAccessLayer.Migrations
 
                     b.HasIndex("NotificationId");
 
-                    b.ToTable("AccountNotification");
+                    b.ToTable("AccountNotification", (string)null);
                 });
 
             modelBuilder.Entity("Data.Entity.AccountPermission", b =>
@@ -197,7 +197,7 @@ namespace DataAccessLayer.Migrations
 
                     b.HasIndex("PermissionId");
 
-                    b.ToTable("AccountPermission");
+                    b.ToTable("AccountPermission", (string)null);
                 });
 
             modelBuilder.Entity("Data.Entity.AccountWarehouse", b =>
@@ -249,7 +249,7 @@ namespace DataAccessLayer.Migrations
 
                     b.HasIndex("WarehouseId");
 
-                    b.ToTable("AccountWarehouse");
+                    b.ToTable("AccountWarehouse", (string)null);
                 });
 
             modelBuilder.Entity("Data.Entity.Batch", b =>
@@ -307,7 +307,7 @@ namespace DataAccessLayer.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("Batch");
+                    b.ToTable("Batch", (string)null);
                 });
 
             modelBuilder.Entity("Data.Entity.Brand", b =>
@@ -341,7 +341,7 @@ namespace DataAccessLayer.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Brand");
+                    b.ToTable("Brand", (string)null);
                 });
 
             modelBuilder.Entity("Data.Entity.Category", b =>
@@ -378,7 +378,7 @@ namespace DataAccessLayer.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Category");
+                    b.ToTable("Category", (string)null);
                 });
 
             modelBuilder.Entity("Data.Entity.ErrorTicket", b =>
@@ -427,7 +427,7 @@ namespace DataAccessLayer.Migrations
 
                     b.HasIndex("InventoryCountDetailId");
 
-                    b.ToTable("ErrorTicket");
+                    b.ToTable("ErrorTicket", (string)null);
                 });
 
             modelBuilder.Entity("Data.Entity.GoodNote", b =>
@@ -482,7 +482,7 @@ namespace DataAccessLayer.Migrations
 
                     b.HasIndex("GoodRequestId");
 
-                    b.ToTable("GoodNote");
+                    b.ToTable("GoodNote", (string)null);
                 });
 
             modelBuilder.Entity("Data.Entity.GoodNoteDetail", b =>
@@ -531,7 +531,7 @@ namespace DataAccessLayer.Migrations
 
                     b.HasIndex("GoodNoteId");
 
-                    b.ToTable("GoodNoteDetail");
+                    b.ToTable("GoodNoteDetail", (string)null);
                 });
 
             modelBuilder.Entity("Data.Entity.GoodRequest", b =>
@@ -592,7 +592,7 @@ namespace DataAccessLayer.Migrations
 
                     b.HasIndex("WarehouseId");
 
-                    b.ToTable("GoodRequest");
+                    b.ToTable("GoodRequest", (string)null);
                 });
 
             modelBuilder.Entity("Data.Entity.GoodRequestDetail", b =>
@@ -638,7 +638,7 @@ namespace DataAccessLayer.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("GoodRequestDetails");
+                    b.ToTable("GoodRequestDetails", (string)null);
                 });
 
             modelBuilder.Entity("Data.Entity.Group", b =>
@@ -672,7 +672,7 @@ namespace DataAccessLayer.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Group");
+                    b.ToTable("Group", (string)null);
                 });
 
             modelBuilder.Entity("Data.Entity.GroupPermission", b =>
@@ -715,7 +715,7 @@ namespace DataAccessLayer.Migrations
 
                     b.HasIndex("PermissionId");
 
-                    b.ToTable("GroupPermission");
+                    b.ToTable("GroupPermission", (string)null);
                 });
 
             modelBuilder.Entity("Data.Entity.Inventory", b =>
@@ -767,7 +767,7 @@ namespace DataAccessLayer.Migrations
 
                     b.HasIndex("WarehouseId");
 
-                    b.ToTable("Inventory");
+                    b.ToTable("Inventory", (string)null);
                 });
 
             modelBuilder.Entity("Data.Entity.InventoryAdjustment", b =>
@@ -819,7 +819,7 @@ namespace DataAccessLayer.Migrations
 
                     b.HasIndex("WarehouseId");
 
-                    b.ToTable("InventoryAdjustment");
+                    b.ToTable("InventoryAdjustment", (string)null);
                 });
 
             modelBuilder.Entity("Data.Entity.InventoryAdjustmentDetail", b =>
@@ -870,7 +870,7 @@ namespace DataAccessLayer.Migrations
 
                     b.HasIndex("InventoryId");
 
-                    b.ToTable("InventoryAdjustmentDetail");
+                    b.ToTable("InventoryAdjustmentDetail", (string)null);
                 });
 
             modelBuilder.Entity("Data.Entity.InventoryCount", b =>
@@ -929,7 +929,7 @@ namespace DataAccessLayer.Migrations
                         .IsUnique()
                         .HasFilter("[ScheduleId] IS NOT NULL");
 
-                    b.ToTable("InventoryCount");
+                    b.ToTable("InventoryCount", (string)null);
                 });
 
             modelBuilder.Entity("Data.Entity.InventoryCountDetail", b =>
@@ -990,7 +990,7 @@ namespace DataAccessLayer.Migrations
 
                     b.HasIndex("InventoryId");
 
-                    b.ToTable("InventoryCountDetail");
+                    b.ToTable("InventoryCountDetail", (string)null);
                 });
 
             modelBuilder.Entity("Data.Entity.InventoryLocation", b =>
@@ -1036,7 +1036,7 @@ namespace DataAccessLayer.Migrations
 
                     b.HasIndex("LocationId");
 
-                    b.ToTable("InventoryLocation");
+                    b.ToTable("InventoryLocation", (string)null);
                 });
 
             modelBuilder.Entity("Data.Entity.IssueDetail", b =>
@@ -1079,7 +1079,7 @@ namespace DataAccessLayer.Migrations
 
                     b.HasIndex("NoteId");
 
-                    b.ToTable("IssueDetail");
+                    b.ToTable("IssueDetail", (string)null);
                 });
 
             modelBuilder.Entity("Data.Entity.IssueNote", b =>
@@ -1133,7 +1133,7 @@ namespace DataAccessLayer.Migrations
 
                     b.HasIndex("WarehouseId");
 
-                    b.ToTable("IssueNote");
+                    b.ToTable("IssueNote", (string)null);
                 });
 
             modelBuilder.Entity("Data.Entity.Location", b =>
@@ -1184,7 +1184,7 @@ namespace DataAccessLayer.Migrations
 
                     b.HasIndex("WarehouseId");
 
-                    b.ToTable("Location");
+                    b.ToTable("Location", (string)null);
                 });
 
             modelBuilder.Entity("Data.Entity.LocationLog", b =>
@@ -1230,7 +1230,7 @@ namespace DataAccessLayer.Migrations
 
                     b.HasIndex("InventoryLocationId");
 
-                    b.ToTable("LocationLog");
+                    b.ToTable("LocationLog", (string)null);
                 });
 
             modelBuilder.Entity("Data.Entity.Notification", b =>
@@ -1270,7 +1270,7 @@ namespace DataAccessLayer.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Notification");
+                    b.ToTable("Notification", (string)null);
                 });
 
             modelBuilder.Entity("Data.Entity.Partner", b =>
@@ -1313,7 +1313,7 @@ namespace DataAccessLayer.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Partner");
+                    b.ToTable("Partner", (string)null);
                 });
 
             modelBuilder.Entity("Data.Entity.Permission", b =>
@@ -1353,7 +1353,7 @@ namespace DataAccessLayer.Migrations
 
                     b.HasIndex("RouteId");
 
-                    b.ToTable("Permission");
+                    b.ToTable("Permission", (string)null);
                 });
 
             modelBuilder.Entity("Data.Entity.Product", b =>
@@ -1414,7 +1414,7 @@ namespace DataAccessLayer.Migrations
 
                     b.HasIndex("UnitId");
 
-                    b.ToTable("Product");
+                    b.ToTable("Product", (string)null);
                 });
 
             modelBuilder.Entity("Data.Entity.ProductType", b =>
@@ -1457,7 +1457,7 @@ namespace DataAccessLayer.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.ToTable("ProductType");
+                    b.ToTable("ProductType", (string)null);
                 });
 
             modelBuilder.Entity("Data.Entity.Profile", b =>
@@ -1516,7 +1516,7 @@ namespace DataAccessLayer.Migrations
                     b.HasIndex("AccountId")
                         .IsUnique();
 
-                    b.ToTable("Profile");
+                    b.ToTable("Profile", (string)null);
                 });
 
             modelBuilder.Entity("Data.Entity.ReceivingDetail", b =>
@@ -1562,7 +1562,7 @@ namespace DataAccessLayer.Migrations
 
                     b.HasIndex("receivingNoteId");
 
-                    b.ToTable("ReceivingDetail");
+                    b.ToTable("ReceivingDetail", (string)null);
                 });
 
             modelBuilder.Entity("Data.Entity.ReceivingNote", b =>
@@ -1613,7 +1613,7 @@ namespace DataAccessLayer.Migrations
 
                     b.HasIndex("WarehouseId");
 
-                    b.ToTable("ReceivingNote");
+                    b.ToTable("ReceivingNote", (string)null);
                 });
 
             modelBuilder.Entity("Data.Entity.RefreshToken", b =>
@@ -1657,7 +1657,7 @@ namespace DataAccessLayer.Migrations
 
                     b.HasIndex("AccountId");
 
-                    b.ToTable("RefreshToken");
+                    b.ToTable("RefreshToken", (string)null);
                 });
 
             modelBuilder.Entity("Data.Entity.Route", b =>
@@ -1694,7 +1694,7 @@ namespace DataAccessLayer.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Route");
+                    b.ToTable("Route", (string)null);
                 });
 
             modelBuilder.Entity("Data.Entity.Schedule", b =>
@@ -1740,7 +1740,7 @@ namespace DataAccessLayer.Migrations
 
                     b.HasIndex("WarehouseId");
 
-                    b.ToTable("Schedule");
+                    b.ToTable("Schedule", (string)null);
                 });
 
             modelBuilder.Entity("Data.Entity.ScheduleSetting", b =>
@@ -1787,7 +1787,7 @@ namespace DataAccessLayer.Migrations
 
                     b.HasIndex("LocationId");
 
-                    b.ToTable("ScheduleSetting");
+                    b.ToTable("ScheduleSetting", (string)null);
                 });
 
             modelBuilder.Entity("Data.Entity.StockBook", b =>
@@ -1839,7 +1839,7 @@ namespace DataAccessLayer.Migrations
 
                     b.HasIndex("WarehouseId");
 
-                    b.ToTable("StockBook");
+                    b.ToTable("StockBook", (string)null);
                 });
 
             modelBuilder.Entity("Data.Entity.Unit", b =>
@@ -1879,7 +1879,7 @@ namespace DataAccessLayer.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Unit");
+                    b.ToTable("Unit", (string)null);
                 });
 
             modelBuilder.Entity("Data.Entity.Warehouse", b =>
@@ -1931,7 +1931,7 @@ namespace DataAccessLayer.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Warehouse");
+                    b.ToTable("Warehouse", (string)null);
                 });
 
             modelBuilder.Entity("Data.Entity.AccountGroup", b =>

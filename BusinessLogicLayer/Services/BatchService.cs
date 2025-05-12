@@ -214,7 +214,8 @@ namespace BusinessLogicLayer.Services
             var totalRecords = await _batchRepository.Count(filter);
 
             var results = await _genericRepository.Search(
-                filter: filter, pageIndex: pageIndex, pageSize: pageSize);
+                filter: filter, pageIndex: pageIndex, pageSize: pageSize,
+                includeProperties: "Product,Product.ProductType,Product.ProductType.Category,Product.Brand,Product.Unit");
 
             var mappedResults = _mapper.Map<IEnumerable<TResult>>(results);
 

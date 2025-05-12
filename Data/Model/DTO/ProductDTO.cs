@@ -21,5 +21,6 @@ namespace Data.Model.DTO
         public string Category { get; set; }
         public string Brand { get; set; }
         public string Unit { get; set; }
+        public UnitEnum UnitType { get; set; }
     }
 }
