@@ -157,7 +157,7 @@ namespace BusinessLogicLayer.Services
                                 {
                                     {
                                         var inventory = await _inventoryRepository.GetByCondition(p => p.Id == detailDto.InventoryId,
-                                            includeProperties: "Inventory.Batch");
+                                            includeProperties: "Batch");
                                         if (inventory == null)
                                             throw new Exception($"Inventory với Id {detailDto.InventoryId} không tồn tại");
                                         if (inventory.WarehouseId != request.WarehouseId)

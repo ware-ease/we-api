@@ -17,6 +17,6 @@ namespace Data.Model.DTO
         public DateOnly InboundDate { get; set; }
         public DateOnly MfgDate { get; set; }
         public DateOnly ExpDate { get; set; }
-        public string? InventoryId { get; set; }
+        //public string? InventoryId { get; set; }
     }
 }

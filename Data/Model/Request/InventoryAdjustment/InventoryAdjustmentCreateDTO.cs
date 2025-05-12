@@ -60,7 +60,7 @@ namespace Data.Model.Request.InventoryAdjustment
         public string WarehouseId { get; set; }
         //public string InventoryCountId { get; set; }
         //[JsonIgnore]
-        public List<InventoryAdjustmentDetailCreateDTOv2> InventoryAdjustmentDetails { get; set; } = new();
+        public List<InventoryAdjustmentDetailCreateDTOv2> inventoryAdjustmentDetailCreateDTOs { get; set; } = new();
     }
 
     public class InventoryAdjustmentDetailCreateDTOv2 : BaseCreateDTO
