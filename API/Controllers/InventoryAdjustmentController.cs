@@ -64,7 +64,7 @@ namespace API.Controllers
                 if (authUser != null)
                 {
                     request.CreatedBy = authUser.id;
-                    request.inventoryAdjustmentDetailCreateDTOs.ForEach(x => x.CreatedBy = authUser.id);
+                    request.InventoryAdjustmentDetails.ForEach(x => x.CreatedBy = authUser.id);
                 }
 
                 var respones = await _inventoryAdjustmentService.AddInventoryAdjustmentWithDetail(request);

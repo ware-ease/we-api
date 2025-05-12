@@ -78,7 +78,7 @@ namespace BusinessLogicLayer.Services
                     }
                     await _genericRepository.Insert(inventoryAdjustment);
                     await _unitOfWork.SaveAsync();
-                    foreach (var detailDto in request.inventoryAdjustmentDetailCreateDTOs)
+                    foreach (var detailDto in request.InventoryAdjustmentDetails)
                     {
                         var inventoryAdjustmentDetail = _mapper.Map<InventoryAdjustmentDetail>(detailDto);
                         inventoryAdjustmentDetail.InventoryAdjustmentId = inventoryAdjustment.Id;
