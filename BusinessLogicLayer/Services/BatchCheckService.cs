@@ -129,8 +129,9 @@ namespace BusinessLogicLayer.Services
                         
                     }
                     skip += batchSize;
-                    await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken);
+                    //await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken);
                     //await Task.Delay(TimeSpan.FromMinutes(5), stoppingToken);
+                    await Task.Delay(TimeSpan.FromHours(5), stoppingToken);
                 }
             }
         }
