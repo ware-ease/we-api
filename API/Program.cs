@@ -1,4 +1,4 @@
-using API.Middlewares;
+﻿using API.Middlewares;
 using AutoMapper;
 using BusinessLogicLayer.Generic;
 using BusinessLogicLayer.IService;
@@ -15,6 +15,7 @@ using DataAccessLayer.Repositories;
 using DataAccessLayer.UnitOfWork;
 using DotNetEnv;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
@@ -228,6 +229,21 @@ builder.Services.AddControllers().AddJsonOptions(options =>
     options.JsonSerializerOptions.WriteIndented = true;
 });
 
+// Global exception handler
+builder.Services.AddProblemDetails(options =>
+{
+    options.CustomizeProblemDetails = context =>
+    {
+        var exception = context.HttpContext.Features.Get<IExceptionHandlerPathFeature>()?.Error;
+        context.ProblemDetails.Extensions["traceId"] = context.HttpContext.TraceIdentifier;
+
+        if (exception != null)
+        {
+            context.ProblemDetails.Extensions["exceptionMessage"] = exception.Message;
+        }
+    };
+});
+
 var app = builder.Build();
 
 app.UseCors("Cors");
@@ -239,6 +255,8 @@ app.UseCors("Cors");
 
 app.UseSwagger();
 app.UseSwaggerUI();
+
+app.UseExceptionHandler();  
 
 app.UseHttpsRedirection();
 

@@ -1320,5 +1320,37 @@ namespace BusinessLogicLayer.Services
                 Data = grouped
             };
         }
+        //Get all staffs of warehouse
+        public async Task<ServiceResponse> GetStaffsOfWarehouse(string warehouseId, int? pageIndex = null, int? pageSize = null,
+                                                                     string? keyword = null)
+        {
+            var staffs = await _unitOfWork.AccountRepository.Search(
+                a => a.AccountWarehouses.Any(aw => aw.WarehouseId == warehouseId)
+                && a.AccountGroups.Any(ag => ag.Group.Name == "Nhân viên kho")
+                && (string.IsNullOrEmpty(keyword) || a.Profile.FirstName.Contains(keyword) || a.Profile.LastName.Contains(keyword)),
+                includeProperties: "AccountWarehouses,AccountGroups,AccountGroups.Group,Profile",
+                pageSize: pageSize,
+                pageIndex: pageIndex
+            );
+
+            if (staffs == null || !staffs.Any())
+            {
+                return new ServiceResponse
+                {
+                    Status = SRStatus.NotFound,
+                    Message = "No staff found in the warehouse.",
+                    Data = warehouseId
+                };
+            }
+
+            var staffDtos = _mapper.Map<IEnumerable<AccountDTO>>(staffs);
+
+            return new ServiceResponse
+            {
+                Status = SRStatus.Success,
+                Message = "Staff retrieved successfully.",
+                Data = staffDtos
+            };
+        }
     }
 }
