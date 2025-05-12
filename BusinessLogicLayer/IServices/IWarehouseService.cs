@@ -14,12 +14,11 @@ namespace BusinessLogicLayer.IServices
     {
         Task<ServiceResponse> GetFullWarehouseInfo<TResult>(string id);
         Task<ServiceResponse> CreateStructureAsync(CreateWarehouseStructureRequest request);
-        Task<ServiceResponse> SearchWarehouses(
-                                                        int? pageIndex = null,
-                                                        int? pageSize = null,
-                                                        string? keyword = null,
-                                                        float? minArea = null,
-                                                        float? maxArea = null);
+        Task<ServiceResponse> SearchWarehouses( int? pageIndex = null,
+                                                int? pageSize = null,
+                                                string? keyword = null,
+                                                float? minArea = null,
+                                                float? maxArea = null);
         Task<ServiceResponse> GetInventoryByWarehouseId(string warehouseId);
         Task<ServiceResponse> InventoryLocationInOutAsync(CreateInventoryLocationDTO request);
         Task<ServiceResponse> GetInventoriesInLocation(string locationId);
@@ -33,6 +32,10 @@ namespace BusinessLogicLayer.IServices
         Task<ServiceResponse> GetStockPieChartByWarehouseAsync(string warehouseId);
         Task<ServiceResponse> GetStockBookAsync(string warehouseId, int month, int year, string userId);
         Task<ServiceResponse> GetAvailableProductsInWarehouse(string warehouseId);
+        Task<ServiceResponse> GetStaffsOfWarehouse(string warehouseId, 
+                                                    int? pageIndex = null,
+                                                    int? pageSize = null,
+                                                    string? keyword = null);
 
     }
 }

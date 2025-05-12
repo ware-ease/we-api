@@ -164,5 +164,14 @@ namespace API.Controllers
             var result = await _warehouseService.GetAvailableProductsInWarehouse(id);
             return ControllerResponse.Response(result);
         }
+        //Get all staff of warehouse
+        [HttpGet("{id}/staffs")]
+        public async Task<IActionResult> GetStaffsInWarehouse(string id, [FromQuery] int pageIndex = 1,
+                                                            [FromQuery] int pageSize = 5,
+                                                            [FromQuery] string? keyword = null)
+        {
+            var result = await _warehouseService.GetStaffsOfWarehouse(id, pageIndex, pageSize, keyword);
+            return ControllerResponse.Response(result);
+        }
     }
 }

@@ -167,7 +167,7 @@ namespace BusinessLogicLayer.Services
 
         public async Task<ServiceResponse> DeleteAsync(string id)
         {
-            var entity = await _partnerRepository.Get(id);
+            var entity = await _partnerRepository.GetByCondition(p => p.Id == id);
             if (entity == null)
             {
                 return new ServiceResponse
