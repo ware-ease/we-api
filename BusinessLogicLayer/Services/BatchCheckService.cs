@@ -99,9 +99,9 @@ namespace BusinessLogicLayer.Services
                                             batch.AlertLevel = 2;
                                             _batchRepository.Update(batch);
                                             await _unitOfWork.SaveAsync();
-                                            await _firebaseService.SendNotificationToUsersAsync(managers, "Lô gần hết hạn.", $"Lô {batch.Code} thuộc sản phẩm {product.Sku} sẽ hết hạn vào ngày {batch.ExpDate.Value.ToString("dd/MM/yyyy")}(còn {daysUntilExpiry} ngày trước khi hết hạn)", NotificationType.ALERT_LEVEL_2, null);
-                                            //_logger.LogInformation($"[BatchCheckService] Gửi cảnh báo bậc 2 cho batch {batch.Id} tại kho {warehouse.Name}, hết hạn sau {daysUntilExpiry} ngày.");
-                                            //_logger.LogInformation($"Lô {batch.Code} thuộc sản phẩm {product.Sku} sẽ hết hạn vào ngày {batch.ExpDate.Value.ToString("dd/MM/yyyy")}");
+                                            //await _firebaseService.SendNotificationToUsersAsync(managers, "Lô gần hết hạn.", $"Lô {batch.Code} thuộc sản phẩm {product.Sku} sẽ hết hạn vào ngày {batch.ExpDate.Value.ToString("dd/MM/yyyy")}(còn {daysUntilExpiry} ngày trước khi hết hạn)", NotificationType.ALERT_LEVEL_2, null);
+                                            _logger.LogInformation($"[BatchCheckService] Gửi cảnh báo bậc 2 cho batch {batch.Id} tại kho {warehouse.Name}, hết hạn sau {(int)daysUntilExpiry} ngày.");
+                                            _logger.LogInformation($"Lô {batch.Code} thuộc sản phẩm {product.Sku} sẽ hết hạn vào ngày {batch.ExpDate.Value.ToString("dd/MM/yyyy")}");
                                         }
                                         break;
                                     }
@@ -116,9 +116,9 @@ namespace BusinessLogicLayer.Services
                                             batch.AlertLevel = 1;
                                             _batchRepository.Update(batch);
                                             await _unitOfWork.SaveAsync();
-                                            await _firebaseService.SendNotificationToUsersAsync(managers, "Lô gần hết hạn.", $"Lô {batch.Code} thuộc sản phẩm {product.Sku} sẽ hết hạn vào ngày {batch.ExpDate.Value.ToString("dd/MM/yyyy")}(còn {daysUntilExpiry} ngày trước khi hết hạn)", NotificationType.ALERT_LEVEL_1, null);
-                                            //_logger.LogInformation($"[BatchCheckService] Gửi cảnh báo bậc 1 cho batch {batch.Id} tại kho {warehouse.Name}, hết hạn sau {daysUntilExpiry} ngày.");
-                                            //_logger.LogInformation($"Lô {batch.Code} thuộc sản phẩm {product.Sku} sẽ hết hạn vào ngày {batch.ExpDate.Value.ToString("dd/MM/yyyy")}");
+                                            //await _firebaseService.SendNotificationToUsersAsync(managers, "Lô gần hết hạn.", $"Lô {batch.Code} thuộc sản phẩm {product.Sku} sẽ hết hạn vào ngày {batch.ExpDate.Value.ToString("dd/MM/yyyy")}(còn {daysUntilExpiry} ngày trước khi hết hạn)", NotificationType.ALERT_LEVEL_1, null);
+                                            _logger.LogInformation($"[BatchCheckService] Gửi cảnh báo bậc 1 cho batch {batch.Id} tại kho {warehouse.Name}, hết hạn sau {(int)daysUntilExpiry} ngày.");
+                                            _logger.LogInformation($"Lô {batch.Code} thuộc sản phẩm {product.Sku} sẽ hết hạn vào ngày {batch.ExpDate.Value.ToString("dd/MM/yyyy")}");
                                         }
                                         break;
                                     }
@@ -129,8 +129,8 @@ namespace BusinessLogicLayer.Services
                         
                     }
                     skip += batchSize;
-                    //await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken);
-                    await Task.Delay(TimeSpan.FromMinutes(5), stoppingToken);
+                    await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken);
+                    //await Task.Delay(TimeSpan.FromMinutes(5), stoppingToken);
                 }
             }
         }
