@@ -65,7 +65,8 @@ namespace Data.Model.Request.InventoryAdjustment
 
     public class InventoryAdjustmentDetailCreateDTOv2 : BaseCreateDTO
     {
-        [Required(ErrorMessage = "NewQuantity không được để trống")]
+        //[Required(ErrorMessage = "NewQuantity không được để trống")]
+        [JsonIgnore]
         public float NewQuantity { get; set; }
         [Required(ErrorMessage = "ChangeInQuantity không được để trống")]
         public float ChangeInQuantity { get; set; }
