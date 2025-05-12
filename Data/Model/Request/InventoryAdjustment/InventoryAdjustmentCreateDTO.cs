@@ -59,7 +59,7 @@ namespace Data.Model.Request.InventoryAdjustment
         [Required(ErrorMessage = "WarehouseId không được để trống")]
         public string WarehouseId { get; set; }
         public string InventoryCountId { get; set; }
-        [JsonIgnore]
+        //[JsonIgnore]
         public List<InventoryAdjustmentDetailCreateDTO> InventoryAdjustmentDetails { get; set; } = new();
     }
 
