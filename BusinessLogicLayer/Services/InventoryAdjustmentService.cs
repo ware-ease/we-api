@@ -630,9 +630,26 @@ namespace BusinessLogicLayer.Services
 
             var results = await _genericRepository.Search(
                 filter: filter, pageIndex: pageIndex, pageSize: pageSize,
-                includeProperties: "InventoryAdjustmentDetails,Warehouse");
+                includeProperties: "InventoryAdjustmentDetails,Warehouse," +
+                "InventoryAdjustmentDetails.Inventory.Batch.Product.ProductType.Category," +
+                "InventoryAdjustmentDetails.Inventory.Batch.Product.Brand," +
+                "InventoryAdjustmentDetails.Inventory.Batch.Product.Unit");
 
-            var mappedResults = _mapper.Map<IEnumerable<TResult>>(results);
+            var mappedResults = _mapper.Map<List<InventoryAdjustmentDTO>>(results);
+
+            foreach (var dto in mappedResults)
+            {
+                if (!string.IsNullOrEmpty(dto.CreatedBy))
+                {
+                    var account = await _unitOfWork.AccountRepository.GetByCondition(a => a.Id == dto.CreatedBy, "Profile,AccountGroups,AccountGroups.Group");
+                    if (account != null)
+                    {
+                        dto.CreatedByAvatarUrl = account.Profile!.AvatarUrl;
+                        dto.CreatedByFullName = $"{account.Profile.FirstName} {account.Profile.LastName}";
+                        dto.CreatedByGroup = account.AccountGroups.FirstOrDefault()?.Group?.Name;
+                    }
+                }
+            }
 
             int totalPages = (int)Math.Ceiling((double)totalRecords / (pageSize ?? totalRecords));
 

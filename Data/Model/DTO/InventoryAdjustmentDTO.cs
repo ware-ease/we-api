@@ -23,6 +23,8 @@ namespace Data.Model.DTO
         public float NewQuantity { get; set; }
         public float ChangeInQuantity { get; set; }
         public string? Note { get; set; }
+        public string? InventoryId { get; set; }
+        public BatchDTO Batch { get; set; }
         //public string LocationLogId { get; set; }
     }
 }
