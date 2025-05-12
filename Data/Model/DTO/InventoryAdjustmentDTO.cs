@@ -13,8 +13,9 @@ namespace Data.Model.DTO
         public string? Reason { get; set; }
         public string? Note { get; set; }
         public string? RelatedDocument { get; set; }
+        public string WarehouseId { get; set; }
         public string WarehouseName { get; set; }
-        public List<InventoryAdjustmentDetailDTO> inventoryAdjustmentDetailDTOs { get; set; }
+        public List<InventoryAdjustmentDetailDTO> inventoryAdjustmentDetails { get; set; }
     }
 
     public class InventoryAdjustmentDetailDTO : BaseDTO
@@ -22,6 +23,6 @@ namespace Data.Model.DTO
         public float NewQuantity { get; set; }
         public float ChangeInQuantity { get; set; }
         public string? Note { get; set; }
-        public string LocationLogId { get; set; }
+        //public string LocationLogId { get; set; }
     }
 }

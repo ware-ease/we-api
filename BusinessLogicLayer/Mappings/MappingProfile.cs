@@ -163,7 +163,7 @@ namespace BusinessLogicLayer.Mappings
             #region InventoryAdjustment
             CreateMap<InventoryAdjustment, InventoryAdjustmentDTO>()
                 .ForMember(dest => dest.WarehouseName, opt => opt.MapFrom(src => $"{src.Warehouse.Name}".Trim()))
-                .ForMember(dest => dest.inventoryAdjustmentDetailDTOs, opt => opt.MapFrom(src => src.InventoryAdjustmentDetails))
+                .ForMember(dest => dest.inventoryAdjustmentDetails, opt => opt.MapFrom(src => src.InventoryAdjustmentDetails))
                 .ReverseMap();
 
             CreateMap<InventoryAdjustment, InventoryAdjustmentCreateDTO>().ReverseMap();
