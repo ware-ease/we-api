@@ -387,15 +387,28 @@ namespace BusinessLogicLayer.Services
         public async Task<ServiceResponse> Search<TResult>(int? pageIndex = null, int? pageSize = null,
                                                                    string? keyword = null, InventoryCountStatus? status = null, string? WarehouseId = null)
         {
+            Expression<Func<InventoryCount, bool>> filter;
+            if (status.HasValue)
+            {
+                filter = p =>
+                (p.Status == status &&
+                (string.IsNullOrEmpty(keyword) || p.Code.Contains(keyword)
+                    || p.Note.Contains(keyword)
+                    || p.InventoryCheckDetails.Any(d => d.Note != null && d.Note.Contains(keyword)))
+                    ) &&
+                    (string.IsNullOrEmpty(WarehouseId) || p.Schedule.Warehouse.Id == WarehouseId);
+            }
+            else
+            {
 
-            Expression<Func<InventoryCount, bool>> filter = p =>
-            (p.Status == status &&
-            (string.IsNullOrEmpty(keyword) || p.Code.Contains(keyword)
-                || p.Note.Contains(keyword)
-                || p.InventoryCheckDetails.Any(d => d.Note != null && d.Note.Contains(keyword)))
-                //|| p.InventoryCheckDetails.Any(d => d.Product != null && d.Product.Name.Contains(keyword)))
-                ) &&
-                (string.IsNullOrEmpty(WarehouseId) || p.Schedule.Warehouse.Id == WarehouseId);
+                filter = p =>
+                (string.IsNullOrEmpty(keyword) || p.Code.Contains(keyword)
+                    || p.Note.Contains(keyword)
+                    || p.InventoryCheckDetails.Any(d => d.Note != null && d.Note.Contains(keyword))
+                    ) &&
+                    (string.IsNullOrEmpty(WarehouseId) || p.Schedule.Warehouse.Id == WarehouseId);
+            }
+
 
             var totalRecords = await _genericRepository.Count(filter);
 

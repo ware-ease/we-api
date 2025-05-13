@@ -116,8 +116,9 @@ namespace BusinessLogicLayer.Services
 
                                     var goodRequestEntity = new GoodRequest
                                     {
-                                        Note = "From adjustment detail ID: " + inventoryAdjustmentDetail.Id,
-                                        Code = await _codeGeneratorService.GenerateCodeAsync(Data.Enum.CodeType.YCN),
+                                        Note = "From adjustment with code: " + inventoryAdjustment.Code,
+                                        //Code = await _codeGeneratorService.GenerateCodeAsync(Data.Enum.CodeType.YCN),
+                                        Code = "AR",
                                         RequestType = Data.Enum.GoodRequestEnum.Receive,
                                         //WarehouseId = null,
                                         RequestedWarehouseId = request.WarehouseId,
@@ -152,7 +153,7 @@ namespace BusinessLogicLayer.Services
                                     var goodNoteDetailEntity = new GoodNoteDetail
                                     {
                                         Quantity = detailDto.ChangeInQuantity,
-                                        Note = "Receive Adjustment with manually created Details",
+                                        Note = "Receive Adjustment by adjustment code:" + inventoryAdjustment.Code + ", GoodNote code:" + goodNoteEntity.Code,
                                         CreatedBy = request.CreatedBy,
                                         BatchId = inventory.BatchId,
                                         GoodNoteId = goodNoteEntity.Id
@@ -185,8 +186,9 @@ namespace BusinessLogicLayer.Services
 
                                         var goodRequestEntity = new GoodRequest
                                         {
-                                            Note = "From adjustment detail ID: " + inventoryAdjustmentDetail.Id,
-                                            Code = await _codeGeneratorService.GenerateCodeAsync(Data.Enum.CodeType.YCX),
+                                            Note = "From adjustment with code: " + inventoryAdjustment.Code,
+                                            //Code = await _codeGeneratorService.GenerateCodeAsync(Data.Enum.CodeType.YCX),
+                                            Code = "AR",
                                             RequestType = Data.Enum.GoodRequestEnum.Issue,
                                             //WarehouseId = null,
                                             RequestedWarehouseId = request.WarehouseId,
@@ -221,7 +223,7 @@ namespace BusinessLogicLayer.Services
                                         var goodNoteDetailEntity = new GoodNoteDetail
                                         {
                                             Quantity = Math.Abs(detailDto.ChangeInQuantity),
-                                            Note = "Issue Adjustment with manually created Details",
+                                            Note = "Issue Adjustment by adjustment code:" + inventoryAdjustment.Code + ", GoodNote code:" + goodNoteEntity.Code,
                                             CreatedBy = request.CreatedBy,
                                             BatchId = inventory.BatchId,
                                             GoodNoteId = goodNoteEntity.Id
@@ -337,8 +339,9 @@ namespace BusinessLogicLayer.Services
 
                                     var goodRequestEntity = new GoodRequest
                                     {
-                                        Note = "From adjustment detail ID: " + inventoryAdjustmentDetail.Id,
-                                        Code = await _codeGeneratorService.GenerateCodeAsync(Data.Enum.CodeType.YCN),
+                                        Note = "From adjustment with code: " + inventoryAdjustment.Code,
+                                        //Code = await _codeGeneratorService.GenerateCodeAsync(Data.Enum.CodeType.YCN),
+                                        Code = "AR",
                                         RequestType = Data.Enum.GoodRequestEnum.Receive,
                                         //WarehouseId = null,
                                         RequestedWarehouseId = request.WarehouseId,
@@ -409,7 +412,7 @@ namespace BusinessLogicLayer.Services
                                     var goodNoteDetailEntity = new GoodNoteDetail
                                     {
                                         Quantity = changeInQuantity,
-                                        Note = "Adjustment for overstock",
+                                        Note = "Adjustment for overstock from adjustment code:" + inventoryAdjustment.Code,
                                         CreatedBy = request.CreatedBy,
                                         BatchId = detailDto.Inventory.BatchId,
                                         GoodNoteId = goodNoteEntity.Id
@@ -453,8 +456,9 @@ namespace BusinessLogicLayer.Services
 
                                     var goodRequestEntity = new GoodRequest
                                     {
-                                        Note = "From adjustment detail ID: " + inventoryAdjustmentDetail.Id,
-                                        Code = await _codeGeneratorService.GenerateCodeAsync(Data.Enum.CodeType.YCX),
+                                        Note = "From adjustment with code: " + inventoryAdjustment.Code,
+                                        //Code = await _codeGeneratorService.GenerateCodeAsync(Data.Enum.CodeType.YCX),
+                                        Code = "AR",
                                         RequestType = Data.Enum.GoodRequestEnum.Issue,
                                         //WarehouseId = null,
                                         RequestedWarehouseId = request.WarehouseId,
@@ -498,7 +502,7 @@ namespace BusinessLogicLayer.Services
                                     var goodNoteDetailEntity = new GoodNoteDetail
                                     {
                                         Quantity = changeInQuantity,
-                                        Note = "Adjustment for understock",
+                                        Note = "Adjustment for understock from adjustment code:" + inventoryAdjustment.Code,
                                         CreatedBy = request.CreatedBy,
                                         BatchId = detailDto.Inventory.BatchId,
                                         GoodNoteId = goodNoteEntity.Id
