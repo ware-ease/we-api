@@ -274,6 +274,10 @@ namespace BusinessLogicLayer.Services
                     if (inventoryCount == null)
                         throw new Exception("InventoryCount không tồn tại");
 
+                    inventoryCount.Status = Data.Enum.InventoryCountStatus.Adjusted;
+                    _inventoryCountRepository.Update(inventoryCount);
+                    await _unitOfWork.SaveAsync();
+
 
 
 
