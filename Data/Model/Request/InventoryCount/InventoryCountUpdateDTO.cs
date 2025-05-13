@@ -48,7 +48,7 @@ namespace Data.Model.Request.InventoryCount
         public string? Note { get; set; }
         public string? AccountId { get; set; }
         //[Required(ErrorMessage = "ProductId không được để trống")]
-        //public string? InventoryId { get; set; }
+        public string? InventoryId { get; set; }
         public string? ErrorTicketId { get; set; }
     }
 }
