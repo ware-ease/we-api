@@ -4,6 +4,7 @@ using BusinessLogicLayer.Services;
 using Data.Entity;
 using Data.Enum;
 using Data.Model.DTO;
+using Data.Model.Request.InventoryAdjustment;
 using Data.Model.Request.InventoryCount;
 using Data.Model.Request.Product;
 using Data.Model.Request.Schedule;
@@ -20,10 +21,12 @@ namespace API.Controllers
     public class InventoryCountController : ControllerBase
     {
         private readonly IInventoryCountService _inventoryCountService;
+        private readonly IInventoryAdjustmentService _inventoryAdjustmentService;
 
-        public InventoryCountController(IInventoryCountService inventoryCountService)
+        public InventoryCountController(IInventoryCountService inventoryCountService, IInventoryAdjustmentService inventoryAdjustmentService)
         {
             _inventoryCountService = inventoryCountService;
+            _inventoryAdjustmentService = inventoryAdjustmentService;
         }
 
         [HttpGet]
@@ -69,6 +72,39 @@ namespace API.Controllers
                     Status = SRStatus.Success,
                     Message = " successfully",
                     Data = response
+                });
+            }
+            catch (Exception ex)
+            {
+                return ControllerResponse.Response(new ServiceResponse
+                {
+                    Status = SRStatus.Error,
+                    Message = ex.Message,
+                    Data = null
+                });
+            }
+        }
+
+        [Authorize]
+        [HttpPost("adjustment")]
+        public async Task<IActionResult> Add([FromBody] InventoryAdjustmentCreateDTO request)
+        {
+            try
+            {
+                var authUser = AuthHelper.GetCurrentUser(HttpContext.Request);
+
+                if (authUser != null)
+                {
+                    request.CreatedBy = authUser.id;
+                    request.InventoryAdjustmentDetails.ForEach(x => x.CreatedBy = authUser.id);
+                }
+
+                var respones = await _inventoryAdjustmentService.AddInventoryAdjustment(request);
+                return ControllerResponse.Response(new ServiceResponse
+                {
+                    Status = SRStatus.Success,
+                    Message = "InventoryAdjustment created successfully",
+                    Data = respones
                 });
             }
             catch (Exception ex)

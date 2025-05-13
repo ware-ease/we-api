@@ -18,6 +18,8 @@ namespace Data.Enum
         PXNB,
         LO,
         PNDC,
-        PXDC
+        PXDC,
+        PDC,
+        PKK
     }
 }
