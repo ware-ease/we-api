@@ -13,7 +13,7 @@ namespace Data.Model.DTO
     {
         public string Id { get; set; }
         public InventoryCountStatus Status { get; set; }
-        public InventoryCountCheckStatus CheckStatus { get; set; }
+        //public InventoryCountCheckStatus CheckStatus { get; set; }
         public string? Code { get; set; }
         public string? Note { get; set; }
         public DateOnly? Date { get; set; }
