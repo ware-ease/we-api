@@ -302,7 +302,7 @@ namespace BusinessLogicLayer.Services
                         }
                         if (!string.IsNullOrEmpty(detailDto.Note))
                             existingDetail.Note = detailDto.Note;
-                        if (!string.IsNullOrEmpty(detailDto.InventoryId))
+                        /*if (!string.IsNullOrEmpty(detailDto.InventoryId))
                         {
                             var inventory = await _inventoryRepository.GetByCondition(p => p.Id == detailDto.InventoryId);
                             if (inventory == null)
@@ -312,11 +312,11 @@ namespace BusinessLogicLayer.Services
                             detailDto.ExpectedQuantity = inventory.CurrentQuantity;
                         }
                         if (!string.IsNullOrEmpty(detailDto.ErrorTicketId))
-                            existingDetail.ErrorTicketId = detailDto.ErrorTicketId;
+                            existingDetail.ErrorTicketId = detailDto.ErrorTicketId;*/
 
                         if (changeEmployee)
                         {
-                            var inventory = await _inventoryRepository.GetByCondition(p => p.Id == detailDto.InventoryId);
+                            var inventory = await _inventoryRepository.GetByCondition(p => p.Id == existingDetail.InventoryId);
                             var employeeAccountIds = new List<string>();
                             var oldEmployeeAccountIds = new List<string>();
                             employeeAccountIds.Add(detailDto.AccountId);
