@@ -61,7 +61,7 @@ namespace Data.Model.Request.InventoryAdjustment
         //public string InventoryCountId { get; set; }
         //[JsonIgnore]
         [Required(ErrorMessage = "InventoryAdjustmentDetails không được để trống")]
-        public List<InventoryAdjustmentDetailCreateDTOv2> InventoryAdjustmentDetails { get; set; } = new();
+        public List<InventoryAdjustmentDetailCreateDTOv2> InventoryAdjustmentDetails { get; set; }
     }
 
     public class InventoryAdjustmentDetailCreateDTOv2 : BaseCreateDTO

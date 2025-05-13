@@ -181,6 +181,8 @@ builder.Services.AddScoped<ILocationLogRepository, LocationLogRepository>();
 builder.Services.AddScoped<IGroupPermissionRepository, GroupPermissionRepository>();
 builder.Services.AddScoped<IAccountPermissionRepository, AccountPermissionRepository>();
 builder.Services.AddScoped<IAccountGroupRepository, AccountGroupRepository>();
+builder.Services.AddScoped<IInventoryAdjustmentRepository, InventoryAdjustmentRepository>();
+builder.Services.AddScoped<IInventoryCountRepository, InventoryCountRepository>();
 #endregion Repositories
 
 builder.Services.AddAuthentication(options =>

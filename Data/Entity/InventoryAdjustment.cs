@@ -15,6 +15,7 @@ namespace Data.Entity
         public DateTime? Date { get; set; }
         public string? Reason { get; set; }
         public string? Note { get; set; }
+        public string? Code { get; set; }
         public DocumentType? DocumentType { get; set; }
         public string? RelatedDocument { get; set; }
 

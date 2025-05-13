@@ -63,8 +63,17 @@ namespace BusinessLogicLayer.Services
                     var warehouse = await _warehouseRepository.GetByCondition(p => p.Id == request.WarehouseId);
                     if (warehouse == null)
                         throw new Exception("Warehouse không tồn tại");
-                    var inventoryAdjustment = _mapper.Map<InventoryAdjustment>(request);
-                    inventoryAdjustment.WarehouseId = request.WarehouseId;
+                    var inventoryAdjustment = new InventoryAdjustment
+                    {
+                        Date = request.Date,
+                        Reason = request.Reason,
+                        Note = request.Note,
+                        Code = await _codeGeneratorService.GenerateCodeAsync(Data.Enum.CodeType.PDC),
+                        DocumentType = request.DocumentType,
+                        RelatedDocument = request.RelatedDocument,
+                        WarehouseId = request.WarehouseId,
+                        CreatedBy = request.CreatedBy,
+                    };
                     if (request.DocumentType.HasValue && (request.DocumentType != Data.Enum.DocumentType.GoodNote && request.DocumentType != Data.Enum.DocumentType.InventoryCount))
                         throw new Exception("DocumentType không hợp lệ");
                     if (!string.IsNullOrEmpty(request.RelatedDocument))
@@ -80,8 +89,14 @@ namespace BusinessLogicLayer.Services
                     await _unitOfWork.SaveAsync();
                     foreach (var detailDto in request.InventoryAdjustmentDetails)
                     {
-                        var inventoryAdjustmentDetail = _mapper.Map<InventoryAdjustmentDetail>(detailDto);
-                        inventoryAdjustmentDetail.InventoryAdjustmentId = inventoryAdjustment.Id;
+                        var inventoryAdjustmentDetail = new InventoryAdjustmentDetail
+                        {
+                            InventoryAdjustmentId = inventoryAdjustment.Id,
+                            InventoryId = detailDto.InventoryId,
+                            ChangeInQuantity = detailDto.ChangeInQuantity,
+                            CreatedBy = request.CreatedBy
+                        };
+                        //inventoryAdjustmentDetail.InventoryAdjustmentId = inventoryAdjustment.Id;
                         switch (detailDto.ChangeInQuantity)
                         {
                             case > 0:
@@ -94,6 +109,7 @@ namespace BusinessLogicLayer.Services
                                         throw new Exception($"Inventory với Id {detailDto.InventoryId} không thuộc Warehouse với Id {request.WarehouseId}");
 
                                     inventoryAdjustmentDetail.NewQuantity = inventory.CurrentQuantity + detailDto.ChangeInQuantity;
+                                    //inventoryAdjustmentDetail.Inventory = null;
 
                                     await _inventoryAdjustmentDetailRepository.Insert(inventoryAdjustmentDetail);
                                     await _unitOfWork.SaveAsync();
@@ -144,11 +160,10 @@ namespace BusinessLogicLayer.Services
                                     await _unitOfWork.GoodNoteDetailRepository.Insert(goodNoteDetailEntity);
                                     await _unitOfWork.SaveAsync();
 
-                                    var inventoryUpdate = await _inventoryRepository.GetByCondition(p => p.Id == detailDto.InventoryId);
-                                    if (inventoryUpdate == null)
-                                        throw new Exception($"Inventory với Id {detailDto.InventoryId} không tồn tại");
-                                    inventoryUpdate.CurrentQuantity = inventoryUpdate.CurrentQuantity + detailDto.ChangeInQuantity;
-                                    _inventoryRepository.Update(inventoryUpdate);
+                                    
+                                    inventory.CurrentQuantity = inventory.CurrentQuantity + detailDto.ChangeInQuantity;
+                                    //inventory.InventoryAdjustmentDetails = null;
+                                    _inventoryRepository.Update(inventory);
                                     await _unitOfWork.SaveAsync();
 
                                     break;
@@ -214,11 +229,9 @@ namespace BusinessLogicLayer.Services
                                         await _unitOfWork.GoodNoteDetailRepository.Insert(goodNoteDetailEntity);
                                         await _unitOfWork.SaveAsync();
 
-                                        var inventoryUpdate = await _inventoryRepository.GetByCondition(p => p.Id == detailDto.InventoryId);
-                                        if (inventoryUpdate == null)
-                                            throw new Exception($"Inventory với Id {detailDto.InventoryId} không tồn tại");
-                                        inventoryUpdate.CurrentQuantity = inventoryUpdate.CurrentQuantity + detailDto.ChangeInQuantity;
-                                        _inventoryRepository.Update(inventoryUpdate);
+                                        inventory.CurrentQuantity = inventory.CurrentQuantity + detailDto.ChangeInQuantity;
+                                        //inventory.InventoryAdjustmentDetails = null;
+                                        _inventoryRepository.Update(inventory);
                                         await _unitOfWork.SaveAsync();
 
                                         break;
@@ -228,7 +241,7 @@ namespace BusinessLogicLayer.Services
                                 throw new Exception("ChangeInQuantity không hợp lệ");
                         }
                         //await _genericRepository.Insert(inventoryAdjustment);
-                        await _unitOfWork.SaveAsync();
+                        //await _unitOfWork.SaveAsync();
                     }
                     scope.Complete();
                     return _mapper.Map<InventoryAdjustmentDTO>(inventoryAdjustment);
@@ -264,6 +277,7 @@ namespace BusinessLogicLayer.Services
 
                     var inventoryAdjustment = _mapper.Map<InventoryAdjustment>(request);
                     inventoryAdjustment.WarehouseId = request.WarehouseId;
+                    inventoryAdjustment.Code = await _codeGeneratorService.GenerateCodeAsync(Data.Enum.CodeType.PDC);
 
                     if (request.DocumentType.HasValue && (request.DocumentType != Data.Enum.DocumentType.GoodNote && request.DocumentType != Data.Enum.DocumentType.InventoryCount))
                         throw new Exception("DocumentType không hợp lệ");

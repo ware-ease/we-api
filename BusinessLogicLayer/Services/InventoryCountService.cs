@@ -31,6 +31,7 @@ namespace BusinessLogicLayer.Services
         private readonly IGenericRepository<Account> _accountRepository;
         private readonly IGenericRepository<AccountGroup> _accountGroupRepository;
         private readonly IFirebaseService _firebaseService;
+        private readonly ICodeGeneratorService _codeGeneratorService;
         public InventoryCountService(IGenericRepository<InventoryCount> genericRepository,
             IGenericRepository<Schedule> scheduleRepository,
             IGenericRepository<Location> locationRepository,
@@ -43,6 +44,7 @@ namespace BusinessLogicLayer.Services
             IGenericRepository<AccountGroup> accountGroupRepository,
             IGenericRepository<InventoryCountDetail> inventoryCountDetailRepository,
             IFirebaseService firebaseService,
+            ICodeGeneratorService codeGeneratorService,
             IMapper mapper, IUnitOfWork unitOfWork) : base(genericRepository, mapper, unitOfWork)
         {
             _scheduleRepository = scheduleRepository;
@@ -56,6 +58,7 @@ namespace BusinessLogicLayer.Services
             _accountGroupRepository = accountGroupRepository;
             _inventoryCountDetailRepository = inventoryCountDetailRepository;
             _firebaseService = firebaseService;
+            _codeGeneratorService = codeGeneratorService;
         }
 
 
@@ -138,6 +141,7 @@ namespace BusinessLogicLayer.Services
                 throw new Exception("Product không tồn tại");*/
 
             var inventoryCount = _mapper.Map<InventoryCount>(request);
+            inventoryCount.Code = await _codeGeneratorService.GenerateCodeAsync(Data.Enum.CodeType.PKK);
             //inventoryCount.LocationId = schedule.LocationId;
             //inventoryCount.LocationId = request.LocationId;
 
@@ -194,7 +198,7 @@ namespace BusinessLogicLayer.Services
                     await _unitOfWork.SaveAsync();
 
                     await _firebaseService.SendNotificationToUsersAsync(employeeAccountIds, $"Nhân viên được sắp xếp kiểm kê",
-                                                                    $"Nhân viên vừa được sắp xếp vào vai trò kiểm kê với Id kho là: {detail.InventoryId}",
+                                                                    $"Nhân viên vừa được sắp xếp vào vai trò kiểm kê tại kho: {inventory.Warehouse.Name} với mã phiếu {inventoryCount.Code}",
                                                                     NotificationType.INVENTORY_COUNT_ASSIGNED, request.WarehouseId);
                 }
 
@@ -311,16 +315,17 @@ namespace BusinessLogicLayer.Services
 
                         if (changeEmployee)
                         {
+                            var inventory = await _inventoryRepository.GetByCondition(p => p.Id == detailDto.InventoryId);
                             var employeeAccountIds = new List<string>();
                             var oldEmployeeAccountIds = new List<string>();
                             employeeAccountIds.Add(detailDto.AccountId);
                             oldEmployeeAccountIds.Add(oldEmployee);
                             await _firebaseService.SendNotificationToUsersAsync(employeeAccountIds, $"Nhân viên được sắp xếp kiểm kê",
-                                                                    $"Nhân viên vừa được sắp xếp vào vai trò kiểm kê với Id kho là: {detailDto.InventoryId}",
+                                                                    $"Nhân viên vừa được sắp xếp vào vai trò kiểm kê tại kho: {inventory.Warehouse.Name} với mã phiếu {existingInventoryCount.Code}",
                                                                     NotificationType.INVENTORY_COUNT_ASSIGNED, existingInventoryCount.Schedule.WarehouseId);
 
                             await _firebaseService.SendNotificationToUsersAsync(oldEmployeeAccountIds, $"Nhân viên đã thay đổi",
-                                                                    $"Nhân viên vừa bị thay đổi khỏi vị trí kiểm kê với detail Id là: {detailDto.Id}",
+                                                                    $"Nhân viên vừa bị thay đổi khỏi vị trí kiểm kê, mã phiếu {existingInventoryCount.Code}",
                                                                     NotificationType.INVENTORY_COUNT_UNASSIGNED, existingInventoryCount.Schedule.WarehouseId);
                         }
                     }
