@@ -9,7 +9,6 @@ namespace Data.Enum
     public enum InventoryCountDetailStatus
     {
         Uncounted,
-        Counting,
         Balanced,
         Understock,
         Overstock

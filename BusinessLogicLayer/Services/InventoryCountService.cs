@@ -91,8 +91,8 @@ namespace BusinessLogicLayer.Services
 
         public async Task<InventoryCountDTO> AddInventoryCount(InventoryCountCreateDTO request)
         {
-            if (request.Date > DateOnly.FromDateTime(DateTime.Now))
-                throw new Exception("Date không được ở tương lai");
+            /*if (request.Date > DateOnly.FromDateTime(DateTime.Now))
+                throw new Exception("Date không được ở tương lai");*/
 
             if (request.EndTime < request.StartTime)
                 throw new Exception("EndTime không được ở trước StartTime");
@@ -193,6 +193,7 @@ namespace BusinessLogicLayer.Services
                     inventoryCountDetail.InventoryCountId = inventoryCount.Id;
                     //inventoryCountDetail.ExpectedQuantity = expectedQuantity;
                     inventoryCountDetail.CreatedBy = inventoryCount.CreatedBy;
+                    inventoryCountDetail.ExpectedQuantity = inventory.CurrentQuantity;
 
                     await _inventoryCountDetailRepository.Insert(inventoryCountDetail);
                     await _unitOfWork.SaveAsync();
@@ -220,8 +221,8 @@ namespace BusinessLogicLayer.Services
             /*if (request.Status.HasValue)
                 existingInventoryCount.Status = request.Status.Value;*/
 
-            if (!string.IsNullOrEmpty(request.Code))
-                existingInventoryCount.Code = request.Code;
+            /*if (!string.IsNullOrEmpty(request.Code))
+                existingInventoryCount.Code = request.Code;*/
 
             if (!string.IsNullOrEmpty(request.Note))
                 existingInventoryCount.Note = request.Note;
@@ -347,7 +348,7 @@ namespace BusinessLogicLayer.Services
 
             if (allCounted)
             {
-                existingInventoryCount.CheckStatus = InventoryCountCheckStatus.Completed;
+                //existingInventoryCount.CheckStatus = InventoryCountCheckStatus.Completed;
 
                 var combinedDateTime = existingInventoryCount.Date.Value.ToDateTime(existingInventoryCount.EndTime.Value);
                 if (combinedDateTime < DateTime.Now)
@@ -360,7 +361,7 @@ namespace BusinessLogicLayer.Services
                 }
                 var userOfRequestedWarehouseIds = await _unitOfWork.AccountRepository.GetUserIdsByWarehouseAndGroups(existingInventoryCount.Schedule.WarehouseId, new List<string> { "Thủ kho" });
                 await _firebaseService.SendNotificationToUsersAsync(userOfRequestedWarehouseIds, $"Phiếu kiểm kê đã hoàn thành",
-                                                                    $"Phiếu kiểm kê với Id là: {existingInventoryCount.Id} đã hoàn thành",
+                                                                    $"Phiếu kiểm kê với mã phiếu: {existingInventoryCount.Code} đã hoàn thành",
                                                                     NotificationType.INVENTORY_COUNT_COMPLETED, existingInventoryCount.Schedule.WarehouseId);
             }
 

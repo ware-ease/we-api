@@ -138,7 +138,7 @@ namespace API.Controllers
                     return ControllerResponse.Response(new ServiceResponse
                     {
                         Status = SRStatus.Success,
-                        Message = "Product created successfully",
+                        Message = "Inventory-Count created successfully",
                         Data = inventoryCount
                     });
                     
