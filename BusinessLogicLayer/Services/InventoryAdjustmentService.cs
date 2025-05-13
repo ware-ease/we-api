@@ -186,7 +186,7 @@ namespace BusinessLogicLayer.Services
                                         var goodRequestEntity = new GoodRequest
                                         {
                                             Note = "From adjustment detail ID: " + inventoryAdjustmentDetail.Id,
-                                            Code = await _codeGeneratorService.GenerateCodeAsync(Data.Enum.CodeType.YCN),
+                                            Code = await _codeGeneratorService.GenerateCodeAsync(Data.Enum.CodeType.YCX),
                                             RequestType = Data.Enum.GoodRequestEnum.Issue,
                                             //WarehouseId = null,
                                             RequestedWarehouseId = request.WarehouseId,
@@ -196,7 +196,7 @@ namespace BusinessLogicLayer.Services
                                         {
                                             new GoodRequestDetail
                                             {
-                                                Quantity = detailDto.ChangeInQuantity,
+                                                Quantity = Math.Abs(detailDto.ChangeInQuantity),
                                                 ProductId = inventory.Batch.ProductId,
                                                 CreatedBy = request.CreatedBy
                                             }
@@ -211,7 +211,7 @@ namespace BusinessLogicLayer.Services
                                             NoteType = Data.Enum.GoodNoteEnum.Issue,
                                             ShipperName = null,
                                             ReceiverName = null,
-                                            Code = await _codeGeneratorService.GenerateCodeAsync(Data.Enum.CodeType.PNDC),
+                                            Code = await _codeGeneratorService.GenerateCodeAsync(Data.Enum.CodeType.PXDC),
                                             Date = request.Date,
                                             GoodRequestId = goodRequestEntity.Id,
                                         };
@@ -220,7 +220,7 @@ namespace BusinessLogicLayer.Services
 
                                         var goodNoteDetailEntity = new GoodNoteDetail
                                         {
-                                            Quantity = detailDto.ChangeInQuantity,
+                                            Quantity = Math.Abs(detailDto.ChangeInQuantity),
                                             Note = "Issue Adjustment with manually created Details",
                                             CreatedBy = request.CreatedBy,
                                             BatchId = inventory.BatchId,
@@ -230,6 +230,8 @@ namespace BusinessLogicLayer.Services
                                         await _unitOfWork.SaveAsync();
 
                                         inventory.CurrentQuantity = inventory.CurrentQuantity + detailDto.ChangeInQuantity;
+                                        if (inventory.CurrentQuantity < 0)
+                                            throw new Exception($"Inventory với Id {detailDto.InventoryId} không đủ số lượng để xuất");
                                         //inventory.InventoryAdjustmentDetails = null;
                                         _inventoryRepository.Update(inventory);
                                         await _unitOfWork.SaveAsync();
@@ -505,6 +507,8 @@ namespace BusinessLogicLayer.Services
                                     if (inventoryUpdate == null)
                                         throw new Exception($"Inventory with Id {detailDto.InventoryId} doesnt exist");
                                     inventoryUpdate.CurrentQuantity = inventoryUpdate.CurrentQuantity - changeInQuantity;
+                                    if (inventoryUpdate.CurrentQuantity < 0)
+                                        throw new Exception($"Inventory với Id {detailDto.InventoryId} không đủ số lượng để xuất");
 
                                     _inventoryRepository.Update(inventoryUpdate);
 
