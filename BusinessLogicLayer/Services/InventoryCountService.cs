@@ -350,7 +350,7 @@ namespace BusinessLogicLayer.Services
             {
                 //existingInventoryCount.CheckStatus = InventoryCountCheckStatus.Completed;
 
-                var combinedDateTime = existingInventoryCount.Date.Value.ToDateTime(existingInventoryCount.EndTime.Value);
+                /*var combinedDateTime = existingInventoryCount.Date.Value.ToDateTime(existingInventoryCount.EndTime.Value);
                 if (combinedDateTime < DateTime.Now)
                 {
                     existingInventoryCount.Status = InventoryCountStatus.Overdue;
@@ -358,7 +358,8 @@ namespace BusinessLogicLayer.Services
                 else
                 {
                     existingInventoryCount.Status = InventoryCountStatus.OnTime;
-                }
+                }*/
+                existingInventoryCount.Status = InventoryCountStatus.Completed;
                 var userOfRequestedWarehouseIds = await _unitOfWork.AccountRepository.GetUserIdsByWarehouseAndGroups(existingInventoryCount.Schedule.WarehouseId, new List<string> { "Thủ kho" });
                 await _firebaseService.SendNotificationToUsersAsync(userOfRequestedWarehouseIds, $"Phiếu kiểm kê đã hoàn thành",
                                                                     $"Phiếu kiểm kê với mã phiếu: {existingInventoryCount.Code} đã hoàn thành",
