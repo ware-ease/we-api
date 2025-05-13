@@ -20,7 +20,7 @@ namespace Data.Model.Request.InventoryCount
         [JsonIgnore]
         public InventoryCountCheckStatus? CheckStatus { get; set; }
         //[Required(ErrorMessage = "Code không được để trống")]
-        public string? Code { get; set; }
+        //public string? Code { get; set; }
         public string? Note { get; set; }
         //[Required(ErrorMessage = "Date không được để trống")]
         public DateOnly? Date { get; set; }

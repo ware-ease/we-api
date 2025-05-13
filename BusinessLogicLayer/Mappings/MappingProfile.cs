@@ -143,7 +143,7 @@ namespace BusinessLogicLayer.Mappings
                 .ForMember(dest => dest.WarehouseName, opt => opt.MapFrom(src => src.Schedule.Warehouse.Name))
                 .ForMember(dest => dest.WarehouseId, opt => opt.MapFrom(src => src.Schedule.Warehouse.Id))
                 .ForMember(dest => dest.ScheduleDate, opt => opt.MapFrom(src => src.Schedule.Date))
-                .ForMember(dest => dest.InventoryCountDetailDTO, opt => opt.MapFrom(src => src.InventoryCheckDetails))
+                .ForMember(dest => dest.InventoryCountDetails, opt => opt.MapFrom(src => src.InventoryCheckDetails))
                 .ReverseMap();
 
             CreateMap<InventoryCount, InventoryCountCreateDTO>().ReverseMap();

@@ -76,7 +76,7 @@ namespace BusinessLogicLayer.Services
                     };
                     if (request.DocumentType.HasValue && (request.DocumentType != Data.Enum.DocumentType.GoodNote && request.DocumentType != Data.Enum.DocumentType.InventoryCount))
                         throw new Exception("DocumentType không hợp lệ");
-                    if (!string.IsNullOrEmpty(request.RelatedDocument))
+                    /*if (!string.IsNullOrEmpty(request.RelatedDocument))
                     {
                         var inventoryCount = await _inventoryCountRepository.GetByCondition(p => p.Id == request.RelatedDocument);
                         if (inventoryCount != null)
@@ -84,7 +84,7 @@ namespace BusinessLogicLayer.Services
                             inventoryCount.Status = Data.Enum.InventoryCountStatus.OnTime;
                             _inventoryCountRepository.Update(inventoryCount);
                         }
-                    }
+                    }*/
                     await _genericRepository.Insert(inventoryAdjustment);
                     await _unitOfWork.SaveAsync();
                     foreach (var detailDto in request.InventoryAdjustmentDetails)
@@ -283,7 +283,7 @@ namespace BusinessLogicLayer.Services
 
                     if (request.DocumentType.HasValue && (request.DocumentType != Data.Enum.DocumentType.GoodNote && request.DocumentType != Data.Enum.DocumentType.InventoryCount))
                         throw new Exception("DocumentType không hợp lệ");
-                    if (!string.IsNullOrEmpty(request.RelatedDocument))
+                    /*if (!string.IsNullOrEmpty(request.RelatedDocument))
                     {
                         //var inventoryCount = await _inventoryCountRepository.GetByCondition(p => p.Id == request.RelatedDocument);
                         if (inventoryCount != null)
@@ -291,7 +291,7 @@ namespace BusinessLogicLayer.Services
                             //inventoryCount.Status = Data.Enum.InventoryCountStatus.Balanced;
                             _inventoryCountRepository.Update(inventoryCount);
                         }
-                    }
+                    }*/
 
                     await _genericRepository.Insert(inventoryAdjustment);
                     await _unitOfWork.SaveAsync();
