@@ -4,6 +4,7 @@ using BusinessLogicLayer.Services;
 using Data.Entity;
 using Data.Enum;
 using Data.Model.DTO;
+using Data.Model.Request.InventoryAdjustment;
 using Data.Model.Request.InventoryCount;
 using Data.Model.Request.Product;
 using Data.Model.Request.Schedule;
@@ -20,17 +21,19 @@ namespace API.Controllers
     public class InventoryCountController : ControllerBase
     {
         private readonly IInventoryCountService _inventoryCountService;
+        private readonly IInventoryAdjustmentService _inventoryAdjustmentService;
 
-        public InventoryCountController(IInventoryCountService inventoryCountService)
+        public InventoryCountController(IInventoryCountService inventoryCountService, IInventoryAdjustmentService inventoryAdjustmentService)
         {
             _inventoryCountService = inventoryCountService;
+            _inventoryAdjustmentService = inventoryAdjustmentService;
         }
 
         [HttpGet]
         public async Task<IActionResult> SearchPartners([FromQuery] int pageIndex = 1,
                                                         [FromQuery] int pageSize = 5,
                                                         [FromQuery] string? keyword = null,
-                                                        [FromQuery] InventoryCountStatus? status = 0,
+                                                        [FromQuery] InventoryCountStatus? status = null,
                                                         [FromQuery] string? warehouseId = null)
         {
             var response = await _inventoryCountService.Search<InventoryCountDTO>(
@@ -83,6 +86,39 @@ namespace API.Controllers
         }
 
         [Authorize]
+        [HttpPost("adjustment")]
+        public async Task<IActionResult> Add([FromBody] InventoryAdjustmentCreateDTO request)
+        {
+            try
+            {
+                var authUser = AuthHelper.GetCurrentUser(HttpContext.Request);
+
+                if (authUser != null)
+                {
+                    request.CreatedBy = authUser.id;
+                    request.InventoryAdjustmentDetails.ForEach(x => x.CreatedBy = authUser.id);
+                }
+
+                var respones = await _inventoryAdjustmentService.AddInventoryAdjustment(request);
+                return ControllerResponse.Response(new ServiceResponse
+                {
+                    Status = SRStatus.Success,
+                    Message = "InventoryAdjustment created successfully",
+                    Data = respones
+                });
+            }
+            catch (Exception ex)
+            {
+                return ControllerResponse.Response(new ServiceResponse
+                {
+                    Status = SRStatus.Error,
+                    Message = ex.Message,
+                    Data = null
+                });
+            }
+        }
+
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> Add([FromBody] InventoryCountCreateDTO request)
         {
@@ -102,7 +138,7 @@ namespace API.Controllers
                     return ControllerResponse.Response(new ServiceResponse
                     {
                         Status = SRStatus.Success,
-                        Message = "Product created successfully",
+                        Message = "Inventory-Count created successfully",
                         Data = inventoryCount
                     });
                     

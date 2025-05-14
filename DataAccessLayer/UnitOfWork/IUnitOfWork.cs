@@ -37,5 +37,7 @@ namespace DataAccessLayer.UnitOfWork
         IGroupPermissionRepository GroupPermissionRepository { get; }
         IAccountPermissionRepository AccountPermissionRepository { get; }
         IAccountGroupRepository AccountGroupRepository { get; }
+        IInventoryAdjustmentRepository InventoryAdjustmentRepository { get; }
+        IInventoryCountRepository InventoryCountRepository { get; }
     }
 }

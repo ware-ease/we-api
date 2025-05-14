@@ -13,7 +13,7 @@ namespace Data.Model.DTO
     {
         public string Id { get; set; }
         public InventoryCountStatus Status { get; set; }
-        public InventoryCountCheckStatus CheckStatus { get; set; }
+        //public InventoryCountCheckStatus CheckStatus { get; set; }
         public string? Code { get; set; }
         public string? Note { get; set; }
         public DateOnly? Date { get; set; }
@@ -24,7 +24,7 @@ namespace Data.Model.DTO
         public string LocationId { get; set; }*/
         public string WarehouseName { get; set; }
         public string WarehouseId { get; set; }
-        public List<InventoryCountDetailDTO> InventoryCountDetailDTO { get; set; }
+        public List<InventoryCountDetailDTO> InventoryCountDetails { get; set; }
     }
 
     public class InventoryCountDetailDTO : BaseDTO
@@ -52,7 +52,7 @@ namespace Data.Model.DTO
         public TimeOnly? StartTime { get; set; }
         public TimeOnly? EndTime { get; set; }
         public DateOnly? ScheduleDate { get; set; }
-        public List<InventoryCountDetailResponseDTO> InventoryCountDetailDTO { get; set; }
+        public List<InventoryCountDetailResponseDTO> InventoryCountDetails { get; set; }
     }
 
     public class InventoryCountDetailResponseDTO : BaseDTO

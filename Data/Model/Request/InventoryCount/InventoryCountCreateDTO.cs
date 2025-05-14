@@ -18,8 +18,8 @@ namespace Data.Model.Request.InventoryCount
         //[Required(ErrorMessage = "CheckStatus không được để trống")]
         [JsonIgnore]
         public InventoryCountCheckStatus CheckStatus { get; set; } = InventoryCountCheckStatus.Incomplete;
-        [Required(ErrorMessage = "Code không được để trống")]
-        public string? Code { get; set; }
+        /*[Required(ErrorMessage = "Code không được để trống")]
+        public string? Code { get; set; }*/
         public string? Note { get; set; }
         [Required(ErrorMessage = "Date không được để trống")]
         public DateOnly? Date { get; set; }

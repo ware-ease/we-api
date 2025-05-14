@@ -31,6 +31,7 @@ namespace BusinessLogicLayer.Services
         private readonly IGenericRepository<Account> _accountRepository;
         private readonly IGenericRepository<AccountGroup> _accountGroupRepository;
         private readonly IFirebaseService _firebaseService;
+        private readonly ICodeGeneratorService _codeGeneratorService;
         public InventoryCountService(IGenericRepository<InventoryCount> genericRepository,
             IGenericRepository<Schedule> scheduleRepository,
             IGenericRepository<Location> locationRepository,
@@ -43,6 +44,7 @@ namespace BusinessLogicLayer.Services
             IGenericRepository<AccountGroup> accountGroupRepository,
             IGenericRepository<InventoryCountDetail> inventoryCountDetailRepository,
             IFirebaseService firebaseService,
+            ICodeGeneratorService codeGeneratorService,
             IMapper mapper, IUnitOfWork unitOfWork) : base(genericRepository, mapper, unitOfWork)
         {
             _scheduleRepository = scheduleRepository;
@@ -56,6 +58,7 @@ namespace BusinessLogicLayer.Services
             _accountGroupRepository = accountGroupRepository;
             _inventoryCountDetailRepository = inventoryCountDetailRepository;
             _firebaseService = firebaseService;
+            _codeGeneratorService = codeGeneratorService;
         }
 
 
@@ -88,8 +91,8 @@ namespace BusinessLogicLayer.Services
 
         public async Task<InventoryCountDTO> AddInventoryCount(InventoryCountCreateDTO request)
         {
-            if (request.Date > DateOnly.FromDateTime(DateTime.Now))
-                throw new Exception("Date không được ở tương lai");
+            /*if (request.Date > DateOnly.FromDateTime(DateTime.Now))
+                throw new Exception("Date không được ở tương lai");*/
 
             if (request.EndTime < request.StartTime)
                 throw new Exception("EndTime không được ở trước StartTime");
@@ -138,6 +141,7 @@ namespace BusinessLogicLayer.Services
                 throw new Exception("Product không tồn tại");*/
 
             var inventoryCount = _mapper.Map<InventoryCount>(request);
+            inventoryCount.Code = await _codeGeneratorService.GenerateCodeAsync(Data.Enum.CodeType.PKK);
             //inventoryCount.LocationId = schedule.LocationId;
             //inventoryCount.LocationId = request.LocationId;
 
@@ -189,12 +193,13 @@ namespace BusinessLogicLayer.Services
                     inventoryCountDetail.InventoryCountId = inventoryCount.Id;
                     //inventoryCountDetail.ExpectedQuantity = expectedQuantity;
                     inventoryCountDetail.CreatedBy = inventoryCount.CreatedBy;
+                    inventoryCountDetail.ExpectedQuantity = inventory.CurrentQuantity;
 
                     await _inventoryCountDetailRepository.Insert(inventoryCountDetail);
                     await _unitOfWork.SaveAsync();
 
                     await _firebaseService.SendNotificationToUsersAsync(employeeAccountIds, $"Nhân viên được sắp xếp kiểm kê",
-                                                                    $"Nhân viên vừa được sắp xếp vào vai trò kiểm kê với Id kho là: {detail.InventoryId}",
+                                                                    $"Nhân viên vừa được sắp xếp vào vai trò kiểm kê tại kho: {inventory.Warehouse.Name} với mã phiếu {inventoryCount.Code}",
                                                                     NotificationType.INVENTORY_COUNT_ASSIGNED, request.WarehouseId);
                 }
 
@@ -216,8 +221,8 @@ namespace BusinessLogicLayer.Services
             /*if (request.Status.HasValue)
                 existingInventoryCount.Status = request.Status.Value;*/
 
-            if (!string.IsNullOrEmpty(request.Code))
-                existingInventoryCount.Code = request.Code;
+            /*if (!string.IsNullOrEmpty(request.Code))
+                existingInventoryCount.Code = request.Code;*/
 
             if (!string.IsNullOrEmpty(request.Note))
                 existingInventoryCount.Note = request.Note;
@@ -311,16 +316,20 @@ namespace BusinessLogicLayer.Services
 
                         if (changeEmployee)
                         {
+                            var inventory = await _inventoryRepository.GetByCondition(p => p.Id == existingDetail.InventoryId,
+                            includeProperties: "Warehouse");
+                            if (inventory == null)
+                                throw new Exception($"Inventory with ID {existingDetail.InventoryId} not found");
                             var employeeAccountIds = new List<string>();
                             var oldEmployeeAccountIds = new List<string>();
                             employeeAccountIds.Add(detailDto.AccountId);
                             oldEmployeeAccountIds.Add(oldEmployee);
                             await _firebaseService.SendNotificationToUsersAsync(employeeAccountIds, $"Nhân viên được sắp xếp kiểm kê",
-                                                                    $"Nhân viên vừa được sắp xếp vào vai trò kiểm kê với Id kho là: {detailDto.InventoryId}",
+                                                                    $"Nhân viên vừa được sắp xếp vào vai trò kiểm kê tại kho: {inventory.Warehouse.Name} với mã phiếu {existingInventoryCount.Code}",
                                                                     NotificationType.INVENTORY_COUNT_ASSIGNED, existingInventoryCount.Schedule.WarehouseId);
 
                             await _firebaseService.SendNotificationToUsersAsync(oldEmployeeAccountIds, $"Nhân viên đã thay đổi",
-                                                                    $"Nhân viên vừa bị thay đổi khỏi vị trí kiểm kê với detail Id là: {detailDto.Id}",
+                                                                    $"Nhân viên vừa bị thay đổi khỏi vị trí kiểm kê, mã phiếu {existingInventoryCount.Code}",
                                                                     NotificationType.INVENTORY_COUNT_UNASSIGNED, existingInventoryCount.Schedule.WarehouseId);
                         }
                     }
@@ -342,9 +351,9 @@ namespace BusinessLogicLayer.Services
 
             if (allCounted)
             {
-                existingInventoryCount.CheckStatus = InventoryCountCheckStatus.Completed;
+                //existingInventoryCount.CheckStatus = InventoryCountCheckStatus.Completed;
 
-                var combinedDateTime = existingInventoryCount.Date.Value.ToDateTime(existingInventoryCount.EndTime.Value);
+                /*var combinedDateTime = existingInventoryCount.Date.Value.ToDateTime(existingInventoryCount.EndTime.Value);
                 if (combinedDateTime < DateTime.Now)
                 {
                     existingInventoryCount.Status = InventoryCountStatus.Overdue;
@@ -352,10 +361,11 @@ namespace BusinessLogicLayer.Services
                 else
                 {
                     existingInventoryCount.Status = InventoryCountStatus.OnTime;
-                }
+                }*/
+                existingInventoryCount.Status = InventoryCountStatus.Completed;
                 var userOfRequestedWarehouseIds = await _unitOfWork.AccountRepository.GetUserIdsByWarehouseAndGroups(existingInventoryCount.Schedule.WarehouseId, new List<string> { "Thủ kho" });
                 await _firebaseService.SendNotificationToUsersAsync(userOfRequestedWarehouseIds, $"Phiếu kiểm kê đã hoàn thành",
-                                                                    $"Phiếu kiểm kê với Id là: {existingInventoryCount.Id} đã hoàn thành",
+                                                                    $"Phiếu kiểm kê với mã phiếu: {existingInventoryCount.Code} đã hoàn thành",
                                                                     NotificationType.INVENTORY_COUNT_COMPLETED, existingInventoryCount.Schedule.WarehouseId);
             }
 
@@ -377,15 +387,28 @@ namespace BusinessLogicLayer.Services
         public async Task<ServiceResponse> Search<TResult>(int? pageIndex = null, int? pageSize = null,
                                                                    string? keyword = null, InventoryCountStatus? status = null, string? WarehouseId = null)
         {
+            Expression<Func<InventoryCount, bool>> filter;
+            if (status.HasValue)
+            {
+                filter = p =>
+                (p.Status == status &&
+                (string.IsNullOrEmpty(keyword) || p.Code.Contains(keyword)
+                    || p.Note.Contains(keyword)
+                    || p.InventoryCheckDetails.Any(d => d.Note != null && d.Note.Contains(keyword)))
+                    ) &&
+                    (string.IsNullOrEmpty(WarehouseId) || p.Schedule.Warehouse.Id == WarehouseId);
+            }
+            else
+            {
 
-            Expression<Func<InventoryCount, bool>> filter = p =>
-            (p.Status == status &&
-            (string.IsNullOrEmpty(keyword) || p.Code.Contains(keyword)
-                || p.Note.Contains(keyword)
-                || p.InventoryCheckDetails.Any(d => d.Note != null && d.Note.Contains(keyword)))
-                //|| p.InventoryCheckDetails.Any(d => d.Product != null && d.Product.Name.Contains(keyword)))
-                ) &&
-                (string.IsNullOrEmpty(WarehouseId) || p.Schedule.Warehouse.Id == WarehouseId);
+                filter = p =>
+                (string.IsNullOrEmpty(keyword) || p.Code.Contains(keyword)
+                    || p.Note.Contains(keyword)
+                    || p.InventoryCheckDetails.Any(d => d.Note != null && d.Note.Contains(keyword))
+                    ) &&
+                    (string.IsNullOrEmpty(WarehouseId) || p.Schedule.Warehouse.Id == WarehouseId);
+            }
+
 
             var totalRecords = await _genericRepository.Count(filter);
 

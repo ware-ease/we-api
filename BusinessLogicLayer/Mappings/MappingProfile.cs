@@ -117,6 +117,7 @@ namespace BusinessLogicLayer.Mappings
                 .ForMember(dest => dest.Category, opt => opt.MapFrom(src => $"{src.ProductType.Category.Name} {src.ProductType.Category.Note}".Trim()))
                 .ForMember(dest => dest.Brand, opt => opt.MapFrom(src => $"{src.Brand.Name}".Trim()))
                 .ForMember(dest => dest.Unit, opt => opt.MapFrom(src => $"{src.Unit.Name} {src.Unit.Note}".Trim()))
+                .ForMember(dest => dest.UnitType, opt => opt.MapFrom(src => src.Unit.Type))
                 .ReverseMap();
 
             CreateMap<ProductCreateDTO, Product>().ReverseMap();
@@ -142,7 +143,7 @@ namespace BusinessLogicLayer.Mappings
                 .ForMember(dest => dest.WarehouseName, opt => opt.MapFrom(src => src.Schedule.Warehouse.Name))
                 .ForMember(dest => dest.WarehouseId, opt => opt.MapFrom(src => src.Schedule.Warehouse.Id))
                 .ForMember(dest => dest.ScheduleDate, opt => opt.MapFrom(src => src.Schedule.Date))
-                .ForMember(dest => dest.InventoryCountDetailDTO, opt => opt.MapFrom(src => src.InventoryCheckDetails))
+                .ForMember(dest => dest.InventoryCountDetails, opt => opt.MapFrom(src => src.InventoryCheckDetails))
                 .ReverseMap();
 
             CreateMap<InventoryCount, InventoryCountCreateDTO>().ReverseMap();
@@ -163,7 +164,7 @@ namespace BusinessLogicLayer.Mappings
             #region InventoryAdjustment
             CreateMap<InventoryAdjustment, InventoryAdjustmentDTO>()
                 .ForMember(dest => dest.WarehouseName, opt => opt.MapFrom(src => $"{src.Warehouse.Name}".Trim()))
-                .ForMember(dest => dest.inventoryAdjustmentDetailDTOs, opt => opt.MapFrom(src => src.InventoryAdjustmentDetails))
+                .ForMember(dest => dest.inventoryAdjustmentDetails, opt => opt.MapFrom(src => src.InventoryAdjustmentDetails))
                 .ReverseMap();
 
             CreateMap<InventoryAdjustment, InventoryAdjustmentCreateDTO>().ReverseMap();
@@ -173,6 +174,7 @@ namespace BusinessLogicLayer.Mappings
 
             #region InventoryAdjustmentDetail
             CreateMap<InventoryAdjustmentDetail, InventoryAdjustmentDetailDTO>()
+                .ForMember(dest => dest.Batch, opt => opt.MapFrom(src => src.Inventory.Batch))
                 .ReverseMap();
 
             CreateMap<InventoryAdjustmentDetail, InventoryAdjustmentDetailCreateDTO>().ReverseMap();
@@ -212,7 +214,7 @@ namespace BusinessLogicLayer.Mappings
 
             #region Batch
             CreateMap<Batch, BatchDTO>()
-                .ForMember(dest => dest.ProductName, opt => opt.MapFrom(src => src.Product.Name))
+                //.ForMember(dest => dest.ProductName, opt => opt.MapFrom(src => src.Product.Name))
                 .ReverseMap();
             CreateMap<Batch, BatchCreateDTO>().ReverseMap();
             CreateMap<BatchCreateDTOv2, Batch>()

@@ -1,5 +1,7 @@
 ﻿using BusinessLogicLayer.IServices;
+using Data.Entity;
 using Data.Enum;
+using DataAccessLayer.Generic;
 using DataAccessLayer.UnitOfWork;
 using System;
 using System.Collections.Generic;
@@ -92,6 +94,24 @@ namespace BusinessLogicLayer.Services
                         1, 1
                     );
                     maxCode = goodNotesPXDC.FirstOrDefault()?.Code;
+                    break;
+                case CodeType.PDC:
+                    var adjustmentPDC = await _unitOfWork.InventoryAdjustmentRepository.Search(
+                    x => x.Code.StartsWith("P") && x.Code.Contains("DC"),
+                        q => q.OrderByDescending(x => x.Code),
+                        "",
+                        1, 1
+                );
+                    maxCode = adjustmentPDC.FirstOrDefault()?.Code;
+                    break;
+                case CodeType.PKK:
+                    var countPKK = await _unitOfWork.InventoryCountRepository.Search(
+                    x => x.Code.StartsWith("P") && x.Code.Contains("KK"),
+                    q => q.OrderByDescending(x => x.Code),
+                    "",
+                    1, 1
+                );
+                    maxCode = countPKK.FirstOrDefault()?.Code;
                     break;
                 case CodeType.LO:
                     var batchCodes = await _unitOfWork.BatchRepository.Search(

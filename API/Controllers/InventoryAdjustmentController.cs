@@ -53,8 +53,9 @@ namespace API.Controllers
             }
         }
 
+        //[NonAction]
         [Authorize]
-        [HttpPost("with-Details")]
+        [HttpPost]
         public async Task<IActionResult> Add([FromBody] InventoryAdjustmentCreateDTOv2 request)
         {
             try
@@ -68,40 +69,6 @@ namespace API.Controllers
                 }
 
                 var respones = await _inventoryAdjustmentService.AddInventoryAdjustmentWithDetail(request);
-                return ControllerResponse.Response(new ServiceResponse
-                {
-                    Status = SRStatus.Success,
-                    Message = "InventoryAdjustment created successfully",
-                    Data = respones
-                });
-            }
-            catch (Exception ex)
-            {
-                return ControllerResponse.Response(new ServiceResponse
-                {
-                    Status = SRStatus.Error,
-                    Message = ex.Message,
-                    Data = null
-                });
-            }
-        }
-
-
-        [Authorize]
-        [HttpPost]
-        public async Task<IActionResult> Add([FromBody] InventoryAdjustmentCreateDTO request)
-        {
-            try
-            {
-                var authUser = AuthHelper.GetCurrentUser(HttpContext.Request);
-
-                if (authUser != null)
-                {
-                    request.CreatedBy = authUser.id;
-                    request.InventoryAdjustmentDetails.ForEach(x => x.CreatedBy = authUser.id);
-                }
-
-                var respones = await _inventoryAdjustmentService.AddInventoryAdjustment(request);
                 return ControllerResponse.Response(new ServiceResponse
                 {
                     Status = SRStatus.Success,

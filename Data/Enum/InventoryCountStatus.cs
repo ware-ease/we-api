@@ -9,7 +9,7 @@ namespace Data.Enum
     public enum InventoryCountStatus
     {
         Inprogress,
-        OnTime,
-        Overdue
+        Completed,
+        Adjusted
     }
 }

@@ -19,7 +19,7 @@ namespace Data.Entity
         public string InventoryAdjustmentId { get; set; }
         public InventoryAdjustment InventoryAdjustment { get; set; }
 
-        [ForeignKey("LocationLog")]
+        [ForeignKey("Inventory")]
         public string? InventoryId { get; set; }
         public Inventory Inventory { get; set; }
     }
