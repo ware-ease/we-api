@@ -275,6 +275,8 @@ namespace BusinessLogicLayer.Services
                         includeProperties: "InventoryCheckDetails,InventoryCheckDetails.Inventory.Batch.Product");
                     if (inventoryCount == null)
                         throw new Exception("InventoryCount không tồn tại");
+                    if (inventoryCount.Status == Data.Enum.InventoryCountStatus.Adjusted)
+                        throw new Exception("InventoryCount này đã được điều chỉnh");
 
                     inventoryCount.Status = Data.Enum.InventoryCountStatus.Adjusted;
                     _inventoryCountRepository.Update(inventoryCount);
