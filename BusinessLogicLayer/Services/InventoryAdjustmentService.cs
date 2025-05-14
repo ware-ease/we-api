@@ -476,6 +476,7 @@ namespace BusinessLogicLayer.Services
                                     };
 
                                     //var serviceResponse = await _goodRequestService.CreateAsync<GoodRequestDTO>(goodRequestDTO);
+                                    await _unitOfWork.GoodRequestRepository.Insert(goodRequestEntity);
                                     await _unitOfWork.SaveAsync();
 
                                     /*var goodRequestData = serviceResponse.Data as GoodRequestDTO;
