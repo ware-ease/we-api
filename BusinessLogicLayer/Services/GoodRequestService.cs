@@ -449,7 +449,8 @@ namespace BusinessLogicLayer.Services
                                                     (g.RequestedWarehouse != null && g.RequestedWarehouse.Name.Contains(keyword)) ||
                                                     (g.Partner != null && g.Partner.Name.Contains(keyword)))) &&
                                                     (!requestType.HasValue || g.RequestType == requestType.Value) &&  // ✅ Lọc theo loại yêu cầu
-                                                    (!status.HasValue || g.Status == status.Value);                   // ✅ Lọc theo trạng thái yêu cầu
+                                                    (!status.HasValue || g.Status == status.Value) &&                   // ✅ Lọc theo trạng thái yêu cầu
+                                                    g.Code != "AR";
                 var totalRecords = await _goodRequestRepository.Count(filter);
 
                 var results = await _goodRequestRepository.Search(
