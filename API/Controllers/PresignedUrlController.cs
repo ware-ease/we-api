@@ -1,6 +1,7 @@
 ﻿using BusinessLogicLayer.IServices;
 using BusinessLogicLayer.Models.General;
 using CloudinaryDotNet;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -20,7 +21,7 @@ namespace API.Controllers
         {
             _cloudinaryService = cloudinaryService;
         }
-
+        [Authorize]
         [HttpGet("generate")]
         public async Task<IActionResult> GeneratePresignedUrl()
         {

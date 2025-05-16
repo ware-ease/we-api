@@ -18,7 +18,7 @@ namespace API.Controllers
         {
             _goodNoteService = goodNoteService;
         }
-
+        [Authorize]
         [HttpGet()]
         public async Task<IActionResult> Search([FromQuery] int pageIndex = 1,
                                                 [FromQuery] int pageSize = 5,
@@ -32,6 +32,7 @@ namespace API.Controllers
             );
             return ControllerResponse.Response(response);
         }
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(string id)
         {

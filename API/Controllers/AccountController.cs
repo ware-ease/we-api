@@ -21,6 +21,7 @@ namespace API.Controllers
             _accountService = appUserService;
         }
 
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(string id)
         {
@@ -45,6 +46,7 @@ namespace API.Controllers
             return ControllerResponse.Response(result);
         }
 
+        [Authorize]
         [HttpGet()]
         public async Task<IActionResult> Get()
         {
@@ -63,6 +65,7 @@ namespace API.Controllers
             return ControllerResponse.Response(result);
         }
 
+        [Authorize]
         [HttpPatch("{id}")]
         public async Task<IActionResult> Update([FromRoute] string id, [FromBody] AccountUpdateDTO request)
         {

@@ -22,7 +22,7 @@ namespace API.Controllers
         {
             _inventoryAdjustmentService = inventoryAdjustmentService;
         }
-
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> SearchPartners([FromQuery] int pageIndex = 1,
                                                         [FromQuery] int pageSize = 5,
@@ -33,7 +33,7 @@ namespace API.Controllers
 
             return ControllerResponse.Response(response);
         }
-
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(string id)
         {

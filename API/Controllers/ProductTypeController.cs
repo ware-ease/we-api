@@ -22,7 +22,7 @@ namespace API.Controllers
         {
             _productTypeService = productTypesService;
         }
-
+        [Authorize]
         [HttpGet("count")]
         public async Task<IActionResult> Count()
         {
@@ -36,7 +36,7 @@ namespace API.Controllers
 
             return ControllerResponse.Response(response);
         }
-
+        [Authorize]
         [NonAction]
         public async Task<IActionResult> Get()
         {
@@ -55,7 +55,7 @@ namespace API.Controllers
                 });
             }
         }
-
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> SearchPartners([FromQuery] int pageIndex = 1,
                                                         [FromQuery] int pageSize = 5,
@@ -66,7 +66,7 @@ namespace API.Controllers
 
             return ControllerResponse.Response(response);
         }
-
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(string id)
         {
@@ -117,7 +117,7 @@ namespace API.Controllers
                 });
             }
         }
-
+        [Authorize]
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(string id, [FromBody] ProductTypeUpdateDTO request)
         {
@@ -142,7 +142,7 @@ namespace API.Controllers
                 });
             }
         }
-
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(string id)
         {

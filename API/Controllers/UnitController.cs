@@ -22,14 +22,14 @@ namespace API.Controllers
         {
             _unitService = unitService;
         }
-
+        [Authorize]
         [NonAction]
         public async Task<IActionResult> Get()
         {
             var result = await _unitService.Get<UnitDTO>();
             return ControllerResponse.Response(result);
         }
-
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> SearchPartners([FromQuery] int pageIndex = 1,
                                                         [FromQuery] int pageSize = 5,
@@ -40,7 +40,7 @@ namespace API.Controllers
 
             return ControllerResponse.Response(response);
         }
-
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(string id)
         {
@@ -67,7 +67,7 @@ namespace API.Controllers
                 Data = result
             });
         }
-
+        [Authorize]
         [HttpPatch("{id}")]
         public async Task<IActionResult> Update(string id, [FromBody] UnitUpdateDTO request)
         {
@@ -92,7 +92,7 @@ namespace API.Controllers
                 });
             }
         }
-
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(string id)
         {

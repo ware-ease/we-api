@@ -28,7 +28,7 @@ namespace API.Controllers
             _inventoryCountService = inventoryCountService;
             _inventoryAdjustmentService = inventoryAdjustmentService;
         }
-
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> SearchPartners([FromQuery] int pageIndex = 1,
                                                         [FromQuery] int pageSize = 5,
@@ -41,7 +41,7 @@ namespace API.Controllers
 
             return ControllerResponse.Response(response);
         }
-
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(string id)
         {
@@ -60,30 +60,30 @@ namespace API.Controllers
                 });
             }
         }
-
-        [HttpGet("location-level0")]
-        public async Task<IActionResult> GetByLocation(string id)
-        {
-            try
-            {
-                var response = await _inventoryCountService.GetInventoriesByLocationLevel0Async(id);
-                return ControllerResponse.Response(new ServiceResponse
-                {
-                    Status = SRStatus.Success,
-                    Message = " successfully",
-                    Data = response
-                });
-            }
-            catch (Exception ex)
-            {
-                return ControllerResponse.Response(new ServiceResponse
-                {
-                    Status = SRStatus.Error,
-                    Message = ex.Message,
-                    Data = null
-                });
-            }
-        }
+        //[Authorize]
+        //[HttpGet("location-level0")]
+        //public async Task<IActionResult> GetByLocation(string id)
+        //{
+        //    try
+        //    {
+        //        var response = await _inventoryCountService.GetInventoriesByLocationLevel0Async(id);
+        //        return ControllerResponse.Response(new ServiceResponse
+        //        {
+        //            Status = SRStatus.Success,
+        //            Message = " successfully",
+        //            Data = response
+        //        });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return ControllerResponse.Response(new ServiceResponse
+        //        {
+        //            Status = SRStatus.Error,
+        //            Message = ex.Message,
+        //            Data = null
+        //        });
+        //    }
+        //}
 
         [Authorize]
         [HttpPost("adjustment")]
@@ -154,7 +154,7 @@ namespace API.Controllers
                 }
             }
         }
-
+        [Authorize]
         [HttpPatch("{id}")]
         public async Task<IActionResult> Update(string id, [FromBody] InventoryCountUpdateDTO request)
         {

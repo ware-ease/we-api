@@ -25,7 +25,8 @@ namespace API.Controllers
         {
             _warehouseService = warehouseService;
         }
-        [HttpGet()]
+        [Authorize]
+        [HttpGet]
         public async Task<IActionResult> SearchWarehouses(
                                                             [FromQuery] int pageIndex = 1,
                                                             [FromQuery] int pageSize = 5,
@@ -54,7 +55,7 @@ namespace API.Controllers
 
             return ControllerResponse.Response(result);
         }
-
+        [Authorize]
         [HttpPatch("{id}")]
         public async Task<IActionResult> Update([FromRoute] string id, [FromBody] UpdateWarehouseDTO request)
         {
@@ -62,7 +63,7 @@ namespace API.Controllers
             var result = await _warehouseService.Update<WarehouseDTO, UpdateWarehouseDTO>(request);
             return ControllerResponse.Response(result);
         }
-
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete([FromRoute] string id)
         {
@@ -70,7 +71,7 @@ namespace API.Controllers
 
             return ControllerResponse.Response(result);
         }
-
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetFullWarehouseInfo([FromRoute] string id)
         {
@@ -79,7 +80,7 @@ namespace API.Controllers
             return ControllerResponse.Response(result);
         }
 
-        //[Authorize]
+        [Authorize]
         [HttpPost("{id}/location")]
         public async Task<IActionResult> AddWarehouseLocation([FromRoute] string id, [FromBody] CreateWarehouseStructureRequest request)
         {
@@ -98,7 +99,7 @@ namespace API.Controllers
 
             return ControllerResponse.Response(result);
         }
-        //[Authorize]
+        [Authorize]
         [HttpGet("{id}/inventory")]
         public async Task<IActionResult> GetWarehouseInventory([FromRoute] string id)
         {
@@ -120,24 +121,27 @@ namespace API.Controllers
         //    var result = await _warehouseService.GetInventoriesInLocation(locationId);
         //    return ControllerResponse.Response(result);
         //}
-        [HttpGet("{id}/location-logs")]
-        public async Task<IActionResult> GetLocationLogs(
-            [FromRoute] string id,
-            [FromQuery] string? locationId = null,  // locationId là tùy chọn
-            [FromQuery] int pageIndex = 1,
-            [FromQuery] int pageSize = 10)
-        {
-            // Gọi service để lấy log
-            var result = await _warehouseService.GetLocationLogsAsync(id, locationId, pageIndex, pageSize);
+        //[Authorize]
+        //[HttpGet("{id}/location-logs")]
+        //public async Task<IActionResult> GetLocationLogs(
+        //    [FromRoute] string id,
+        //    [FromQuery] string? locationId = null,  // locationId là tùy chọn
+        //    [FromQuery] int pageIndex = 1,
+        //    [FromQuery] int pageSize = 10)
+        //{
+        //    // Gọi service để lấy log
+        //    var result = await _warehouseService.GetLocationLogsAsync(id, locationId, pageIndex, pageSize);
 
-            return ControllerResponse.Response(result);
-        }
+        //    return ControllerResponse.Response(result);
+        //}
         /// <summary>
         /// Lấy dữ liệu thẻ kho theo sản phẩm và kho
         /// </summary>
         /// <param name="productId">ID sản phẩm</param>
         /// <param name="warehouseId">ID kho</param>
         /// <returns>Thông tin thẻ kho</returns>
+
+        [Authorize]
         [HttpGet("stock-card")]
         public async Task<IActionResult> GetStockCard([FromQuery] string productId, [FromQuery] string warehouseId, 
                                                       [FromQuery] DateTime? from = null, [FromQuery] DateTime? to = null)
@@ -158,6 +162,7 @@ namespace API.Controllers
             var response = await _warehouseService.GetStockBookAsync(warehouseId, month, year, authUser.id);
             return ControllerResponse.Response(response);
         }
+        [Authorize]
         [HttpGet("{id}/products")]
         public async Task<IActionResult> GetAvailableProductsInWarehouse(string id)
         {
@@ -165,6 +170,7 @@ namespace API.Controllers
             return ControllerResponse.Response(result);
         }
         //Get all staff of warehouse
+        [Authorize]
         [HttpGet("{id}/staffs")]
         public async Task<IActionResult> GetStaffsInWarehouse(string id, [FromQuery] int pageIndex = 1,
                                                             [FromQuery] int pageSize = 5,
