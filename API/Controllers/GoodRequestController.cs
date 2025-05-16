@@ -18,9 +18,8 @@ namespace API.Controllers
         {
             _goodRequestService = goodRequestService;
         }
-
-        [HttpGet()]
         [Authorize]
+        [HttpGet()]
         public async Task<IActionResult> Search([FromQuery] int pageIndex = 1,
                                                 [FromQuery] int pageSize = 5,
                                                 [FromQuery] string? keyword = null,
@@ -32,6 +31,7 @@ namespace API.Controllers
             );
             return ControllerResponse.Response(response);
         }
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(string id)
         {
@@ -51,7 +51,7 @@ namespace API.Controllers
             var result = await _goodRequestService.CreateAsync<GoodRequestDTO>(request);
             return ControllerResponse.Response(result);
         }
-
+        [Authorize]
         [HttpPatch("{id}")]
         public async Task<IActionResult> Update([FromRoute] string id, [FromBody] GoodRequestUpdateDTO request)
         {
@@ -59,13 +59,14 @@ namespace API.Controllers
             var result = await _goodRequestService.UpdateAsync(id, request);
             return ControllerResponse.Response(result);
         }
-
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(string id)
         {
             var result = await _goodRequestService.Delete(id);
             return ControllerResponse.Response(result);
         }
+        [Authorize]
         [HttpPut("{id}/status")]
         public async Task<IActionResult> UpdateStatus(string id, [FromQuery] GoodRequestStatusEnum requestStatus, string? statusNote)
         {

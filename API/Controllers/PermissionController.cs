@@ -3,6 +3,7 @@ using BusinessLogicLayer.IServices;
 using Data.Model.DTO;
 using Data.Model.Request.Customer;
 using Data.Model.Response;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,7 +19,7 @@ namespace API.Controllers
         {
             _permissionService = permissionService;
         }
-
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> Get()
         {

@@ -1,5 +1,6 @@
 ﻿using BusinessLogicLayer.IServices;
 using Data.Enum;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,7 +15,7 @@ namespace API.Controllers
         {
             _codeGeneratorService = codeGeneratorService;
         }
-
+        [Authorize]
         [HttpGet("generate")]
         public async Task<IActionResult> GenerateCode([FromQuery] CodeType codeType)
         {
@@ -28,6 +29,7 @@ namespace API.Controllers
                 return BadRequest(new { error = ex.Message });
             }
         }
+        [Authorize]
         [HttpGet("generate-batch-code")]
         public async Task<IActionResult> GenerateBatchCodeByProduct([FromQuery] string productId)
         {

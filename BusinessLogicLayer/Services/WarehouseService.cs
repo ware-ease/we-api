@@ -1262,7 +1262,7 @@ namespace BusinessLogicLayer.Services
             }
 
             var inventories = await _unitOfWork.InventoryRepository.Search(
-                i => i.WarehouseId == warehouseId && i.CurrentQuantity > 0,
+                i => i.WarehouseId == warehouseId /*&& i.CurrentQuantity > 0*/,
                 includeProperties: "Batch,Batch.Product,Batch.Product.Unit," +
                                     "Batch.Product.Brand," +
                                     "Batch.Product.ProductType," +
@@ -1278,19 +1278,6 @@ namespace BusinessLogicLayer.Services
                     Data = warehouseId
                 };
             }
-
-            //var grouped = inventories
-            //    .GroupBy(i => i.Batch.ProductId)
-            //    .Select(g => new ProductWithQuantityDTO
-            //    {
-            //        ProductId = g.Key.Id,
-            //        ProductName = g.Key.Name,
-            //        Sku = g.Key.Sku,
-            //        UnitName = g.Key.Unit?.Name,
-            //        BrandName = g.Key.Brand?.Name,
-            //        TotalQuantity = g.Sum(i => i.CurrentQuantity)
-            //    })
-            //    .ToList();
             var grouped = inventories
                 .GroupBy(i => i.Batch.ProductId)
                 .Select(g =>
@@ -1338,7 +1325,7 @@ namespace BusinessLogicLayer.Services
                 return new ServiceResponse
                 {
                     Status = SRStatus.NotFound,
-                    Message = "No staff found in the warehouse.",
+                    Message = "Không tìm thấy nhân viên nào trong kho.",
                     Data = warehouseId
                 };
             }
@@ -1348,7 +1335,7 @@ namespace BusinessLogicLayer.Services
             return new ServiceResponse
             {
                 Status = SRStatus.Success,
-                Message = "Staff retrieved successfully.",
+                Message = "Lấy danh sách nhân viên thành công.",
                 Data = staffDtos
             };
         }

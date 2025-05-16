@@ -29,7 +29,7 @@ namespace API.Controllers
             _categoryService = service;
             //_mapper = mapper;
         }
-
+        [Authorize]
         [HttpGet("count")]
         public async Task<IActionResult> Count()
         {
@@ -43,14 +43,14 @@ namespace API.Controllers
 
             return ControllerResponse.Response(response);
         }
-
+        [Authorize]
         [NonAction]
         public async Task<IActionResult> Get()
         {
             var result = await _categoryService.Get<CategoryDTO>();
             return ControllerResponse.Response(result);
         }
-
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> SearchPartners([FromQuery] int pageIndex = 1,
                                                         [FromQuery] int pageSize = 5,
@@ -61,7 +61,7 @@ namespace API.Controllers
 
             return ControllerResponse.Response(response);
         }
-
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(string id)
         {
@@ -87,7 +87,7 @@ namespace API.Controllers
             var result = await _categoryService.Add<CategoryDTO, CategoryCreateDTO>(request);
             return ControllerResponse.Response(result);
         }
-
+        [Authorize]
         [HttpPatch("{id}")]
         public async Task<IActionResult> Update(string id, [FromBody] CategoryUpdateDTO request)
         {
@@ -112,7 +112,7 @@ namespace API.Controllers
                 });
             }
         }
-
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(string id)
         {

@@ -21,7 +21,7 @@ namespace API.Controllers
         {
             _groupService = groupService;
         }
-
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> Get()
         {

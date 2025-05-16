@@ -24,6 +24,7 @@ namespace API.Controllers
             _batchService = batchService;
         }
 
+        [Authorize]
         [HttpGet("count")]
         public async Task<IActionResult> Count()
         {
@@ -37,7 +38,7 @@ namespace API.Controllers
 
             return ControllerResponse.Response(response);
         }
-
+        [Authorize]
         [NonAction]
         public async Task<IActionResult> Get()
         {
@@ -45,7 +46,7 @@ namespace API.Controllers
             var batchs = await _batchService.Get<BatchDTO>();
             return ControllerResponse.Response(batchs);
         }
-
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> SearchPartners([FromQuery] int pageIndex = 1,
                                                         [FromQuery] int pageSize = 5,
@@ -57,7 +58,7 @@ namespace API.Controllers
 
             return ControllerResponse.Response(response);
         }
-
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(string id)
         {
@@ -108,7 +109,7 @@ namespace API.Controllers
                 });
             }
         }
-
+        [Authorize]
         [HttpPatch("{id}")]
         public async Task<IActionResult> Update(string id, [FromBody] BatchUpdateDTO request)
         {
@@ -133,7 +134,7 @@ namespace API.Controllers
                 });
             }
         }
-
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(string id)
         {
