@@ -18,5 +18,6 @@ namespace BusinessLogicLayer.IServices
         Task<ServiceResponse> Update(string id, AccountUpdateDTO request);
         Task<ServiceResponse> ChangePassword(string id, string oldPassword, string password);
         Task<ServiceResponse> UpdateStatus(string id, AccountStatus status);
+        Task<ServiceResponse> GetTasks(string id, InventoryCountDetailStatus? status, int? pageIndex, int? pageSize);
     }
 }
