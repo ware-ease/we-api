@@ -97,6 +97,7 @@ namespace DataAccessLayer.UnitOfWork
         public IAccountGroupRepository AccountGroupRepository => GetIRepository<IAccountGroupRepository>();
         public IInventoryAdjustmentRepository InventoryAdjustmentRepository => GetIRepository<IInventoryAdjustmentRepository>();
         public IInventoryCountRepository InventoryCountRepository => GetIRepository<IInventoryCountRepository>();
+        public IInventoryCountDetailRepository InventoryCountDetailRepository => GetIRepository<IInventoryCountDetailRepository>();
 
         public TRepository GetIRepository<TRepository>()
         {

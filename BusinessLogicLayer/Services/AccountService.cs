@@ -158,7 +158,7 @@ namespace BusinessLogicLayer.Services
                 return new ServiceResponse
                 {
                     Status = Data.Enum.SRStatus.Success,
-                    Message = "Add successfully!",
+                    Message = "Thêm tài khoản thành công!",
                     Data = _mapper.Map<AccountDTO>(account)
                 };
             }
@@ -350,6 +350,42 @@ namespace BusinessLogicLayer.Services
                 Status = Data.Enum.SRStatus.Success,
                 Message = "Update status successfully!",
                 Data = { }
+            };
+        }
+        //get task of staff
+        public async Task<ServiceResponse> GetTasks(string id, InventoryCountDetailStatus? status, int? pageIndex = null, int? pageSize = null)
+        {
+            var account = await _unitOfWork.AccountRepository.GetByCondition(a => a.Id == id);
+
+            if (account == null)
+            {
+                return new ServiceResponse
+                {
+                    Status = Data.Enum.SRStatus.NotFound,
+                    Message = "Không tìm thấy tài khoản",
+                    Data = id,
+                };
+            }
+            var tasks = await _unitOfWork.InventoryCountDetailRepository.Search(a => a.AccountId == id && (status == null || a.Status == status),
+                includeProperties: "InventoryCount,Inventory,Inventory.Batch,Inventory.Batch.Product", 
+                pageIndex: pageIndex,pageSize: pageSize);
+            
+            var tasksDTO = _mapper.Map<List<InventoryCountDetailDTO>>(tasks);
+            foreach (var item in tasksDTO)
+            {
+                var createdByAccount = await _unitOfWork.AccountRepository.GetByCondition(a => a.Id == item.CreatedBy, "Profile,AccountGroups,AccountGroups.Group");
+                if (createdByAccount != null)
+                {
+                    item.CreatedByAvatarUrl = createdByAccount.Profile!.AvatarUrl;
+                    item.CreatedByFullName = $"{createdByAccount.Profile.FirstName} {createdByAccount.Profile.LastName}";
+                    item.CreatedByGroup = createdByAccount.AccountGroups.FirstOrDefault()?.Group?.Name;
+                }
+            }
+            return new ServiceResponse
+            {
+                Status = Data.Enum.SRStatus.Success,
+                Message = "Tìm thành công",
+                Data = tasksDTO
             };
         }
     }

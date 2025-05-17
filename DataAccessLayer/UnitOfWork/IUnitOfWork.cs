@@ -39,5 +39,6 @@ namespace DataAccessLayer.UnitOfWork
         IAccountGroupRepository AccountGroupRepository { get; }
         IInventoryAdjustmentRepository InventoryAdjustmentRepository { get; }
         IInventoryCountRepository InventoryCountRepository { get; }
+        IInventoryCountDetailRepository InventoryCountDetailRepository { get; }
     }
 }

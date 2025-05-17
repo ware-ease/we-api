@@ -183,6 +183,7 @@ builder.Services.AddScoped<IAccountPermissionRepository, AccountPermissionReposi
 builder.Services.AddScoped<IAccountGroupRepository, AccountGroupRepository>();
 builder.Services.AddScoped<IInventoryAdjustmentRepository, InventoryAdjustmentRepository>();
 builder.Services.AddScoped<IInventoryCountRepository, InventoryCountRepository>();
+builder.Services.AddScoped<IInventoryCountDetailRepository, InventoryCountDetailRepository>();
 #endregion Repositories
 
 builder.Services.AddAuthentication(options =>
