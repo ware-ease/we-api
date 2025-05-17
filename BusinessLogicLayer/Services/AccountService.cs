@@ -353,7 +353,7 @@ namespace BusinessLogicLayer.Services
             };
         }
         //get task of staff
-        public async Task<ServiceResponse> GetTasks(string id, InventoryCountDetailStatus? status, int? pageIndex = null, int? pageSize = null)
+        public async Task<ServiceResponse> GetTasks(string id, string? warehouseId, InventoryCountDetailStatus? status, int? pageIndex = null, int? pageSize = null)
         {
             var account = await _unitOfWork.AccountRepository.GetByCondition(a => a.Id == id);
 
@@ -366,7 +366,7 @@ namespace BusinessLogicLayer.Services
                     Data = id,
                 };
             }
-            var tasks = await _unitOfWork.InventoryCountDetailRepository.Search(a => a.AccountId == id && (status == null || a.Status == status),
+            var tasks = await _unitOfWork.InventoryCountDetailRepository.Search(a => a.AccountId == id && (warehouseId == null || a.Inventory.WarehouseId == warehouseId) && (status == null || a.Status == status),
                 includeProperties: "InventoryCount,Inventory,Inventory.Batch,Inventory.Batch.Product", 
                 pageIndex: pageIndex,pageSize: pageSize);
             
@@ -381,11 +381,22 @@ namespace BusinessLogicLayer.Services
                     item.CreatedByGroup = createdByAccount.AccountGroups.FirstOrDefault()?.Group?.Name;
                 }
             }
+
+            //paging 
+            var totalCount = await _unitOfWork.InventoryCountDetailRepository.Count(a => a.AccountId == id && (warehouseId == null || a.Inventory.WarehouseId == warehouseId) && (status == null || a.Status == status));
+            var totalPage = (int)Math.Ceiling((double)totalCount / (pageSize ?? 10));
             return new ServiceResponse
             {
                 Status = Data.Enum.SRStatus.Success,
                 Message = "Tìm thành công",
-                Data = tasksDTO
+                Data = new
+                {
+                    Tasks = tasksDTO,
+                    TotalCount = totalCount,
+                    TotalPage = totalPage,
+                    PageIndex = pageIndex,
+                    PageSize = pageSize
+                }
             };
         }
     }
