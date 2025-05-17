@@ -111,11 +111,11 @@ namespace API.Controllers
         //get all task of staff
         [Authorize]
         [HttpGet("tasks")]
-        public async Task<IActionResult> GetTasks([FromQuery] InventoryCountDetailStatus? status,[FromQuery] int pageIndex = 1, [FromQuery] int pageSize = 10)
+        public async Task<IActionResult> GetTasks([FromQuery] string? warehouseId, [FromQuery] InventoryCountDetailStatus? status,[FromQuery] int pageIndex = 1, [FromQuery] int pageSize = 10)
         {
             var authUser = AuthHelper.GetCurrentUser(HttpContext.Request);
 
-            var result = await _accountService.GetTasks(authUser!.id!, status, pageIndex, pageSize);
+            var result = await _accountService.GetTasks(authUser!.id!, warehouseId, status, pageIndex, pageSize);
             return ControllerResponse.Response(result);
         }
 
