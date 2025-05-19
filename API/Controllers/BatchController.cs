@@ -48,7 +48,7 @@ namespace API.Controllers
         }
         [Authorize]
         [HttpGet]
-        public async Task<IActionResult> SearchPartners([FromQuery] int pageIndex = 1,
+        public async Task<IActionResult> Search([FromQuery] int pageIndex = 1,
                                                         [FromQuery] int pageSize = 5,
                                                         [FromQuery] string? keyword = null,
                                                         [FromQuery] string? productId = null)
