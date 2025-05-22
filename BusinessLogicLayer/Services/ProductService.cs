@@ -193,9 +193,9 @@ namespace BusinessLogicLayer.Services
 
             if (!string.IsNullOrEmpty(request.ProductTypeId))
             {
-                var category = await _categoryRepository.GetByCondition(p => p.Id == request.ProductTypeId);
-                if (category == null)
-                    throw new Exception("Category not found");
+                var productType = await _productTypeRepository.GetByCondition(p => p.Id == request.ProductTypeId);
+                if (productType == null)
+                    throw new Exception("ProductType not found");
                 existingProduct.ProductTypeId = request.ProductTypeId;
             }
 
