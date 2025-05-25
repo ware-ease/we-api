@@ -9,7 +9,7 @@ namespace Data.Model.Request.ProductType
     public class ProductTypeCreateDTO : BaseCreateDTO
     {
         public string Name { get; set; }
-        public string Note { get; set; }
+        public string? Note { get; set; }
         public string CategoryId { get; set; }
     }
 }

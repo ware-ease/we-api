@@ -17,7 +17,7 @@ namespace Data.Model.Request.InventoryAdjustment
         public string? Reason { get; set; }
         //[Required(ErrorMessage = "Loại yêu cầu không được để trống.")]
         //public GoodRequestEnum RequestType { get; set; }
-        [Required(ErrorMessage = "Note không được để trống")]
+        //[Required(ErrorMessage = "Note không được để trống")]
         public string? Note { get; set; }
         public DocumentType? DocumentType { get; set; }
         public string? RelatedDocument { get; set; }
@@ -52,7 +52,7 @@ namespace Data.Model.Request.InventoryAdjustment
         public string? Reason { get; set; }
         //[Required(ErrorMessage = "Loại yêu cầu không được để trống.")]
         //public GoodRequestEnum RequestType { get; set; }
-        [Required(ErrorMessage = "Note không được để trống")]
+        //[Required(ErrorMessage = "Note không được để trống")]
         public string? Note { get; set; }
         public DocumentType? DocumentType { get; set; }
         public string? RelatedDocument { get; set; }
@@ -71,7 +71,7 @@ namespace Data.Model.Request.InventoryAdjustment
         public float NewQuantity { get; set; }
         [Required(ErrorMessage = "ChangeInQuantity không được để trống")]
         public float ChangeInQuantity { get; set; }
-        [Required(ErrorMessage = "Note không được để trống")]
+        //[Required(ErrorMessage = "Note không được để trống")]
         public string? Note { get; set; }
         //public string? ProductId { get; set; }
         [Required(ErrorMessage = "InventoryId không được để trống")]
