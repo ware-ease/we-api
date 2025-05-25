@@ -659,6 +659,7 @@ namespace BusinessLogicLayer.Services
 
             var results = await _genericRepository.Search(
                 filter: filter, pageIndex: pageIndex, pageSize: pageSize,
+                orderBy: q => q.OrderByDescending(x => x.CreatedTime),
                 includeProperties: "InventoryAdjustmentDetails,Warehouse," +
                 "InventoryAdjustmentDetails.Inventory.Batch.Product.ProductType.Category," +
                 "InventoryAdjustmentDetails.Inventory.Batch.Product.Brand," +
