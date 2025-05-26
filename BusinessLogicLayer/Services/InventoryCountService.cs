@@ -416,7 +416,61 @@ namespace BusinessLogicLayer.Services
                 filter: filter, pageIndex: pageIndex, pageSize: pageSize,
                 includeProperties: "InventoryCheckDetails,Schedule.Warehouse,InventoryCheckDetails.Inventory.Batch.Product");
 
-            var mappedResults = _mapper.Map<IEnumerable<TResult>>(results);
+            var mappedResults = _mapper.Map<List<InventoryCountDTO>>(results);
+            
+
+            foreach (var dto in mappedResults)
+            {
+                if (!string.IsNullOrEmpty(dto.CreatedBy))
+                {
+                    var account = await _unitOfWork.AccountRepository.GetByCondition(a => a.Id == dto.CreatedBy, "Profile,AccountGroups,AccountGroups.Group");
+                    if (account != null)
+                    {
+                        dto.CreatedByAvatarUrl = account.Profile!.AvatarUrl;
+                        dto.CreatedByFullName = $"{account.Profile.FirstName} {account.Profile.LastName}";
+                        dto.CreatedByGroup = account.AccountGroups.FirstOrDefault()?.Group?.Name;
+                    }
+                }
+
+                if (dto.InventoryCountDetails != null && dto.InventoryCountDetails.Any())
+                {
+                    foreach (var detailDto in dto.InventoryCountDetails)
+                    {
+                        if (!string.IsNullOrEmpty(detailDto.AccountId))
+                        {
+                            var detailAccount = await _unitOfWork.AccountRepository.GetByCondition(
+                                a => a.Id == detailDto.AccountId, "Profile,AccountGroups,AccountGroups.Group");
+
+                            if (detailAccount != null)
+                            {
+                                detailDto.CreatedByAvatarUrl = detailAccount.Profile!.AvatarUrl;
+                                detailDto.CreatedByFullName = $"{detailAccount.Profile.FirstName} {detailAccount.Profile.LastName}";
+                                detailDto.CreatedByGroup = detailAccount.AccountGroups.FirstOrDefault()?.Group?.Name;
+                            }
+                        }
+                    }
+                }
+            }
+
+
+
+            /*var mappedResultsForCountDetail = _mapper.Map<List<InventoryCountDetailDTO>>(results);
+
+            foreach (var dto in mappedResultsForCountDetail)
+            {
+                if (!string.IsNullOrEmpty(dto.CreatedBy))
+                {
+                    var account = await _unitOfWork.AccountRepository.GetByCondition(a => a.Id == dto.CreatedBy, "Profile,AccountGroups,AccountGroups.Group");
+                    if (account != null)
+                    {
+                        dto.CreatedByAvatarUrl = account.Profile!.AvatarUrl;
+                        dto.CreatedByFullName = $"{account.Profile.FirstName} {account.Profile.LastName}";
+                        dto.CreatedByGroup = account.AccountGroups.FirstOrDefault()?.Group?.Name;
+                    }
+                }
+            }*/
+
+            //var mappedResults = _mapper.Map<IEnumerable<TResult>>(results);
 
             int totalPages = (int)Math.Ceiling((double)totalRecords / (pageSize ?? totalRecords));
 
