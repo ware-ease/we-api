@@ -114,7 +114,7 @@ namespace BusinessLogicLayer.Services
                 return new ServiceResponse
                 {
                     Status = SRStatus.Error,
-                    Message = "Vui lòng chọn kho gửi (WarehouseId) cho yêu cầu chuyển kho!"
+                    Message = "Vui lòng chọn kho nhận hàng (WarehouseId) cho yêu cầu chuyển kho!"
                 };
             }
 
@@ -138,7 +138,7 @@ namespace BusinessLogicLayer.Services
                 return new ServiceResponse
                 {
                     Status = SRStatus.Error,
-                    Message = "Vui lòng chọn kho nhận (RequestedWarehouseId)!"
+                    Message = "Vui lòng chọn kho nhận yêu cầu (RequestedWarehouseId)!"
                 };
             }
             else
@@ -218,7 +218,7 @@ namespace BusinessLogicLayer.Services
                 return new ServiceResponse
                 {
                     Status = SRStatus.Success,
-                    Message = "Good request created successfully!",
+                    Message = "Tạo yêu cầu thành công!",
                     Data = result
                 };
             }
@@ -229,7 +229,7 @@ namespace BusinessLogicLayer.Services
                 return new ServiceResponse
                 {
                     Status = SRStatus.Error,
-                    Message = $"Error creating good request: {ex.Message}"
+                    Message = $"Lỗi khi tạo yêu cầu: {ex.Message}"
                 };
             }
         }

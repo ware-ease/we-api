@@ -81,6 +81,7 @@ namespace Data.Model.Request.GoodNote
 
     public class GoodNoteDetailCreateDTO : BaseCreateDTO
     {
+        [Range(0, double.MaxValue, ErrorMessage = "Số lượng không được âm.")]
         public float Quantity { get; set; }
         public string? Note { get; set; }
         [JsonIgnore]
