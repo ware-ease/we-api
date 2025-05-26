@@ -390,7 +390,7 @@ namespace BusinessLogicLayer.Services
             try
             {
                 //validate
-                var goodRequest = await _unitOfWork.GoodRequestRepository.GetByCondition(x => x.Id == dto.GoodRequestId, includeProperties: "Warehouse");
+                var goodRequest = await _unitOfWork.GoodRequestRepository.GetByCondition(x => x.Id == dto.GoodRequestId, includeProperties: "Warehouse,RequestedWarehouse");
                 if (goodRequest == null)
                 {
                     serviceResponse.Status = SRStatus.Error;
