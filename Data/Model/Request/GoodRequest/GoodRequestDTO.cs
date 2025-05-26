@@ -93,6 +93,7 @@ namespace Data.Model.Request.GoodRequest
 
     public class GoodRequestDetailDTO : BaseCreateDTO
     {
+        [Range(0, double.MaxValue, ErrorMessage = "Số lượng phải là số dương")]
         public float Quantity { get; set; }
 
         private string? _productId;

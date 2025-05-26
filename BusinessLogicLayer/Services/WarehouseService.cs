@@ -633,11 +633,11 @@ namespace BusinessLogicLayer.Services
             float SumByNoteType(IEnumerable<GoodNoteDetail> details, GoodNoteEnum type) =>
                 details.Where(d => d.GoodNote.NoteType == type).Sum(d => d.Quantity);
 
-            // Chuyển kho tính theo phiếu Issue thôi để tránh double
+            // Chuyển kho tính theo phiếu receive thôi để tránh double
             float SumTransfer(IEnumerable<GoodNoteDetail> details) =>
                 details
                     .Where(d => d.GoodNote.GoodRequest.RequestType == GoodRequestEnum.Transfer
-                                && d.GoodNote.NoteType == GoodNoteEnum.Issue)
+                                && d.GoodNote.NoteType == GoodNoteEnum.Receive)
                     .Sum(d => d.Quantity);
 
             // Hàm tính phần trăm thay đổi
@@ -732,20 +732,19 @@ namespace BusinessLogicLayer.Services
 
                     var putIn = dayDetails
                         .Where(d =>
+                         (
+                                (d.GoodNote.GoodRequest.RequestType == GoodRequestEnum.Transfer &&
+                                 d.GoodNote.GoodRequest.WarehouseId == warehouse.Id) ||
                             d.GoodNote.NoteType == GoodNoteEnum.Receive &&
-                            d.GoodNote.GoodRequest.RequestedWarehouseId == warehouse.Id
+                            d.GoodNote.GoodRequest.RequestedWarehouseId == warehouse.Id)
                         )
                         .Sum(d => d.Quantity);
 
                     var takeOut = dayDetails
                         .Where(d =>
                             d.GoodNote.NoteType == GoodNoteEnum.Issue &&
-                            (
-                                (d.GoodNote.GoodRequest.RequestType == GoodRequestEnum.Transfer &&
-                                 d.GoodNote.GoodRequest.WarehouseId == warehouse.Id) ||
                                 (d.GoodNote.GoodRequest.RequestType != GoodRequestEnum.Transfer &&
                                  d.GoodNote.GoodRequest.RequestedWarehouseId == warehouse.Id)
-                            )
                         )
                         .Sum(d => d.Quantity);
 
@@ -784,18 +783,18 @@ namespace BusinessLogicLayer.Services
                     .Search(d =>
                         d.Batch.ProductId == productId &&
                         (
-                            // Nhập: luôn về RequestedWarehouse
-                            (d.GoodNote.NoteType == GoodNoteEnum.Receive &&
+                            // Xuất: luôn là RequestedWarehouseId
+                            (d.GoodNote.NoteType == GoodNoteEnum.Issue &&
                              d.GoodNote.GoodRequest.RequestedWarehouseId == warehouseId) ||
 
-                            // Xuất: tùy theo loại phiếu
-                            (d.GoodNote.NoteType == GoodNoteEnum.Issue &&
+                            // Nhập:
+                            (d.GoodNote.NoteType == GoodNoteEnum.Receive &&
                              (
-                                 // Nếu là điều chuyển: kho xuất là WarehouseId
+                                 // Nếu điều chuyển: nhập về WarehouseId
                                  (d.GoodNote.GoodRequest.RequestType == GoodRequestEnum.Transfer &&
                                   d.GoodNote.GoodRequest.WarehouseId == warehouseId) ||
 
-                                 // Nếu là xuất thường: kho vẫn là RequestedWarehouseId
+                                 // Còn lại: nhập về RequestedWarehouseId
                                  (d.GoodNote.GoodRequest.RequestType != GoodRequestEnum.Transfer &&
                                   d.GoodNote.GoodRequest.RequestedWarehouseId == warehouseId)
                              ))
@@ -821,18 +820,18 @@ namespace BusinessLogicLayer.Services
                     var request = detail.GoodNote.GoodRequest;
 
                     if (type == GoodNoteEnum.Receive &&
-                        request.RequestedWarehouseId == warehouseId)
+                        (
+                            (request.RequestType == GoodRequestEnum.Transfer &&
+                             request.WarehouseId == warehouseId) ||
+
+                            (request.RequestType != GoodRequestEnum.Transfer &&
+                             request.RequestedWarehouseId == warehouseId)
+                        ))
                     {
                         importQty = detail.Quantity;
                     }
                     else if (type == GoodNoteEnum.Issue &&
-                             (
-                                 (request.RequestType == GoodRequestEnum.Transfer &&
-                                  request.WarehouseId == warehouseId) ||
-
-                                 (request.RequestType != GoodRequestEnum.Transfer &&
-                                  request.RequestedWarehouseId == warehouseId)
-                             ))
+                             request.RequestedWarehouseId == warehouseId)
                     {
                         exportQty = detail.Quantity;
                     }
@@ -910,12 +909,15 @@ namespace BusinessLogicLayer.Services
                             d.GoodNote.NoteType == GoodNoteEnum.Receive &&
                             d.GoodNote.CreatedTime.Value.Month <= month &&
                             (
-                                d.GoodNote.GoodRequest.RequestedWarehouseId == warehouse.Id ||
                                 (d.GoodNote.GoodRequest.RequestType == GoodRequestEnum.Transfer &&
+                                 d.GoodNote.GoodRequest.WarehouseId == warehouse.Id) ||
+
+                                (d.GoodNote.GoodRequest.RequestType != GoodRequestEnum.Transfer &&
                                  d.GoodNote.GoodRequest.RequestedWarehouseId == warehouse.Id)
                             )
                         )
                         .Sum(d => d.Quantity);
+
 
                     var stockOut = details
                         .Where(d =>
@@ -923,7 +925,7 @@ namespace BusinessLogicLayer.Services
                             d.GoodNote.CreatedTime.Value.Month <= month &&
                             (
                                 (d.GoodNote.GoodRequest.RequestType == GoodRequestEnum.Transfer &&
-                                 d.GoodNote.GoodRequest.WarehouseId == warehouse.Id) ||
+                                 d.GoodNote.GoodRequest.RequestedWarehouseId == warehouse.Id) ||
                                 (d.GoodNote.GoodRequest.RequestType != GoodRequestEnum.Transfer &&
                                  d.GoodNote.GoodRequest.RequestedWarehouseId == warehouse.Id)
                             )
@@ -1009,9 +1011,10 @@ namespace BusinessLogicLayer.Services
                 var stockIn = details
                     .Where(d =>
                         (d.GoodNote.NoteType == GoodNoteEnum.Receive &&
-                         (
-                             d.GoodNote.GoodRequest.RequestedWarehouseId == warehouse.Id ||
+                        (
                              (d.GoodNote.GoodRequest.RequestType == GoodRequestEnum.Transfer &&
+                              d.GoodNote.GoodRequest.WarehouseId == warehouse.Id) ||
+                             (d.GoodNote.GoodRequest.RequestType != GoodRequestEnum.Transfer &&
                               d.GoodNote.GoodRequest.RequestedWarehouseId == warehouse.Id)
                          ))
                     )
@@ -1022,7 +1025,7 @@ namespace BusinessLogicLayer.Services
                         (d.GoodNote.NoteType == GoodNoteEnum.Issue &&
                          (
                              (d.GoodNote.GoodRequest.RequestType == GoodRequestEnum.Transfer &&
-                              d.GoodNote.GoodRequest.WarehouseId == warehouse.Id) ||
+                              d.GoodNote.GoodRequest.RequestedWarehouseId == warehouse.Id) ||
                              (d.GoodNote.GoodRequest.RequestType != GoodRequestEnum.Transfer &&
                               d.GoodNote.GoodRequest.RequestedWarehouseId == warehouse.Id)
                          ))
@@ -1040,8 +1043,9 @@ namespace BusinessLogicLayer.Services
                          (d.GoodNote.CreatedTime.Value.Year == currentYear && d.GoodNote.CreatedTime.Value.Month < currentMonth)) &&
                         d.GoodNote.NoteType == GoodNoteEnum.Receive &&
                         (
-                            d.GoodNote.GoodRequest.RequestedWarehouseId == warehouse.Id ||
                             (d.GoodNote.GoodRequest.RequestType == GoodRequestEnum.Transfer &&
+                             d.GoodNote.GoodRequest.WarehouseId == warehouse.Id) ||
+                            (d.GoodNote.GoodRequest.RequestType != GoodRequestEnum.Transfer &&
                              d.GoodNote.GoodRequest.RequestedWarehouseId == warehouse.Id)
                         )
                     )
@@ -1055,7 +1059,7 @@ namespace BusinessLogicLayer.Services
                         d.GoodNote.NoteType == GoodNoteEnum.Issue &&
                         (
                             (d.GoodNote.GoodRequest.RequestType == GoodRequestEnum.Transfer &&
-                             d.GoodNote.GoodRequest.WarehouseId == warehouse.Id) ||
+                             d.GoodNote.GoodRequest.RequestedWarehouseId == warehouse.Id) ||
                             (d.GoodNote.GoodRequest.RequestType != GoodRequestEnum.Transfer &&
                              d.GoodNote.GoodRequest.RequestedWarehouseId == warehouse.Id)
                         )
@@ -1105,13 +1109,17 @@ namespace BusinessLogicLayer.Services
             var grouped = details.GroupBy(d => d.Batch.Product.ProductType.CategoryId).Select(g =>
             {
                 var stockIn = g.Where(d => d.GoodNote.NoteType == GoodNoteEnum.Receive &&
-                                           d.GoodNote.GoodRequest.RequestedWarehouseId == warehouseId)
-                               .Sum(d => d.Quantity);
+                                            (
+                                                (d.GoodNote.GoodRequest.RequestType == GoodRequestEnum.Transfer &&
+                                                 d.GoodNote.GoodRequest.WarehouseId == warehouseId) ||
+                                                (d.GoodNote.GoodRequest.RequestType != GoodRequestEnum.Transfer &&
+                                                 d.GoodNote.GoodRequest.RequestedWarehouseId == warehouseId)
+                                            )).Sum(d => d.Quantity);
 
                 var stockOut = g.Where(d => d.GoodNote.NoteType == GoodNoteEnum.Issue &&
                                             (
                                                 (d.GoodNote.GoodRequest.RequestType == GoodRequestEnum.Transfer &&
-                                                 d.GoodNote.GoodRequest.WarehouseId == warehouseId) ||
+                                                 d.GoodNote.GoodRequest.RequestedWarehouseId == warehouseId) ||
                                                 (d.GoodNote.GoodRequest.RequestType != GoodRequestEnum.Transfer &&
                                                  d.GoodNote.GoodRequest.RequestedWarehouseId == warehouseId)
                                             ))
@@ -1158,12 +1166,17 @@ namespace BusinessLogicLayer.Services
                         d.GoodNote.CreatedTime < endDate &&
                         (
                             // Nhập vào RequestedWarehouse
-                            (d.GoodNote.NoteType == GoodNoteEnum.Receive && d.GoodNote.GoodRequest.RequestedWarehouseId == warehouseId) ||
+                            (d.GoodNote.NoteType == GoodNoteEnum.Receive && (
+                                    (d.GoodNote.GoodRequest.RequestType == GoodRequestEnum.Transfer &&
+                                     d.GoodNote.GoodRequest.WarehouseId == warehouseId) ||
+                                    (d.GoodNote.GoodRequest.RequestType != GoodRequestEnum.Transfer &&
+                                     d.GoodNote.GoodRequest.RequestedWarehouseId == warehouseId)
+                                )) ||
                             // Xuất: điều chuyển từ WarehouseId
                             (d.GoodNote.NoteType == GoodNoteEnum.Issue &&
                                 (
                                     (d.GoodNote.GoodRequest.RequestType == GoodRequestEnum.Transfer &&
-                                     d.GoodNote.GoodRequest.WarehouseId == warehouseId) ||
+                                     d.GoodNote.GoodRequest.RequestedWarehouseId == warehouseId) ||
                                     (d.GoodNote.GoodRequest.RequestType != GoodRequestEnum.Transfer &&
                                      d.GoodNote.GoodRequest.RequestedWarehouseId == warehouseId)
                                 ))
@@ -1189,14 +1202,19 @@ namespace BusinessLogicLayer.Services
                     float prevStock = stockMap.ContainsKey(batchId) ? stockMap[batchId] : 0;
 
                     if (detail.GoodNote.NoteType == GoodNoteEnum.Receive &&
-                        detail.GoodNote.GoodRequest.RequestedWarehouseId == warehouseId)
+                             (
+                                 (detail.GoodNote.GoodRequest.RequestType == GoodRequestEnum.Transfer &&
+                                  detail.GoodNote.GoodRequest.WarehouseId == warehouseId) ||
+                                 (detail.GoodNote.GoodRequest.RequestType != GoodRequestEnum.Transfer &&
+                                  detail.GoodNote.GoodRequest.RequestedWarehouseId == warehouseId)
+                             ))
                     {
                         import = detail.Quantity;
                     }
                     else if (detail.GoodNote.NoteType == GoodNoteEnum.Issue &&
                              (
                                  (detail.GoodNote.GoodRequest.RequestType == GoodRequestEnum.Transfer &&
-                                  detail.GoodNote.GoodRequest.WarehouseId == warehouseId) ||
+                                  detail.GoodNote.GoodRequest.RequestedWarehouseId == warehouseId) ||
                                  (detail.GoodNote.GoodRequest.RequestType != GoodRequestEnum.Transfer &&
                                   detail.GoodNote.GoodRequest.RequestedWarehouseId == warehouseId)
                              ))

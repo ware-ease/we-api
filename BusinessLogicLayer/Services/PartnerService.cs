@@ -108,7 +108,7 @@ namespace BusinessLogicLayer.Services
                 return new ServiceResponse
                 {
                     Status = SRStatus.Success,
-                    Message = "Partner created successfully!",
+                    Message = "Tạo đối tác thành công!",
                     Data = result
                 };
             }
@@ -117,7 +117,7 @@ namespace BusinessLogicLayer.Services
                 return new ServiceResponse
                 {
                     Status = SRStatus.Error,
-                    Message = $"Error creating partner: {ex.Message}"
+                    Message = $"Lỗi khi tạo đối tác: {ex.Message}"
                 };
             }
         }

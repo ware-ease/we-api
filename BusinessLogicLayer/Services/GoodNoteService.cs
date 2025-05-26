@@ -47,7 +47,7 @@ namespace BusinessLogicLayer.Services
                         (g.GoodRequest.Warehouse != null && g.GoodRequest.Warehouse.Name.Contains(keyword))) &&
                     (!goodNoteType.HasValue || g.NoteType == goodNoteType.Value) &&
                     (!status.HasValue || g.Status == status.Value) &&
-                    (string.IsNullOrEmpty(requestedWarehouseId) || g.GoodRequest.RequestedWarehouseId == requestedWarehouseId || (g.GoodRequest.WarehouseId == requestedWarehouseId && g.NoteType == GoodNoteEnum.Issue));
+                    (string.IsNullOrEmpty(requestedWarehouseId) || g.GoodRequest.RequestedWarehouseId == requestedWarehouseId || (g.GoodRequest.WarehouseId == requestedWarehouseId && g.NoteType == GoodNoteEnum.Receive));
 
                 // Dùng Search
                 var pagedGoodNotes = await _unitOfWork.GoodNoteRepository.Search(
@@ -339,7 +339,11 @@ namespace BusinessLogicLayer.Services
             var requestedWarehouseId = goodNote.GoodRequest?.RequestedWarehouseId
                 ?? throw new Exception("Yêu cầu kho chưa có kho nhận.");
 
-
+            //Kho nhận là warehouseId nếu là yêu cầu chuyển kho
+            if(goodNote.GoodRequest?.RequestType == GoodRequestEnum.Transfer)
+            {
+                requestedWarehouseId = goodNote.GoodRequest?.WarehouseId;
+            }
             var batchIds = details.Select(d => d.BatchId).Distinct().ToList();
             var inventories = await _unitOfWork.InventoryRepository.Search(
                 i => batchIds.Contains(i.BatchId)
@@ -410,7 +414,7 @@ namespace BusinessLogicLayer.Services
                 }
                 string? checkWarehouseId = codeType switch
                 {
-                    CodeType.PXNB => goodRequest.WarehouseId,
+                    CodeType.PXNB => goodRequest.RequestedWarehouseId,
                     CodeType.PX => goodRequest.RequestedWarehouseId,
                     _ => null
                 };
@@ -477,13 +481,13 @@ namespace BusinessLogicLayer.Services
                 // Gửi thông báo cho kho nhận
                 if (codeType == CodeType.PXNB)
                 {
-                    var receiverIds = await _unitOfWork.AccountRepository.GetUserIdsByWarehouseAndGroups(goodRequest.RequestedWarehouseId!, new List<string> { "Thủ kho" });
+                    var receiverIds = await _unitOfWork.AccountRepository.GetUserIdsByWarehouseAndGroups(goodRequest.WarehouseId!, new List<string> { "Thủ kho" });
                     await _firebaseService.SendNotificationToUsersAsync(
                         receiverIds,
                         "Thông báo điều chuyuển kho",
-                        $"Phiếu xuất {goodNote.Code} đã xuất các lô: {string.Join(", ", batchMessages)} từ kho {goodRequest.Warehouse!.Name}",
+                        $"Phiếu xuất {goodNote.Code} đã xuất các lô: {string.Join(", ", batchMessages)} từ kho {goodRequest.RequestedWarehouse!.Name}",
                         NotificationType.ISSUE_NOTE_CREATED,
-                        goodRequest.RequestedWarehouseId
+                        goodRequest.WarehouseId
                     );
                 }
                 await _unitOfWork.CommitTransactionAsync();  // Commit transaction nếu mọi thứ thành công
@@ -681,16 +685,32 @@ namespace BusinessLogicLayer.Services
 
                 await _unitOfWork.SaveAsync();
 
-
-                if (goodRequest != null && !string.IsNullOrEmpty(goodRequest.CreatedBy))
+                if (goodRequest.RequestType == GoodRequestEnum.Return)
                 {
-                    await _firebaseService.SendNotificationToUsersAsync(
-                        new List<string> { goodRequest.CreatedBy },
-                        "Thông báo",
-                        $"Phiếu nhập kho {goodNote.Code} đã được tạo từ yêu cầu kho {goodRequest.Code}.",
-                        NotificationType.GOOD_REQUEST_APPROVED,
-                        goodRequest.RequestedWarehouseId
-                    );
+                    if (goodRequest != null && !string.IsNullOrEmpty(goodRequest.CreatedBy))
+                    {
+                        await _firebaseService.SendNotificationToUsersAsync(
+                            new List<string> { goodRequest.CreatedBy },
+                            "Thông báo",
+                            $"Phiếu nhập kho {goodNote.Code} đã được tạo từ yêu cầu kho {goodRequest.Code}.",
+                            NotificationType.GOOD_REQUEST_APPROVED,
+                            goodRequest.RequestedWarehouseId
+                        );
+                    }
+                } 
+
+                if (goodRequest!.RequestType == GoodRequestEnum.Transfer)
+                {
+                    if (goodRequest != null && !string.IsNullOrEmpty(goodRequest.CreatedBy))
+                    {
+                        await _firebaseService.SendNotificationToUsersAsync(
+                            new List<string> { goodRequest.CreatedBy },
+                            "Thông báo",
+                            $"Phiếu nhập kho {goodNote.Code} đã được tạo từ yêu cầu kho {goodRequest.Code}.",
+                            NotificationType.GOOD_REQUEST_APPROVED,
+                            goodRequest.WarehouseId
+                        );
+                    }
                 }
                 //// Thông báo cho thủ kho
                 //var batchMessages = goodNoteDetails
