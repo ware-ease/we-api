@@ -63,7 +63,7 @@ namespace API.Controllers
             return ControllerResponse.Response(new ServiceResponse
             {
                 Status = Data.Enum.SRStatus.Success,
-                Message = "Unit added successfully",
+                Message = "Unit đã tạo thành công",
                 Data = result
             });
         }
@@ -78,7 +78,7 @@ namespace API.Controllers
                 return ControllerResponse.Response(new ServiceResponse
                 {
                     Status = Data.Enum.SRStatus.Success,
-                    Message = "Unit updated successfully",
+                    Message = "Unit đã sửa thành công",
                     Data = updatedUnit
                 });
             }

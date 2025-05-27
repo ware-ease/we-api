@@ -73,7 +73,7 @@ namespace BusinessLogicLayer.Services
                 return new ServiceResponse
                 {
                     Status = Data.Enum.SRStatus.NotFound,
-                    Message = "ProductType not found!",
+                    Message = "ProductType không tìm thấy!",
                     Data = id
                 };
             }
@@ -83,7 +83,7 @@ namespace BusinessLogicLayer.Services
             return new ServiceResponse
             {
                 Status = Data.Enum.SRStatus.Success,
-                Message = "Get successfully!",
+                Message = "Get thành công!",
                 Data = result
             };
         }
@@ -98,7 +98,7 @@ namespace BusinessLogicLayer.Services
             return new ServiceResponse
             {
                 Status = Data.Enum.SRStatus.Success,
-                Message = "Get successfully!",
+                Message = "Get thành công!",
                 Data = products
             };
         }
@@ -136,7 +136,7 @@ namespace BusinessLogicLayer.Services
             {
                 var category = await _categoryRepository.GetByCondition(p => p.Id == request.CategoryId);
                 if (category == null)
-                    throw new Exception("Category not found");
+                    throw new Exception("Category không tồn tại");
                 existedProductType.CategoryId = request.CategoryId;
             }
 
@@ -146,7 +146,7 @@ namespace BusinessLogicLayer.Services
 
             var updatedProductType = await _productTypeRepository.GetByCondition(p => p.Id == existedProductType.Id);
             if (updatedProductType == null)
-                throw new Exception("Update failed, ProductType not found after update");
+                throw new Exception("Update lỗi, ProductType không được tìm thấy sau khi update");
 
             return _mapper.Map<ProductTypeDTO>(updatedProductType);
         }

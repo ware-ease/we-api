@@ -103,7 +103,7 @@ namespace API.Controllers
                 return ControllerResponse.Response(new ServiceResponse
                 {
                     Status = SRStatus.Success,
-                    Message = "ProductType created successfully",
+                    Message = "ProductType đã tạo thành công",
                     Data = result
                 });
             }
@@ -128,7 +128,7 @@ namespace API.Controllers
                 return ControllerResponse.Response(new ServiceResponse
                 {
                     Status = Data.Enum.SRStatus.Success,
-                    Message = "ProductType updated successfully",
+                    Message = "ProductType đã sửa thành công",
                     Data = result
                 });
             }
