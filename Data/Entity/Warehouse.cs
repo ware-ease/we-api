@@ -24,8 +24,6 @@ namespace Data.Entity
 
         public ICollection<AccountWarehouse> AccountWarehouses { get; set; } = [];
         public ICollection<Location> Locations { get; set; } = [];
-        public ICollection<ReceivingNote> ReceivingNotes { get; set; }
-        public ICollection<IssueNote> IssueNotes { get; set; } = [];
         public ICollection<Inventory> Inventories { get; set; } = [];
         public ICollection<StockBook> StockBooks { get; set; } = [];
         public ICollection<GoodRequest> GoodRequests { get; set; } = [];
