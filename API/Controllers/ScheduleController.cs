@@ -70,7 +70,7 @@ namespace API.Controllers
                 return ControllerResponse.Response(new ServiceResponse
                 {
                     Status = SRStatus.Success,
-                    Message = "Product created successfully",
+                    Message = "Schedule đã được tạo thành công",
                     Data = schedule
                 });
             }
@@ -95,7 +95,7 @@ namespace API.Controllers
                 return ControllerResponse.Response(new ServiceResponse
                 {
                     Status = Data.Enum.SRStatus.Success,
-                    Message = "Product updated successfully",
+                    Message = "Schedule đã được sửa thành công",
                     Data = updatedSchedule
                 });
             }

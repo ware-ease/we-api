@@ -95,19 +95,10 @@ namespace BusinessLogicLayer.Services
 
         public async Task<BatchDTO> AddBatch(BatchCreateDTO request)
         {
-            /*var supplier = await _partnerRepository.Get(request.SupplierId);
-            if (supplier == null)
-                throw new Exception("Supplier không tồn tại");
-
-            if (supplier.PartnerType != Data.Enum.PartnerEnum.Supplier)
-                throw new Exception("Partner này không phải là Supplier");*/
 
             var product = await _productRepository.GetByCondition(p => p.Id == request.ProductId);
             if (product == null)
                 throw new Exception("Product không tồn tại");
-
-            /*if (request.MfgDate >= request.ExpDate)
-                throw new Exception("MfgDate phải nhỏ hơn ExpDate");*/
 
             if (request.InboundDate >= DateOnly.FromDateTime(DateTime.Now))
                 throw new Exception("InboundDate không được đặt ở tương lai");

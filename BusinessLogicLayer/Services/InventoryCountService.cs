@@ -172,23 +172,6 @@ namespace BusinessLogicLayer.Services
                     if (inventoryCount.Schedule.WarehouseId != inventory.WarehouseId)
                         throw new Exception("Inventory phải nằm trong đúng Warehouse");
 
-                    //var expectedQuantity = await SumInventoryLocationQuantityByLocationLevel0AndInventory(inventoryCount.LocationId, detail.InventoryId);
-                    /*var expectedQuantity = inventory.CurrentQuantity;
-                    switch (detail.CountedQuantity)
-                    {
-                        case var c when c < expectedQuantity:
-                            detail.Status = InventoryCountDetailStatus.Understock;
-                            break;
-
-                        case var c when c > expectedQuantity:
-                            detail.Status = InventoryCountDetailStatus.Overstock;
-                            break;
-
-                        case var c when c == expectedQuantity:
-                            detail.Status = InventoryCountDetailStatus.Balanced;
-                            break;
-                    }*/
-
                     var inventoryCountDetail = _mapper.Map<InventoryCountDetail>(detail);
                     inventoryCountDetail.InventoryCountId = inventoryCount.Id;
                     //inventoryCountDetail.ExpectedQuantity = expectedQuantity;
@@ -216,7 +199,7 @@ namespace BusinessLogicLayer.Services
                 includeProperties: "InventoryCheckDetails");
 
             if (existingInventoryCount == null)
-                throw new Exception("InventoryCount not found");
+                throw new Exception("InventoryCount không tìm thấy");
 
             /*if (request.Status.HasValue)
                 existingInventoryCount.Status = request.Status.Value;*/
@@ -306,7 +289,7 @@ namespace BusinessLogicLayer.Services
                         {
                             var inventory = await _inventoryRepository.GetByCondition(p => p.Id == detailDto.InventoryId);
                             if (inventory == null)
-                                throw new Exception($"Inventory with ID {detailDto.InventoryId} not found");
+                                throw new Exception($"Inventory với ID {detailDto.InventoryId} không tìm thấy");
                             existingDetail.InventoryId = detailDto.InventoryId;
                             //var expectedQuantity = await SumInventoryLocationQuantityByLocationLevel0AndInventory(existingInventoryCount.LocationId, existingDetail.InventoryId);
                             detailDto.ExpectedQuantity = inventory.CurrentQuantity;
@@ -319,7 +302,7 @@ namespace BusinessLogicLayer.Services
                             var inventory = await _inventoryRepository.GetByCondition(p => p.Id == existingDetail.InventoryId,
                             includeProperties: "Warehouse");
                             if (inventory == null)
-                                throw new Exception($"Inventory with ID {existingDetail.InventoryId} not found");
+                                throw new Exception($"Inventory với ID {existingDetail.InventoryId} không tìm thấy");
                             var employeeAccountIds = new List<string>();
                             var oldEmployeeAccountIds = new List<string>();
                             employeeAccountIds.Add(detailDto.AccountId);
@@ -378,7 +361,7 @@ namespace BusinessLogicLayer.Services
             );
 
             if (updatedInventoryCount == null)
-                throw new Exception("Update failed, InventoryCount not found after update");
+                throw new Exception("Update lỗi, InventoryCount không được tìm thấy sau khi update");
 
             return _mapper.Map<InventoryCountDTO>(updatedInventoryCount);
 
