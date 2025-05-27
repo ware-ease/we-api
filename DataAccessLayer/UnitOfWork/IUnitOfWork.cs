@@ -23,7 +23,6 @@ namespace DataAccessLayer.UnitOfWork
         IWarehouseRepository WarehouseRepository { get; }
         IRefreshTokenRepository RefreshTokenRepository { get; }
         //ICustomerRepository CustomerRepository { get; }
-        ILocationRepository LocationRepository { get; }
         IGoodRequestRepository GoodRequestRepository { get; }
         IGoodRequestDetailRepository GoodRequestDetailRepository { get; }
         IProductRepository ProductRepository { get; }
@@ -32,8 +31,6 @@ namespace DataAccessLayer.UnitOfWork
         IGoodNoteDetailRepository GoodNoteDetailRepository { get; }
         IBatchRepository BatchRepository { get; }
         IInventoryRepository InventoryRepository { get; }
-        IInventoryLocationRepository InventoryLocationRepository { get; }
-        ILocationLogRepository LocationLogRepository { get; }
         IGroupPermissionRepository GroupPermissionRepository { get; }
         IAccountPermissionRepository AccountPermissionRepository { get; }
         IAccountGroupRepository AccountGroupRepository { get; }

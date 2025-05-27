@@ -1,14 +1,7 @@
-﻿using Azure;
-using BusinessLogicLayer.IServices;
-using BusinessLogicLayer.Services;
-using Data.Enum;
-using Data.Model.DTO;
-using Data.Model.Request.InventoryLocation;
+﻿using BusinessLogicLayer.IServices;
 using Data.Model.Response;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Sprache;
 
 namespace API.Controllers
 {
@@ -37,60 +30,5 @@ namespace API.Controllers
 
             return ControllerResponse.Response(response);
         }
-
-        //[HttpGet("{id}")]
-        //public async Task<IActionResult> Get(string id)
-        //{
-        //    try
-        //    {
-        //        var inventory = await _inventoryService.Get<Data.Model.DTO.InventoryDTO>(id);
-        //        return ControllerResponse.Response(inventory);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return ControllerResponse.Response(new ServiceResponse
-        //        {
-        //            Status = SRStatus.Error,
-        //            Message = ex.Message,
-        //            Data = null
-        //        });
-        //    }
-        //}
-        [Authorize]
-        [HttpPost("inventory-location")]
-        public async Task<IActionResult> PutAwayInvento([FromBody] CreateInventoryLocationDTO request)
-        {
-            var result = await _warehouseService.InventoryLocationInOutAsync(request);
-            return ControllerResponse.Response(result);
-        }
-        //[Authorize]
-        //[HttpGet("locations/{locationId}")]
-        //public async Task<IActionResult> GetInventoriesInLocation([FromRoute] string locationId)
-        //{
-        //    var result = await _warehouseService.GetInventoriesInLocation(locationId);
-        //    return ControllerResponse.Response(result);
-        //}
-        //[Authorize]
-        //[HttpGet("{inventoryId}")]
-        //public async Task<IActionResult> GetLocationsByInventoryId(string inventoryId)
-        //{
-        //    var response = await _inventoryService.GetLocationsByInventoryId(inventoryId);
-
-        //    return ControllerResponse.Response(response);
-        //}
-        //[Authorize]
-        //[HttpGet("batch/{batchId}/locations")]
-        //public async Task<IActionResult> GetLocationsByBatchId(string batchId)
-        //{
-        //    var response = await _inventoryService.GetLocationsByBatchId(batchId);
-
-        //    return ControllerResponse.Response(response);
-        //}
-        //[HttpGet("{inventoryId}/location-logs")]
-        //public async Task<IActionResult> GetLogsByInventory(string inventoryId, int pageIndex = 1, int pageSize = 5)
-        //{
-        //    var result = await _inventoryService.GetLocationLogsByInventoryIdAsync(inventoryId, pageIndex, pageSize);
-        //    return StatusCode((int)result.Status, result);
-        //}
     }
 }

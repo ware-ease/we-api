@@ -58,13 +58,10 @@ namespace DataAccessLayer
         public virtual DbSet<GoodRequest> GoodRequests { get; set; }
         public virtual DbSet<GoodRequestDetail> GoodRequestDetails { get; set; }
         public virtual DbSet<Partner> Partners { get; set; }
-        public virtual DbSet<Location> Locations { get; set; }
-        public virtual DbSet<LocationLog> LocationLogs { get; set; }
         public virtual DbSet<InventoryAdjustment> InventoryAdjustments { get; set; }
         public virtual DbSet<InventoryAdjustmentDetail> InventoryAdjustmentDetails { get; set; }
         public virtual DbSet<InventoryCount> InventoryCounts { get; set; }
         public virtual DbSet<InventoryCountDetail> InventoryCountDetails { get; set; }
-        public virtual DbSet<InventoryLocation> InventoryLocations { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
