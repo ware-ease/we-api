@@ -72,7 +72,7 @@ namespace API.Controllers
                 return ControllerResponse.Response(new ServiceResponse
                 {
                     Status = SRStatus.Success,
-                    Message = "InventoryAdjustment created successfully",
+                    Message = "InventoryAdjustment đã tạo thành công",
                     Data = respones
                 });
             }
@@ -86,37 +86,5 @@ namespace API.Controllers
                 });
             }
         }
-
-        /*[HttpPatch("{id}")]
-        public async Task<IActionResult> Update(string id, [FromBody] InventoryAdjustmentUpdateDTO request)
-        {
-            try
-            {
-                request.Id = id;
-                var updatedInventoryAdjustment = await _inventoryAdjustmentService.UpdateInventoryAdjustment(request);
-                return ControllerResponse.Response(new ServiceResponse
-                {
-                    Status = Data.Enum.SRStatus.Success,
-                    Message = "InventoryAdjustment updated successfully",
-                    Data = updatedInventoryAdjustment
-                });
-            }
-            catch (Exception ex)
-            {
-                return ControllerResponse.Response(new ServiceResponse
-                {
-                    Status = Data.Enum.SRStatus.Error,
-                    Message = ex.Message,
-                    Data = null
-                });
-            }
-        }
-
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(string id)
-        {
-            var result = await _inventoryAdjustmentService.Delete(id);
-            return ControllerResponse.Response(result);
-        }*/
     }
 }

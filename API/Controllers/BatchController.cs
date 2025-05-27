@@ -95,7 +95,7 @@ namespace API.Controllers
                 return ControllerResponse.Response(new ServiceResponse
                 {
                     Status = SRStatus.Success,
-                    Message = "Batch created successfully",
+                    Message = "Batch đã tạo thành công",
                     Data = batch
                 });
             }
@@ -120,7 +120,7 @@ namespace API.Controllers
                 return ControllerResponse.Response(new ServiceResponse
                 {
                     Status = Data.Enum.SRStatus.Success,
-                    Message = "Product updated successfully",
+                    Message = "Batch đã được sửa thành công",
                     Data = updatedBatch
                 });
             }

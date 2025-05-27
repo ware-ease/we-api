@@ -72,7 +72,7 @@ namespace BusinessLogicLayer.Services
             return new ServiceResponse
             {
                 Status = Data.Enum.SRStatus.Success,
-                Message = "Get successfully!",
+                Message = "Get thành công!",
                 Data = mappedResults
             };
         }
@@ -89,7 +89,7 @@ namespace BusinessLogicLayer.Services
                 return new ServiceResponse
                 {
                     Status = Data.Enum.SRStatus.NotFound,
-                    Message = "Product not found!",
+                    Message = "Product không tìm thấy!",
                     Data = id
                 };
             }
@@ -99,7 +99,7 @@ namespace BusinessLogicLayer.Services
             return new ServiceResponse
             {
                 Status = Data.Enum.SRStatus.Success,
-                Message = "Get successfully!",
+                Message = "Get thành công!",
                 Data = result
             };
         }
@@ -115,7 +115,7 @@ namespace BusinessLogicLayer.Services
             return new ServiceResponse
             {
                 Status = Data.Enum.SRStatus.Success,
-                Message = "Get successfully!",
+                Message = "Get thành công!",
                 Data = products
             };
         }
@@ -158,7 +158,7 @@ namespace BusinessLogicLayer.Services
         {
             var product = await _productRepository.GetFullProductById(id);
             if (product == null)
-                throw new Exception("Product not found");
+                throw new Exception("Product không tìm thấy");
             return _mapper.Map<ProductDTO>(product);
         }
 
@@ -167,7 +167,7 @@ namespace BusinessLogicLayer.Services
         {
             var existingProduct = await _productRepository.GetByCondition(p => p.Id == request.Id);
             if (existingProduct == null)
-                throw new Exception("Product not found");
+                throw new Exception("Product không tìm thấy");
 
             if (!string.IsNullOrEmpty(request.Name))
             {
@@ -195,7 +195,7 @@ namespace BusinessLogicLayer.Services
             {
                 var productType = await _productTypeRepository.GetByCondition(p => p.Id == request.ProductTypeId);
                 if (productType == null)
-                    throw new Exception("ProductType not found");
+                    throw new Exception("ProductType không tìm thấy");
                 existingProduct.ProductTypeId = request.ProductTypeId;
             }
 
@@ -203,7 +203,7 @@ namespace BusinessLogicLayer.Services
             {
                 var brand = await _brandRepository.GetByCondition(p => p.Id == request.BrandId);
                 if (brand == null)
-                    throw new Exception("Brand not found");
+                    throw new Exception("Brand không tìm thấy");
                 existingProduct.BrandId = request.BrandId;
             }
 
@@ -211,7 +211,7 @@ namespace BusinessLogicLayer.Services
             {
                 var unit = await _unitRepository.GetByCondition(p => p.Id == request.UnitId);
                 if (unit == null)
-                    throw new Exception("Unit not found");
+                    throw new Exception("Unit không tìm thấy");
                 existingProduct.UnitId = request.UnitId;
             }
 
@@ -224,7 +224,7 @@ namespace BusinessLogicLayer.Services
             var updatedProduct = await _productRepository.GetByCondition(p => p.Id == existingProduct.Id,
                 includeProperties: "ProductType,Brand,Unit");
             if (updatedProduct == null)
-                throw new Exception("Update failed, product not found after update");
+                throw new Exception("Update lỗi, product không được tìm thấy sau khi update");
 
             return _mapper.Map<ProductDTO>(updatedProduct);
         }
@@ -266,128 +266,5 @@ namespace BusinessLogicLayer.Services
                 }
             };
         }
-        /*private readonly IProductRepository _productRepository;
-        private readonly ICategoryRepository _categoryRepository;
-        private readonly IGenericPaginationService _genericPaginationService;
-        private readonly IMapper _mapper;
-
-        public ProductService(IProductRepository productRepository, 
-            ICategoryRepository categoryRepository, 
-            IMapper mapper, 
-            IGenericPaginationService genericPaginationService)
-        {
-            _productRepository = productRepository;
-            _categoryRepository = categoryRepository;
-            _mapper = mapper;
-            _genericPaginationService = genericPaginationService;
-        }
-
-        public async Task<PagedResult<Product>> GetAllAsync(int? pageNumber, int? pageSize)
-        {
-            var query = _productRepository.GetAllQueryable();
-            return await _genericPaginationService.GetPagedDataAsync(query, pageNumber, pageSize);
-        }
-
-        public async Task<PagedResult<Product>> GetAllByCategoryIdAsync(string categoryId, int? pageNumber, int? pageSize)
-        {
-            var category = await _categoryRepository.GetByIdAsync(categoryId);
-            if (category == null)
-            {
-                throw new ArgumentException("Không tìm thấy Category Id");
-            }
-            var query = _productRepository.GetByCategoryIdQueryable(categoryId);
-            return await _genericPaginationService.GetPagedDataAsync(query, pageNumber, pageSize);
-        }
-
-        public async Task<Product> GetByIdAsync(string id)
-        {
-            var product = await _productRepository.GetByIdAsync(id);
-            if (product == null)
-            {
-                throw new ArgumentException("Không thể tìm thấy Id");
-            }
-            return product;
-        }
-
-        public async Task<Product> AddAsync(string categoryId, CreateProductDTO createProductDTO)
-        {
-            var category = await _categoryRepository.GetByIdAsync(categoryId);
-            if (category == null)
-            {
-                throw new ArgumentException("Không tìm thấy Category Id");
-            }
-            if (category.IsDeleted == true)
-            {
-                throw new ArgumentException("Category này đã bị xóa");
-            }
-            if (string.IsNullOrWhiteSpace(createProductDTO.Name))
-            {
-                throw new ArgumentException("Tên sản phẩm không được để trống");
-            }
-            if (string.IsNullOrWhiteSpace(createProductDTO.CreatedBy))
-            {
-                throw new ArgumentException("Người tạo không được để trống");
-            }
-
-            var product = _mapper.Map<Product>(createProductDTO);
-            product.CreatedTime = DateTime.Now;
-            product.CategoryId = categoryId;
-            await _productRepository.AddAsync(product);
-            return product;
-        }
-
-        public async Task<Product> UpdateAsync(string id, UpdateProductDTO updateProductDTO)
-        {
-            var product = await _productRepository.GetByIdAsync(id);
-            if (product == null)
-            {
-                throw new ArgumentException("Không thể tìm thấy Product với ID này");
-            }
-
-            if (!string.IsNullOrWhiteSpace(updateProductDTO.Name))
-            {
-                product.Name = updateProductDTO.Name;
-            }
-            if (!string.IsNullOrWhiteSpace(updateProductDTO.CategoryId))
-            {
-                var updateCategory = await _categoryRepository.GetByIdAsync(updateProductDTO.CategoryId);
-                if (updateCategory == null)
-                {
-                    throw new ArgumentException("Không thể tìm thấy Category với ID này");
-                }
-                if (updateCategory.IsDeleted == true)
-                {
-                    throw new ArgumentException("Category này đã bị xóa");
-                }
-                product.CategoryId = updateProductDTO.CategoryId;
-            }
-            if (string.IsNullOrWhiteSpace(updateProductDTO.LastUpdatedBy))
-            {
-                throw new ArgumentException("Người sửa không được để trống");
-            }
-
-            product.LastUpdatedBy = updateProductDTO.LastUpdatedBy;
-            product.LastUpdatedTime = DateTime.Now;
-
-            await _productRepository.UpdateAsync(product);
-            return product;
-        }
-
-        public async Task DeleteAsync(string Id, string deletedBy)
-        {
-            var product = await _productRepository.GetByIdAsync(Id);
-            if (product == null)
-            {
-                throw new ArgumentException("Không thể tìm thấy Id để Delete");
-            }
-            if (string.IsNullOrWhiteSpace(deletedBy))
-            {
-                throw new ArgumentException("Người xóa không được để trống");
-            }
-            product.DeletedBy = deletedBy;
-            product.DeletedTime = DateTime.Now;
-            product.IsDeleted = true;
-            await _productRepository.UpdateAsync(product);
-        }*/
     }
 }

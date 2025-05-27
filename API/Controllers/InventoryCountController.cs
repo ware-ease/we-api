@@ -60,30 +60,6 @@ namespace API.Controllers
                 });
             }
         }
-        //[Authorize]
-        //[HttpGet("location-level0")]
-        //public async Task<IActionResult> GetByLocation(string id)
-        //{
-        //    try
-        //    {
-        //        var response = await _inventoryCountService.GetInventoriesByLocationLevel0Async(id);
-        //        return ControllerResponse.Response(new ServiceResponse
-        //        {
-        //            Status = SRStatus.Success,
-        //            Message = " successfully",
-        //            Data = response
-        //        });
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return ControllerResponse.Response(new ServiceResponse
-        //        {
-        //            Status = SRStatus.Error,
-        //            Message = ex.Message,
-        //            Data = null
-        //        });
-        //    }
-        //}
 
         [Authorize]
         [HttpPost("adjustment")]
@@ -138,7 +114,7 @@ namespace API.Controllers
                     return ControllerResponse.Response(new ServiceResponse
                     {
                         Status = SRStatus.Success,
-                        Message = "Inventory-Count created successfully",
+                        Message = "Inventory-Count đã tạo thành công",
                         Data = inventoryCount
                     });
                     
@@ -165,7 +141,7 @@ namespace API.Controllers
                 return ControllerResponse.Response(new ServiceResponse
                 {
                     Status = Data.Enum.SRStatus.Success,
-                    Message = "InventoryCount updated successfully",
+                    Message = "Inventory-Count đã sửa thành công",
                     Data = updated
                 });
             }

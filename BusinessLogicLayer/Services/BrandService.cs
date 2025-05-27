@@ -34,7 +34,7 @@ namespace BusinessLogicLayer.Services
             return new ServiceResponse
             {
                 Status = Data.Enum.SRStatus.Success,
-                Message = "Get successfully!",
+                Message = "Đã lấy thành công!",
                 Data = mappedResults
             };
         }
@@ -48,7 +48,7 @@ namespace BusinessLogicLayer.Services
                 return new ServiceResponse
                 {
                     Status = Data.Enum.SRStatus.NotFound,
-                    Message = "Brand not found!",
+                    Message = "Brand không tìm thấy!",
                     Data = id
                 };
             }
@@ -58,7 +58,7 @@ namespace BusinessLogicLayer.Services
             return new ServiceResponse
             {
                 Status = Data.Enum.SRStatus.Success,
-                Message = "Get successfully!",
+                Message = "Đã lấy thành công!",
                 Data = result
             };
         }
@@ -82,7 +82,7 @@ namespace BusinessLogicLayer.Services
             return new ServiceResponse
             {
                 Status = Data.Enum.SRStatus.Success,
-                Message = "Search successful!",
+                Message = "Search thành công!",
                 Data = new
                 {
                     TotalRecords = totalRecords,
