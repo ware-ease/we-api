@@ -81,7 +81,6 @@ namespace DataAccessLayer.UnitOfWork
         public IRouteRepository AppActionRepository => GetIRepository<IRouteRepository>();
         public IPermissionRepository PermissionRepository => GetIRepository<IPermissionRepository>();
         public IWarehouseRepository WarehouseRepository => GetIRepository<IWarehouseRepository>();
-        public ILocationRepository LocationRepository => GetIRepository<ILocationRepository>();
         public IGoodRequestRepository GoodRequestRepository => GetIRepository<IGoodRequestRepository>();
         public IGoodRequestDetailRepository GoodRequestDetailRepository => GetIRepository<IGoodRequestDetailRepository>();
         public IProductRepository ProductRepository => GetIRepository<IProductRepository>();
@@ -90,8 +89,6 @@ namespace DataAccessLayer.UnitOfWork
         public IGoodNoteDetailRepository GoodNoteDetailRepository => GetIRepository<IGoodNoteDetailRepository>();
         public IBatchRepository BatchRepository => GetIRepository<IBatchRepository>();
         public IInventoryRepository InventoryRepository => GetIRepository<IInventoryRepository>();
-        public IInventoryLocationRepository InventoryLocationRepository => GetIRepository<IInventoryLocationRepository>();
-        public ILocationLogRepository LocationLogRepository => GetIRepository<ILocationLogRepository>();
         public IGroupPermissionRepository GroupPermissionRepository => GetIRepository<IGroupPermissionRepository>();
         public IAccountPermissionRepository AccountPermissionRepository => GetIRepository<IAccountPermissionRepository>();
         public IAccountGroupRepository AccountGroupRepository => GetIRepository<IAccountGroupRepository>();

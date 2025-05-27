@@ -3,19 +3,11 @@ using BusinessLogicLayer.Generic;
 using BusinessLogicLayer.IServices;
 using Data.Entity;
 using Data.Enum;
-using Data.Model.DTO;
-using Data.Model.Request.InventoryLocation;
-using Data.Model.Request.LocationLog;
-using Data.Model.Request.Warehouse;
+using Data.Model.Request.Inventory;
 using Data.Model.Response;
 using DataAccessLayer.Generic;
 using DataAccessLayer.UnitOfWork;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BusinessLogicLayer.Services
 {
@@ -94,7 +86,7 @@ namespace BusinessLogicLayer.Services
             return new ServiceResponse
             {
                 Status = Data.Enum.SRStatus.Success,
-                Message = "Search successful!",
+                Message = "Tìm thành công!",
                 Data = new
                 {
                     TotalRecords = totalRecords,
@@ -104,125 +96,6 @@ namespace BusinessLogicLayer.Services
                     Records = mappedResults
                 }
             };
-        }
-
-        public async Task<ServiceResponse> GetLocationsByInventoryId(string inventoryId)
-        {
-            var inventory = await _unitOfWork.InventoryRepository.GetByCondition(
-                i => i.Id == inventoryId,
-                includeProperties: "InventoryLocations.Location,InventoryLocations," +
-                "Batch,Batch.Product,Batch.Product.Unit,Batch.Product.Brand"
-            );
-
-            if (inventory == null)
-            {
-                return new ServiceResponse
-                {
-                    Status = SRStatus.NotFound,
-                    Message = "Inventory not found.",
-                    Data = inventoryId
-                };
-            }
-
-            //var locations = inventory.InventoryLocations
-            //    .Select(il => il.Location)
-            //.Distinct()
-            //.ToList();
-
-            //var locationDtos = _mapper.Map<List<InventoryLocationDTO>>(inventory.InventoryLocations);
-
-            var locationsByInventoryDtos = _mapper.Map<InventoryDTOv2>(inventory);
-            //locationsByInventoryDtos.InventoryLocations = _mapper.Map<List<InventoryLocationDTO>>(inventory.InventoryLocations);
-
-            return new ServiceResponse
-            {
-                Status = SRStatus.Success,
-                Message = "Locations retrieved successfully.",
-                Data = locationsByInventoryDtos
-            };
-        }
-
-        public async Task<ServiceResponse> GetLocationsByBatchId(string batchId)
-        {
-            var inventories = await _unitOfWork.InventoryRepository.Search(
-                i => i.BatchId == batchId,
-                includeProperties: "InventoryLocations.Location"
-            );
-
-            if (inventories == null || !inventories.Any())
-            {
-                return new ServiceResponse
-                {
-                    Status = SRStatus.NotFound,
-                    Message = "No inventories found for the given batch.",
-                    Data = batchId
-                };
-            }
-
-            var locations = inventories
-                .SelectMany(i => i.InventoryLocations)
-                .Select(il => il.Location)
-                .Distinct()
-                .ToList();
-
-            var locationDtos = _mapper.Map<List<LocationDTO>>(locations);
-
-            return new ServiceResponse
-            {
-                Status = SRStatus.Success,
-                Message = "Locations retrieved successfully.",
-                Data = locationDtos
-            };
-        }
-
-        public async Task<ServiceResponse> GetLocationLogsByInventoryIdAsync(string inventoryId, int pageIndex, int pageSize)
-        {
-            // Tạo filter để lấy các LocationLog liên quan đến InventoryId
-            Expression<Func<LocationLog, bool>> filter = log =>
-                log.InventoryLocation.InventoryId == inventoryId;
-
-            // Đếm tổng số bản ghi
-            var totalRecords = await _unitOfWork.LocationLogRepository.Count(filter);
-
-            // Truy vấn dữ liệu có phân trang + bao gồm các bảng liên quan
-            var logs = await _unitOfWork.LocationLogRepository.Search(
-                filter: filter,
-                orderBy: l => l.OrderByDescending(x => x.CreatedTime),
-                pageIndex: pageIndex,
-                pageSize: pageSize,
-                includeProperties: "InventoryLocation,InventoryLocation.Location,InventoryLocation.Inventory"
-            );
-
-            // Nếu không có bản ghi nào
-            if (logs == null || !logs.Any())
-            {
-                return new ServiceResponse
-                {
-                    Status = SRStatus.NotFound,
-                    Message = "No location logs found for the given InventoryId.",
-                    Data = null
-                };
-            }
-
-            // Map sang DTO
-            var logsDto = _mapper.Map<IEnumerable<LocationLogDTO>>(logs);
-
-            // Tính tổng số trang
-            int totalPages = (int)Math.Ceiling((double)totalRecords / pageSize);
-
-            return new ServiceResponse
-            {
-                Status = SRStatus.Success,
-                Message = "Location logs retrieved successfully.",
-                Data = new
-                {
-                    TotalRecords = totalRecords,
-                    TotalPages = totalPages,
-                    PageIndex = pageIndex,
-                    PageSize = pageSize,
-                    Records = logsDto
-                }
-            };
-        }
+        }      
     }
 }

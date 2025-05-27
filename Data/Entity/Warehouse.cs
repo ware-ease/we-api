@@ -1,11 +1,5 @@
 ﻿using Data.Entity.Base;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Data.Entity
 {
@@ -23,7 +17,6 @@ namespace Data.Entity
         public DateTime OperateFrom { get; set; }
 
         public ICollection<AccountWarehouse> AccountWarehouses { get; set; } = [];
-        public ICollection<Location> Locations { get; set; } = [];
         public ICollection<Inventory> Inventories { get; set; } = [];
         public ICollection<StockBook> StockBooks { get; set; } = [];
         public ICollection<GoodRequest> GoodRequests { get; set; } = [];

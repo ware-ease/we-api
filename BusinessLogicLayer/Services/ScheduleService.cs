@@ -21,14 +21,11 @@ namespace BusinessLogicLayer.Services
 {
     public class ScheduleService : GenericService<Schedule>, IScheduleService
     {
-        private readonly ILocationRepository _locationRepository;
         private readonly IGenericRepository<Warehouse> _warehouseRepository;
         public ScheduleService(IGenericRepository<Schedule> genericRepository,
-            ILocationRepository locationRepository,
             IGenericRepository<Warehouse> warehouseRepository,
             IMapper mapper, IUnitOfWork unitOfWork) : base(genericRepository, mapper, unitOfWork)
         {
-            _locationRepository = locationRepository;
             _warehouseRepository = warehouseRepository;
         }
 

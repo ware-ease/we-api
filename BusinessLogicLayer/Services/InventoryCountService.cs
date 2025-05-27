@@ -21,11 +21,9 @@ namespace BusinessLogicLayer.Services
     public class InventoryCountService : GenericService<InventoryCount>, IInventoryCountService
     {
         private readonly IGenericRepository<Schedule> _scheduleRepository;
-        private readonly IGenericRepository<Location> _locationRepository;
         private readonly IGenericRepository<Product> _productRepository;
         private readonly IGenericRepository<InventoryCountDetail> _inventoryCountDetailRepository;
         private readonly IGenericRepository<Inventory> _inventoryRepository;
-        private readonly IGenericRepository<InventoryLocation> _inventoryLocationRepository;
         private readonly IGenericRepository<Batch> _batchRepository;
         private readonly IGenericRepository<Warehouse> _warehouseRepository;
         private readonly IGenericRepository<Account> _accountRepository;
@@ -34,10 +32,8 @@ namespace BusinessLogicLayer.Services
         private readonly ICodeGeneratorService _codeGeneratorService;
         public InventoryCountService(IGenericRepository<InventoryCount> genericRepository,
             IGenericRepository<Schedule> scheduleRepository,
-            IGenericRepository<Location> locationRepository,
             IGenericRepository<Product> productRepository,
             IGenericRepository<Inventory> inventoryRepository,
-            IGenericRepository<InventoryLocation> inventoryLocationRepository,
             IGenericRepository<Batch> batchRepository,
             IGenericRepository<Warehouse> warehouseRepository,
             IGenericRepository<Account> accountRepository,
@@ -48,10 +44,8 @@ namespace BusinessLogicLayer.Services
             IMapper mapper, IUnitOfWork unitOfWork) : base(genericRepository, mapper, unitOfWork)
         {
             _scheduleRepository = scheduleRepository;
-            _locationRepository = locationRepository;
             _productRepository = productRepository;
             _inventoryRepository = inventoryRepository;
-            _inventoryLocationRepository = inventoryLocationRepository;
             _batchRepository = batchRepository;
             _warehouseRepository = warehouseRepository;
             _accountRepository = accountRepository;
@@ -471,81 +465,5 @@ namespace BusinessLogicLayer.Services
                 }
             };
         }
-
-        private async Task<float> CalculateExpectedQuantity(string locationId, string productId)
-        {
-            var inventoryLocations = await _inventoryLocationRepository.GetAllNoPaging(
-                filter: il => il.LocationId == locationId,
-                includeProperties: "Inventory,Inventory.Batch"
-                );
-
-
-            var matchedInventories = inventoryLocations
-                .Where(il => il.Inventory?.Batch != null && il.Inventory.Batch.ProductId == productId)
-                .Select(il => il.Inventory)
-                .Distinct()
-                .ToList();
-
-            float expectedQuantity = matchedInventories.Sum(inv => inv.CurrentQuantity);
-            return expectedQuantity;
-        }
-
-
-        public async Task<InventoryByLocationDTO> GetInventoriesByLocationLevel0Async(string locationLevel0Id)
-        {
-            var locationLevel0 = await _locationRepository.GetByCondition(p => p.Id == locationLevel0Id);
-            if (locationLevel0 != null)
-            {
-                if (locationLevel0.Level != 0)
-                    throw new Exception("Location không phải là cấp độ 0");
-            }
-            else
-                throw new Exception("Location không tồn tại");
-
-            var level2LocationIds = await _locationRepository.GetAllNoPaging(
-            x => x.Level == 2 && x.Parent!.ParentId == locationLevel0Id);
-
-            var level2Ids = level2LocationIds.Select(x => x.Id).ToList();
-
-            var inventoryLocations = await _inventoryLocationRepository.GetAllNoPaging(
-            x => level2Ids.Contains(x.LocationId),
-            includeProperties: "Inventory,Inventory.Batch");
-
-            var inventories = inventoryLocations.Select(x => x.Inventory).Distinct().ToList();
-
-            var dto = _mapper.Map<InventoryByLocationDTO>(locationLevel0);
-            dto.InventoryLocations = _mapper.Map<List<CustomInventoryLocationDTO>>(inventoryLocations);
-            dto.Inventories = _mapper.Map<List<InventoryWithProductDTO>>(inventories);
-
-            return dto;
-
-        }
-
-
-        public async Task<float> SumInventoryLocationQuantityByLocationLevel0AndInventory(string locationLevel0Id, string inventoryId)
-        {
-            // Lấy tất cả Location level 2 thuộc location level 0
-            var level2Locations = await _locationRepository.GetAllNoPaging(
-                x => x.Level == 2 && x.Parent!.ParentId == locationLevel0Id
-            );
-
-            var level2LocationIds = level2Locations.Select(x => x.Id).ToList();
-
-            // Lấy tất cả InventoryLocation thuộc các Location level 2 đó
-            var inventoryLocations = await _inventoryLocationRepository.GetAllNoPaging(
-                x => level2LocationIds.Contains(x.LocationId) && x.InventoryId == inventoryId,
-                includeProperties: "Inventory"
-            );
-
-            // Lấy WarehouseId của Inventory truyền vào (chỉ để đảm bảo đúng warehouse)
-            var inventory = await _inventoryRepository.GetByCondition(x => x.Id == inventoryId);
-            if (inventory == null) return 0;
-
-            var matchedInventoryLocations = inventoryLocations
-                .Where(il => il.Inventory.WarehouseId == inventory.WarehouseId);
-
-            return matchedInventoryLocations.Sum(il => (float)il.Quantity);
-        }
-
     }
 }

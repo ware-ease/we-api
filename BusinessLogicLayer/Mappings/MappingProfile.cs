@@ -1,16 +1,7 @@
 ﻿using BusinessLogicLayer.Models.Category;
-using BusinessLogicLayer.Models.Cell;
-using BusinessLogicLayer.Models.Floor;
-using BusinessLogicLayer.Models.Product;
-using BusinessLogicLayer.Models.ReceivingNote;
-using BusinessLogicLayer.Models.Shelf;
-using BusinessLogicLayer.Models.StockCard;
-using BusinessLogicLayer.Models.StockCardDetail;
-using BusinessLogicLayer.Models.Supplier;
 using Data.Entity;
 using Data.Model.DTO;
 using Data.Model.Request.Account;
-using Data.Model.Request.Area;
 using Data.Model.Request.Batch;
 using Data.Model.Request.Brand;
 using Data.Model.Request.Category;
@@ -18,21 +9,15 @@ using Data.Model.Request.Customer;
 using Data.Model.Request.GoodNote;
 using Data.Model.Request.GoodRequest;
 using Data.Model.Request.InventoryCount;
-using Data.Model.Request.Inventory;
 using Data.Model.Request.Partner;
 using Data.Model.Request.Product;
 using Data.Model.Request.ProductType;
 using Data.Model.Request.Schedule;
-using Data.Model.Request.Suppiler;
-using Data.Model.Request.Supplier;
 using Data.Model.Request.Unit;
 using Data.Model.Request.Warehouse;
-using static Data.Model.Request.Warehouse.WarehouseFullInfoDTO;
 using Profile = Data.Entity.Profile;
 using Data.Model.Request.InventoryAdjustment;
-using Data.Model.Request.InventoryLocation;
-using Data.Model.Request.LocationLog;
-using Data.Model.Request.ErrorTicket;
+using Data.Model.Request.Inventory;
 
 namespace BusinessLogicLayer.Mappings
 {
@@ -40,11 +25,12 @@ namespace BusinessLogicLayer.Mappings
     {
         public MappingProfile()
         {
+            // Mapping classes
+
             CreateMap<Partner, Data.Model.DTO.CustomerDTO>().ReverseMap();
             CreateMap<CustomerCreateDTO, Partner>().ReverseMap();
             CreateMap<CustomerUpdateDTO, Partner>().ReverseMap();
 
-            // Mapping classes
             #region Account
             CreateMap<Account, AccountDTO>()
                 .ForMember(dest => dest.Profile, opt => opt.MapFrom(src => src.Profile))
@@ -92,10 +78,6 @@ namespace BusinessLogicLayer.Mappings
 
             #region Supplier
             CreateMap<Partner, SupplierDTO>().ReverseMap();
-
-            CreateMap<Partner, SupplierCreateDTO>().ReverseMap();
-
-            CreateMap<Partner, SupplierUpdateDTO>().ReverseMap();
             #endregion
 
             #region Customer
@@ -125,10 +107,10 @@ namespace BusinessLogicLayer.Mappings
                 .ForMember(d => d.BatchCode, opt => opt.MapFrom(src => $"{src.Batch.Code}".Trim()))
                 .ForMember(d => d.WarehouseName, opt => opt.MapFrom(src => $"{src.Warehouse.Name}".Trim()))
                 .ReverseMap();
-
-            CreateMap<Inventory, InventoryDTOv2>()/*.ForMember(d => d.InventoryLocations, opt => opt.MapFrom(src => src.InventoryLocations))*/
-                .ReverseMap();
-            CreateMap<InventoryLocation, InventoryLocationDTO>().ReverseMap();
+            CreateMap<Inventory, InventoryDTOv2>()
+             .ForMember(d => d.Batch, opt => opt.MapFrom(src => src.Batch))
+             .ForMember(d => d.Warehouse, opt => opt.MapFrom(src => src.Warehouse))
+             .ReverseMap();
             #endregion
 
             #region InventoryCount
@@ -144,16 +126,8 @@ namespace BusinessLogicLayer.Mappings
             CreateMap<InventoryCount, InventoryCountCreateDTO>().ReverseMap();
             CreateMap<InventoryCount, InventoryCountUpdateDTO>().ReverseMap();
 
-
-            CreateMap<InventoryLocation, CustomInventoryLocationDTO>().ReverseMap();
-
             CreateMap<Inventory, InventoryWithProductDTO>()
                 .ForMember(dest => dest.ProductId, opt => opt.MapFrom(src => src.Batch.ProductId)).ReverseMap();
-
-            CreateMap<Location, InventoryByLocationDTO>()
-                .ForMember(dest => dest.LocationId, opt => opt.MapFrom(src => src.Id))
-                .ForMember(dest => dest.LocationName, opt => opt.MapFrom(src => src.Name))
-                .ForMember(dest => dest.LocationCode, opt => opt.MapFrom(src => src.Code)).ReverseMap();
             #endregion
 
             #region InventoryAdjustment
@@ -252,12 +226,11 @@ namespace BusinessLogicLayer.Mappings
             CreateMap<Warehouse, CreateWarehouseDTO>().ReverseMap();
             CreateMap<Warehouse, UpdateWarehouseDTO>().ReverseMap();
             CreateMap<Warehouse, WarehouseFullInfoDTO>().ReverseMap();
-            CreateMap<Location, LocationDto>().ReverseMap();
-            CreateMap<Location, LocationCreateDto>().ReverseMap();
             CreateMap<Warehouse, WarehouseInventoryDTO>().ReverseMap();
+            #endregion
+
             #region Inventory
             CreateMap<Inventory, Data.Model.Request.Inventory.InventoryDTO>().ReverseMap();
-            #endregion
             #endregion
 
             #region GoodRequest
@@ -329,21 +302,6 @@ namespace BusinessLogicLayer.Mappings
                 .ForMember(dest => dest.Id, opt => opt.Ignore());
             #endregion
 
-            #region InventoryLocation
-            CreateMap<InventoryLocation, InventoryInLocationDTO>().ReverseMap();
-            CreateMap<Location, LocationInventoryDTO>()
-                .ForMember(dest => dest.InventoryItems, opt => opt.MapFrom(src => src.InventoryLocations))
-                .ReverseMap();
-            #endregion 
-
-            #region LocationLog
-            CreateMap<LocationLog, LocationLogDTO>()
-                .ForMember(dest => dest.LocationId, opt => opt.MapFrom(src => src.InventoryLocation.LocationId))
-                .ReverseMap();
-            #endregion 
-            #region Location
-            CreateMap<Location, LocationDTO>().ReverseMap();
-            #endregion
         }
     }
 }

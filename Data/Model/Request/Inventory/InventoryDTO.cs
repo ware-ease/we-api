@@ -1,4 +1,5 @@
 ﻿using Data.Entity;
+using Data.Model.DTO;
 using Data.Model.DTO.Base;
 using Data.Model.Request.GoodNote;
 using System;
@@ -17,5 +18,15 @@ namespace Data.Model.Request.Inventory
         public float? NotArrgangedQuantity { get; set; }
         public string BatchId { get; set; }
         public BatchNoteDTO? Batch { get; set; }
+    }
+    public class InventoryDTOv2 : BaseDTO
+    {
+        public float CurrentQuantity { get; set; }
+        public float? ArrangedQuantity { get; set; }
+        public float? NotArrgangedQuantity { get; set; }
+        public string WarehouseId { get; set; }
+        public WarehouseDTO Warehouse { get; set; }
+        public string BatchId { get; set; }
+        public BatchNoteDTO Batch { get; set; }
     }
 }

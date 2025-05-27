@@ -59,7 +59,7 @@ namespace Data.Model.Request.Warehouse
         public float Area { get; set; }
         public DateTime OperateFrom { get; set; }
 
-        public List<LocationDto>? Locations { get; set; }
+        //public List<LocationDto>? Locations { get; set; }
     }
     public class LocationDto : BaseDTO
     {
