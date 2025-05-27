@@ -79,26 +79,6 @@ namespace API.Controllers
 
             return ControllerResponse.Response(result);
         }
-
-        [Authorize]
-        [HttpPost("{id}/location")]
-        public async Task<IActionResult> AddWarehouseLocation([FromRoute] string id, [FromBody] CreateWarehouseStructureRequest request)
-        {
-            //var authUser = AuthHelper.GetCurrentUser(HttpContext.Request);
-
-            //if (authUser != null)
-            //{
-            //    request.CreatedBy = authUser.id;
-            //}
-            //else
-            //{
-            //    return Unauthorized();
-            //}
-            request.Id = id;
-            var result = await _warehouseService.CreateStructureAsync(request);
-
-            return ControllerResponse.Response(result);
-        }
         [Authorize]
         [HttpGet("{id}/inventory")]
         public async Task<IActionResult> GetWarehouseInventory([FromRoute] string id)
@@ -107,33 +87,6 @@ namespace API.Controllers
 
             return ControllerResponse.Response(result);
         }
-
-        ////[Authorize]
-        //[HttpPost("{id}/inventory-location")]
-        //public async Task<IActionResult> PutAwayInventory([FromRoute] string id, [FromBody] CreateInventoryLocationDTO request)
-        //{
-        //    var result = await _warehouseService.InventoryLocationInOutAsync(request);
-        //    return ControllerResponse.Response(result);
-        //}
-        //[HttpGet("locations/{locationId}")]
-        //public async Task<IActionResult> GetInventoriesInLocation([FromRoute] string locationId)
-        //{
-        //    var result = await _warehouseService.GetInventoriesInLocation(locationId);
-        //    return ControllerResponse.Response(result);
-        //}
-        //[Authorize]
-        //[HttpGet("{id}/location-logs")]
-        //public async Task<IActionResult> GetLocationLogs(
-        //    [FromRoute] string id,
-        //    [FromQuery] string? locationId = null,  // locationId là tùy chọn
-        //    [FromQuery] int pageIndex = 1,
-        //    [FromQuery] int pageSize = 10)
-        //{
-        //    // Gọi service để lấy log
-        //    var result = await _warehouseService.GetLocationLogsAsync(id, locationId, pageIndex, pageSize);
-
-        //    return ControllerResponse.Response(result);
-        //}
         /// <summary>
         /// Lấy dữ liệu thẻ kho theo sản phẩm và kho
         /// </summary>

@@ -62,24 +62,21 @@ namespace BusinessLogicLayer.Services
             return new ServiceResponse
             {
                 Status = Data.Enum.SRStatus.Success,
-                Message = "Get successfully!",
+                Message = "Tìm thành công!",
                 Data = mappedResults
             };
         }
 
         public async Task<ServiceResponse> GetFullWarehouseInfo<TResult>(string id)
         {
-            var warehouse = await _unitOfWork.WarehouseRepository.GetByCondition(
-                w => w.Id == id,
-                includeProperties: "Locations"
-            );
+            var warehouse = await _unitOfWork.WarehouseRepository.GetByCondition(w => w.Id == id);
 
             if (warehouse == null)
             {
                 return new ServiceResponse
                 {
                     Status = Data.Enum.SRStatus.NotFound,
-                    Message = "Warehouse not found!",
+                    Message = "Không tìm thấy kho!",
                     Data = id
                 };
             }
@@ -89,7 +86,7 @@ namespace BusinessLogicLayer.Services
             return new ServiceResponse
             {
                 Status = Data.Enum.SRStatus.Success,
-                Message = "Get full warehouse info successfully!",
+                Message = "Tìm thành công!",
                 Data = result
             };
         }
@@ -102,7 +99,7 @@ namespace BusinessLogicLayer.Services
                 return new ServiceResponse
                 {
                     Status = Data.Enum.SRStatus.NotFound,
-                    Message = "Warehouse not found",
+                    Message = "Không tìm thấy kho!",
                     Data = request.Id
                 };
             }
@@ -228,7 +225,7 @@ namespace BusinessLogicLayer.Services
                 return new ServiceResponse
                 {
                     Status = Data.Enum.SRStatus.Success,
-                    Message = "Update successfully!",
+                    Message = "Cập nhật thành công!",
                     Data = result
                 };
             }

@@ -56,6 +56,7 @@ namespace API.Controllers
         }
 
         [Authorize]
+        
         [HttpGet("me")]
         public async Task<IActionResult> GetMe()
         {

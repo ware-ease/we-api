@@ -280,7 +280,7 @@ namespace BusinessLogicLayer.Services
                 return new ServiceResponse
                 {
                     Status = Data.Enum.SRStatus.Unauthorized,
-                    Message = "Wrong password!",
+                    Message = "Sai mật khẩu!",
                     Data = id,
                 };
             }
@@ -293,7 +293,7 @@ namespace BusinessLogicLayer.Services
             return new ServiceResponse
             {
                 Status = Data.Enum.SRStatus.Success,
-                Message = "Update successfully!",
+                Message = "Cập nhật thành công!",
                 Data = { }
             };
         }
@@ -307,7 +307,7 @@ namespace BusinessLogicLayer.Services
                 return new ServiceResponse
                 {
                     Status = Data.Enum.SRStatus.NotFound,
-                    Message = "Account not found!",
+                    Message = "Không tìm thấy tài khoản!",
                     Data = id,
                 };
             }
@@ -348,7 +348,7 @@ namespace BusinessLogicLayer.Services
             return new ServiceResponse
             {
                 Status = Data.Enum.SRStatus.Success,
-                Message = "Update status successfully!",
+                Message = "Cập nhật trạng thái tài khoản thành công!",
                 Data = { }
             };
         }
