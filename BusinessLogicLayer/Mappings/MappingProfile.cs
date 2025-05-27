@@ -106,11 +106,6 @@ namespace BusinessLogicLayer.Mappings
             CreateMap<Partner, CustomerUpdateDTO>().ReverseMap();
             #endregion
 
-            #region ReceivingNote
-            CreateMap<ReceivingNote, CreateReceivingNoteDTO>();
-            CreateMap<CreateReceivingNoteDTO, ReceivingNote>();
-            #endregion
-
             #region Product
             CreateMap<Product, ProductDTO>()
                 .ForMember(dest => dest.ProductType, opt => opt.MapFrom(src => $"{src.ProductType.Name} {src.ProductType.Note}".Trim()))
@@ -201,15 +196,6 @@ namespace BusinessLogicLayer.Mappings
 
             CreateMap<Schedule, ScheduleCreateDTO>().ReverseMap();
             CreateMap<Schedule, ScheduleUpdateDTO>().ReverseMap();
-            #endregion
-
-            #region ErrorTicket
-            CreateMap<ErrorTicket, ErrorTicketDTO>()
-                .ForMember(dest => dest.InventoryCountDetailNote, opt => opt.MapFrom(src => src.InventoryCountDetail.Note))
-                .ReverseMap();
-
-            CreateMap<ErrorTicket, ErrorTicketCreateDTO>().ReverseMap();
-            CreateMap<ErrorTicket, ErrorTicketUpdateDTO>().ReverseMap();
             #endregion
 
             #region Batch

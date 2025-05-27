@@ -37,26 +37,20 @@ namespace DataAccessLayer
         //public virtual DbSet<Floor> Floors { get; set; }
         public virtual DbSet<Group> Groups { get; set; }
         public virtual DbSet<GroupPermission> GroupPermissions { get; set; }
-        public virtual DbSet<IssueNote> IssueNotes { get; set; }
-        public virtual DbSet<IssueDetail> IssueDetails { get; set; }
         public virtual DbSet<Notification> Notifications { get; set; }
         public virtual DbSet<Route> Routes { get; set; }
         public virtual DbSet<Product> Products { get; set; }
         public virtual DbSet<Profile> Profiles { get; set; }
-        public virtual DbSet<ReceivingDetail> ReceivingDetails { get; set; }
-        public virtual DbSet<ReceivingNote> ReceivingNotes { get; set; }
         //public virtual DbSet<Shelf> Shelves { get; set; }
         //public virtual DbSet<Supplier> Suppliers { get; set; }
         public virtual DbSet<Warehouse> Warehouses { get; set; }
         //public virtual DbSet<Area> Areas { get; set; }
         public virtual DbSet<Batch> Batches { get; set; }
         public virtual DbSet<Brand> Brands { get; set; }
-        public virtual DbSet<ErrorTicket> ErrorTickets { get; set; }
         public virtual DbSet<Inventory> Inventories { get; set; }
         public virtual DbSet<InventoryCount> InventoryChecks { get; set; }
         public virtual DbSet<InventoryCountDetail> InventoryCheckDetails { get; set; }
         public virtual DbSet<Schedule> Schedules { get; set; }
-        public virtual DbSet<ScheduleSetting> ScheduleSettings { get; set; }
         public virtual DbSet<Unit> Units { get; set; }
         public virtual DbSet<ProductType> ProductTypes { get; set; }
         public virtual DbSet<GoodNote> GoodNotes { get; set; }

@@ -15,7 +15,6 @@ namespace Data.Entity
         public string? Name { get; set; }
         public string? Code { get; set; }
 
-        public ICollection<ScheduleSetting> ScheduleSettings { get; set; } = [];
         public ICollection<InventoryLocation> InventoryLocations { get; set; } = [];
         //public ICollection<InventoryCount> InventoryCounts { get; set; } = [];
 
