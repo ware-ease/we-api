@@ -170,7 +170,7 @@ namespace BusinessLogicLayer.Services
                         };
                     }
 
-                    var productExists = await _unitOfWork.ProductRepository.GetByCondition(x => x.Id == detail.ProductId);
+                    var productExists = await _unitOfWork.ProductRepository.GetByCondition(x => x.Id == detail.ProductId, includeProperties: "Unit");
                     if (productExists == null)
                     {
                         return new ServiceResponse
@@ -179,6 +179,31 @@ namespace BusinessLogicLayer.Services
                             Message = $"không tìm thấy sản phẩm với Id {detail.ProductId}!",
                             Data = detail.ProductId
                         };
+                    }
+                    //Validate quantity based on Unit type
+                    if (productExists.Unit.Type == UnitEnum.Int)
+                    {
+                        if (detail.Quantity <= 0 || detail.Quantity % 1 != 0)
+                        {
+                            return new ServiceResponse
+                            {
+                                Status = SRStatus.Error,
+                                Message = $"Sản phẩm {productExists.Sku} yêu cầu số lượng là số nguyên dương!",
+                                Data = detail
+                            };
+                        }
+                    }
+                    else
+                    {
+                        if (detail.Quantity <= 0)
+                        {
+                            return new ServiceResponse
+                            {
+                                Status = SRStatus.Error,
+                                Message = $"Sản phẩm {productExists.Sku} yêu cầu số lượng lớn hơn 0!",
+                                Data = detail
+                            };
+                        }
                     }
                     detail.CreatedBy = request.CreatedBy;
                 }
