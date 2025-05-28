@@ -23,7 +23,7 @@ namespace API.Controllers
         }
 
         [Authorize]
-        [AuthorizeGroup("Admin,Thủ kho")
+        [AuthorizeGroup("Admin,Thủ kho")]
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(string id)
         {
