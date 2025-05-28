@@ -237,11 +237,6 @@ var app = builder.Build();
 
 app.UseCors("Cors");
 
-// Config Middleware
-//app.UseMiddleware<JwtMiddleware>();
-//app.UseMiddleware<AccountStatusMiddleware>();
-//app.UseMiddleware<TokenValidationMiddleware>();
-
 app.UseSwagger();
 app.UseSwaggerUI();
 
@@ -250,8 +245,8 @@ app.UseExceptionHandler();
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
-app.UseMiddleware<PermissionMiddleware>();
 
+app.UseMiddleware<GroupAuthorizationMiddleware>();
 
 app.MapControllers();
 

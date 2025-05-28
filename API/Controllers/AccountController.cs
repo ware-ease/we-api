@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Data.Model.Request.Account;
 using BusinessLogicLayer.IServices;
 using Data.Enum;
+using API.Middlewares;
 
 namespace API.Controllers
 {
@@ -31,6 +32,7 @@ namespace API.Controllers
         }
 
         [Authorize]
+        [AuthorizeGroup("Admin")]
         [HttpPost]
         public async Task<IActionResult> Add([FromBody] AccountCreateDTO request)
         {
@@ -47,6 +49,7 @@ namespace API.Controllers
         }
 
         [Authorize]
+        [AuthorizeGroup("Admin")]
         [HttpGet()]
         public async Task<IActionResult> Get()
         {
@@ -56,7 +59,6 @@ namespace API.Controllers
         }
 
         [Authorize]
-        
         [HttpGet("me")]
         public async Task<IActionResult> GetMe()
         {
@@ -67,6 +69,7 @@ namespace API.Controllers
         }
 
         [Authorize]
+        [AuthorizeGroup("Admin")]
         [HttpPatch("{id}")]
         public async Task<IActionResult> Update([FromRoute] string id, [FromBody] AccountUpdateDTO request)
         {
@@ -75,6 +78,8 @@ namespace API.Controllers
             return ControllerResponse.Response(result);
         }
 
+        [Authorize]
+        [AuthorizeGroup("Admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete([FromRoute] string id)
         {
@@ -103,6 +108,7 @@ namespace API.Controllers
         }
 
         [Authorize]
+        [AuthorizeGroup("Admin")]
         [HttpPut("{id}/status")]
         public async Task<IActionResult> UpdateStatus(string id, [FromQuery] AccountStatus status)
         {

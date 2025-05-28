@@ -1,4 +1,5 @@
-﻿using BusinessLogicLayer.IServices;
+﻿using API.Middlewares;
+using BusinessLogicLayer.IServices;
 using Data.Model.Request.Warehouse;
 using Data.Model.Response;
 using Microsoft.AspNetCore.Authorization;
@@ -19,6 +20,7 @@ namespace API.Controllers
             _warehouseService = warehouseService;
         }
         [Authorize]
+        [AuthorizeGroup("Admin,Thủ kho")]
         [HttpGet("4cards")]
         public async Task<IActionResult> Get4CardsInfo(string? warehouseId)
         {
@@ -26,6 +28,7 @@ namespace API.Controllers
             return ControllerResponse.Response(result);
         }
         [Authorize]
+        [AuthorizeGroup("Admin,Thủ kho")]
         [HttpGet("histogram")]
         public async Task<IActionResult> GetGoodsFlowHistogram(string? warehouseId, int? month, int? year)
         {
@@ -34,6 +37,7 @@ namespace API.Controllers
             return ControllerResponse.Response(response);
         }
         [Authorize]
+        [AuthorizeGroup("Admin,Thủ kho")]
         [HttpGet("linechart")]
         public async Task<IActionResult> GetStockLineChart(int? year, int? startMonth, int? endMonth, string? warehouseId)
         {
@@ -41,6 +45,7 @@ namespace API.Controllers
             return ControllerResponse.Response(response);
         }
         [Authorize]
+        [AuthorizeGroup("Admin,Thủ kho")]
         [HttpGet("piechart")]
         public async Task<IActionResult> GetStockPieChart()
         {
@@ -48,6 +53,7 @@ namespace API.Controllers
             return ControllerResponse.Response(response);
         }
         [Authorize]
+        [AuthorizeGroup("Admin,Thủ kho")]
         [HttpGet("piechart/warehouse/{warehouseId}")]
         public async Task<IActionResult> GetStockPieChartOfAWarehouse(string warehouseId)
         {

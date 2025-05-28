@@ -1,4 +1,5 @@
-﻿using API.Utils;
+﻿using API.Middlewares;
+using API.Utils;
 using BusinessLogicLayer.IServices;
 using Data.Model.Request.Partner;
 using Data.Model.Response;
@@ -19,6 +20,7 @@ namespace API.Controllers
             _partnerService = partnerService;
         }
         [Authorize]
+        [AuthorizeGroup("Admin,Thủ kho,Nhân viên bán hàng")]
         [HttpGet]
         public async Task<IActionResult> SearchPartners([FromQuery] int pageIndex = 1,
                                                        [FromQuery] int pageSize = 5,
@@ -31,6 +33,7 @@ namespace API.Controllers
             return ControllerResponse.Response(response);
         }
         [Authorize]
+        [AuthorizeGroup("Admin,Thủ kho,Nhân viên bán hàng")]
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(string id)
         {
@@ -39,6 +42,7 @@ namespace API.Controllers
         }
 
         [Authorize]
+        [AuthorizeGroup("Admin,Nhân viên bán hàng")]
         [HttpPost]
         public async Task<IActionResult> Add([FromBody] PartnerCreateDTO request)
         {
@@ -51,6 +55,7 @@ namespace API.Controllers
             return ControllerResponse.Response(result);
         }
         [Authorize]
+        [AuthorizeGroup("Admin,Nhân viên bán hàng")]
         [HttpPatch("{id}")]
         public async Task<IActionResult> Update([FromRoute] string id, [FromBody] PartnerUpdateDTO request)
         {
@@ -58,6 +63,7 @@ namespace API.Controllers
             return ControllerResponse.Response(result);
         }
         [Authorize]
+        [AuthorizeGroup("Admin,Nhân viên bán hàng")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(string id)
         {

@@ -15,6 +15,7 @@ namespace BusinessLogicLayer.IServices
         Task<TokenDTO> GenerateTokens(string id);
         Task<bool> CheckRefreshTokenExpiry(string? refreshToken);
         Task<bool> HasPermissionAsync(string userId, string permissionKey);
+        Task<List<string>> GetUserGroups(string userId);
 
     }
 }

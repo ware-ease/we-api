@@ -1,4 +1,5 @@
-﻿using API.Utils;
+﻿using API.Middlewares;
+using API.Utils;
 using BusinessLogicLayer.IServices;
 using BusinessLogicLayer.Services;
 using BusinessLogicLayer.Utils;
@@ -23,6 +24,7 @@ namespace API.Controllers
             _warehouseService = warehouseService;
         }
         [Authorize]
+        [AuthorizeGroup("Admin,Thủ kho,Nhân viên bán hàng,Nhân viên kho")]
         [HttpGet]
         public async Task<IActionResult> SearchWarehouses(
                                                             [FromQuery] int pageIndex = 1,
@@ -38,6 +40,7 @@ namespace API.Controllers
         }
 
         [Authorize]
+        [AuthorizeGroup("Admin,Thủ kho")]
         [HttpPost]
         public async Task<IActionResult> Add([FromBody] CreateWarehouseDTO request)
         {
@@ -53,6 +56,7 @@ namespace API.Controllers
             return ControllerResponse.Response(result);
         }
         [Authorize]
+        [AuthorizeGroup("Admin,Thủ kho")]
         [HttpPatch("{id}")]
         public async Task<IActionResult> Update([FromRoute] string id, [FromBody] UpdateWarehouseDTO request)
         {
@@ -61,6 +65,7 @@ namespace API.Controllers
             return ControllerResponse.Response(result);
         }
         [Authorize]
+        [AuthorizeGroup("Admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete([FromRoute] string id)
         {
@@ -69,6 +74,7 @@ namespace API.Controllers
             return ControllerResponse.Response(result);
         }
         [Authorize]
+        [AuthorizeGroup("Admin,Thủ kho,Nhân viên bán hàng,Nhân viên kho")]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetFullWarehouseInfo([FromRoute] string id)
         {
@@ -76,7 +82,9 @@ namespace API.Controllers
 
             return ControllerResponse.Response(result);
         }
+
         [Authorize]
+        [AuthorizeGroup("Admin,Thủ kho,Nhân viên bán hàng,Nhân viên kho")]
         [HttpGet("{id}/inventory")]
         public async Task<IActionResult> GetWarehouseInventory([FromRoute] string id)
         {
@@ -84,14 +92,9 @@ namespace API.Controllers
 
             return ControllerResponse.Response(result);
         }
-        /// <summary>
-        /// Lấy dữ liệu thẻ kho theo sản phẩm và kho
-        /// </summary>
-        /// <param name="productId">ID sản phẩm</param>
-        /// <param name="warehouseId">ID kho</param>
-        /// <returns>Thông tin thẻ kho</returns>
-
+       
         [Authorize]
+        [AuthorizeGroup("Admin,Thủ kho")]
         [HttpGet("stock-card")]
         public async Task<IActionResult> GetStockCard([FromQuery] string productId, [FromQuery] string warehouseId, 
                                                       [FromQuery] DateTime? from = null, [FromQuery] DateTime? to = null)
@@ -101,6 +104,7 @@ namespace API.Controllers
         }
 
         [Authorize]
+        [AuthorizeGroup("Admin,Thủ kho")]
         [HttpGet("stock-book")]
         public async Task<IActionResult> GetStockBook([FromQuery] string warehouseId, [FromQuery] int month, [FromQuery] int year)
         {
@@ -113,6 +117,7 @@ namespace API.Controllers
             return ControllerResponse.Response(response);
         }
         [Authorize]
+        [AuthorizeGroup("Admin,Thủ kho,Nhân viên bán hàng")]
         [HttpGet("{id}/products")]
         public async Task<IActionResult> GetAvailableProductsInWarehouse(string id)
         {
@@ -121,6 +126,7 @@ namespace API.Controllers
         }
         //Get all staff of warehouse
         [Authorize]
+        [AuthorizeGroup("Admin,Thủ kho")]
         [HttpGet("{id}/staffs")]
         public async Task<IActionResult> GetStaffsInWarehouse(string id, [FromQuery] int pageIndex = 1,
                                                             [FromQuery] int pageSize = 5,
