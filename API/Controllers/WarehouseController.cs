@@ -117,7 +117,7 @@ namespace API.Controllers
             return ControllerResponse.Response(response);
         }
         [Authorize]
-        [AuthorizeGroup("Admin,Thủ kho,Nhân viên bán hàng")]
+        [AuthorizeGroup("Admin,Thủ kho,Nhân viên bán hàng,Nhân viên kho")]
         [HttpGet("{id}/products")]
         public async Task<IActionResult> GetAvailableProductsInWarehouse(string id)
         {

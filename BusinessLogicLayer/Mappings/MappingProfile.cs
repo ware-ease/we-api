@@ -163,6 +163,7 @@ namespace BusinessLogicLayer.Mappings
 
             CreateMap<InventoryCountDetail, InventoryCountDetailCreateDTO>().ReverseMap();
             CreateMap<InventoryCountDetail, InventoryCountDetailUpdateDTO>().ReverseMap();
+            CreateMap<InventoryCountDetail, InventoryCountDTO>().ReverseMap();
             #endregion
 
             #region Schedule

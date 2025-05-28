@@ -13,6 +13,7 @@ using DotNetEnv;
 using MailKit.Security;
 using MimeKit;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace BusinessLogicLayer.Services
 {
@@ -366,38 +367,116 @@ namespace BusinessLogicLayer.Services
                     Data = id,
                 };
             }
-            var tasks = await _unitOfWork.InventoryCountDetailRepository.Search(a => a.AccountId == id && (warehouseId == null || a.Inventory.WarehouseId == warehouseId) && (status == null || a.Status == status),
-                includeProperties: "InventoryCount,Inventory,Inventory.Batch,Inventory.Batch.Product", 
-                pageIndex: pageIndex,pageSize: pageSize);
-            
-            var tasksDTO = _mapper.Map<List<InventoryCountDetailDTO>>(tasks);
-            foreach (var item in tasksDTO)
+            Expression<Func<InventoryCount, bool>> filter;
+            filter = p =>
+                (string.IsNullOrEmpty(warehouseId) || p.Schedule.Warehouse.Id == warehouseId) &&
+                p.InventoryCheckDetails.Any(d => d.AccountId == id && d.Status == status);
+
+            var totalRecords = await _unitOfWork.InventoryCountRepository.Count(filter);
+
+            var results = await _unitOfWork.InventoryCountRepository.Search(
+                filter: filter,
+                pageIndex: pageIndex, pageSize: pageSize,
+                includeProperties: "InventoryCheckDetails,Schedule.Warehouse,InventoryCheckDetails.Inventory.Batch.Product");
+
+            var mappedResults = _mapper.Map<List<InventoryCountDTO>>(results);
+
+            // ✅ Sau khi map xong, lọc chỉ giữ lại detail có AccountId == id
+            foreach (var dto in mappedResults)
             {
-                var createdByAccount = await _unitOfWork.AccountRepository.GetByCondition(a => a.Id == item.CreatedBy, "Profile,AccountGroups,AccountGroups.Group");
-                if (createdByAccount != null)
+                // Lọc lại các detail có đúng AccountId
+                dto.InventoryCountDetails = dto.InventoryCountDetails?
+                    .Where(d => d.AccountId == id)
+                    .ToList();
+
+                // Gán avatar và thông tin người tạo count
+                if (!string.IsNullOrEmpty(dto.CreatedBy))
                 {
-                    item.CreatedByAvatarUrl = createdByAccount.Profile!.AvatarUrl;
-                    item.CreatedByFullName = $"{createdByAccount.Profile.FirstName} {createdByAccount.Profile.LastName}";
-                    item.CreatedByGroup = createdByAccount.AccountGroups.FirstOrDefault()?.Group?.Name;
+                    var accountCreated = await _unitOfWork.AccountRepository.GetByCondition(
+                        a => a.Id == dto.CreatedBy, "Profile,AccountGroups,AccountGroups.Group");
+
+                    if (accountCreated != null)
+                    {
+                        dto.CreatedByAvatarUrl = accountCreated.Profile!.AvatarUrl;
+                        dto.CreatedByFullName = $"{accountCreated.Profile.FirstName} {accountCreated.Profile.LastName}";
+                        dto.CreatedByGroup = accountCreated.AccountGroups.FirstOrDefault()?.Group?.Name;
+                    }
+                }
+
+                // Gán avatar cho từng detail (nếu cần)
+                if (dto.InventoryCountDetails != null && dto.InventoryCountDetails.Any())
+                {
+                    foreach (var detailDto in dto.InventoryCountDetails)
+                    {
+                        if (!string.IsNullOrEmpty(detailDto.CreatedBy))
+                        {
+                            var detailAccount = await _unitOfWork.AccountRepository.GetByCondition(
+                                a => a.Id == detailDto.AccountId, "Profile,AccountGroups,AccountGroups.Group");
+
+                            if (detailAccount != null)
+                            {
+                                detailDto.CreatedByAvatarUrl = detailAccount.Profile!.AvatarUrl;
+                                detailDto.CreatedByFullName = $"{detailAccount.Profile.FirstName} {detailAccount.Profile.LastName}";
+                                detailDto.CreatedByGroup = detailAccount.AccountGroups.FirstOrDefault()?.Group?.Name;
+                            }
+                        }
+                    }
                 }
             }
 
-            //paging 
-            var totalCount = await _unitOfWork.InventoryCountDetailRepository.Count(a => a.AccountId == id && (warehouseId == null || a.Inventory.WarehouseId == warehouseId) && (status == null || a.Status == status));
-            var totalPage = (int)Math.Ceiling((double)totalCount / (pageSize ?? 10));
+            // ✅ Nếu muốn: loại luôn InventoryCount nào không còn detail sau khi lọc (phòng trường hợp dữ liệu sai)
+            mappedResults = mappedResults
+                .Where(c => c.InventoryCountDetails != null && c.InventoryCountDetails.Any())
+                .ToList();
+
+            int totalPages = (int)Math.Ceiling((double)totalRecords / (pageSize ?? totalRecords));
+
             return new ServiceResponse
             {
                 Status = Data.Enum.SRStatus.Success,
-                Message = "Tìm thành công",
+                Message = "Search successful!",
                 Data = new
                 {
-                    Tasks = tasksDTO,
-                    TotalCount = totalCount,
-                    TotalPage = totalPage,
-                    PageIndex = pageIndex,
-                    PageSize = pageSize
+                    TotalRecords = mappedResults.Count,
+                    TotalPages = totalPages,
+                    PageIndex = pageIndex ?? 1,
+                    PageSize = pageSize ?? mappedResults.Count,
+                    Records = mappedResults
                 }
             };
+
+            //var tasks = await _unitOfWork.InventoryCountDetailRepository.Search(a => a.AccountId == id && (warehouseId == null || a.Inventory.WarehouseId == warehouseId) && (status == null || a.Status == status),
+            //    includeProperties: "InventoryCount,Inventory,Inventory.Batch,Inventory.Batch.Product", 
+            //    pageIndex: pageIndex,pageSize: pageSize);
+
+            //var tasksDTO = _mapper.Map<List<InventoryCountDetailDTO>>(tasks);
+            //foreach (var item in tasksDTO)
+            //{
+            //    var createdByAccount = await _unitOfWork.AccountRepository.GetByCondition(a => a.Id == item.CreatedBy, "Profile,AccountGroups,AccountGroups.Group");
+            //    if (createdByAccount != null)
+            //    {
+            //        item.CreatedByAvatarUrl = createdByAccount.Profile!.AvatarUrl;
+            //        item.CreatedByFullName = $"{createdByAccount.Profile.FirstName} {createdByAccount.Profile.LastName}";
+            //        item.CreatedByGroup = createdByAccount.AccountGroups.FirstOrDefault()?.Group?.Name;
+            //    }
+            //}
+
+            ////paging 
+            //var totalCount = await _unitOfWork.InventoryCountDetailRepository.Count(a => a.AccountId == id && (warehouseId == null || a.Inventory.WarehouseId == warehouseId) && (status == null || a.Status == status));
+            //var totalPage = (int)Math.Ceiling((double)totalCount / (pageSize ?? 10));
+            //return new ServiceResponse
+            //{
+            //    Status = Data.Enum.SRStatus.Success,
+            //    Message = "Tìm thành công",
+            //    Data = new
+            //    {
+            //        Tasks = tasksDTO,
+            //        TotalCount = totalCount,
+            //        TotalPage = totalPage,
+            //        PageIndex = pageIndex,
+            //        PageSize = pageSize
+            //    }
+            //};
         }
     }
 }
