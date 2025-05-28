@@ -89,7 +89,7 @@ namespace BusinessLogicLayer.Services
                 return new ServiceResponse
                 {
                     Status = Data.Enum.SRStatus.Success,
-                    Message = "Add successfully!",
+                    Message = "Add thành công!",
                     Data = result
                 };
             }
@@ -110,7 +110,7 @@ namespace BusinessLogicLayer.Services
         {
             var existingCustomer = await _genericRepository.GetByCondition(p => p.Id == request.Id);
             if (existingCustomer == null)
-                throw new Exception("Customer not found");
+                throw new Exception("Customer không tìm thấy");
 
             if (!string.IsNullOrEmpty(request.Name))
             {
@@ -128,7 +128,7 @@ namespace BusinessLogicLayer.Services
 
             var updatedCustomer = await _genericRepository.GetByCondition(p => p.Id == existingCustomer.Id);
             if (updatedCustomer == null)
-                throw new Exception("Update failed, customer not found after update");
+                throw new Exception("Update lỗi, customer không tìm thấy sau khi update");
 
             return _mapper.Map<CustomerDTO>(updatedCustomer);
         }
@@ -155,7 +155,7 @@ namespace BusinessLogicLayer.Services
             return new ServiceResponse
             {
                 Status = Data.Enum.SRStatus.Success,
-                Message = "Search successful!",
+                Message = "Search thành công!",
                 Data = new
                 {
                     TotalRecords = totalRecords,

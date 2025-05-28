@@ -77,7 +77,7 @@ namespace API.Controllers
                 return ControllerResponse.Response(new ServiceResponse
                 {
                     Status = Data.Enum.SRStatus.Success,
-                    Message = "Customer updated successfully",
+                    Message = "Customer update thành công",
                     Data = result
                 });
             }

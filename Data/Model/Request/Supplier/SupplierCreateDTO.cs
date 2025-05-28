@@ -16,6 +16,6 @@ namespace Data.Model.Request.Suppiler
         [Required]
         public string? Phone { get; set; }
         [Required]
-        public bool Status { get; set; }
+        public bool Status { get; set; } = true;
     }
 }

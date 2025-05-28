@@ -50,7 +50,7 @@ namespace BusinessLogicLayer.Services
             return new ServiceResponse
             {
                 Status = Data.Enum.SRStatus.Success,
-                Message = "Get successfully!",
+                Message = "Get thành công!",
                 Data = mappedResults
             };
         }
@@ -65,7 +65,7 @@ namespace BusinessLogicLayer.Services
                 return new ServiceResponse
                 {
                     Status = Data.Enum.SRStatus.NotFound,
-                    Message = "Supplier not found!",
+                    Message = "Supplier không tồn tại!",
                     Data = id
                 };
             }
@@ -75,7 +75,7 @@ namespace BusinessLogicLayer.Services
             return new ServiceResponse
             {
                 Status = Data.Enum.SRStatus.Success,
-                Message = "Get successfully!",
+                Message = "Get thành công!",
                 Data = result
             };
         }
@@ -99,7 +99,7 @@ namespace BusinessLogicLayer.Services
                 return new ServiceResponse
                 {
                     Status = Data.Enum.SRStatus.Success,
-                    Message = "Add successfully!",
+                    Message = "Add thành công!",
                     Data = result
                 };
             }
@@ -120,7 +120,7 @@ namespace BusinessLogicLayer.Services
         {
             var existingSupplier = await _genericRepository.GetByCondition(p => p.Id == request.Id);
             if (existingSupplier == null)
-                throw new Exception("Supplier not found");
+                throw new Exception("Supplier không tồn tại");
 
             if (!string.IsNullOrEmpty(request.Name))
             {
@@ -138,7 +138,7 @@ namespace BusinessLogicLayer.Services
 
             var updatedSupplier = await _genericRepository.GetByCondition(p => p.Id == existingSupplier.Id);
             if (updatedSupplier == null)
-                throw new Exception("Update failed, supplier not found after update");
+                throw new Exception("Update lỗi, supplier không tìm thấy sau khi update");
 
             return _mapper.Map<SupplierDTO>(updatedSupplier);
         }

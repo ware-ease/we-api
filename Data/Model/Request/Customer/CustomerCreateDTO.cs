@@ -13,6 +13,6 @@ namespace Data.Model.Request.Customer
         public string? Name { get; set; }
         [Phone]
         public string? Phone { get; set; }
-        public bool Status { get; set; }
+        public bool Status { get; set; } = true;
     }
 }
