@@ -47,7 +47,7 @@ namespace BusinessLogicLayer.Services
             return new ServiceResponse
             {
                 Status = Data.Enum.SRStatus.Success,
-                Message = "Get successfully!",
+                Message = "Tìm thành công!",
                 Data = mappedResults
             };
         }
@@ -65,7 +65,7 @@ namespace BusinessLogicLayer.Services
                 return new ServiceResponse
                 {
                     Status = Data.Enum.SRStatus.Success,
-                    Message = "Get successfully!",
+                    Message = "Tìm thành công!",
                     Data = result
                 };
             }
@@ -73,7 +73,7 @@ namespace BusinessLogicLayer.Services
             return new ServiceResponse
             {
                 Status = Data.Enum.SRStatus.NotFound,
-                Message = "Not found!",
+                Message = "Không tìm thấy!",
                 Data = id
             };
         }
@@ -89,7 +89,7 @@ namespace BusinessLogicLayer.Services
                     return new ServiceResponse
                     {
                         Status = Data.Enum.SRStatus.Duplicated,
-                        Message = "Username is existed!",
+                        Message = "Tên đăng nhập đã tồn tại!",
                         Data = _mapper.Map<AccountDTO>(request)
                     };
                 }
@@ -101,7 +101,7 @@ namespace BusinessLogicLayer.Services
                     return new ServiceResponse
                     {
                         Status = Data.Enum.SRStatus.Duplicated,
-                        Message = "Email is existed!",
+                        Message = "Email đã tồn tại!",
                         Data = _mapper.Map<AccountDTO>(request)
                     };
                 }
@@ -183,7 +183,7 @@ namespace BusinessLogicLayer.Services
                     .GetByCondition(a => a.Id == id, "Profile");
 
                 if (existingAccount == null)
-                    throw new Exception("Account not found!");
+                    throw new Exception("Không tìm thấy tài khoản!");
 
                 if (!string.IsNullOrEmpty(request.Email))
                 {
@@ -196,7 +196,7 @@ namespace BusinessLogicLayer.Services
                             return new ServiceResponse
                             {
                                 Status = Data.Enum.SRStatus.Duplicated,
-                                Message = "Email is existed!",
+                                Message = "Email đã tồn tại!",
                                 Data = id
                             };
                         }
@@ -239,7 +239,7 @@ namespace BusinessLogicLayer.Services
                 return new ServiceResponse
                 {
                     Status = Data.Enum.SRStatus.Success,
-                    Message = "Update successfully!",
+                    Message = "Cập nhật thành công!",
                     Data = _mapper.Map<AccountDTO>(existingAccount)
                 };
             }
@@ -445,39 +445,6 @@ namespace BusinessLogicLayer.Services
                     Records = mappedResults
                 }
             };
-
-            //var tasks = await _unitOfWork.InventoryCountDetailRepository.Search(a => a.AccountId == id && (warehouseId == null || a.Inventory.WarehouseId == warehouseId) && (status == null || a.Status == status),
-            //    includeProperties: "InventoryCount,Inventory,Inventory.Batch,Inventory.Batch.Product", 
-            //    pageIndex: pageIndex,pageSize: pageSize);
-
-            //var tasksDTO = _mapper.Map<List<InventoryCountDetailDTO>>(tasks);
-            //foreach (var item in tasksDTO)
-            //{
-            //    var createdByAccount = await _unitOfWork.AccountRepository.GetByCondition(a => a.Id == item.CreatedBy, "Profile,AccountGroups,AccountGroups.Group");
-            //    if (createdByAccount != null)
-            //    {
-            //        item.CreatedByAvatarUrl = createdByAccount.Profile!.AvatarUrl;
-            //        item.CreatedByFullName = $"{createdByAccount.Profile.FirstName} {createdByAccount.Profile.LastName}";
-            //        item.CreatedByGroup = createdByAccount.AccountGroups.FirstOrDefault()?.Group?.Name;
-            //    }
-            //}
-
-            ////paging 
-            //var totalCount = await _unitOfWork.InventoryCountDetailRepository.Count(a => a.AccountId == id && (warehouseId == null || a.Inventory.WarehouseId == warehouseId) && (status == null || a.Status == status));
-            //var totalPage = (int)Math.Ceiling((double)totalCount / (pageSize ?? 10));
-            //return new ServiceResponse
-            //{
-            //    Status = Data.Enum.SRStatus.Success,
-            //    Message = "Tìm thành công",
-            //    Data = new
-            //    {
-            //        Tasks = tasksDTO,
-            //        TotalCount = totalCount,
-            //        TotalPage = totalPage,
-            //        PageIndex = pageIndex,
-            //        PageSize = pageSize
-            //    }
-            //};
         }
     }
 }
