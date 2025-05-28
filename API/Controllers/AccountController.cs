@@ -23,6 +23,7 @@ namespace API.Controllers
         }
 
         [Authorize]
+        [AuthorizeGroup("Admin,Thủ kho")
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(string id)
         {
@@ -49,7 +50,7 @@ namespace API.Controllers
         }
 
         [Authorize]
-        [AuthorizeGroup("Admin")]
+        [AuthorizeGroup("Admin,Thủ kho")]
         [HttpGet()]
         public async Task<IActionResult> Get()
         {
