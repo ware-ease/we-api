@@ -178,7 +178,8 @@ namespace BusinessLogicLayer.Services
             var serviceResponse = new ServiceResponse();
             try
             {
-                // Kiểm tra yêu cầu kho nếu có
+                //Validate
+                //Check GoodRequest
                 GoodRequest goodRequest = await _unitOfWork.GoodRequestRepository.GetByCondition(x => x.Id == request.GoodRequestId);
                 if (!string.IsNullOrEmpty(request.GoodRequestId))
                 {
@@ -265,22 +266,18 @@ namespace BusinessLogicLayer.Services
                             }
                         }
 
-                        // Tạo batch mới
+                        //Create new batch
                         var batch = _mapper.Map<Batch>(detailDto.NewBatch);
-                        // Sinh mã cho batch
+                        //Generate batch code
                         batch.Code = await _codeGeneratorService.GenerateBatchCodeByProductAsync(batch.ProductId);
                         batch.Name = goodNote.Code;
-                        // Kiểm tra mã lô trùng
-                        //var existingBatch = await _unitOfWork.BatchRepository.GetByCondition(x => x.Code == batch.Code);
-                        //if (existingBatch != null)
-                        //    throw new InvalidOperationException($"Mã lô {batch.Code} đã tồn tại.");
                         if (request.Date.HasValue)
                         {
                             batch.InboundDate = DateOnly.FromDateTime(request.Date.Value);
                         }
                         else
                         {
-                            // gán giá trị mặc định
+                            // Use current date if not provided
                             batch.InboundDate = DateOnly.FromDateTime(DateTime.Now);
                         }
                         batch.CreatedBy =  goodNote.CreatedBy;
@@ -305,7 +302,7 @@ namespace BusinessLogicLayer.Services
                     //goodRequest.Status = GoodRequestStatusEnum.Approved;
                     //_unitOfWork.GoodRequestRepository.Update(goodRequest);
 
-                    // Thông báo cho người yêu cầu
+                    //Notify user who created the request
                     if (!string.IsNullOrEmpty(goodRequest.CreatedBy))
                     {
                         await _firebaseService.SendNotificationToUsersAsync(
@@ -318,8 +315,6 @@ namespace BusinessLogicLayer.Services
                     }
                 }
                 await _unitOfWork.SaveAsync();
-                // Thông báo cho thủ kho
-                //++++
                 await _unitOfWork.CommitTransactionAsync();
 
                 serviceResponse.Status = SRStatus.Success;
@@ -399,29 +394,74 @@ namespace BusinessLogicLayer.Services
             var serviceResponse = new ServiceResponse();
             try
             {
-                //validate
+                //Validate
                 var goodRequest = await _unitOfWork.GoodRequestRepository.GetByCondition(x => x.Id == dto.GoodRequestId, includeProperties: "Warehouse,RequestedWarehouse");
                 if (goodRequest == null)
                 {
                     serviceResponse.Status = SRStatus.Error;
                     serviceResponse.Message = "Không tìm thấy yêu cầu kho.";
-                    //await _unitOfWork.RollbackTransactionAsync();  // Rollback transaction nếu không tìm thấy yêu cầu kho
+                    //await _unitOfWork.RollbackTransactionAsync();  // Rollback transaction if goodRequest is null
                     return serviceResponse;
                 }
                 if (goodRequest.RequestType != GoodRequestEnum.Issue && goodRequest.RequestType != GoodRequestEnum.Transfer)
                 {
                     serviceResponse.Status = SRStatus.Error;
                     serviceResponse.Message = "Yêu cầu kho không phải là yêu cầu xuất kho hoặc điều chuyển kho.";
-                    //await _unitOfWork.RollbackTransactionAsync();  // Rollback transaction nếu yêu cầu không phải xuất kho
+                    //await _unitOfWork.RollbackTransactionAsync();  // Rollback transaction if request type is invalid
                     return serviceResponse;
                 }
                 if (goodRequest.Status != GoodRequestStatusEnum.Approved)
                 {
                     serviceResponse.Status = SRStatus.Error;
                     serviceResponse.Message = "Yêu cầu kho chưa được chấp thuận.";
-                    //await _unitOfWork.RollbackTransactionAsync();  // Rollback transaction nếu yêu cầu chưa được chấp thuận
+                    //await _unitOfWork.RollbackTransactionAsync();  // Rollback transaction if request is not approved
                     return serviceResponse;
                 }
+
+                // Validate quantity for each detail based on Unit.Type
+                foreach (var detail in dto.GoodNoteDetails)
+                {
+                    var product = await _unitOfWork.ProductRepository
+                        .GetByCondition(x => x.Id == detail.ProductId, includeProperties: "Unit");
+
+                    if (product == null)
+                    {
+                        return new ServiceResponse
+                        {
+                            Status = SRStatus.Error,
+                            Message = $"Không tìm thấy sản phẩm với ID {detail.ProductId}.",
+                            Data = detail.ProductId
+                        };
+                    }
+
+                    //If Unit.Type is Int, check if quantity is a positive integer
+                    if (product.Unit.Type == UnitEnum.Int)
+                    {
+                        if (detail.Quantity <= 0 || detail.Quantity % 1 != 0)
+                        {
+                            return new ServiceResponse
+                            {
+                                Status = SRStatus.Error,
+                                Message = $"Sản phẩm '{product.Sku}' yêu cầu số lượng là số nguyên dương.",
+                                Data = detail
+                            };
+                        }
+                    }
+                    else //If Unit.Type is not Int, check if quantity is a positive float
+                    {
+                        if (detail.Quantity <= 0)
+                        {
+                            return new ServiceResponse
+                            {
+                                Status = SRStatus.Error,
+                                Message = $"Sản phẩm '{product.Sku}' yêu cầu số lượng lớn hơn 0.",
+                                Data = detail
+                            };
+                        }
+                    }
+                }
+
+                //Check warehouseId
                 string? checkWarehouseId = codeType switch
                 {
                     CodeType.PXNB => goodRequest.RequestedWarehouseId,
@@ -435,42 +475,42 @@ namespace BusinessLogicLayer.Services
                     serviceResponse.Message = "Không tìm thấy kho để kiểm tra và trừ tồn kho.";
                     return serviceResponse;
                 }
-
-                // Kiểm tra tồn kho
+                //Check inventory
                 var checkResult = await CheckInventorySufficientAsync(dto, checkWarehouseId);
                 if (!checkResult)
                 {
                     serviceResponse.Status = SRStatus.Error;
                     serviceResponse.Message = "Tồn kho không đủ";
-                    //await _unitOfWork.RollbackTransactionAsync();  // Rollback transaction nếu kiểm tra tồn kho thất bại
+                    //await _unitOfWork.RollbackTransactionAsync();  // Rollback transaction if inventory is insufficient
                     return serviceResponse;
                 }
-                // Bắt đầu transaction
+
+                //Begin transaction
                 await _unitOfWork.BeginTransactionAsync();
 
-                // Tạo phiếu xuất kho
+                //Create GoodNote
                 var goodNote = await CreateGoodNoteIssueAsync(dto, codeType);
 
-                // Trừ tồn kho và tạo chi tiết phiếu xuất
+                //Deduct inventory and create good note details
                 var deductResult = await DeductInventoryAndCreateDetailsAsync(dto, goodNote.Id, checkWarehouseId);
                 if (!deductResult)
                 {
                     serviceResponse.Status = SRStatus.Error;
                     serviceResponse.Message = "Lỗi khi trừ tồn kho";
-                    await _unitOfWork.RollbackTransactionAsync();  // Rollback transaction nếu không trừ được tồn kho
+                    await _unitOfWork.RollbackTransactionAsync();  // Rollback transaction if inventory deduction fails
                     return serviceResponse;
                 }
-                // Cập nhật trạng thái yêu cầu kho
+                //update goodRequest status if necessary
                 if (codeType == CodeType.PXNB && goodRequest.RequestType == GoodRequestEnum.Transfer)
                 {
                     goodRequest.Status = GoodRequestStatusEnum.Issued;
                     _unitOfWork.GoodRequestRepository.Update(goodRequest);
                 }
 
-                // Lưu vào cơ sở dữ liệu và commit transaction
+                //Save changes
                 await _unitOfWork.SaveAsync();
 
-                // Gửi thông báo
+                //Notify users
                 var details = await _unitOfWork.GoodNoteDetailRepository.GetDetailsByGoodNoteIdAsync(goodNote.Id);
 
                 var batchMessages = details
@@ -488,7 +528,7 @@ namespace BusinessLogicLayer.Services
                     checkWarehouseId
                 );
 
-                // Gửi thông báo cho kho nhận
+                //Notify receiver if it's a transfer request
                 if (codeType == CodeType.PXNB)
                 {
                     var receiverIds = await _unitOfWork.AccountRepository.GetUserIdsByWarehouseAndGroups(goodRequest.WarehouseId!, new List<string> { "Thủ kho" });
@@ -500,7 +540,7 @@ namespace BusinessLogicLayer.Services
                         goodRequest.WarehouseId
                     );
                 }
-                await _unitOfWork.CommitTransactionAsync();  // Commit transaction nếu mọi thứ thành công
+                await _unitOfWork.CommitTransactionAsync();  // Commit transaction if everything is successful
 
                 serviceResponse.Status = SRStatus.Success;
                 serviceResponse.Message = "Tạo phiếu xuất kho thành công";
@@ -508,7 +548,7 @@ namespace BusinessLogicLayer.Services
             }
             catch (Exception ex)
             {
-                await _unitOfWork.RollbackTransactionAsync();  // Rollback transaction nếu có lỗi
+                await _unitOfWork.RollbackTransactionAsync();  // Rollback transaction if any error occurs
                 serviceResponse.Status = SRStatus.Error;
                 serviceResponse.Message = $"Có lỗi: {ex.Message}";
             }
@@ -627,7 +667,8 @@ namespace BusinessLogicLayer.Services
             var serviceResponse = new ServiceResponse();
             try
             {
-                // Kiểm tra yêu cầu kho nếu có
+                //Validate
+                //Validate GoodRequest
                 GoodRequest goodRequest = null!;
                 if (!string.IsNullOrEmpty(request.GoodRequestId))
                 {
@@ -652,7 +693,7 @@ namespace BusinessLogicLayer.Services
                 if (request.GoodNoteDetails == null || !request.GoodNoteDetails.Any())
                     return Fail("Danh sách chi tiết phiếu kho không được để trống.");
 
-                // Kiểm tra mỗi chi tiết đều có BatchId
+                //Validate batch in each detail
                 foreach (var detail in request.GoodNoteDetails)
                 {
                     if (string.IsNullOrEmpty(detail.BatchId))
@@ -661,14 +702,35 @@ namespace BusinessLogicLayer.Services
                     var existingBatch = await _unitOfWork.BatchRepository.GetByCondition(x => x.Id == detail.BatchId);
                     if (existingBatch == null)
                         return Fail($"Không tìm thấy lô hàng với Id {detail.BatchId}.", null!);
+                    
+
+                    //Get product by BatchId
+                    var product = await _unitOfWork.ProductRepository.GetByCondition(p => p.Id == existingBatch.ProductId, includeProperties: "Unit");
+                    if (product == null)
+                        return Fail($"Sản phẩm trong Batch {existingBatch.Name} không tồn tại.");
+                    //Validate quantity based on Unit type of product
+                    if (product.Unit.Type == UnitEnum.Int)
+                    {
+                        if (detail.Quantity <= 0 || detail.Quantity % 1 != 0)
+                        {
+                            return Fail($"Sản phẩm {product.Sku} yêu cầu số lượng là số nguyên dương.");
+                        }
+                    }
+                    else
+                    {
+                        if (detail.Quantity <= 0)
+                        {
+                            return Fail($"Sản phẩm {product.Sku} yêu cầu số lượng lớn hơn 0.");
+                        }
+                    }
                 }
 
-                // Tạo phiếu
+                //Create GoodNote
                 var goodNote = _mapper.Map<GoodNote>(request);
                 //goodNote.Date = DateTime.Now;   
                 goodNote.CreatedTime = DateTime.Now;
                 goodNote.Status = GoodNoteStatusEnum.Completed;
-                goodNote.Code = await _codeGeneratorService.GenerateCodeAsync(codeType); // codetype là PNNB hoặc PN cho Phiếu nhập kho nội bộ hoặc Phiếu trả hàng
+                goodNote.Code = await _codeGeneratorService.GenerateCodeAsync(codeType); // codetype is PNNB or PN for Internal Receive Note or Return Receive Note
 
                 var existingNote = await _unitOfWork.GoodNoteRepository.GetByCondition(x => x.Code == goodNote.Code);
                 if (existingNote != null)
@@ -722,7 +784,7 @@ namespace BusinessLogicLayer.Services
                         );
                     }
                 }
-                //// Thông báo cho thủ kho
+                //// Notify warehouse keepers
                 //var batchMessages = goodNoteDetails
                 //    .Select(x => $"{x.Batch.Code} ({x.Quantity})")
                 //    .ToList();
