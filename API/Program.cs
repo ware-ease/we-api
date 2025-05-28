@@ -143,6 +143,8 @@ builder.Services.AddScoped<IWarehouseService, WarehouseService>();
 builder.Services.AddScoped<IGoodRequestService, GoodRequestService>();
 builder.Services.AddScoped<IPartnerService, PartnerService>();
 builder.Services.AddScoped<IGoodNoteService, GoodNoteService>();
+builder.Services.AddScoped<ISupplierService, SupplierService>();
+builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddScoped<ICodeGeneratorService, CodeGeneratorService>();
 #endregion Services
 

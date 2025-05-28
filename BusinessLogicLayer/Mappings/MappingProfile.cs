@@ -18,6 +18,8 @@ using Data.Model.Request.Warehouse;
 using Profile = Data.Entity.Profile;
 using Data.Model.Request.InventoryAdjustment;
 using Data.Model.Request.Inventory;
+using Data.Model.Request.Suppiler;
+using Data.Model.Request.Supplier;
 
 namespace BusinessLogicLayer.Mappings
 {
@@ -78,13 +80,13 @@ namespace BusinessLogicLayer.Mappings
 
             #region Supplier
             CreateMap<Partner, SupplierDTO>().ReverseMap();
+            CreateMap<Partner, SupplierCreateDTO>().ReverseMap();
+            CreateMap<Partner, SupplierUpdateDTO>().ReverseMap();
             #endregion
 
             #region Customer
             CreateMap<Partner, CustomerDTO>().ReverseMap();
-
             CreateMap<Partner, CustomerCreateDTO>().ReverseMap();
-
             CreateMap<Partner, CustomerUpdateDTO>().ReverseMap();
             #endregion
 
