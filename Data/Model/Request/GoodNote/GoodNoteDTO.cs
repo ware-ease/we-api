@@ -154,49 +154,11 @@ namespace Data.Model.Request.GoodNote
         public string? Note { get; set; }
     }
 
-    //public class InternalGoodNoteCreateDTO : BaseCreateDTO
-    //{
-    //    [JsonIgnore]
-    //    //[Required(ErrorMessage = "Loại phiếu không được để trống.")]
-    //    public GoodNoteEnum NoteType { get; set; } = GoodNoteEnum.Receive;
-    //    [MaxLength(100, ErrorMessage = "Tên người giao hàng không được vượt quá 100 ký tự.")]
-    //    public string? ShipperName { get; set; }
-    //    [MaxLength(100, ErrorMessage = "Tên người nhận hàng không được vượt quá 100 ký tự.")]
-    //    public string? ReceiverName { get; set; }
-    //    [JsonIgnore]
-    //    //[Required(ErrorMessage = "Mã phiếu không được để trống.")]
-    //    //[MaxLength(50, ErrorMessage = "Mã phiếu không được vượt quá 50 ký tự.")]
-    //    public string? Code { get; set; }
-    //    [Required(ErrorMessage = "Ngày không được để trống.")]
-    //    public DateTime? Date { get; set; }
-    //    [Required(ErrorMessage = "Thiếu Id yêu cầu không được để trống.")]
-    //    public string GoodRequestId { get; set; }
-    //    //[Required(ErrorMessage = "Chi tiết phiếu nhập không được để trống.")]
-    //    //public List<GoodNoteDetailCreateDTO> GoodNoteDetails { get; set; }
-    //}
-
-    //public class GoodNoteAndGoodRequestDTOv2 : BaseDTO
-    //{
-    //    public string? Note { get; set; }
-    //    public string? Code { get; set; }
-
-    //    public GoodRequestEnum RequestType { get; set; }
-    //    public GoodRequestStatusEnum Status { get; set; } = GoodRequestStatusEnum.Pending;
-
-    //    //public ICollection<GoodRequestDetail> GoodRequestDetails { get; set; } = [];
-    //    public PartnerDTO? Partner { get; set; }
-    //    public WarehouseDTO? Warehouse { get; set; }
-    //    public WarehouseDTO? RequestedWarehouse { get; set; }
-    //    public List<GoodNoteDTOv2>? GoodRequestDetails { get; set; }
-    //}
-
-    //
-    //DTO create Cho PNNB và PN
-    //
+    
+    //DTO create for PNNB and PN return 
     public class GoodNoteCreateDTOv2 : BaseCreateDTO
     {
         [JsonIgnore]
-        //[Required(ErrorMessage = "Loại phiếu không được để trống.")]
         public GoodNoteEnum NoteType { get; set; } = GoodNoteEnum.Receive;
         [MaxLength(100, ErrorMessage = "Tên người giao hàng không được vượt quá 100 ký tự.")]
         public string? ShipperName { get; set; }
