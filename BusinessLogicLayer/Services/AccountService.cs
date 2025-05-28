@@ -11,6 +11,7 @@ using DataAccessLayer.Generic;
 using DataAccessLayer.UnitOfWork;
 using DotNetEnv;
 using MailKit.Security;
+using Microsoft.IdentityModel.Tokens;
 using MimeKit;
 using System.Linq;
 using System.Linq.Expressions;
@@ -369,8 +370,8 @@ namespace BusinessLogicLayer.Services
             }
             Expression<Func<InventoryCount, bool>> filter;
             filter = p =>
-                (string.IsNullOrEmpty(warehouseId) || p.Schedule.Warehouse.Id == warehouseId) &&
-                p.InventoryCheckDetails.Any(d => d.AccountId == id && d.Status == status);
+                (string.IsNullOrEmpty(warehouseId) || p.Schedule!.Warehouse.Id == warehouseId) &&
+                p.InventoryCheckDetails.Any(d => d.AccountId == id && (!status.HasValue || d.Status == status));
 
             var totalRecords = await _unitOfWork.InventoryCountRepository.Count(filter);
 
@@ -381,15 +382,15 @@ namespace BusinessLogicLayer.Services
 
             var mappedResults = _mapper.Map<List<InventoryCountDTO>>(results);
 
-            // ✅ Sau khi map xong, lọc chỉ giữ lại detail có AccountId == id
+            //Filter InventoryCountDetails to only include those with the specified AccountId
             foreach (var dto in mappedResults)
             {
-                // Lọc lại các detail có đúng AccountId
+                //Filter InventoryCountDetails to only include those with the specified AccountId
                 dto.InventoryCountDetails = dto.InventoryCountDetails?
                     .Where(d => d.AccountId == id)
-                    .ToList();
+                    .ToList()!;
 
-                // Gán avatar và thông tin người tạo count
+                //Assign avatar and full name for the creator of the InventoryCount
                 if (!string.IsNullOrEmpty(dto.CreatedBy))
                 {
                     var accountCreated = await _unitOfWork.AccountRepository.GetByCondition(
@@ -403,7 +404,7 @@ namespace BusinessLogicLayer.Services
                     }
                 }
 
-                // Gán avatar cho từng detail (nếu cần)
+                //Assign avatar and full name for each detail
                 if (dto.InventoryCountDetails != null && dto.InventoryCountDetails.Any())
                 {
                     foreach (var detailDto in dto.InventoryCountDetails)
@@ -424,7 +425,7 @@ namespace BusinessLogicLayer.Services
                 }
             }
 
-            // ✅ Nếu muốn: loại luôn InventoryCount nào không còn detail sau khi lọc (phòng trường hợp dữ liệu sai)
+            //Remove those with no InventoryCountDetails
             mappedResults = mappedResults
                 .Where(c => c.InventoryCountDetails != null && c.InventoryCountDetails.Any())
                 .ToList();
@@ -434,7 +435,7 @@ namespace BusinessLogicLayer.Services
             return new ServiceResponse
             {
                 Status = Data.Enum.SRStatus.Success,
-                Message = "Search successful!",
+                Message = "Tìm thành công!",
                 Data = new
                 {
                     TotalRecords = mappedResults.Count,
