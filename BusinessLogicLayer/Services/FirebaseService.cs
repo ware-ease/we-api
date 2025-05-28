@@ -44,13 +44,13 @@ namespace BusinessLogicLayer.Services
             //            read = false
             //        })
             //);
-            // Lấy thêm toàn bộ admin userIds
+            //Get admin user ids
             var adminUserIds = await _unitOfWork.AccountRepository.GetAdminUserIdsAsync();
 
-            // Gộp userIds lại và loại trùng
+            //Group all user IDs including admins and distinct them
             var allUserIds = userIds.Concat(adminUserIds).Distinct().ToList();
 
-            // Gửi thông báo
+            //Send notifications to all user IDs
             var tasks = allUserIds.Select(userId =>
                 _firebaseClient
                     .Child("notifications")

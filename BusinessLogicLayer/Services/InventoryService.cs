@@ -36,7 +36,7 @@ namespace BusinessLogicLayer.Services
                 return new ServiceResponse
                 {
                     Status = Data.Enum.SRStatus.NotFound,
-                    Message = "Inventory not found!",
+                    Message = "Không tìm thấy!",
                     Data = id
                 };
             }
@@ -46,7 +46,7 @@ namespace BusinessLogicLayer.Services
             return new ServiceResponse
             {
                 Status = Data.Enum.SRStatus.Success,
-                Message = "Get successfully!",
+                Message = "Tìm thành công!",
                 Data = result
             };
         }

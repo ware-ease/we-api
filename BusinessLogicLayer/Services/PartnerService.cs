@@ -55,7 +55,7 @@ namespace BusinessLogicLayer.Services
             return new ServiceResponse
             {
                 Status = Data.Enum.SRStatus.Success,
-                Message = "Get successfully!",
+                Message = "Tìm thành công!",
                 Data = mappedResults
             };
         }
@@ -67,7 +67,7 @@ namespace BusinessLogicLayer.Services
             return new ServiceResponse
             {
                 Status = SRStatus.Success,
-                Message = "Get all partners successfully!",
+                Message = "Tìm thành công!",
                 Data = result
             };
         }
@@ -80,7 +80,7 @@ namespace BusinessLogicLayer.Services
                 return new ServiceResponse
                 {
                     Status = SRStatus.NotFound,
-                    Message = "Partner not found!",
+                    Message = "Không tìm thấy!",
                     Data = id
                 };
             }
@@ -89,7 +89,7 @@ namespace BusinessLogicLayer.Services
             return new ServiceResponse
             {
                 Status = SRStatus.Success,
-                Message = "Get partner successfully!",
+                Message = "Tìm thành công!",
                 Data = result
             };
         }
@@ -130,7 +130,7 @@ namespace BusinessLogicLayer.Services
                 return new ServiceResponse
                 {
                     Status = SRStatus.NotFound,
-                    Message = "Partner not found!",
+                    Message = "Không tìm thấy đối tác!",
                     Data = id
                 };
             }
@@ -151,7 +151,7 @@ namespace BusinessLogicLayer.Services
                 return new ServiceResponse
                 {
                     Status = SRStatus.Success,
-                    Message = "Partner updated successfully!",
+                    Message = "Cập nhật thành công!",
                     Data = result
                 };
             }
@@ -160,7 +160,7 @@ namespace BusinessLogicLayer.Services
                 return new ServiceResponse
                 {
                     Status = SRStatus.Error,
-                    Message = $"Error updating partner: {ex.Message}"
+                    Message = $"Lỗi khi cập nhật: {ex.Message}"
                 };
             }
         }
@@ -173,7 +173,7 @@ namespace BusinessLogicLayer.Services
                 return new ServiceResponse
                 {
                     Status = SRStatus.NotFound,
-                    Message = "Partner not found!",
+                    Message = "Không tìm thấy!",
                     Data = id
                 };
             }
@@ -186,7 +186,7 @@ namespace BusinessLogicLayer.Services
                 return new ServiceResponse
                 {
                     Status = SRStatus.Success,
-                    Message = "Partner deleted successfully!",
+                    Message = "Xóa thành công!",
                     Data = id
                 };
             }
@@ -195,7 +195,7 @@ namespace BusinessLogicLayer.Services
                 return new ServiceResponse
                 {
                     Status = SRStatus.Error,
-                    Message = $"Error deleting partner: {ex.Message}"
+                    Message = $"Lỗi khi xóa: {ex.Message}"
                 };
             }
         }
@@ -230,7 +230,7 @@ namespace BusinessLogicLayer.Services
             return new ServiceResponse
             {
                 Status = Data.Enum.SRStatus.Success,
-                Message = "Search successful!",
+                Message = "Tìm thành công!",
                 Data = new
                 {
                     TotalRecords = totalRecords,

@@ -37,7 +37,7 @@ namespace BusinessLogicLayer.Services
         {
             try
             {
-                // Bước 1: Lọc danh sách GoodNote trước
+                //Filter GoodNotes based on the provided criteria
                 Expression<Func<GoodNote, bool>> goodNoteFilter = g =>
                     (string.IsNullOrEmpty(keyword) ||
                         (g.ShipperName != null && g.ShipperName.Contains(keyword)) ||
@@ -49,7 +49,7 @@ namespace BusinessLogicLayer.Services
                     (!status.HasValue || g.Status == status.Value) &&
                     (string.IsNullOrEmpty(requestedWarehouseId) || g.GoodRequest.RequestedWarehouseId == requestedWarehouseId || (g.GoodRequest.WarehouseId == requestedWarehouseId /*&& g.NoteType == GoodNoteEnum.Receive*/));
 
-                // Dùng Search
+                //Use search method to get paged results
                 var pagedGoodNotes = await _unitOfWork.GoodNoteRepository.Search(
                     filter: goodNoteFilter,
                     includeProperties: "GoodRequest,GoodRequest.Warehouse,GoodRequest.RequestedWarehouse,GoodRequest.Partner",
@@ -58,14 +58,14 @@ namespace BusinessLogicLayer.Services
                     pageSize: pageSize
                 );
 
-                // Lấy tổng số bản ghi (đếm theo GoodNote)
+                //Get total number of records (count by GoodNote)
                 int totalRecords = await _unitOfWork.GoodNoteRepository.Count(goodNoteFilter);
                 int totalPages = (int)Math.Ceiling((double)totalRecords / (pageSize ?? 5));
 
-                // Lấy danh sách GoodNoteId để truy vấn chi tiết
+                //Get list of GoodNoteIds from paged results
                 var goodNoteIds = pagedGoodNotes.Select(g => g.Id).ToList();
 
-                // Bước 2: Lấy danh sách GoodNoteDetail theo danh sách GoodNoteId
+                //Get GoodNoteDetails for the GoodNotes
                 Expression<Func<GoodNoteDetail, bool>> detailFilter = d => goodNoteIds.Contains(d.GoodNoteId);
 
                 var details = await _unitOfWork.GoodNoteDetailRepository.Search(
@@ -75,7 +75,7 @@ namespace BusinessLogicLayer.Services
                                        "Batch,Batch.Product,Batch.Product.Unit,Batch.Product.Brand"
                 );
 
-                // Bước 3: Nhóm dữ liệu theo GoodNote
+                //Group GoodNotes and map to DTO
                 var groupedResults = pagedGoodNotes.Select(g => new GoodNoteDTO
                 {
                     Id = g.Id,
@@ -120,7 +120,7 @@ namespace BusinessLogicLayer.Services
                 return new ServiceResponse
                 {
                     Status = Data.Enum.SRStatus.Error,
-                    Message = "An error occurred while searching GoodNotes. Please try again later." + ex,
+                    Message = "Đã xảy ra lỗi khi tìm kiếm GoodNotes." + ex,
                     Data = null
                 };
             }
@@ -136,7 +136,7 @@ namespace BusinessLogicLayer.Services
                                                                                                                          "Batch.Product," +
                                                                                                                          "Batch.Product.Unit," +
                                                                                                                          "Batch.Product.Brand");
-            if (entities.Count() == 0)  // Chỉ đếm một lần, không gọi truy vấn lại
+            if (entities.Count() == 0)  //Check if no details found for the GoodNote
             {
                 return new ServiceResponse
                 {
@@ -153,9 +153,6 @@ namespace BusinessLogicLayer.Services
                 ShipperName = entities.First().GoodNote.ShipperName,
                 NoteType = entities.First().GoodNote.NoteType,
                 Status = entities.First().GoodNote.Status,
-                //GoodRequestId = entities.First().GoodNote.GoodRequestId,
-                //GoodRequestCode = entities.First().GoodNote.GoodRequest.Code,
-                //RequestedWarehouseName = entities.First().GoodNote.GoodRequest.RequestedWarehouse?.Name,
                 GoodRequest = _mapper.Map<GoodRequestOfGoodNoteDTO>(entities.First().GoodNote.GoodRequest),
                 Code = entities.First().GoodNote.Code,
                 Date = entities.First().GoodNote.Date,

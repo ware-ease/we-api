@@ -89,7 +89,7 @@ namespace BusinessLogicLayer.Services
                 return new ServiceResponse
                 {
                     Status = Data.Enum.SRStatus.Error,
-                    Message = "Invalid request data!"
+                    Message = "Dữ liệu không hợp lệ!"
                 };
             }
 
@@ -100,7 +100,7 @@ namespace BusinessLogicLayer.Services
                 return new ServiceResponse
                 {
                     Status = Data.Enum.SRStatus.NotFound,
-                    Message = "Warehouse not found!",
+                    Message = "Không tìm thấy kho!",
                     Data = updateDto.Id
                 };
             }
@@ -191,7 +191,7 @@ namespace BusinessLogicLayer.Services
             return new ServiceResponse
             {
                 Status = Data.Enum.SRStatus.Success,
-                Message = "Search successful!",
+                Message = "Tìm thành công!",
                 Data = new
                 {
                     TotalRecords = totalRecords,
@@ -281,7 +281,7 @@ namespace BusinessLogicLayer.Services
             return new ServiceResponse
             {
                 Status = SRStatus.Success,
-                Message = "Warehouse statistics retrieved successfully.",
+                Message = "Thống kê kho đã được truy xuất thành công.",
                 Data = new
                 {
                     TotalPutIn = totalPutIn,
@@ -324,7 +324,7 @@ namespace BusinessLogicLayer.Services
                 return new ServiceResponse
                 {
                     Status = SRStatus.NotFound,
-                    Message = "Warehouse not found."
+                    Message = "Không tìm thấy kho."
                 };
             }
 
@@ -389,7 +389,7 @@ namespace BusinessLogicLayer.Services
             return new ServiceResponse
             {
                 Status = SRStatus.Success,
-                Message = "Histogram data retrieved successfully.",
+                Message = "Dữ liệu biểu đồ đã được truy xuất thành công.",
                 Data = result
             };
         }
@@ -599,7 +599,7 @@ namespace BusinessLogicLayer.Services
             return new ServiceResponse
             {
                 Status = SRStatus.Success,
-                Message = "Stock line chart data retrieved successfully.",
+                Message = "Dữ liệu biểu đồ đường đã được truy xuất thành công.",
                 Data = new
                 {
                     Warehouses = result,
@@ -701,7 +701,7 @@ namespace BusinessLogicLayer.Services
             return new ServiceResponse
             {
                 Status = SRStatus.Success,
-                Message = "Pie chart data retrieved successfully.",
+                Message = "Dữ liệu biểu đồ tròn đã được lấy thành công.",
                 Data = new
                 {
                     Warehouses = pieChartData,
@@ -755,7 +755,7 @@ namespace BusinessLogicLayer.Services
             return new ServiceResponse
             {
                 Status = SRStatus.Success,
-                Message = "Pie chart data retrieved for warehouse.",
+                Message = "Dữ liệu biểu đồ tròn của kho được lấy thành công.",
                 Data = new
                 {
                     WarehouseId = warehouseId,
@@ -893,7 +893,7 @@ namespace BusinessLogicLayer.Services
                 return new ServiceResponse
                 {
                     Status = SRStatus.Error,
-                    Message = "WarehouseId is required."
+                    Message = "Thiếu id kho."
                 };
             }
 
@@ -910,7 +910,7 @@ namespace BusinessLogicLayer.Services
                 return new ServiceResponse
                 {
                     Status = SRStatus.NotFound,
-                    Message = "No available products found in the warehouse.",
+                    Message = "Không tìm thấy sản phẩm có sẵn trong kho.",
                     Data = warehouseId
                 };
             }
@@ -939,7 +939,7 @@ namespace BusinessLogicLayer.Services
             return new ServiceResponse
             {
                 Status = SRStatus.Success,
-                Message = "Available products retrieved successfully.",
+                Message = "Đã lấy thành công các sản phẩm có sẵn.",
                 Data = grouped
             };
         }

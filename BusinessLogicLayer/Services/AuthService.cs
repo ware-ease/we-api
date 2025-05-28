@@ -35,7 +35,7 @@ namespace BusinessLogicLayer.Services
                 return new ServiceResponse
                 {
                     Status = Data.Enum.SRStatus.Unauthorized,
-                    Message = "Username or password is incorrect!",
+                    Message = "Tên người dùng hoặc mật khẩu không đúng!",
                     Data = { }
                 };
             }
@@ -45,7 +45,7 @@ namespace BusinessLogicLayer.Services
                 return new ServiceResponse
                 {
                     Status = Data.Enum.SRStatus.Unauthorized,
-                    Message = "Account is locked!",
+                    Message = "Tài khoản bị khóa!",
                     Data = { }
                 };
             }
@@ -53,7 +53,7 @@ namespace BusinessLogicLayer.Services
             return new ServiceResponse
             {
                 Status = Data.Enum.SRStatus.Success,
-                Message = "Login successfully!",
+                Message = "Đăng nhập thành công!",
                 Data = user.Id,
             };
         }
@@ -71,7 +71,7 @@ namespace BusinessLogicLayer.Services
             return new ServiceResponse
             {
                 Status = Data.Enum.SRStatus.Success,
-                Message = "Logout successfully!",
+                Message = "Đăng xuất thành công!",
                 Data = { }
             };
         }
@@ -108,7 +108,7 @@ namespace BusinessLogicLayer.Services
         {
             Env.Load();
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JWT_SECRET_KEY")));
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JWT_SECRET_KEY")!));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
             var authClaims = new List<Claim>
             {
@@ -150,42 +150,12 @@ namespace BusinessLogicLayer.Services
 
             return false;
         }
-        public async Task<bool> HasPermissionAsync(string userId, string permissionKey)
-        {
-            var permission = await _unitOfWork.PermissionRepository
-                .GetByCondition(p => p.Code == permissionKey);
-
-            if (permission == null)
-                return false;
-
-            // Check trực tiếp permission gán cho account
-            var userPermissions = await _unitOfWork.AccountPermissionRepository
-                .GetByCondition(up => up.Id == userId && up.PermissionId == permission.Id);
-
-            if (userPermissions != null)
-                return true;
-
-            // Lấy tất cả group của account
-            var accountGroups = await _unitOfWork.AccountGroupRepository
-                .Search(ag => ag.AccountId == userId);
-
-            if (!accountGroups.Any())
-                return false;
-
-            var groupIds = accountGroups.Select(ag => ag.GroupId).ToList();
-
-            // Check permission của các group đó
-            var groupPermissions = await _unitOfWork.GroupPermissionRepository
-                .Search(gp => groupIds.Contains(gp.GroupId) && gp.PermissionId == permission.Id);
-
-            return groupPermissions.Any();
-        }
         public async Task<List<string>> GetUserGroups(string userId)
         {
             var accountGroups = await _unitOfWork.AccountGroupRepository
                 .Search(ag => ag.AccountId == userId, includeProperties: "Group");
 
-            return accountGroups.Select(ag => ag.Group.Name).ToList();
+            return accountGroups.Select(ag => ag.Group.Name).ToList()!;
         }
     }
 }
