@@ -180,5 +180,12 @@ namespace BusinessLogicLayer.Services
 
             return groupPermissions.Any();
         }
+        public async Task<List<string>> GetUserGroups(string userId)
+        {
+            var accountGroups = await _unitOfWork.AccountGroupRepository
+                .Search(ag => ag.AccountId == userId, includeProperties: "Group");
+
+            return accountGroups.Select(ag => ag.Group.Name).ToList();
+        }
     }
 }
