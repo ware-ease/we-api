@@ -116,7 +116,7 @@ namespace BusinessLogicLayer.Services
 
                                     var goodRequestEntity = new GoodRequest
                                     {
-                                        Note = "From adjustment with code: " + inventoryAdjustment.Code,
+                                        Note = "Tạo từ phiếu điều chỉnh với mã code: " + inventoryAdjustment.Code,
                                         //Code = await _codeGeneratorService.GenerateCodeAsync(Data.Enum.CodeType.YCN),
                                         Code = "AR",
                                         RequestType = Data.Enum.GoodRequestEnum.Receive,
@@ -153,7 +153,7 @@ namespace BusinessLogicLayer.Services
                                     var goodNoteDetailEntity = new GoodNoteDetail
                                     {
                                         Quantity = detailDto.ChangeInQuantity,
-                                        Note = "Receive Adjustment by adjustment code:" + inventoryAdjustment.Code + ", GoodNote code:" + goodNoteEntity.Code,
+                                        Note = "Phiếu nhập điều chỉnh từ phiếu điều chỉnh với code:" + inventoryAdjustment.Code + ", GoodNote code:" + goodNoteEntity.Code,
                                         CreatedBy = request.CreatedBy,
                                         BatchId = inventory.BatchId,
                                         GoodNoteId = goodNoteEntity.Id
@@ -186,7 +186,7 @@ namespace BusinessLogicLayer.Services
 
                                         var goodRequestEntity = new GoodRequest
                                         {
-                                            Note = "From adjustment with code: " + inventoryAdjustment.Code,
+                                            Note = "Tạo từ phiếu điều chỉnh với mã code: " + inventoryAdjustment.Code,
                                             //Code = await _codeGeneratorService.GenerateCodeAsync(Data.Enum.CodeType.YCX),
                                             Code = "AR",
                                             RequestType = Data.Enum.GoodRequestEnum.Issue,
@@ -223,7 +223,7 @@ namespace BusinessLogicLayer.Services
                                         var goodNoteDetailEntity = new GoodNoteDetail
                                         {
                                             Quantity = Math.Abs(detailDto.ChangeInQuantity),
-                                            Note = "Issue Adjustment by adjustment code:" + inventoryAdjustment.Code + ", GoodNote code:" + goodNoteEntity.Code,
+                                            Note = "Phiếu xuất điều chỉnh từ phiếu điều chỉnh với code:" + inventoryAdjustment.Code + ", GoodNote code:" + goodNoteEntity.Code,
                                             CreatedBy = request.CreatedBy,
                                             BatchId = inventory.BatchId,
                                             GoodNoteId = goodNoteEntity.Id
@@ -341,7 +341,7 @@ namespace BusinessLogicLayer.Services
 
                                     var goodRequestEntity = new GoodRequest
                                     {
-                                        Note = "From adjustment with code: " + inventoryAdjustment.Code,
+                                        Note = "Tạo từ phiếu điều chỉnh với mã code code: " + inventoryAdjustment.Code,
                                         //Code = await _codeGeneratorService.GenerateCodeAsync(Data.Enum.CodeType.YCN),
                                         Code = "AR",
                                         RequestType = Data.Enum.GoodRequestEnum.Receive,
@@ -414,7 +414,7 @@ namespace BusinessLogicLayer.Services
                                     var goodNoteDetailEntity = new GoodNoteDetail
                                     {
                                         Quantity = changeInQuantity,
-                                        Note = "Adjustment for overstock from adjustment code:" + inventoryAdjustment.Code,
+                                        Note = "Điều chỉnh do hàng thực tế nhiều hơn số hàng trong dữ liệu, tạo từ phiếu điều chỉnh với mã code:" + inventoryAdjustment.Code,
                                         CreatedBy = request.CreatedBy,
                                         BatchId = detailDto.Inventory.BatchId,
                                         GoodNoteId = goodNoteEntity.Id
@@ -425,7 +425,7 @@ namespace BusinessLogicLayer.Services
 
                                     var inventoryUpdate = await _inventoryRepository.GetByCondition(p => p.Id == detailDto.InventoryId);
                                     if (inventoryUpdate == null)
-                                        throw new Exception($"Inventory with Id {detailDto.InventoryId} doesnt exist");
+                                        throw new Exception($"Inventory với Id {detailDto.InventoryId} không tồn tại");
                                     inventoryUpdate.CurrentQuantity = inventoryUpdate.CurrentQuantity + changeInQuantity;
 
                                     _inventoryRepository.Update(inventoryUpdate);
@@ -458,7 +458,7 @@ namespace BusinessLogicLayer.Services
 
                                     var goodRequestEntity = new GoodRequest
                                     {
-                                        Note = "From adjustment with code: " + inventoryAdjustment.Code,
+                                        Note = "Tạo từ phiếu điều chỉnh với mã code: " + inventoryAdjustment.Code,
                                         //Code = await _codeGeneratorService.GenerateCodeAsync(Data.Enum.CodeType.YCX),
                                         Code = "AR",
                                         RequestType = Data.Enum.GoodRequestEnum.Issue,
@@ -505,7 +505,7 @@ namespace BusinessLogicLayer.Services
                                     var goodNoteDetailEntity = new GoodNoteDetail
                                     {
                                         Quantity = changeInQuantity,
-                                        Note = "Adjustment for understock from adjustment code:" + inventoryAdjustment.Code,
+                                        Note = "Điều chỉnh do hàng thực tế ít hơn số hàng trong dữ liệu, tạo từ phiếu điều chỉnh với mã code:" + inventoryAdjustment.Code,
                                         CreatedBy = request.CreatedBy,
                                         BatchId = detailDto.Inventory.BatchId,
                                         GoodNoteId = goodNoteEntity.Id
@@ -516,7 +516,7 @@ namespace BusinessLogicLayer.Services
 
                                     var inventoryUpdate = await _inventoryRepository.GetByCondition(p => p.Id == detailDto.InventoryId);
                                     if (inventoryUpdate == null)
-                                        throw new Exception($"Inventory with Id {detailDto.InventoryId} doesnt exist");
+                                        throw new Exception($"Inventory với Id {detailDto.InventoryId} không tồn tại");
                                     inventoryUpdate.CurrentQuantity = inventoryUpdate.CurrentQuantity - changeInQuantity;
                                     if (inventoryUpdate.CurrentQuantity < 0)
                                         throw new Exception($"Inventory với Id {detailDto.InventoryId} không đủ số lượng để xuất");
@@ -686,7 +686,7 @@ namespace BusinessLogicLayer.Services
             return new ServiceResponse
             {
                 Status = Data.Enum.SRStatus.Success,
-                Message = "Search successful!",
+                Message = "Tìm kiếm thành công!",
                 Data = new
                 {
                     TotalRecords = totalRecords,
