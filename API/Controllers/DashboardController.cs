@@ -47,17 +47,18 @@ namespace API.Controllers
         [Authorize]
         [AuthorizeGroup("Admin,Thủ kho")]
         [HttpGet("piechart")]
-        public async Task<IActionResult> GetStockPieChart()
+        public async Task<IActionResult> GetStockPieChart(string? half = "first", int year = 2025)
         {
-            var response = await _warehouseService.GetStockPieChartAsync();
+           // var response = await _warehouseService.GetStockPieChartAsync();
+            var response = await _warehouseService.GetStockDistributionByWarehouseAsync(year,half);
             return ControllerResponse.Response(response);
         }
         [Authorize]
         [AuthorizeGroup("Admin,Thủ kho")]
         [HttpGet("piechart/warehouse/{warehouseId}")]
-        public async Task<IActionResult> GetStockPieChartOfAWarehouse(string warehouseId)
+        public async Task<IActionResult> GetStockPieChartOfAWarehouse(string warehouseId, string? half = "first", int year = 2025)
         {
-            var response = await _warehouseService.GetStockPieChartByWarehouseAsync(warehouseId);
+            var response = await _warehouseService.GetStockPieChartByWarehouseAsync(warehouseId, year, half);
             return ControllerResponse.Response(response);
         }
     }

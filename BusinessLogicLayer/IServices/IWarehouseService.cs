@@ -19,13 +19,14 @@ namespace BusinessLogicLayer.IServices
         Task<ServiceResponse> GetGoodsFlowHistogramAsync(int? month, int? year, string? warehouseId);
         Task<ServiceResponse> GetStockLineChartAsync(int? year, int? startMonth, int? endMonth, string? warehouseId);
         Task<ServiceResponse> GetStockPieChartAsync();
-        Task<ServiceResponse> GetStockPieChartByWarehouseAsync(string warehouseId);
+        Task<ServiceResponse> GetStockPieChartByWarehouseAsync(string warehouseId, int year, string? half);
         Task<ServiceResponse> GetStockBookAsync(string warehouseId, int month, int year, string userId);
         Task<ServiceResponse> GetAvailableProductsInWarehouse(string warehouseId);
         Task<ServiceResponse> GetStaffsOfWarehouse(string warehouseId, 
                                                     int? pageIndex = null,
                                                     int? pageSize = null,
                                                     string? keyword = null);
+        Task<ServiceResponse> GetStockDistributionByWarehouseAsync(int year, string? half);
 
     }
 }
