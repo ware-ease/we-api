@@ -832,7 +832,8 @@ namespace BusinessLogicLayer.Services
                 resultList.Add(new
                 {
                     Warehouse = warehouse.Name,
-                    Quantity = currentStock
+                    Quantity = currentStock,
+                    Percent = totalCurrent == 0 ? 0 : Math.Round((currentStock / totalCurrent) * 100, 2),
                 });
             }
 
@@ -852,8 +853,6 @@ namespace BusinessLogicLayer.Services
                 Message = $"Dữ liệu tồn kho từ {startDate:MM/yyyy} đến {endDate:MM/yyyy} đã được lấy thành công.",
                 Data = new
                 {
-                    Year = year,
-                    Half = half,
                     TotalStock = totalCurrent,
                     ChangePercent = Math.Round(changePercent, 2),
                     Warehouses = resultList
