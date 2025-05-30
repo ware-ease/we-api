@@ -11,8 +11,10 @@ namespace Data.Model.Request.Product
     public class ProductCreateDTO : BaseCreateDTO
     {
         [Required(ErrorMessage = "Name không được để trống")]
+        [MaxLength(200, ErrorMessage = "Tên tối đa 200 ký tự.")]
         public string? Name { get; set; }
         [Required(ErrorMessage = "Sku không được để trống")]
+        [MaxLength(100, ErrorMessage = "Sku tối đa 100 ký tự.")]
         public string? Sku { get; set; }
         [Required(ErrorMessage = "IsBatchManaged không được để trống")]
         public bool IsBatchManaged { get; set; } = true;

@@ -13,7 +13,11 @@ namespace Data.Model.Request.Unit
     {
         [JsonIgnore]
         public string? Id { get; set; }
+        [MaxLength(50, ErrorMessage = "Tên tối đa 50 ký tự.")]
+        [MinLength(2, ErrorMessage = "Tên tối thiểu 2 ký tự.")]
         public string? Name { get; set; }
+        [MaxLength(50, ErrorMessage = "Tên tối đa 50 ký tự.")]
+        [MinLength(2, ErrorMessage = "Tên tối thiểu 2 ký tự.")]
         public string? Note { get; set; }
         public UnitEnum Type { get; set; }
     }
