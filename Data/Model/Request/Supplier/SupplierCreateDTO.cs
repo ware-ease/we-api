@@ -11,6 +11,8 @@ namespace Data.Model.Request.Suppiler
     public class SupplierCreateDTO : BaseCreateDTO
     {
         [Required]
+        [MaxLength(100, ErrorMessage = "Tên tối đa 100 ký tự.")]
+        [MinLength(2, ErrorMessage = "Tên tối thiểu 2 ký tự.")]
         public string? Name { get; set; }
         [Phone]
         [Required]

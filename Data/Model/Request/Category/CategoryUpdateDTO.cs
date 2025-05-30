@@ -12,6 +12,8 @@ namespace Data.Model.Request.Category
     {
         [JsonIgnore]
         public string? Id { get; set; }
+        [MaxLength(100, ErrorMessage = "Tên tối đa 100 ký tự.")]
+        [MinLength(5, ErrorMessage = "Tên tối thiểu 5 ký tự.")]
         public string? Name { get; set; }
         public string? Note { get; set; }
     }

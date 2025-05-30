@@ -21,6 +21,7 @@ namespace Data.Model.Request.InventoryCount
         public InventoryCountCheckStatus? CheckStatus { get; set; }
         //[Required(ErrorMessage = "Code không được để trống")]
         //public string? Code { get; set; }
+        [MaxLength(200, ErrorMessage = "Note tối đa 200 ký tự.")]
         public string? Note { get; set; }
         //[Required(ErrorMessage = "Date không được để trống")]
         public DateOnly? Date { get; set; }
@@ -45,6 +46,7 @@ namespace Data.Model.Request.InventoryCount
         public float? ExpectedQuantity { get; set; }
         //[Required(ErrorMessage = "CountedQuantity không được để trống")]
         public float? CountedQuantity { get; set; }
+        [MaxLength(200, ErrorMessage = "Note tối đa 200 ký tự.")]
         public string? Note { get; set; }
         public string? AccountId { get; set; }
         //[Required(ErrorMessage = "ProductId không được để trống")]
