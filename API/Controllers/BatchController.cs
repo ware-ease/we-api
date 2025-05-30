@@ -1,4 +1,5 @@
-﻿using API.Utils;
+﻿using API.Middlewares;
+using API.Utils;
 using BusinessLogicLayer.IServices;
 using BusinessLogicLayer.Services;
 using Data.Entity;
@@ -25,6 +26,7 @@ namespace API.Controllers
         }
 
         [Authorize]
+        [AuthorizeGroup("Admin,Thủ kho")]
         [HttpGet("count")]
         public async Task<IActionResult> Count()
         {
