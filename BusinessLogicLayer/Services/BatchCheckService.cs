@@ -55,10 +55,23 @@ namespace BusinessLogicLayer.Services
                     _logger.LogError(ex, "[BatchCheckService] Lỗi khi kiểm tra batch.");
                 }
 
+                if (now.DayOfWeek == DayOfWeek.Monday || now.DayOfWeek == DayOfWeek.Tuesday || now.DayOfWeek == DayOfWeek.Friday)
+                {
+                    try
+                    {
+                        //send inventory count reminder message
+                        await InventoryCountRemindMessage(stoppingToken);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "[BatchCheckService] Lỗi khi gửi nhắc nhở kiểm kê kho.");
+                    }
+                }
+
                 //done with the batch check, now delay for 24 hours to run it again at the same time tomorrow
-                _logger.LogInformation($"[BatchCheckService] bắt đầu đợi 24h).");
-                await Task.Delay(TimeSpan.FromHours(24), stoppingToken);
-                //await Task.Delay(TimeSpan.FromSeconds(10), stoppingToken);
+                _logger.LogInformation($"[BatchCheckService] bắt đầu đợi 23h).");
+                await Task.Delay(TimeSpan.FromHours(23), stoppingToken);
+                //await Task.Delay(TimeSpan.FromSeconds(50), stoppingToken);
             }
         }
 
@@ -186,6 +199,20 @@ namespace BusinessLogicLayer.Services
             }
         }
 
+        private async Task InventoryCountRemindMessage(CancellationToken stoppingToken)
+        {
+            using var scope = _scopeFactory.CreateScope();
+            var _accountRepository = scope.ServiceProvider.GetRequiredService<IGenericRepository<Account>>();
+            var _firebaseService = scope.ServiceProvider.GetRequiredService<IFirebaseService>();
+
+            var managers = (await _accountRepository.Search(
+                filter: a => a.AccountGroups.Any(ag => ag.GroupId == "2"),
+                includeProperties: "AccountGroups")).Select(m => m.Id).ToList();
+
+            await _firebaseService.SendNotificationToUsersAsync(managers, "Nhắc nhở tạo lịch kiểm kê.", $"Thủ kho vui lòng lên danh sách kiểm kê trong hôm nay ({DateTime.Now.ToString("dd/MM/yyyy")}) theo quy định",
+                                            NotificationType.INVENTORY_COUNT_REMIND, null);
+            _logger.LogInformation($"[BatchCheckService] Đã nhắc nhở kiểm kê vào ngày {DateTime.Now}");
+        }
 
 
         /*protected override async Task ExecuteAsync(CancellationToken stoppingToken)
