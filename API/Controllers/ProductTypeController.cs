@@ -1,4 +1,5 @@
-﻿using API.Utils;
+﻿using API.Middlewares;
+using API.Utils;
 using BusinessLogicLayer.IServices;
 using BusinessLogicLayer.Services;
 using Data.Enum;
@@ -23,6 +24,7 @@ namespace API.Controllers
             _productTypeService = productTypesService;
         }
         [Authorize]
+        [AuthorizeGroup("Admin,Thủ kho")]
         [HttpGet("count")]
         public async Task<IActionResult> Count()
         {
@@ -56,6 +58,7 @@ namespace API.Controllers
             }
         }
         [Authorize]
+        [AuthorizeGroup("Admin,Thủ kho")]
         [HttpGet]
         public async Task<IActionResult> Search([FromQuery] int pageIndex = 1,
                                                         [FromQuery] int pageSize = 5,
@@ -67,6 +70,7 @@ namespace API.Controllers
             return ControllerResponse.Response(response);
         }
         [Authorize]
+        [AuthorizeGroup("Admin,Thủ kho")]
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(string id)
         {
@@ -87,6 +91,7 @@ namespace API.Controllers
         }
 
         [Authorize]
+        [AuthorizeGroup("Admin,Thủ kho")]
         [HttpPost]
         public async Task<IActionResult> Add([FromBody] ProductTypeCreateDTO request)
         {
@@ -118,6 +123,7 @@ namespace API.Controllers
             }
         }
         [Authorize]
+        [AuthorizeGroup("Admin,Thủ kho")]
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(string id, [FromBody] ProductTypeUpdateDTO request)
         {
@@ -143,6 +149,7 @@ namespace API.Controllers
             }
         }
         [Authorize]
+        [AuthorizeGroup("Admin,Thủ kho")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(string id)
         {
