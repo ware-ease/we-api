@@ -239,10 +239,30 @@ namespace BusinessLogicLayer.Services
             var endOfLastMonth = startOfMonth.AddTicks(-1);
 
             var allDetails = await _unitOfWork.GoodNoteDetailRepository.Search(
-                d => (string.IsNullOrEmpty(warehouseId) || d.GoodNote.GoodRequest.RequestedWarehouseId == warehouseId) &&
-                     d.GoodNote.CreatedTime >= startOfLastMonth && d.GoodNote.CreatedTime <= endOfMonth,
+                d =>
+                    // Nếu không lọc theo warehouse
+                    (string.IsNullOrEmpty(warehouseId) ||
+
+                    // Phiếu nhập từ yêu cầu nhập
+                    (d.GoodNote.NoteType == GoodNoteEnum.Receive &&
+                     d.GoodNote.GoodRequest.RequestType == GoodRequestEnum.Receive &&
+                     d.GoodNote.GoodRequest.RequestedWarehouseId == warehouseId) ||
+
+                    // Phiếu nhập từ yêu cầu điều chuyển
+                    (d.GoodNote.NoteType == GoodNoteEnum.Receive &&
+                     d.GoodNote.GoodRequest.RequestType == GoodRequestEnum.Transfer &&
+                     d.GoodNote.GoodRequest.WarehouseId == warehouseId) ||
+
+                    // Phiếu xuất bất kỳ
+                    (d.GoodNote.NoteType == GoodNoteEnum.Issue &&
+                     d.GoodNote.GoodRequest.RequestedWarehouseId == warehouseId))
+
+                    // Trong thời gian tháng trước đến cuối tháng này
+                    && d.GoodNote.CreatedTime >= startOfLastMonth
+                    && d.GoodNote.CreatedTime <= endOfMonth,
                 includeProperties: "GoodNote,GoodNote.GoodRequest"
             );
+
 
             var currentMonthDetails = allDetails.Where(d => d.GoodNote.CreatedTime >= startOfMonth && d.GoodNote.CreatedTime <= endOfMonth);
             var lastMonthDetails = allDetails.Where(d => d.GoodNote.CreatedTime >= startOfLastMonth && d.GoodNote.CreatedTime <= endOfLastMonth);
@@ -352,7 +372,9 @@ namespace BusinessLogicLayer.Services
                         .Where(d =>
                          (
                                 (d.GoodNote.GoodRequest.RequestType == GoodRequestEnum.Transfer &&
+                                 d.GoodNote.NoteType == GoodNoteEnum.Receive &&
                                  d.GoodNote.GoodRequest.WarehouseId == warehouse.Id) ||
+                            d.GoodNote.GoodRequest.RequestType == GoodRequestEnum.Receive &&
                             d.GoodNote.NoteType == GoodNoteEnum.Receive &&
                             d.GoodNote.GoodRequest.RequestedWarehouseId == warehouse.Id)
                         )
@@ -361,8 +383,7 @@ namespace BusinessLogicLayer.Services
                     var takeOut = dayDetails
                         .Where(d =>
                             d.GoodNote.NoteType == GoodNoteEnum.Issue &&
-                                (d.GoodNote.GoodRequest.RequestType != GoodRequestEnum.Transfer &&
-                                 d.GoodNote.GoodRequest.RequestedWarehouseId == warehouse.Id)
+                                (d.GoodNote.GoodRequest.RequestedWarehouseId == warehouse.Id)
                         )
                         .Sum(d => d.Quantity);
 
@@ -758,7 +779,7 @@ namespace BusinessLogicLayer.Services
 
             var details = await _unitOfWork.GoodNoteDetailRepository.Search(
                 d => d.GoodNote.CreatedTime.HasValue &&
-                     d.GoodNote.CreatedTime.Value >= prevStartDate &&
+                     //d.GoodNote.CreatedTime.Value >= prevStartDate &&
                      d.GoodNote.CreatedTime.Value <= endDate,
                 includeProperties: "GoodNote,GoodNote.GoodRequest"
             );
@@ -772,7 +793,7 @@ namespace BusinessLogicLayer.Services
                 //Calculate stock for the current period
                 var stockInCurrent = details
                     .Where(d =>
-                        d.GoodNote.CreatedTime.Value >= startDate &&
+                        //d.GoodNote.CreatedTime.Value >= startDate &&
                         d.GoodNote.CreatedTime.Value <= endDate &&
                         d.GoodNote.NoteType == GoodNoteEnum.Receive &&
                         (
@@ -785,7 +806,7 @@ namespace BusinessLogicLayer.Services
 
                 var stockOutCurrent = details
                     .Where(d =>
-                        d.GoodNote.CreatedTime.Value >= startDate &&
+                        //d.GoodNote.CreatedTime.Value >= startDate &&
                         d.GoodNote.CreatedTime.Value <= endDate &&
                         d.GoodNote.NoteType == GoodNoteEnum.Issue &&
                         (
@@ -802,7 +823,7 @@ namespace BusinessLogicLayer.Services
                 //Calculate stock for the previous period
                 var stockInPrev = details
                     .Where(d =>
-                        d.GoodNote.CreatedTime.Value >= prevStartDate &&
+                        //d.GoodNote.CreatedTime.Value >= prevStartDate &&
                         d.GoodNote.CreatedTime.Value <= prevEndDate &&
                         d.GoodNote.NoteType == GoodNoteEnum.Receive &&
                         (
@@ -815,7 +836,7 @@ namespace BusinessLogicLayer.Services
 
                 var stockOutPrev = details
                     .Where(d =>
-                        d.GoodNote.CreatedTime.Value >= prevStartDate &&
+                        //d.GoodNote.CreatedTime.Value >= prevStartDate &&
                         d.GoodNote.CreatedTime.Value <= prevEndDate &&
                         d.GoodNote.NoteType == GoodNoteEnum.Issue &&
                         (
@@ -897,7 +918,7 @@ namespace BusinessLogicLayer.Services
 
             //Calculate stock for the current period
             var periodDetails = details
-                .Where(d => d.GoodNote.CreatedTime.Value >= startDate && d.GoodNote.CreatedTime.Value <= endDate)
+                .Where(d => /*d.GoodNote.CreatedTime.Value >= startDate &&*/ d.GoodNote.CreatedTime.Value <= endDate)
                 .ToList();
 
             var grouped = periodDetails
@@ -943,7 +964,7 @@ namespace BusinessLogicLayer.Services
             DateTime lastEndDate = beforeStartDate; //Last day of the month before the current period
 
             var lastDetails = details
-                .Where(d => d.GoodNote.CreatedTime.Value >= lastStartDate &&
+                .Where(d =>/* d.GoodNote.CreatedTime.Value >= lastStartDate &&*/
                             d.GoodNote.CreatedTime.Value <= lastEndDate)
                 .ToList();
 
