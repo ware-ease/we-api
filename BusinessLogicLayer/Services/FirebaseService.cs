@@ -87,5 +87,6 @@ namespace BusinessLogicLayer.Services
         INVENTORY_COUNT_COMPLETED,
         ALERT_LEVEL_1,
         ALERT_LEVEL_2,
+        INVENTORY_COUNT_REMIND,
     }
 }

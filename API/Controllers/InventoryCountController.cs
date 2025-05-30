@@ -1,4 +1,5 @@
-﻿using API.Utils;
+﻿using API.Middlewares;
+using API.Utils;
 using BusinessLogicLayer.IServices;
 using BusinessLogicLayer.Services;
 using Data.Entity;
@@ -29,6 +30,7 @@ namespace API.Controllers
             _inventoryAdjustmentService = inventoryAdjustmentService;
         }
         [Authorize]
+        [AuthorizeGroup("Admin,Thủ kho")]
         [HttpGet]
         public async Task<IActionResult> Search([FromQuery] int pageIndex = 1,
                                                         [FromQuery] int pageSize = 5,
@@ -42,6 +44,7 @@ namespace API.Controllers
             return ControllerResponse.Response(response);
         }
         [Authorize]
+        [AuthorizeGroup("Admin,Thủ kho")]
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(string id)
         {
@@ -62,6 +65,7 @@ namespace API.Controllers
         }
 
         [Authorize]
+        [AuthorizeGroup("Admin,Thủ kho")]
         [HttpPost("adjustment")]
         public async Task<IActionResult> Add([FromBody] InventoryAdjustmentCreateDTO request)
         {
@@ -79,7 +83,7 @@ namespace API.Controllers
                 return ControllerResponse.Response(new ServiceResponse
                 {
                     Status = SRStatus.Success,
-                    Message = "InventoryAdjustment created successfully",
+                    Message = "Đã điều chỉnh thành công",
                     Data = respones
                 });
             }
@@ -95,6 +99,7 @@ namespace API.Controllers
         }
 
         [Authorize]
+        [AuthorizeGroup("Admin,Thủ kho")]
         [HttpPost]
         public async Task<IActionResult> Add([FromBody] InventoryCountCreateDTO request)
         {
@@ -131,6 +136,7 @@ namespace API.Controllers
             }
         }
         [Authorize]
+        [AuthorizeGroup("Admin,Thủ kho,Nhân viên kho")]
         [HttpPatch("{id}")]
         public async Task<IActionResult> Update(string id, [FromBody] InventoryCountUpdateDTO request)
         {

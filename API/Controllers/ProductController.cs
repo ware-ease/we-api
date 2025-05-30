@@ -1,4 +1,5 @@
-﻿using API.Utils;
+﻿using API.Middlewares;
+using API.Utils;
 using AutoMapper;
 using BusinessLogicLayer.IServices;
 using BusinessLogicLayer.Models.General;
@@ -32,6 +33,7 @@ namespace API.Controllers
             //_mapper = mapper;
         }
         [Authorize]
+        [AuthorizeGroup("Admin,Thủ kho,Nhân viên bán hàng")]
         [HttpGet("count")]
         public async Task<IActionResult> Count()
         {
@@ -53,6 +55,7 @@ namespace API.Controllers
             return ControllerResponse.Response(products);
         }
         [Authorize]
+        [AuthorizeGroup("Admin,Thủ kho,Nhân viên bán hàng")]
         [HttpGet]
         public async Task<IActionResult> Search([FromQuery] int pageIndex = 1,
                                                         [FromQuery] int pageSize = 5,
@@ -65,6 +68,7 @@ namespace API.Controllers
             return ControllerResponse.Response(response);
         }
         [Authorize]
+        [AuthorizeGroup("Admin,Thủ kho,Nhân viên bán hàng")]
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(string id)
         {
@@ -85,6 +89,7 @@ namespace API.Controllers
         }
 
         [Authorize]
+        [AuthorizeGroup("Admin,Thủ kho")]
         [HttpPost]
         public async Task<IActionResult> Add([FromBody] ProductCreateDTO request)
         {
@@ -116,6 +121,7 @@ namespace API.Controllers
             }
         }
         [Authorize]
+        [AuthorizeGroup("Admin,Thủ kho")]
         [HttpPatch("{id}")]
         public async Task<IActionResult> Update(string id, [FromBody] ProductUpdateDTO request)
         {
@@ -141,6 +147,7 @@ namespace API.Controllers
             }
         }
         [Authorize]
+        [AuthorizeGroup("Admin,Thủ kho")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(string id)
         {
