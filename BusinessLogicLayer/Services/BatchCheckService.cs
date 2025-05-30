@@ -34,7 +34,7 @@ namespace BusinessLogicLayer.Services
             {
                 //figure out the next run time: today at 8am or tomorrow if its already past that
                 var now = DateTime.Now;
-                var nextRunTime = new DateTime(now.Year, now.Month, now.Day, 10, 12, 0);
+                var nextRunTime = new DateTime(now.Year, now.Month, now.Day, 8, 0, 0);
                 if (now > nextRunTime)
                 {
                     //if it already past 8am today, so schedule for 8am tomorrow
@@ -48,7 +48,7 @@ namespace BusinessLogicLayer.Services
                 try
                 {
                     //time to do the batch check
-                    await DoBatchCheckAsync(stoppingToken, nextRunTime, delay);
+                    await DoBatchCheckAsync(stoppingToken);
                 }
                 catch (Exception ex)
                 {
@@ -62,7 +62,7 @@ namespace BusinessLogicLayer.Services
             }
         }
 
-        private async Task DoBatchCheckAsync(CancellationToken stoppingToken, DateTime nextRunTime, TimeSpan delay)
+        private async Task DoBatchCheckAsync(CancellationToken stoppingToken)
         {
             const int batchSize = 100;
             int skipWarehouse = 0;
@@ -118,9 +118,6 @@ namespace BusinessLogicLayer.Services
                             filter: a => a.AccountWarehouses.Any(aw => aw.WarehouseId == warehouse.Id)
                             && a.AccountGroups.Any(ag => ag.GroupId == "2"),
                             includeProperties: "AccountWarehouses,AccountGroups")).Select(m => m.Id).ToList();
-
-                        await _firebaseService.SendNotificationToUsersAsync(managers, "TEST Thông báo.", $"Thông báo mới sẽ gửi vào ngày {nextRunTime}, còn {delay}",
-                                            NotificationType.ALERT_LEVEL_2, null);
 
                         foreach (var inventory in inventories)
                         {
