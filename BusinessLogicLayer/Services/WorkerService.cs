@@ -40,7 +40,7 @@ namespace BusinessLogicLayer.Services
         {
             while (!stoppingToken.IsCancellationRequested)
             {
-                // Xác định thời gian chạy tiếp theo: 8h sáng hôm nay hoặc ngày mai nếu đã quá 8h
+                //identify the next run time (next day at 00:00:00)
                 var now = DateTime.Now;
                 var nextRunTime = new DateTime(now.Year, now.Month, now.Day, 0, 0, 0);
                 if (now > nextRunTime)
@@ -51,13 +51,13 @@ namespace BusinessLogicLayer.Services
                 var delay = nextRunTime - now;
                 _logger.LogInformation($"[WorkerService] Đang đợi đến {nextRunTime} để bắt đầu xử lý (còn {delay}).");
 
-                // Chờ đến thời điểm chạy
+                //wait until next run time
                 await Task.Delay(delay, stoppingToken);
 
-                // Sau khi đã chờ đủ, bắt đầu xử lý
+                //start to run after waiting
                 await ProcessAccountsAsync(stoppingToken);
 
-                // Sau khi xử lý xong, đợi đúng 24 giờ trước khi lặp lại
+                //wait 23h before run agian
                 _logger.LogInformation("[WorkerService] Hoàn thành xử lý. Đang chờ 23 giờ trước khi chạy lại.");
                 await Task.Delay(TimeSpan.FromHours(23), stoppingToken);
             }
@@ -168,24 +168,24 @@ namespace BusinessLogicLayer.Services
 
         private async Task SendEmailAsync(string toEmail, string subject, string body)
         {
-            // Load environment variables from .env file
+            //load environment variables from .env file
             var from = Environment.GetEnvironmentVariable("SMTP_FROM");
             var host = Environment.GetEnvironmentVariable("SMTP_HOST");
             var port = int.Parse(Environment.GetEnvironmentVariable("SMTP_PORT"));
             var user = Environment.GetEnvironmentVariable("SMTP_USER");
             var pass = Environment.GetEnvironmentVariable("SMTP_PASS");
 
-            // Create the email message
+            //create the email message
             var email = new MimeMessage();
             email.From.Add(new MailboxAddress("Admin WareEaseSystem", from));
             email.To.Add(new MailboxAddress("", toEmail));
             email.Subject = subject;
 
-            // Create the email body
+            //create the email body
             var builder = new BodyBuilder { HtmlBody = body };
             email.Body = builder.ToMessageBody();
 
-            // Send the email using MailKit
+            //send the email using MailKit
             using (var smtp = new MailKit.Net.Smtp.SmtpClient())
             {
                 await smtp.ConnectAsync(host, port, SecureSocketOptions.StartTls);
