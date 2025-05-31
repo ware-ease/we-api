@@ -36,7 +36,7 @@ namespace BusinessLogicLayer.Services
             return new ServiceResponse
             {
                 Status = Data.Enum.SRStatus.Success,
-                Message = "Get thành công!",
+                Message = "Lấy thành công!",
                 Data = mappedResults
             };
         }
@@ -50,7 +50,7 @@ namespace BusinessLogicLayer.Services
                 return new ServiceResponse
                 {
                     Status = Data.Enum.SRStatus.NotFound,
-                    Message = "Unit không tồn tại!",
+                    Message = "Đơn vị không tồn tại!",
                     Data = id
                 };
             }
@@ -60,7 +60,7 @@ namespace BusinessLogicLayer.Services
             return new ServiceResponse
             {
                 Status = Data.Enum.SRStatus.Success,
-                Message = "Get thành công!",
+                Message = "Lấy thành công!",
                 Data = result
             };
         }
@@ -68,14 +68,14 @@ namespace BusinessLogicLayer.Services
         public async Task<UnitDTO> AddUnit(UnitCreateDTO request)
         {
             if ((request.Type != UnitEnum.Int) && (request.Type != UnitEnum.Float))
-                throw new Exception("Type không hợp lệ");
+                throw new Exception("Loại không hợp lệ");
             var unit = _mapper.Map<Unit>(request);
 
             await _genericRepository.Add(unit);
             await _unitOfWork.SaveAsync();
             var createdUnit = await _genericRepository.GetByCondition(p => p.Id == unit.Id);
             if (createdUnit == null)
-                throw new Exception("Add lỗi, Unit không được tìm thấy sau khi add");
+                throw new Exception("Thêm lỗi, đơn vị không được tìm thấy sau khi thêm");
             return _mapper.Map<UnitDTO>(createdUnit);
         }
 
@@ -83,7 +83,7 @@ namespace BusinessLogicLayer.Services
         {
             var existedUnit = await _genericRepository.GetByCondition(p => p.Id == request.Id);
             if (existedUnit == null)
-                throw new Exception("Unit không tồn tại");
+                throw new Exception("Đơn vị không tồn tại");
 
             if (!string.IsNullOrEmpty(request.Name))
             {
@@ -100,7 +100,7 @@ namespace BusinessLogicLayer.Services
 
             var updatedUnit = await _genericRepository.GetByCondition(p => p.Id == existedUnit.Id);
             if (updatedUnit == null)
-                throw new Exception("Update lỗi, Unit không được tìm thấy sau khi update");
+                throw new Exception("Cập nhật lỗi, đơn vị không được tìm thấy sau khi cập nhật");
 
             return _mapper.Map<UnitDTO>(updatedUnit);
         }
@@ -125,7 +125,7 @@ namespace BusinessLogicLayer.Services
             return new ServiceResponse
             {
                 Status = Data.Enum.SRStatus.Success,
-                Message = "Search successful!",
+                Message = "Tìm kiếm thành công!",
                 Data = new
                 {
                     TotalRecords = totalRecords,

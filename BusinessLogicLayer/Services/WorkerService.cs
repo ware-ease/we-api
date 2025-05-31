@@ -35,7 +35,79 @@ namespace BusinessLogicLayer.Services
             _configuration = configuration;
         }
 
+
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+        {
+            while (!stoppingToken.IsCancellationRequested)
+            {
+                //identify the next run time (next day at 00:00:00)
+                var now = DateTime.Now;
+                var nextRunTime = new DateTime(now.Year, now.Month, now.Day, 0, 0, 0);
+                if (now > nextRunTime)
+                {
+                    nextRunTime = nextRunTime.AddDays(1);
+                }
+
+                var delay = nextRunTime - now;
+                _logger.LogInformation($"[WorkerService] Đang đợi đến {nextRunTime} để bắt đầu xử lý (còn {delay}).");
+
+                //wait until next run time
+                await Task.Delay(delay, stoppingToken);
+
+                //start to run after waiting
+                await ProcessAccountsAsync(stoppingToken);
+
+                //wait 23h before run agian
+                _logger.LogInformation("[WorkerService] Hoàn thành xử lý. Đang chờ 23 giờ trước khi chạy lại.");
+                await Task.Delay(TimeSpan.FromHours(23), stoppingToken);
+            }
+        }
+
+        private async Task ProcessAccountsAsync(CancellationToken stoppingToken)
+        {
+            const int batchSize = 100;
+            int skip = 0;
+
+            using var scope = _scopeFactory.CreateScope();
+            var accountRepo = scope.ServiceProvider.GetRequiredService<IGenericRepository<Account>>();
+            var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+
+            while (!stoppingToken.IsCancellationRequested)
+            {
+                var expiredAccounts = await accountRepo.Search(
+                    filter: a => a.Status == AccountStatus.Unverified && a.UnverifiedAt.AddDays(7) <= DateTime.Now,
+                    orderBy: q => q.OrderBy(a => a.CreatedTime),
+                    pageIndex: skip / batchSize,
+                    pageSize: batchSize
+                );
+
+                if (!expiredAccounts.Any())
+                {
+                    _logger.LogInformation("[WorkerService] Không còn tài khoản Unverified cần xử lý.");
+                    break;
+                }
+
+                foreach (var account in expiredAccounts)
+                {
+                    account.Status = AccountStatus.Locked;
+                    accountRepo.Update(account);
+
+                    var subject = "Tài khoản của bạn đã bị khóa";
+                    var body = $"<p>Tài khoản của bạn ({account.Username}) đã bị khóa do không xác thực trong vòng 7 ngày.</p>" +
+                                "<p>Vui lòng liên hệ với quản trị viên để biết thêm chi tiết.</p>";
+                    await SendEmailAsync(account.Email!, subject, body);
+                }
+
+                await unitOfWork.SaveAsync();
+
+                _logger.LogInformation($"[WorkerService] Đã khóa {expiredAccounts.Count()} tài khoản hết hạn.");
+
+                skip += batchSize;
+            }
+        }
+
+
+        /*protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             const int batchSize = 100; // number
             int skip = 0;
@@ -63,9 +135,9 @@ namespace BusinessLogicLayer.Services
                         accountRepo.Update(account);
 
 
-                        /*Console.WriteLine($"SMTP_FROM: {Environment.GetEnvironmentVariable("SMTP_FROM")}");
+                        *//*Console.WriteLine($"SMTP_FROM: {Environment.GetEnvironmentVariable("SMTP_FROM")}");
                         Console.WriteLine($"SMTP_HOST: {Environment.GetEnvironmentVariable("SMTP_HOST")}");
-                        Console.WriteLine($"SMTP_PORT: {Environment.GetEnvironmentVariable("SMTP_PORT")}");*/
+                        Console.WriteLine($"SMTP_PORT: {Environment.GetEnvironmentVariable("SMTP_PORT")}");*//*
 
                         var subject = "Tài khoản của bạn đã bị khóa";
                         var body = $"<p>Tài khoản của bạn ({account.Username}) đã bị khóa do không xác thực trong vòng 7 ngày.</p>" +
@@ -92,28 +164,28 @@ namespace BusinessLogicLayer.Services
                 // Wait for 5 minutes before checking again
                 await Task.Delay(TimeSpan.FromMinutes(5), stoppingToken);
             }
-        }
+        }*/
 
         private async Task SendEmailAsync(string toEmail, string subject, string body)
         {
-            // Load environment variables from .env file
+            //load environment variables from .env file
             var from = Environment.GetEnvironmentVariable("SMTP_FROM");
             var host = Environment.GetEnvironmentVariable("SMTP_HOST");
             var port = int.Parse(Environment.GetEnvironmentVariable("SMTP_PORT"));
             var user = Environment.GetEnvironmentVariable("SMTP_USER");
             var pass = Environment.GetEnvironmentVariable("SMTP_PASS");
 
-            // Create the email message
+            //create the email message
             var email = new MimeMessage();
             email.From.Add(new MailboxAddress("Admin WareEaseSystem", from));
             email.To.Add(new MailboxAddress("", toEmail));
             email.Subject = subject;
 
-            // Create the email body
+            //create the email body
             var builder = new BodyBuilder { HtmlBody = body };
             email.Body = builder.ToMessageBody();
 
-            // Send the email using MailKit
+            //send the email using MailKit
             using (var smtp = new MailKit.Net.Smtp.SmtpClient())
             {
                 await smtp.ConnectAsync(host, port, SecureSocketOptions.StartTls);

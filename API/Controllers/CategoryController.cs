@@ -40,7 +40,7 @@ namespace API.Controllers
             {
                 Data = count,
                 Status = SRStatus.Success,
-                Message = "Đã đếm xong số lượng category"
+                Message = "Đã đếm xong số lượng danh mục"
             };
 
             return ControllerResponse.Response(response);
@@ -105,7 +105,7 @@ namespace API.Controllers
                 return ControllerResponse.Response(new ServiceResponse
                 {
                     Status = Data.Enum.SRStatus.Success,
-                    Message = "Category đã sửa thành công",
+                    Message = "Danh mục đã cập nhật thành công",
                     Data = result
                 });
             }

@@ -59,10 +59,10 @@ namespace BusinessLogicLayer.Services
                 try
                 {
                     if (request.Date > DateTime.Now)
-                        throw new Exception("Date không được ở tương lai");
+                        throw new Exception("Ngày không được ở tương lai");
                     var warehouse = await _warehouseRepository.GetByCondition(p => p.Id == request.WarehouseId);
                     if (warehouse == null)
-                        throw new Exception("Warehouse không tồn tại");
+                        throw new Exception("Kho không tồn tại");
                     var inventoryAdjustment = new InventoryAdjustment
                     {
                         Date = request.Date,
@@ -75,7 +75,7 @@ namespace BusinessLogicLayer.Services
                         CreatedBy = request.CreatedBy,
                     };
                     if (request.DocumentType.HasValue && (request.DocumentType != Data.Enum.DocumentType.GoodNote && request.DocumentType != Data.Enum.DocumentType.InventoryCount))
-                        throw new Exception("DocumentType không hợp lệ");
+                        throw new Exception("Loại tài liệu không hợp lệ");
                     /*if (!string.IsNullOrEmpty(request.RelatedDocument))
                     {
                         var inventoryCount = await _inventoryCountRepository.GetByCondition(p => p.Id == request.RelatedDocument);
@@ -106,7 +106,7 @@ namespace BusinessLogicLayer.Services
                                     if (inventory == null)
                                         throw new Exception($"Inventory với Id {detailDto.InventoryId} không tồn tại");
                                     if (inventory.WarehouseId != request.WarehouseId)
-                                        throw new Exception($"Inventory với Id {detailDto.InventoryId} không thuộc Warehouse với Id {request.WarehouseId}");
+                                        throw new Exception($"Inventory với Id {detailDto.InventoryId} không thuộc kho với Id {request.WarehouseId}");
 
                                     inventoryAdjustmentDetail.NewQuantity = inventory.CurrentQuantity + detailDto.ChangeInQuantity;
                                     //inventoryAdjustmentDetail.Inventory = null;
@@ -116,7 +116,7 @@ namespace BusinessLogicLayer.Services
 
                                     var goodRequestEntity = new GoodRequest
                                     {
-                                        Note = "Tạo từ phiếu điều chỉnh với mã code: " + inventoryAdjustment.Code,
+                                        Note = "Tạo từ phiếu điều chỉnh với mã: " + inventoryAdjustment.Code,
                                         //Code = await _codeGeneratorService.GenerateCodeAsync(Data.Enum.CodeType.YCN),
                                         Code = "AR",
                                         RequestType = Data.Enum.GoodRequestEnum.Receive,
@@ -153,7 +153,7 @@ namespace BusinessLogicLayer.Services
                                     var goodNoteDetailEntity = new GoodNoteDetail
                                     {
                                         Quantity = detailDto.ChangeInQuantity,
-                                        Note = "Phiếu nhập điều chỉnh từ phiếu điều chỉnh với code:" + inventoryAdjustment.Code + ", GoodNote code:" + goodNoteEntity.Code,
+                                        Note = "Phiếu nhập điều chỉnh từ phiếu điều chỉnh với mã: " + inventoryAdjustment.Code,
                                         CreatedBy = request.CreatedBy,
                                         BatchId = inventory.BatchId,
                                         GoodNoteId = goodNoteEntity.Id
@@ -177,7 +177,7 @@ namespace BusinessLogicLayer.Services
                                         if (inventory == null)
                                             throw new Exception($"Inventory với Id {detailDto.InventoryId} không tồn tại");
                                         if (inventory.WarehouseId != request.WarehouseId)
-                                            throw new Exception($"Inventory với Id {detailDto.InventoryId} không thuộc Warehouse với Id {request.WarehouseId}");
+                                            throw new Exception($"Inventory với Id {detailDto.InventoryId} không thuộc kho với Id {request.WarehouseId}");
 
                                         inventoryAdjustmentDetail.NewQuantity = inventory.CurrentQuantity + detailDto.ChangeInQuantity;
 
@@ -186,7 +186,7 @@ namespace BusinessLogicLayer.Services
 
                                         var goodRequestEntity = new GoodRequest
                                         {
-                                            Note = "Tạo từ phiếu điều chỉnh với mã code: " + inventoryAdjustment.Code,
+                                            Note = "Tạo từ phiếu điều chỉnh với mã: " + inventoryAdjustment.Code,
                                             //Code = await _codeGeneratorService.GenerateCodeAsync(Data.Enum.CodeType.YCX),
                                             Code = "AR",
                                             RequestType = Data.Enum.GoodRequestEnum.Issue,
@@ -223,7 +223,7 @@ namespace BusinessLogicLayer.Services
                                         var goodNoteDetailEntity = new GoodNoteDetail
                                         {
                                             Quantity = Math.Abs(detailDto.ChangeInQuantity),
-                                            Note = "Phiếu xuất điều chỉnh từ phiếu điều chỉnh với code:" + inventoryAdjustment.Code + ", GoodNote code:" + goodNoteEntity.Code,
+                                            Note = "Phiếu xuất điều chỉnh từ phiếu điều chỉnh với mã: " + inventoryAdjustment.Code,
                                             CreatedBy = request.CreatedBy,
                                             BatchId = inventory.BatchId,
                                             GoodNoteId = goodNoteEntity.Id
@@ -242,7 +242,7 @@ namespace BusinessLogicLayer.Services
                                     }
                                 }
                             default:
-                                throw new Exception("ChangeInQuantity không hợp lệ");
+                                throw new Exception("Số lượng thay đổi không hợp lệ");
                         }
                         //await _genericRepository.Insert(inventoryAdjustment);
                         //await _unitOfWork.SaveAsync();
@@ -252,7 +252,7 @@ namespace BusinessLogicLayer.Services
                 }
                 catch (Exception ex)
                 {
-                    throw new Exception($"Lỗi khi thêm InventoryAdjustment: {ex.Message}");
+                    throw new Exception($"Lỗi khi thêm Phiếu điều chỉnh: {ex.Message}");
                 }
             }
         }
@@ -265,18 +265,18 @@ namespace BusinessLogicLayer.Services
                 try
                 {
                     if (request.Date > DateTime.Now)
-                        throw new Exception("Date không được ở tương lai");
+                        throw new Exception("Ngày không được ở tương lai");
 
                     var warehouse = await _warehouseRepository.GetByCondition(p => p.Id == request.WarehouseId);
                     if (warehouse == null)
-                        throw new Exception("Warehouse không tồn tại");
+                        throw new Exception("Kho không tồn tại");
 
                     var inventoryCount = await _inventoryCountRepository.GetByCondition(x => x.Id == request.InventoryCountId,
                         includeProperties: "InventoryCheckDetails,InventoryCheckDetails.Inventory.Batch.Product");
                     if (inventoryCount == null)
-                        throw new Exception("InventoryCount không tồn tại");
+                        throw new Exception("Phiếu kiểm kê không tồn tại");
                     if (inventoryCount.Status == Data.Enum.InventoryCountStatus.Adjusted)
-                        throw new Exception("InventoryCount này đã được điều chỉnh");
+                        throw new Exception("Phiếu kiểm kê này đã được điều chỉnh");
 
                     inventoryCount.Status = Data.Enum.InventoryCountStatus.Adjusted;
                     _inventoryCountRepository.Update(inventoryCount);
@@ -290,7 +290,7 @@ namespace BusinessLogicLayer.Services
                     inventoryAdjustment.Code = await _codeGeneratorService.GenerateCodeAsync(Data.Enum.CodeType.PDC);
 
                     if (request.DocumentType.HasValue && (request.DocumentType != Data.Enum.DocumentType.GoodNote && request.DocumentType != Data.Enum.DocumentType.InventoryCount))
-                        throw new Exception("DocumentType không hợp lệ");
+                        throw new Exception("Loại tài liệu không hợp lệ");
                     /*if (!string.IsNullOrEmpty(request.RelatedDocument))
                     {
                         //var inventoryCount = await _inventoryCountRepository.GetByCondition(p => p.Id == request.RelatedDocument);
@@ -414,7 +414,7 @@ namespace BusinessLogicLayer.Services
                                     var goodNoteDetailEntity = new GoodNoteDetail
                                     {
                                         Quantity = changeInQuantity,
-                                        Note = "Điều chỉnh do hàng thực tế nhiều hơn số hàng trong dữ liệu, tạo từ phiếu điều chỉnh với mã code:" + inventoryAdjustment.Code,
+                                        Note = "Điều chỉnh do hàng thực tế nhiều hơn số hàng trong dữ liệu, tạo từ phiếu điều chỉnh với mã: " + inventoryAdjustment.Code,
                                         CreatedBy = request.CreatedBy,
                                         BatchId = detailDto.Inventory.BatchId,
                                         GoodNoteId = goodNoteEntity.Id
@@ -505,7 +505,7 @@ namespace BusinessLogicLayer.Services
                                     var goodNoteDetailEntity = new GoodNoteDetail
                                     {
                                         Quantity = changeInQuantity,
-                                        Note = "Điều chỉnh do hàng thực tế ít hơn số hàng trong dữ liệu, tạo từ phiếu điều chỉnh với mã code:" + inventoryAdjustment.Code,
+                                        Note = "Điều chỉnh do hàng thực tế ít hơn số hàng trong dữ liệu, tạo từ phiếu điều chỉnh với mã: " + inventoryAdjustment.Code,
                                         CreatedBy = request.CreatedBy,
                                         BatchId = detailDto.Inventory.BatchId,
                                         GoodNoteId = goodNoteEntity.Id
@@ -638,7 +638,7 @@ namespace BusinessLogicLayer.Services
             return new ServiceResponse
             {
                 Status = Data.Enum.SRStatus.Success,
-                Message = "Get successfully!",
+                Message = "Lấy thành công!",
                 Data = mappedResults
             };
         }
