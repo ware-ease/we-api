@@ -147,14 +147,14 @@ namespace BusinessLogicLayer.Services
                             {
                                 case <= 0:
                                     {
-                                        //expired, set AlertLevel to 2 if not already
-                                        if (batch.AlertLevel == 2) continue;
-                                        batch.AlertLevel = 2;
+                                        //expired, set AlertLevel to 3 if not already
+                                        if (batch.AlertLevel == 3) continue;
+                                        batch.AlertLevel = 3;
                                         _batchRepository.Update(batch);
                                         await _unitOfWork.SaveAsync();
                                         await _firebaseService.SendNotificationToUsersAsync(managers, "Lô đã hết hạn.", $"Lô {batch.Code} thuộc sản phẩm {product.Sku} đã hết hạn, hạn của phẩm: {batch.ExpDate.Value:dd/MM/yyyy}",
-                                            NotificationType.ALERT_LEVEL_2, null);
-                                        _logger.LogInformation($"[BatchCheckService] Gửi cảnh báo bậc 2 cho batch {batch.Id} tại kho {warehouse.Name}, đã hết hạn sử dụng {(int)daysUntilExpiry}.");
+                                            NotificationType.ALERT_LEVEL_3, null);
+                                        _logger.LogInformation($"[BatchCheckService] Gửi cảnh báo bậc 3 cho batch {batch.Id} tại kho {warehouse.Name}, đã hết hạn sử dụng {(int)daysUntilExpiry}.");
                                         _logger.LogInformation($"[BatchCheckService] Lô {batch.Code} thuộc sản phẩm {product.Sku} đã hết hạn sử dụng {batch.ExpDate.Value.ToString("dd/MM/yyyy")}");
                                         break;
                                     }
