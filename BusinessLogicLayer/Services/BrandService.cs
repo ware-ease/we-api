@@ -48,7 +48,7 @@ namespace BusinessLogicLayer.Services
                 return new ServiceResponse
                 {
                     Status = Data.Enum.SRStatus.NotFound,
-                    Message = "Brand không tìm thấy!",
+                    Message = "Hãng không tìm thấy!",
                     Data = id
                 };
             }
@@ -82,7 +82,7 @@ namespace BusinessLogicLayer.Services
             return new ServiceResponse
             {
                 Status = Data.Enum.SRStatus.Success,
-                Message = "Search thành công!",
+                Message = "Tìm kiếm thành công!",
                 Data = new
                 {
                     TotalRecords = totalRecords,

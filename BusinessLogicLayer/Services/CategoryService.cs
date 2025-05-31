@@ -37,7 +37,7 @@ namespace BusinessLogicLayer.Services
             return new ServiceResponse
             {
                 Status = Data.Enum.SRStatus.Success,
-                Message = "Get successfully!",
+                Message = "Đã lấy thành công!",
                 Data = mappedResults
             };
         }
@@ -51,7 +51,7 @@ namespace BusinessLogicLayer.Services
                 return new ServiceResponse
                 {
                     Status = Data.Enum.SRStatus.NotFound,
-                    Message = "Category not found!",
+                    Message = "Danh mục không tồn tại!",
                     Data = id
                 };
             }
@@ -61,7 +61,7 @@ namespace BusinessLogicLayer.Services
             return new ServiceResponse
             {
                 Status = Data.Enum.SRStatus.Success,
-                Message = "Get successfully!",
+                Message = "Đã lấy thành công!",
                 Data = result
             };
         }
@@ -76,7 +76,7 @@ namespace BusinessLogicLayer.Services
         {
             var existingCategory = await _genericRepository.GetByCondition(p => p.Id == request.Id);
             if (existingCategory == null)
-                throw new Exception("Category not found");
+                throw new Exception("Danh mục không tồn tại");
 
             if (!string.IsNullOrEmpty(request.Name))
             {
@@ -92,7 +92,7 @@ namespace BusinessLogicLayer.Services
 
             var updatedCategory = await _genericRepository.GetByCondition(p => p.Id == existingCategory.Id);
             if (updatedCategory == null)
-                throw new Exception("Update failed, category not found after update");
+                throw new Exception("Cập nhật thất bại, danh mục không thể tìm thấy sau cập nhật");
 
             return _mapper.Map<CategoryDTO>(updatedCategory);
         }
@@ -117,7 +117,7 @@ namespace BusinessLogicLayer.Services
             return new ServiceResponse
             {
                 Status = Data.Enum.SRStatus.Success,
-                Message = "Search successful!",
+                Message = "Tìm kiếm thành công!",
                 Data = new
                 {
                     TotalRecords = totalRecords,

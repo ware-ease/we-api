@@ -33,7 +33,7 @@ namespace API.Controllers
             {
                 Data = count,
                 Status = SRStatus.Success,
-                Message = "Total product type count retrieved successfully"
+                Message = "Tổng loại sản phẩm được đếm thành công"
             };
 
             return ControllerResponse.Response(response);
@@ -108,7 +108,7 @@ namespace API.Controllers
                 return ControllerResponse.Response(new ServiceResponse
                 {
                     Status = SRStatus.Success,
-                    Message = "ProductType đã tạo thành công",
+                    Message = "Loại sản phẩm đã tạo thành công",
                     Data = result
                 });
             }
@@ -134,7 +134,7 @@ namespace API.Controllers
                 return ControllerResponse.Response(new ServiceResponse
                 {
                     Status = Data.Enum.SRStatus.Success,
-                    Message = "ProductType đã sửa thành công",
+                    Message = "Loại sản phẩm đã cập nhật thành công",
                     Data = result
                 });
             }

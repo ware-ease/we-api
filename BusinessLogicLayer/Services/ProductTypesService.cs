@@ -55,7 +55,7 @@ namespace BusinessLogicLayer.Services
             return new ServiceResponse
             {
                 Status = Data.Enum.SRStatus.Success,
-                Message = "Get successfully!",
+                Message = "Lấy thành công!",
                 Data = mappedResults
             };
         }
@@ -73,7 +73,7 @@ namespace BusinessLogicLayer.Services
                 return new ServiceResponse
                 {
                     Status = Data.Enum.SRStatus.NotFound,
-                    Message = "ProductType không tìm thấy!",
+                    Message = "Loại sản phẩm không tìm thấy!",
                     Data = id
                 };
             }
@@ -83,7 +83,7 @@ namespace BusinessLogicLayer.Services
             return new ServiceResponse
             {
                 Status = Data.Enum.SRStatus.Success,
-                Message = "Get thành công!",
+                Message = "Lấy thành công!",
                 Data = result
             };
         }
@@ -98,7 +98,7 @@ namespace BusinessLogicLayer.Services
             return new ServiceResponse
             {
                 Status = Data.Enum.SRStatus.Success,
-                Message = "Get thành công!",
+                Message = "Lấy thành công!",
                 Data = products
             };
         }
@@ -107,7 +107,7 @@ namespace BusinessLogicLayer.Services
         {
             var category = await _categoryRepository.GetByCondition(p => p.Id == request.CategoryId);
             if (category == null)
-                throw new Exception("Category không tồn tại");
+                throw new Exception("Danh mục không tồn tại");
 
             var productType = _mapper.Map<ProductType>(request);
             productType.Category = category;
@@ -121,7 +121,7 @@ namespace BusinessLogicLayer.Services
         {
             var existedProductType = await _productTypeRepository.GetByCondition(p => p.Id == request.Id);
             if (existedProductType == null)
-                throw new Exception("ProductType không tồn tại");
+                throw new Exception("Loại sản phẩm không tồn tại");
 
             if (!string.IsNullOrEmpty(request.Name))
             {
@@ -136,7 +136,7 @@ namespace BusinessLogicLayer.Services
             {
                 var category = await _categoryRepository.GetByCondition(p => p.Id == request.CategoryId);
                 if (category == null)
-                    throw new Exception("Category không tồn tại");
+                    throw new Exception("Danh mục không tồn tại");
                 existedProductType.CategoryId = request.CategoryId;
             }
 
@@ -146,7 +146,7 @@ namespace BusinessLogicLayer.Services
 
             var updatedProductType = await _productTypeRepository.GetByCondition(p => p.Id == existedProductType.Id);
             if (updatedProductType == null)
-                throw new Exception("Update lỗi, ProductType không được tìm thấy sau khi update");
+                throw new Exception("Cập nhật lỗi, loại sản phẩm không được tìm thấy sau khi cập nhật");
 
             return _mapper.Map<ProductTypeDTO>(updatedProductType);
         }
@@ -173,7 +173,7 @@ namespace BusinessLogicLayer.Services
             return new ServiceResponse
             {
                 Status = Data.Enum.SRStatus.Success,
-                Message = "Search successful!",
+                Message = "Tìm kiếm thành công!",
                 Data = new
                 {
                     TotalRecords = totalRecords,

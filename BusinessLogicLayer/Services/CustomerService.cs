@@ -41,7 +41,7 @@ namespace BusinessLogicLayer.Services
             return new ServiceResponse
             {
                 Status = Data.Enum.SRStatus.Success,
-                Message = "Get successfully!",
+                Message = "Lấy thành công!",
                 Data = mappedResults
             };
         }
@@ -55,7 +55,7 @@ namespace BusinessLogicLayer.Services
                 return new ServiceResponse
                 {
                     Status = Data.Enum.SRStatus.NotFound,
-                    Message = "Customer not found!",
+                    Message = "Khách hàng không tồn tại!",
                     Data = id
                 };
             }
@@ -65,7 +65,7 @@ namespace BusinessLogicLayer.Services
             return new ServiceResponse
             {
                 Status = Data.Enum.SRStatus.Success,
-                Message = "Get successfully!",
+                Message = "Lấy thành công!",
                 Data = result
             };
         }
@@ -89,7 +89,7 @@ namespace BusinessLogicLayer.Services
                 return new ServiceResponse
                 {
                     Status = Data.Enum.SRStatus.Success,
-                    Message = "Add thành công!",
+                    Message = "Thêm thành công!",
                     Data = result
                 };
             }
@@ -110,7 +110,7 @@ namespace BusinessLogicLayer.Services
         {
             var existingCustomer = await _genericRepository.GetByCondition(p => p.Id == request.Id);
             if (existingCustomer == null)
-                throw new Exception("Customer không tìm thấy");
+                throw new Exception("Khách hàng không tìm thấy");
 
             if (!string.IsNullOrEmpty(request.Name))
             {
@@ -128,7 +128,7 @@ namespace BusinessLogicLayer.Services
 
             var updatedCustomer = await _genericRepository.GetByCondition(p => p.Id == existingCustomer.Id);
             if (updatedCustomer == null)
-                throw new Exception("Update lỗi, customer không tìm thấy sau khi update");
+                throw new Exception("Cập nhật lỗi, khách hàng không tìm thấy sau khi cập nhật");
 
             return _mapper.Map<CustomerDTO>(updatedCustomer);
         }

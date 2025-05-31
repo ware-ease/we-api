@@ -35,7 +35,7 @@ namespace API.Controllers
             {
                 Data = count,
                 Status = SRStatus.Success,
-                Message = "Total batch count retrieved successfully"
+                Message = "Tổng số lô được đếm thành công"
             };
 
             return ControllerResponse.Response(response);

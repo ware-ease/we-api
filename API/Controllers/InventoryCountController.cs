@@ -83,7 +83,7 @@ namespace API.Controllers
                 return ControllerResponse.Response(new ServiceResponse
                 {
                     Status = SRStatus.Success,
-                    Message = "Đã điều chỉnh thành công",
+                    Message = "Phiếu kiểm kê điều chỉnh thành công",
                     Data = respones
                 });
             }
@@ -119,7 +119,7 @@ namespace API.Controllers
                     return ControllerResponse.Response(new ServiceResponse
                     {
                         Status = SRStatus.Success,
-                        Message = "Inventory-Count đã tạo thành công",
+                        Message = "Phiếu kiểm kê đã tạo thành công",
                         Data = inventoryCount
                     });
                     
@@ -147,7 +147,7 @@ namespace API.Controllers
                 return ControllerResponse.Response(new ServiceResponse
                 {
                     Status = Data.Enum.SRStatus.Success,
-                    Message = "Inventory-Count đã sửa thành công",
+                    Message = "Phiếu kiểm kê đã sửa thành công",
                     Data = updated
                 });
             }

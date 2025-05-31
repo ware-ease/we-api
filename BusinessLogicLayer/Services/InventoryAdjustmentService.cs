@@ -59,10 +59,10 @@ namespace BusinessLogicLayer.Services
                 try
                 {
                     if (request.Date > DateTime.Now)
-                        throw new Exception("Date không được ở tương lai");
+                        throw new Exception("Ngày không được ở tương lai");
                     var warehouse = await _warehouseRepository.GetByCondition(p => p.Id == request.WarehouseId);
                     if (warehouse == null)
-                        throw new Exception("Warehouse không tồn tại");
+                        throw new Exception("Kho không tồn tại");
                     var inventoryAdjustment = new InventoryAdjustment
                     {
                         Date = request.Date,
@@ -75,7 +75,7 @@ namespace BusinessLogicLayer.Services
                         CreatedBy = request.CreatedBy,
                     };
                     if (request.DocumentType.HasValue && (request.DocumentType != Data.Enum.DocumentType.GoodNote && request.DocumentType != Data.Enum.DocumentType.InventoryCount))
-                        throw new Exception("DocumentType không hợp lệ");
+                        throw new Exception("Loại tài liệu không hợp lệ");
                     /*if (!string.IsNullOrEmpty(request.RelatedDocument))
                     {
                         var inventoryCount = await _inventoryCountRepository.GetByCondition(p => p.Id == request.RelatedDocument);
@@ -106,7 +106,7 @@ namespace BusinessLogicLayer.Services
                                     if (inventory == null)
                                         throw new Exception($"Inventory với Id {detailDto.InventoryId} không tồn tại");
                                     if (inventory.WarehouseId != request.WarehouseId)
-                                        throw new Exception($"Inventory với Id {detailDto.InventoryId} không thuộc Warehouse với Id {request.WarehouseId}");
+                                        throw new Exception($"Inventory với Id {detailDto.InventoryId} không thuộc kho với Id {request.WarehouseId}");
 
                                     inventoryAdjustmentDetail.NewQuantity = inventory.CurrentQuantity + detailDto.ChangeInQuantity;
                                     //inventoryAdjustmentDetail.Inventory = null;
@@ -177,7 +177,7 @@ namespace BusinessLogicLayer.Services
                                         if (inventory == null)
                                             throw new Exception($"Inventory với Id {detailDto.InventoryId} không tồn tại");
                                         if (inventory.WarehouseId != request.WarehouseId)
-                                            throw new Exception($"Inventory với Id {detailDto.InventoryId} không thuộc Warehouse với Id {request.WarehouseId}");
+                                            throw new Exception($"Inventory với Id {detailDto.InventoryId} không thuộc kho với Id {request.WarehouseId}");
 
                                         inventoryAdjustmentDetail.NewQuantity = inventory.CurrentQuantity + detailDto.ChangeInQuantity;
 
@@ -265,11 +265,11 @@ namespace BusinessLogicLayer.Services
                 try
                 {
                     if (request.Date > DateTime.Now)
-                        throw new Exception("Date không được ở tương lai");
+                        throw new Exception("Ngày không được ở tương lai");
 
                     var warehouse = await _warehouseRepository.GetByCondition(p => p.Id == request.WarehouseId);
                     if (warehouse == null)
-                        throw new Exception("Warehouse không tồn tại");
+                        throw new Exception("Kho không tồn tại");
 
                     var inventoryCount = await _inventoryCountRepository.GetByCondition(x => x.Id == request.InventoryCountId,
                         includeProperties: "InventoryCheckDetails,InventoryCheckDetails.Inventory.Batch.Product");
