@@ -13,6 +13,8 @@ namespace Data.Model.Request.Brand
         [JsonIgnore]
         public string? Id { get; set; }
         [Required]
+        [MaxLength(50, ErrorMessage = "Tên tối đa 50 ký tự.")]
+        [MinLength(3, ErrorMessage = "Tên tối thiểu 3 ký tự.")]
         public string? Name { get; set; }
     }
 }

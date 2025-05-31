@@ -13,11 +13,13 @@ namespace Data.Model.Request.InventoryAdjustment
     {
         [Required(ErrorMessage = "Date không được để trống")]
         public DateTime? Date { get; set; }
-        [Required(ErrorMessage = "Reason không được để trống")]
+        [Required(ErrorMessage = "Lý do không được để trống")]
+        [MaxLength(200, ErrorMessage = "Lý do tối đa 200 ký tự.")]
         public string? Reason { get; set; }
         //[Required(ErrorMessage = "Loại yêu cầu không được để trống.")]
         //public GoodRequestEnum RequestType { get; set; }
         //[Required(ErrorMessage = "Note không được để trống")]
+        [MaxLength(200, ErrorMessage = "Note tối đa 200 ký tự.")]
         public string? Note { get; set; }
         public DocumentType? DocumentType { get; set; }
         public string? RelatedDocument { get; set; }
@@ -49,10 +51,12 @@ namespace Data.Model.Request.InventoryAdjustment
         [Required(ErrorMessage = "Date không được để trống")]
         public DateTime? Date { get; set; }
         [Required(ErrorMessage = "Reason không được để trống")]
+        [MaxLength(200, ErrorMessage = "Lý do tối đa 100 ký tự.")]
         public string? Reason { get; set; }
         //[Required(ErrorMessage = "Loại yêu cầu không được để trống.")]
         //public GoodRequestEnum RequestType { get; set; }
         //[Required(ErrorMessage = "Note không được để trống")]
+        [MaxLength(200, ErrorMessage = "Note tối đa 200 ký tự.")]
         public string? Note { get; set; }
         public DocumentType? DocumentType { get; set; }
         public string? RelatedDocument { get; set; }
@@ -72,6 +76,7 @@ namespace Data.Model.Request.InventoryAdjustment
         [Required(ErrorMessage = "ChangeInQuantity không được để trống")]
         public float ChangeInQuantity { get; set; }
         //[Required(ErrorMessage = "Note không được để trống")]
+        [MaxLength(200, ErrorMessage = "Note tối đa 200 ký tự.")]
         public string? Note { get; set; }
         //public string? ProductId { get; set; }
         [Required(ErrorMessage = "InventoryId không được để trống")]
