@@ -93,7 +93,7 @@ namespace BusinessLogicLayer.Services
                 };
             }
 
-            // 🔥 Tìm warehouse hiện có trong DB
+            // Find all warehouse
             var existingEntity = await _genericRepository.GetByCondition(x => x.Id == updateDto.Id);
             if (existingEntity == null)
             {
@@ -105,7 +105,7 @@ namespace BusinessLogicLayer.Services
                 };
             }
 
-            // 🔥 CHỈ CẬP NHẬT CÁC TRƯỜNG CÓ GIÁ TRỊ (Không ghi đè toàn bộ)
+            // Update
             if (!string.IsNullOrWhiteSpace(updateDto.Name))
             {
                 existingEntity.Name = updateDto.Name;
@@ -422,18 +422,18 @@ namespace BusinessLogicLayer.Services
                     .Search(d =>
                         d.Batch.ProductId == productId &&
                         (
-                            // Xuất: luôn là RequestedWarehouseId
+                            //Issue always RequestedWarehouseId
                             (d.GoodNote.NoteType == GoodNoteEnum.Issue &&
                              d.GoodNote.GoodRequest.RequestedWarehouseId == warehouseId) ||
 
-                            // Nhập:
+                            // Receive:
                             (d.GoodNote.NoteType == GoodNoteEnum.Receive &&
                              (
-                                 // Nếu điều chuyển: nhập về WarehouseId
+                                 // Receive transfer is WarehouseId
                                  (d.GoodNote.GoodRequest.RequestType == GoodRequestEnum.Transfer &&
                                   d.GoodNote.GoodRequest.WarehouseId == warehouseId) ||
 
-                                 // Còn lại: nhập về RequestedWarehouseId
+                                 // Receive RequestedWarehouseId
                                  (d.GoodNote.GoodRequest.RequestType != GoodRequestEnum.Transfer &&
                                   d.GoodNote.GoodRequest.RequestedWarehouseId == warehouseId)
                              ))
@@ -527,7 +527,7 @@ namespace BusinessLogicLayer.Services
             var result = new List<object>();
             var totalByMonth = new Dictionary<float, float>();
 
-            // Lấy toàn bộ GoodNoteDetail kèm GoodNote và GoodRequest
+            //Get al GoodNoteDetail and GoodNote and GoodRequest
             var details = await _unitOfWork.GoodNoteDetailRepository.Search(
                 d => d.GoodNote.CreatedTime.HasValue &&
                      d.GoodNote.CreatedTime.Value.Year == targetYear &&

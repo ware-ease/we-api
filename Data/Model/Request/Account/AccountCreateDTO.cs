@@ -32,19 +32,19 @@ namespace Data.Model.Request.Account
     public class ProfileCreateDTO
     {
         //[Required(ErrorMessage = "Họ là bắt buộc")]
-        //[StringLength(50, ErrorMessage = "Họ không được vượt quá 50 ký tự")]
+        [StringLength(50, ErrorMessage = "Họ không được vượt quá 50 ký tự")]
         public string? FirstName { get; set; }
         //[Required(ErrorMessage = "Tên là bắt buộc")]
-        //[StringLength(50, ErrorMessage = "Tên không được vượt quá 50 ký tự")]
+        [StringLength(50, ErrorMessage = "Tên không được vượt quá 50 ký tự")]
         public string? LastName { get; set; }
         [Phone(ErrorMessage = "Số điện thoại không hợp lệ")]
         //[StringLength(15, ErrorMessage = "Số điện thoại không được vượt quá 15 ký tự")]
         public string? Phone { get; set; }
-        //[StringLength(200, ErrorMessage = "Địa chỉ không được vượt quá 200 ký tự")]
+        [StringLength(200, ErrorMessage = "Địa chỉ không được vượt quá 200 ký tự")]
         public string? Address { get; set; }
         [Required]
         public bool Sex { get; set; }
-        //[StringLength(100, ErrorMessage = "Quốc tịch không được vượt quá 100 ký tự")]
+        [StringLength(100, ErrorMessage = "Quốc tịch không được vượt quá 100 ký tự")]
         public string? Nationality { get; set; }
         public string? AvatarUrl { get; set; }
     }
