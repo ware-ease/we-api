@@ -240,24 +240,24 @@ namespace BusinessLogicLayer.Services
 
             var allDetails = await _unitOfWork.GoodNoteDetailRepository.Search(
                 d =>
-                    // Nếu không lọc theo warehouse
+                    //If warehouseId is null or empty, we consider all warehouses
                     (string.IsNullOrEmpty(warehouseId) ||
 
-                    // Phiếu nhập từ yêu cầu nhập
+                    //Receive notes from requested warehouse
                     (d.GoodNote.NoteType == GoodNoteEnum.Receive &&
                      d.GoodNote.GoodRequest.RequestType == GoodRequestEnum.Receive &&
                      d.GoodNote.GoodRequest.RequestedWarehouseId == warehouseId) ||
 
-                    // Phiếu nhập từ yêu cầu điều chuyển
+                    //Receive notes from transfer to this warehouse
                     (d.GoodNote.NoteType == GoodNoteEnum.Receive &&
                      d.GoodNote.GoodRequest.RequestType == GoodRequestEnum.Transfer &&
                      d.GoodNote.GoodRequest.WarehouseId == warehouseId) ||
 
-                    // Phiếu xuất bất kỳ
+                    //Issue notes from any good requeste
                     (d.GoodNote.NoteType == GoodNoteEnum.Issue &&
                      d.GoodNote.GoodRequest.RequestedWarehouseId == warehouseId))
 
-                    // Trong thời gian tháng trước đến cuối tháng này
+                    //Include only notes created in the last two months
                     && d.GoodNote.CreatedTime >= startOfLastMonth
                     && d.GoodNote.CreatedTime <= endOfMonth,
                 includeProperties: "GoodNote,GoodNote.GoodRequest"
@@ -267,31 +267,31 @@ namespace BusinessLogicLayer.Services
             var currentMonthDetails = allDetails.Where(d => d.GoodNote.CreatedTime >= startOfMonth && d.GoodNote.CreatedTime <= endOfMonth);
             var lastMonthDetails = allDetails.Where(d => d.GoodNote.CreatedTime >= startOfLastMonth && d.GoodNote.CreatedTime <= endOfLastMonth);
 
-            // Hàm tính tổng số lượng theo loại phiếu
+            //function to sum quantities by note type
             float SumByNoteType(IEnumerable<GoodNoteDetail> details, GoodNoteEnum type) =>
                 details.Where(d => d.GoodNote.NoteType == type).Sum(d => d.Quantity);
 
-            // Chuyển kho tính theo phiếu receive thôi để tránh double
+            //function to sum quantities for transfer notes
             float SumTransfer(IEnumerable<GoodNoteDetail> details) =>
                 details
                     .Where(d => d.GoodNote.GoodRequest.RequestType == GoodRequestEnum.Transfer
-                                && d.GoodNote.NoteType == GoodNoteEnum.Receive)
+                                && d.GoodNote.NoteType == GoodNoteEnum.Receive) //Caculate only Receive notes from transfer requests
                     .Sum(d => d.Quantity);
 
-            // Hàm tính phần trăm thay đổi
+            //function to calculate change percent
             double CalcChangePercent(float current, float previous)
             {
                 if (previous == 0) return current == 0 ? 0 : 100;
                 return Math.Round(((double)(current - previous) / previous) * 100, 2);
             }
 
-            // Tháng này
+            //Calculates the total stock change for the current month
             float totalPutIn = SumByNoteType(currentMonthDetails, GoodNoteEnum.Receive);
             float totalTakeOut = SumByNoteType(currentMonthDetails, GoodNoteEnum.Issue);
             float totalTransfer = SumTransfer(currentMonthDetails);
             
 
-            // Tháng trước
+            //Calculates the stock change for the last month
             float lastPutIn = SumByNoteType(lastMonthDetails, GoodNoteEnum.Receive);
             float lastTakeOut = SumByNoteType(lastMonthDetails, GoodNoteEnum.Issue);
             float lastTransfer = SumTransfer(lastMonthDetails);
@@ -750,7 +750,7 @@ namespace BusinessLogicLayer.Services
         }
         public async Task<ServiceResponse> GetStockDistributionByWarehouseAsync(int year, string? half)
         {
-            //Define the start and end dates based on the half parameter
+            //Current period
             DateTime startDate, endDate;
             if (half == "first")
             {
@@ -771,29 +771,23 @@ namespace BusinessLogicLayer.Services
                 };
             }
 
-            //Perform the previous 6 months calculation
+            //Pre period
             DateTime prevStartDate = startDate.AddMonths(-6);
             DateTime prevEndDate = startDate.AddDays(-1).Date.AddHours(23).AddMinutes(59).AddSeconds(59);
 
             var warehouses = await _unitOfWork.WarehouseRepository.Search();
-
             var details = await _unitOfWork.GoodNoteDetailRepository.Search(
                 d => d.GoodNote.CreatedTime.HasValue &&
-                     //d.GoodNote.CreatedTime.Value >= prevStartDate &&
                      d.GoodNote.CreatedTime.Value <= endDate,
                 includeProperties: "GoodNote,GoodNote.GoodRequest"
             );
 
-            var resultList = new List<object>();
-            float totalCurrent = 0;
-            float totalPrev = 0;
-
-            foreach (var warehouse in warehouses)
+            //Caculate stock of curren period
+            var resultList = warehouses.Select(warehouse =>
             {
-                //Calculate stock for the current period
-                var stockInCurrent = details
+                var stockIn = details
                     .Where(d =>
-                        //d.GoodNote.CreatedTime.Value >= startDate &&
+                        d.GoodNote.CreatedTime.Value >= startDate &&
                         d.GoodNote.CreatedTime.Value <= endDate &&
                         d.GoodNote.NoteType == GoodNoteEnum.Receive &&
                         (
@@ -804,9 +798,9 @@ namespace BusinessLogicLayer.Services
                         )
                     ).Sum(d => d.Quantity);
 
-                var stockOutCurrent = details
+                var stockOut = details
                     .Where(d =>
-                        //d.GoodNote.CreatedTime.Value >= startDate &&
+                        d.GoodNote.CreatedTime.Value >= startDate &&
                         d.GoodNote.CreatedTime.Value <= endDate &&
                         d.GoodNote.NoteType == GoodNoteEnum.Issue &&
                         (
@@ -817,46 +811,48 @@ namespace BusinessLogicLayer.Services
                         )
                     ).Sum(d => d.Quantity);
 
-                float currentStock = stockInCurrent - stockOutCurrent;
-                totalCurrent += currentStock;
+                float currentStock = stockIn - stockOut;
 
-                //Calculate stock for the previous period
-                var stockInPrev = details
-                    .Where(d =>
-                        //d.GoodNote.CreatedTime.Value >= prevStartDate &&
-                        d.GoodNote.CreatedTime.Value <= prevEndDate &&
-                        d.GoodNote.NoteType == GoodNoteEnum.Receive &&
-                        (
-                            (d.GoodNote.GoodRequest.RequestType == GoodRequestEnum.Transfer &&
-                             d.GoodNote.GoodRequest.WarehouseId == warehouse.Id) ||
-                            (d.GoodNote.GoodRequest.RequestType == GoodRequestEnum.Receive &&
-                             d.GoodNote.GoodRequest.RequestedWarehouseId == warehouse.Id)
-                        )
-                    ).Sum(d => d.Quantity);
-
-                var stockOutPrev = details
-                    .Where(d =>
-                        //d.GoodNote.CreatedTime.Value >= prevStartDate &&
-                        d.GoodNote.CreatedTime.Value <= prevEndDate &&
-                        d.GoodNote.NoteType == GoodNoteEnum.Issue &&
-                        (
-                            (d.GoodNote.GoodRequest.RequestType == GoodRequestEnum.Transfer &&
-                             d.GoodNote.GoodRequest.RequestedWarehouseId == warehouse.Id) ||
-                            (d.GoodNote.GoodRequest.RequestType == GoodRequestEnum.Issue &&
-                             d.GoodNote.GoodRequest.RequestedWarehouseId == warehouse.Id)
-                        )
-                    ).Sum(d => d.Quantity);
-
-                float prevStock = stockInPrev - stockOutPrev;
-                totalPrev += prevStock;
-
-                resultList.Add(new
+                return new
                 {
                     Warehouse = warehouse.Name,
-                    Quantity = currentStock,
-                    Percent = totalCurrent == 0 ? 0 : Math.Round((currentStock / totalCurrent) * 100, 2),
-                });
-            }
+                    Quantity = currentStock
+                };
+            }).ToList();
+
+            float totalCurrent = resultList.Sum(r => r.Quantity);
+
+            //Caculate stock of previous period
+            float totalPrev = warehouses.Sum(warehouse =>
+            {
+                var stockIn = details
+                    .Where(d =>
+                        d.GoodNote.CreatedTime.Value >= prevStartDate &&
+                        d.GoodNote.CreatedTime.Value <= prevEndDate &&
+                        d.GoodNote.NoteType == GoodNoteEnum.Receive &&
+                        (
+                            (d.GoodNote.GoodRequest.RequestType == GoodRequestEnum.Transfer &&
+                             d.GoodNote.GoodRequest.WarehouseId == warehouse.Id) ||
+                            (d.GoodNote.GoodRequest.RequestType == GoodRequestEnum.Receive &&
+                             d.GoodNote.GoodRequest.RequestedWarehouseId == warehouse.Id)
+                        )
+                    ).Sum(d => d.Quantity);
+
+                var stockOut = details
+                    .Where(d =>
+                        d.GoodNote.CreatedTime.Value >= prevStartDate &&
+                        d.GoodNote.CreatedTime.Value <= prevEndDate &&
+                        d.GoodNote.NoteType == GoodNoteEnum.Issue &&
+                        (
+                            (d.GoodNote.GoodRequest.RequestType == GoodRequestEnum.Transfer &&
+                             d.GoodNote.GoodRequest.RequestedWarehouseId == warehouse.Id) ||
+                            (d.GoodNote.GoodRequest.RequestType == GoodRequestEnum.Issue &&
+                             d.GoodNote.GoodRequest.RequestedWarehouseId == warehouse.Id)
+                        )
+                    ).Sum(d => d.Quantity);
+
+                return stockIn - stockOut;
+            });
 
             double changePercent = 0;
             if (totalPrev == 0)
@@ -868,6 +864,14 @@ namespace BusinessLogicLayer.Services
                 changePercent = ((double)(totalCurrent - totalPrev) / totalPrev) * 100;
             }
 
+            //
+            var finalResult = resultList.Select(x => new
+            {
+                x.Warehouse,
+                x.Quantity,
+                Percent = totalCurrent > 0 ? Math.Round((x.Quantity / totalCurrent) * 100, 2) : 0
+            }).ToList();
+
             return new ServiceResponse
             {
                 Status = SRStatus.Success,
@@ -876,10 +880,11 @@ namespace BusinessLogicLayer.Services
                 {
                     TotalStock = totalCurrent,
                     ChangePercent = Math.Round(changePercent, 2),
-                    Warehouses = resultList
+                    Warehouses = finalResult
                 }
             };
         }
+
 
         public async Task<ServiceResponse> GetStockPieChartByWarehouseAsync(string warehouseId, int year, string? half)
         {
