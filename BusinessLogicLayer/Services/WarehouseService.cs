@@ -258,13 +258,15 @@ namespace BusinessLogicLayer.Services
                      d.GoodNote.GoodRequest.RequestedWarehouseId == warehouseId))
 
                     //Include only notes created in the last two months
-                    && d.GoodNote.CreatedTime >= startOfLastMonth
+                    //&& d.GoodNote.CreatedTime >= startOfLastMonth
                     && d.GoodNote.CreatedTime <= endOfMonth,
                 includeProperties: "GoodNote,GoodNote.GoodRequest"
             );
 
 
             var currentMonthDetails = allDetails.Where(d => d.GoodNote.CreatedTime >= startOfMonth && d.GoodNote.CreatedTime <= endOfMonth);
+
+            //last month details is all details created <= endOfLastMonth
             var lastMonthDetails = allDetails.Where(d => d.GoodNote.CreatedTime >= startOfLastMonth && d.GoodNote.CreatedTime <= endOfLastMonth);
 
             //function to sum quantities by note type
@@ -285,18 +287,21 @@ namespace BusinessLogicLayer.Services
                 return Math.Round(((double)(current - previous) / previous) * 100, 2);
             }
 
-            //Calculates the total stock change for the current month
+            //Calculates the total put in take out and transfer for the current month
             float totalPutIn = SumByNoteType(currentMonthDetails, GoodNoteEnum.Receive);
             float totalTakeOut = SumByNoteType(currentMonthDetails, GoodNoteEnum.Issue);
             float totalTransfer = SumTransfer(currentMonthDetails);
             
 
-            //Calculates the stock change for the last month
+            //Calculates the total put in takout out and transfer for the last month
             float lastPutIn = SumByNoteType(lastMonthDetails, GoodNoteEnum.Receive);
             float lastTakeOut = SumByNoteType(lastMonthDetails, GoodNoteEnum.Issue);
             float lastTransfer = SumTransfer(lastMonthDetails);
-            float lastStockChange = lastPutIn - lastTakeOut;
-            float currentStockChange = lastStockChange + totalPutIn - totalTakeOut;
+
+            //Calculates the total stock
+            var totalStockOfLastMonth = allDetails.Where(d =>/* d.GoodNote.CreatedTime >= startOfLastMonth && */d.GoodNote.CreatedTime <= endOfLastMonth);
+            float lastStockChange = /*lastPutIn - lastTakeOut;*/+SumByNoteType(totalStockOfLastMonth, GoodNoteEnum.Receive) - SumByNoteType(totalStockOfLastMonth, GoodNoteEnum.Issue);
+            float currentStockChange = lastStockChange + totalPutIn - totalTakeOut; 
 
             return new ServiceResponse
             {
@@ -1027,7 +1032,7 @@ namespace BusinessLogicLayer.Services
         {
             try
             {
-                // 1. Lấy thông tin kho
+                // Get warehouse
                 var warehouse = await _unitOfWork.WarehouseRepository.GetByCondition(w => w.Id == warehouseId, includeProperties: "AccountWarehouses,AccountWarehouses.Account,AccountWarehouses.Account.Profile");
                 if (warehouse == null)
                     return new ServiceResponse { Status = SRStatus.Error, Message = "Không tìm thấy kho." };
@@ -1036,20 +1041,20 @@ namespace BusinessLogicLayer.Services
                 var startDate = new DateTime(year, month, 1);
                 var endDate = startDate.AddMonths(1);
 
-                // 2. Lấy tất cả các GoodNoteDetail liên quan đến kho này (cả nhập và xuất)
+                //Get all GoodNoteDetails for the warehouse in the specified month
                 var allDetails = await _unitOfWork.GoodNoteDetailRepository.Search(
                     d =>
-                        d.GoodNote.CreatedTime >= startDate.AddMonths(-1) &&
+                        //d.GoodNote.CreatedTime >= startDate.AddMonths(-1) &&
                         d.GoodNote.CreatedTime < endDate &&
                         (
-                            // Nhập vào RequestedWarehouse
+                            //Receive
                             (d.GoodNote.NoteType == GoodNoteEnum.Receive && (
                                     (d.GoodNote.GoodRequest.RequestType == GoodRequestEnum.Transfer &&
                                      d.GoodNote.GoodRequest.WarehouseId == warehouseId) ||
                                     (d.GoodNote.GoodRequest.RequestType != GoodRequestEnum.Transfer &&
                                      d.GoodNote.GoodRequest.RequestedWarehouseId == warehouseId)
                                 )) ||
-                            // Xuất: điều chuyển từ WarehouseId
+                            //Issue
                             (d.GoodNote.NoteType == GoodNoteEnum.Issue &&
                                 (
                                     (d.GoodNote.GoodRequest.RequestType == GoodRequestEnum.Transfer &&
@@ -1064,7 +1069,7 @@ namespace BusinessLogicLayer.Services
                 var sortedDetails = allDetails.OrderBy(d => d.GoodNote.CreatedTime).ThenBy(d => d.GoodNote.Code).ToList();
 
                 var result = new List<object>();
-                var stockMap = new Dictionary<string, float>(); // batchId -> tồn
+                var stockMap = new Dictionary<string, float>(); 
 
                 foreach (var detail in sortedDetails)
                 {
