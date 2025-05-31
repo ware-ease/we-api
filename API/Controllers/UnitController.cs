@@ -67,7 +67,7 @@ namespace API.Controllers
             return ControllerResponse.Response(new ServiceResponse
             {
                 Status = Data.Enum.SRStatus.Success,
-                Message = "Unit đã tạo thành công",
+                Message = "Đơn vị đã tạo thành công",
                 Data = result
             });
         }
@@ -83,7 +83,7 @@ namespace API.Controllers
                 return ControllerResponse.Response(new ServiceResponse
                 {
                     Status = Data.Enum.SRStatus.Success,
-                    Message = "Unit đã sửa thành công",
+                    Message = "Đơn vị đã sửa thành công",
                     Data = updatedUnit
                 });
             }

@@ -90,7 +90,7 @@ namespace API.Controllers
                 return ControllerResponse.Response(new ServiceResponse
                 {
                     Status = Data.Enum.SRStatus.Success,
-                    Message = "Supplier update thành công",
+                    Message = "Nhà cung cấp đã cập nhật thành công",
                     Data = result
                 });
             }

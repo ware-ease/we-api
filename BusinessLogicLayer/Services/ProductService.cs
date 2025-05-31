@@ -72,7 +72,7 @@ namespace BusinessLogicLayer.Services
             return new ServiceResponse
             {
                 Status = Data.Enum.SRStatus.Success,
-                Message = "Get thành công!",
+                Message = "Lấy thành công!",
                 Data = mappedResults
             };
         }
@@ -89,7 +89,7 @@ namespace BusinessLogicLayer.Services
                 return new ServiceResponse
                 {
                     Status = Data.Enum.SRStatus.NotFound,
-                    Message = "Product không tìm thấy!",
+                    Message = "Sản phẩm không tìm thấy!",
                     Data = id
                 };
             }
@@ -99,7 +99,7 @@ namespace BusinessLogicLayer.Services
             return new ServiceResponse
             {
                 Status = Data.Enum.SRStatus.Success,
-                Message = "Get thành công!",
+                Message = "Lấy thành công!",
                 Data = result
             };
         }
@@ -115,7 +115,7 @@ namespace BusinessLogicLayer.Services
             return new ServiceResponse
             {
                 Status = Data.Enum.SRStatus.Success,
-                Message = "Get thành công!",
+                Message = "Lấy thành công!",
                 Data = products
             };
         }
@@ -128,15 +128,15 @@ namespace BusinessLogicLayer.Services
 
             var productType = await _productTypeRepository.GetByCondition(p => p.Id == request.ProductTypeId);
             if (productType == null)
-                throw new Exception("ProductType không tồn tại");
+                throw new Exception("Loại sản phẩm không tồn tại");
 
             var brand = await _brandRepository.GetByCondition(p => p.Id == request.BrandId);
             if (brand == null)
-                throw new Exception("Brand không tồn tại");
+                throw new Exception("Hãng không tồn tại");
 
             var unit = await _unitRepository.GetByCondition(p => p.Id == request.UnitId);
             if (unit == null)
-                throw new Exception("Unit không tồn tại");
+                throw new Exception("Đơn vị không tồn tại");
 
 
             var product = _mapper.Map<Product>(request);
@@ -158,7 +158,7 @@ namespace BusinessLogicLayer.Services
         {
             var product = await _productRepository.GetFullProductById(id);
             if (product == null)
-                throw new Exception("Product không tìm thấy");
+                throw new Exception("Sản phẩm không tìm thấy");
             return _mapper.Map<ProductDTO>(product);
         }
 
@@ -167,7 +167,7 @@ namespace BusinessLogicLayer.Services
         {
             var existingProduct = await _productRepository.GetByCondition(p => p.Id == request.Id);
             if (existingProduct == null)
-                throw new Exception("Product không tìm thấy");
+                throw new Exception("Sản phẩm không tìm thấy");
 
             if (!string.IsNullOrEmpty(request.Name))
             {
@@ -195,7 +195,7 @@ namespace BusinessLogicLayer.Services
             {
                 var productType = await _productTypeRepository.GetByCondition(p => p.Id == request.ProductTypeId);
                 if (productType == null)
-                    throw new Exception("ProductType không tìm thấy");
+                    throw new Exception("Loại sản phẩm không tìm thấy");
                 existingProduct.ProductTypeId = request.ProductTypeId;
             }
 
@@ -203,7 +203,7 @@ namespace BusinessLogicLayer.Services
             {
                 var brand = await _brandRepository.GetByCondition(p => p.Id == request.BrandId);
                 if (brand == null)
-                    throw new Exception("Brand không tìm thấy");
+                    throw new Exception("Hãng không tìm thấy");
                 existingProduct.BrandId = request.BrandId;
             }
 
@@ -211,7 +211,7 @@ namespace BusinessLogicLayer.Services
             {
                 var unit = await _unitRepository.GetByCondition(p => p.Id == request.UnitId);
                 if (unit == null)
-                    throw new Exception("Unit không tìm thấy");
+                    throw new Exception("Đơn vị không tìm thấy");
                 existingProduct.UnitId = request.UnitId;
             }
 
@@ -224,7 +224,7 @@ namespace BusinessLogicLayer.Services
             var updatedProduct = await _productRepository.GetByCondition(p => p.Id == existingProduct.Id,
                 includeProperties: "ProductType,Brand,Unit");
             if (updatedProduct == null)
-                throw new Exception("Update lỗi, product không được tìm thấy sau khi update");
+                throw new Exception("Cập nhật lỗi, sản phẩm không được tìm thấy sau khi cập nhật");
 
             return _mapper.Map<ProductDTO>(updatedProduct);
         }
@@ -255,7 +255,7 @@ namespace BusinessLogicLayer.Services
             return new ServiceResponse
             {
                 Status = Data.Enum.SRStatus.Success,
-                Message = "Search successful!",
+                Message = "Tìm kiếm thành công!",
                 Data = new
                 {
                     TotalRecords = totalRecords,

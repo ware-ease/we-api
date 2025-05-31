@@ -76,7 +76,7 @@ namespace API.Controllers
                 return ControllerResponse.Response(new ServiceResponse
                 {
                     Status = SRStatus.Success,
-                    Message = "InventoryAdjustment đã tạo thành công",
+                    Message = "Phiếu điều chỉnh đã tạo thành công",
                     Data = respones
                 });
             }

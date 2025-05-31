@@ -68,7 +68,7 @@ namespace BusinessLogicLayer.Services
                 return new ServiceResponse
                 {
                     Status = Data.Enum.SRStatus.NotFound,
-                    Message = "InventoryCount not found!",
+                    Message = "Phiếu kiểm kê không tồn tại!",
                     Data = id
                 };
             }
@@ -78,7 +78,7 @@ namespace BusinessLogicLayer.Services
             return new ServiceResponse
             {
                 Status = Data.Enum.SRStatus.Success,
-                Message = "Get successfully!",
+                Message = "Lấy thành công!",
                 Data = result
             };
         }
@@ -89,7 +89,7 @@ namespace BusinessLogicLayer.Services
                 throw new Exception("Date không được ở tương lai");*/
 
             if (request.EndTime < request.StartTime)
-                throw new Exception("EndTime không được ở trước StartTime");
+                throw new Exception("Ngày kết thúc không được ở trước ngày bắt đầu");
 
             /*var schedule = await _scheduleRepository.GetByCondition(p => p.Id == request.ScheduleId);
             if (schedule == null)
@@ -152,10 +152,10 @@ namespace BusinessLogicLayer.Services
                     var employeeAccountIds = new List<string>();
                     var account = await _accountRepository.GetByCondition(a => a.Id == detail.AccountId);
                     if (account == null)
-                        throw new Exception($"Account với ID {detail.AccountId} không tồn tại");
+                        throw new Exception($"Tài khoản với ID {detail.AccountId} không tồn tại");
                     var accountGroup = await _accountGroupRepository.GetByCondition(ag => ag.AccountId == detail.AccountId && ag.GroupId == "3");
                     if (accountGroup == null)
-                        throw new Exception($"Account với ID {detail.AccountId} không thuộc nhân viên kho");
+                        throw new Exception($"Tài khoản với ID {detail.AccountId} không thuộc nhân viên kho");
 
                     employeeAccountIds.Add(detail.AccountId);
 
@@ -164,7 +164,7 @@ namespace BusinessLogicLayer.Services
                         throw new Exception($"Inventory với ID {detail.InventoryId} không tồn tại");
 
                     if (inventoryCount.Schedule.WarehouseId != inventory.WarehouseId)
-                        throw new Exception("Inventory phải nằm trong đúng Warehouse");
+                        throw new Exception("Inventory phải nằm trong đúng kho");
 
                     var inventoryCountDetail = _mapper.Map<InventoryCountDetail>(detail);
                     inventoryCountDetail.InventoryCountId = inventoryCount.Id;
@@ -193,7 +193,7 @@ namespace BusinessLogicLayer.Services
                 includeProperties: "InventoryCheckDetails");
 
             if (existingInventoryCount == null)
-                throw new Exception("InventoryCount không tìm thấy");
+                throw new Exception("Phiếu kiểm kê không tìm thấy");
 
             /*if (request.Status.HasValue)
                 existingInventoryCount.Status = request.Status.Value;*/
@@ -355,7 +355,7 @@ namespace BusinessLogicLayer.Services
             );
 
             if (updatedInventoryCount == null)
-                throw new Exception("Update lỗi, InventoryCount không được tìm thấy sau khi update");
+                throw new Exception("Cập nhật lỗi, phiếu kiểm kê không được tìm thấy sau khi cập nhật");
 
             return _mapper.Map<InventoryCountDTO>(updatedInventoryCount);
 

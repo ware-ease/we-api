@@ -42,7 +42,7 @@ namespace API.Controllers
             {
                 Data = count,
                 Status = SRStatus.Success,
-                Message = "Total product count retrieved successfully"
+                Message = "Tổng số sản phẩm được đếm thành công"
             };
 
             return ControllerResponse.Response(response);
@@ -106,7 +106,7 @@ namespace API.Controllers
                 return ControllerResponse.Response(new ServiceResponse
                 {
                     Status = SRStatus.Success,
-                    Message = "Product đã tạo thành công",
+                    Message = "Sản phẩm đã tạo thành công",
                     Data = productDTO
                 });
             }
@@ -132,7 +132,7 @@ namespace API.Controllers
                 return ControllerResponse.Response(new ServiceResponse
                 {
                     Status = Data.Enum.SRStatus.Success,
-                    Message = "Product đã sửa thành công",
+                    Message = "Sản phẩm đã cập nhật thành công",
                     Data = updatedProduct
                 });
             }

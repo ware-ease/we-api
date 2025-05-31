@@ -64,7 +64,7 @@ namespace BusinessLogicLayer.Services
             return new ServiceResponse
             {
                 Status = Data.Enum.SRStatus.Success,
-                Message = "Get successfully!",
+                Message = "Lấy thành công!",
                 Data = mappedResults
             };
         }
@@ -78,7 +78,7 @@ namespace BusinessLogicLayer.Services
                 return new ServiceResponse
                 {
                     Status = Data.Enum.SRStatus.NotFound,
-                    Message = "Batch not found!",
+                    Message = "Lô không tồn tại!",
                     Data = id
                 };
             }
@@ -88,7 +88,7 @@ namespace BusinessLogicLayer.Services
             return new ServiceResponse
             {
                 Status = Data.Enum.SRStatus.Success,
-                Message = "Get successfully!",
+                Message = "Lấy thành công!",
                 Data = result
             };
         }
@@ -98,7 +98,7 @@ namespace BusinessLogicLayer.Services
 
             var product = await _productRepository.GetByCondition(p => p.Id == request.ProductId);
             if (product == null)
-                throw new Exception("Product không tồn tại");
+                throw new Exception("Sản phẩm không tồn tại");
 
             if (request.InboundDate >= DateOnly.FromDateTime(DateTime.Now))
                 throw new Exception("InboundDate không được đặt ở tương lai");
@@ -111,11 +111,11 @@ namespace BusinessLogicLayer.Services
             try
             {
                 var userIds = (await _accountGroupRepository.GetAllNoPaging(x => x.GroupId == "4")).Select(x => x.AccountId).Distinct().ToList();
-                await _firebaseService.SendNotificationToUsersAsync(userIds, "Batch mới vừa được tạo.", $"Batch Code: {batch.Code}", NotificationType.BATCH_CREATED, null);
+                await _firebaseService.SendNotificationToUsersAsync(userIds, "Lô mới vừa được tạo.", $"Mã lô: {batch.Code}", NotificationType.BATCH_CREATED, null);
             }
             catch
             {
-                throw new Exception("Lỗi khi gửi thông báo batch");
+                throw new Exception("Lỗi khi gửi thông báo lô");
             }
 
 
@@ -126,20 +126,20 @@ namespace BusinessLogicLayer.Services
         {
             var existingBatch = await _batchRepository.GetByCondition(p => p.Id == request.Id);
             if (existingBatch == null)
-                throw new Exception("Batch not found");
+                throw new Exception("Lô không tồn tại");
 
             if (!string.IsNullOrEmpty(request.SupplierId))
             {
                 var supplier = await _partnerRepository.GetByCondition(p => p.Id == request.SupplierId);
                 if (supplier == null)
-                    throw new Exception("Supplier not found");
+                    throw new Exception("Người cung cấp không tồn tại");
                 existingBatch.SupplierId = request.SupplierId;
             }
             if (!string.IsNullOrEmpty(request.ProductId))
             {
                 var product = await _productRepository.GetByCondition(p => p.Id == request.ProductId);
                 if (product == null)
-                    throw new Exception("Product not found");
+                    throw new Exception("Sản phẩm không tồn tại");
                 existingBatch.ProductId = request.ProductId;
             }
 
@@ -170,7 +170,7 @@ namespace BusinessLogicLayer.Services
 
             var updatedBatch = await _batchRepository.GetByCondition(p => p.Id == existingBatch.Id);
             if (updatedBatch == null)
-                throw new Exception("Update failed, batch not found after update");
+                throw new Exception("Cập nhật thất bại, lô không tìm thấy sau khi tồn tại");
 
             try
             {
@@ -180,11 +180,11 @@ namespace BusinessLogicLayer.Services
                 .Select(x => x.AccountId)
                 .Distinct()
                 .ToList();
-                await _firebaseService.SendNotificationToUsersAsync(userIds, "Batch mới được chỉnh sửa.", $"Batch Code: {updatedBatch.Code}", NotificationType.BATCH_CREATED, null);
+                await _firebaseService.SendNotificationToUsersAsync(userIds, "Lô mới được chỉnh sửa.", $"Mã lô: {updatedBatch.Code}", NotificationType.BATCH_CREATED, null);
             }
             catch
             {
-                throw new Exception("Lỗi khi gửi thông báo batch");
+                throw new Exception("Lỗi khi gửi thông báo lô");
             }
 
             return _mapper.Map<BatchDTO>(updatedBatch);
@@ -215,7 +215,7 @@ namespace BusinessLogicLayer.Services
             return new ServiceResponse
             {
                 Status = Data.Enum.SRStatus.Success,
-                Message = "Search successful!",
+                Message = "Tìm kiếm thành công!",
                 Data = new
                 {
                     TotalRecords = totalRecords,
