@@ -30,6 +30,8 @@ namespace Data.Model.DTO
         public string BatchId { get; set; }
         public string BatchCode { get; set; }
         public string ProductName { get; set; }
+        public string ProductSku { get; set; }
+        public string UnitName { get; set; }
     }
 
     public class InventoryCountResponesDTO : BaseDTO

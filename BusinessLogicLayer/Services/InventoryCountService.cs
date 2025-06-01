@@ -60,7 +60,7 @@ namespace BusinessLogicLayer.Services
         {
             var inventoryCount = await _genericRepository.GetByCondition(
                 p => p.Id == id,
-                includeProperties: "InventoryCheckDetails"
+                includeProperties: "InventoryCheckDetails,Schedule.Warehouse,InventoryCheckDetails.Inventory.Batch.Product.Unit"
             );
 
             if (inventoryCount == null)
@@ -391,7 +391,7 @@ namespace BusinessLogicLayer.Services
 
             var results = await _genericRepository.Search(
                 filter: filter, pageIndex: pageIndex, pageSize: pageSize,
-                includeProperties: "InventoryCheckDetails,Schedule.Warehouse,InventoryCheckDetails.Inventory.Batch.Product");
+                includeProperties: "InventoryCheckDetails,Schedule.Warehouse,InventoryCheckDetails.Inventory.Batch.Product.Unit");
 
             var mappedResults = _mapper.Map<List<InventoryCountDTO>>(results);
             
