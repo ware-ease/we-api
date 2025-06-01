@@ -159,6 +159,8 @@ namespace BusinessLogicLayer.Mappings
                 .ForMember(dest => dest.BatchId, opt => opt.MapFrom(src => src.Inventory.BatchId))
                 .ForMember(dest => dest.BatchCode, opt => opt.MapFrom(src => src.Inventory.Batch.Code))
                 .ForMember(dest => dest.ProductName, opt => opt.MapFrom(src => src.Inventory.Batch.Product.Name))
+                .ForMember(dest => dest.ProductSku, opt => opt.MapFrom(src => src.Inventory.Batch.Product.Sku))
+                .ForMember(dest => dest.UnitName, opt => opt.MapFrom(src => $"{src.Inventory.Batch.Product.Unit.Name} {src.Inventory.Batch.Product.Unit.Note}".Trim()))
                 .ReverseMap();
 
             CreateMap<InventoryCountDetail, InventoryCountDetailCreateDTO>().ReverseMap();
