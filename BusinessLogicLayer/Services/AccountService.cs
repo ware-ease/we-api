@@ -378,7 +378,8 @@ namespace BusinessLogicLayer.Services
             var results = await _unitOfWork.InventoryCountRepository.Search(
                 filter: filter,
                 pageIndex: pageIndex, pageSize: pageSize,
-                includeProperties: "InventoryCheckDetails,Schedule.Warehouse,InventoryCheckDetails.Inventory.Batch.Product.Unit");
+                includeProperties: "InventoryCheckDetails,Schedule.Warehouse,InventoryCheckDetails.Inventory.Batch.Product.Unit," +
+                "InventoryCheckDetails.Inventory.Batch.Product,InventoryCheckDetails.Inventory.Batch");
 
             var mappedResults = _mapper.Map<List<InventoryCountDTO>>(results);
 
