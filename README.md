@@ -326,7 +326,3 @@ Swagger UI hỗ trợ:
   - `BatchCheckService`: kiểm tra định kỳ các lô hàng (`Batch`) sắp/đã hết hạn để cảnh báo.
 - **Generic Repository & UnitOfWork pattern**: hầu hết entity dùng `IGenericRepository<T>` cho thao tác CRUD cơ bản, kết hợp `IUnitOfWork` để đảm bảo tính nhất quán giao dịch (transaction) khi thao tác trên nhiều bảng.
 - Múi giờ container được set cố định là `Asia/Ho_Chi_Minh` trong Dockerfile.
-
----
-
-*File README này được tạo dựa trên việc phân tích trực tiếp mã nguồn trong file `we-api.zip` (cấu trúc thư mục, `Program.cs`, các Controller, Entity, Dockerfile và GitHub Actions). Nếu dự án có thêm tài liệu nghiệp vụ chi tiết (ERD, đặc tả API đầy đủ từng field), nên bổ sung thêm vào các mục tương ứng.*
